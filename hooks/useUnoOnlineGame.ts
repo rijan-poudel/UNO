@@ -7,6 +7,11 @@ import type { Card, CardColor } from '../types/card';
 import type { GameRules } from '../types/rules';
 import type { Ack, MultiplayerAction, RoomSnapshot } from '../types/multiplayer';
 import { getPlayableCards } from '../lib/gameRules';
+import { getBotMove, getBotPreferredColor } from '../lib/botSupport';
+
+const HUMAN_IDLE_TIMEOUT_MS = 12000;
+const HUMAN_IDLE_AFTER_DRAW_TIMEOUT_MS = 4500;
+const HUMAN_IDLE_WILD_PICK_TIMEOUT_MS = 3500;
 
 interface FeedState {
   room: RoomSnapshot | null;
@@ -276,6 +281,59 @@ export function useUnoOnlineGame() {
       error: null,
     }));
   }, []);
+
+  useEffect(() => {
+    if (!state.connected || !game || game.winnerId || !localPlayer || !isLocalTurn) return;
+
+    const timeoutMs = state.pendingWild
+      ? HUMAN_IDLE_WILD_PICK_TIMEOUT_MS
+      : state.drawnThisTurn
+        ? HUMAN_IDLE_AFTER_DRAW_TIMEOUT_MS
+        : HUMAN_IDLE_TIMEOUT_MS;
+
+    const timer = setTimeout(() => {
+      // Wild chosen but color not confirmed: auto-pick preferred color.
+      if (state.pendingWild) {
+        const color = getBotPreferredColor(localPlayer.hand);
+        setState((prev) => ({ ...prev, pendingWild: null }));
+        void sendAction({ type: 'play', cardId: state.pendingWild.id, chosenColor: color });
+        return;
+      }
+
+      // If player already drew this turn, auto-play if possible; else auto-pass.
+      if (state.drawnThisTurn) {
+        const move = getBotMove(game, localPlayerIndex);
+        if (move.action === 'play') {
+          void sendAction({ type: 'play', cardId: move.cardId, chosenColor: move.chosenColor });
+          return;
+        }
+
+        void sendAction({ type: 'pass' });
+        return;
+      }
+
+      // Normal turn auto-resolution.
+      const move = getBotMove(game, localPlayerIndex);
+      if (move.action === 'play') {
+        void sendAction({ type: 'play', cardId: move.cardId, chosenColor: move.chosenColor });
+      } else if (move.action === 'drawRequired' || move.action === 'draw') {
+        void sendAction({ type: 'draw' });
+      } else {
+        void sendAction({ type: 'pass' });
+      }
+    }, timeoutMs);
+
+    return () => clearTimeout(timer);
+  }, [
+    state.connected,
+    state.pendingWild,
+    state.drawnThisTurn,
+    game,
+    localPlayer,
+    localPlayerIndex,
+    isLocalTurn,
+    sendAction,
+  ]);
 
   const startGame = useCallback(() => {
     // No-op for compatibility with GameBoard typing.

@@ -15,13 +15,6 @@ interface GameBoardProps {
   onOpenSettings: () => void;
 }
 
-const COLOR_META: Record<string, { label: string; bg: string; fg: string }> = {
-  red:    { label: 'RED',    bg: '#c0392b', fg: '#fff8f0' },
-  yellow: { label: 'YELLOW', bg: '#d4a017', fg: '#1a0f00' },
-  green:  { label: 'GREEN',  bg: '#1e6b3a', fg: '#f0fff4' },
-  blue:   { label: 'BLUE',   bg: '#1a4f8a', fg: '#f0f6ff' },
-};
-
 const COLOR_ORDER: Record<string, number> = { red: 0, yellow: 1, green: 2, blue: 3, wild: 4 };
 const VALUE_ORDER: Record<string, number> = {
   '0':0,'1':1,'2':2,'3':3,'4':4,'5':5,'6':6,'7':7,'8':8,'9':9,
@@ -241,6 +234,8 @@ export default function GameBoard({ gameApi, onReset, onOpenSettings }: GameBoar
   const [feed, setFeed] = useState<FeedEntry[]>([]);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
   const [isPortraitMobile, setIsPortraitMobile] = useState(false);
+  const [isCompactBoard, setIsCompactBoard] = useState(false);
+  const [boardScale, setBoardScale] = useState(1);
   const feedCounter = useRef(0);
   const prevLogRef = useRef<string[]>([]);
 
@@ -261,18 +256,24 @@ export default function GameBoard({ gameApi, onReset, onOpenSettings }: GameBoar
   }, [log]);
 
   useEffect(() => {
-    const updateOrientationState = () => {
+    const updateLayoutState = () => {
       const portrait = window.matchMedia('(orientation: portrait)').matches;
       const mobileLike = Math.min(window.innerWidth, window.innerHeight) <= 900;
+      const shortViewport = window.innerHeight < 760;
+      const narrowViewport = window.innerWidth < 1100;
+      const tinyViewport = window.innerHeight < 680;
+
       setIsPortraitMobile(portrait && mobileLike);
+      setIsCompactBoard(shortViewport || narrowViewport);
+      setBoardScale(tinyViewport ? 0.82 : (shortViewport || narrowViewport) ? 0.9 : 1);
     };
 
-    updateOrientationState();
-    window.addEventListener('resize', updateOrientationState);
-    window.addEventListener('orientationchange', updateOrientationState);
+    updateLayoutState();
+    window.addEventListener('resize', updateLayoutState);
+    window.addEventListener('orientationchange', updateLayoutState);
     return () => {
-      window.removeEventListener('resize', updateOrientationState);
-      window.removeEventListener('orientationchange', updateOrientationState);
+      window.removeEventListener('resize', updateLayoutState);
+      window.removeEventListener('orientationchange', updateLayoutState);
     };
   }, []);
 
@@ -282,9 +283,10 @@ export default function GameBoard({ gameApi, onReset, onOpenSettings }: GameBoar
   const winner       = game.winnerId ? game.players.find(p => p.id === game.winnerId) : null;
   const humanTurn    = isLocalTurn && !localPlayer.isBot && !game.winnerId;
   const drawDisabled = botThinking || !!game.winnerId || (drawnThisTurn && game.pendingDraw === 0) || !humanTurn;
-  const activeColor  = game.activeColor ? COLOR_META[game.activeColor] : null;
   const sortedHand   = sortHand(localPlayer.hand);
   const opponents    = game.players.filter((_, i) => i !== localPlayerIndex);
+  const pileCardScale = boardScale;
+  const handCardScale = boardScale < 1 ? 0.95 : 1.12;
 
   const unoReady  = humanTurn && localPlayer.hand.length >= 1 && localPlayer.hand.length <= 2 && !localPlayer.saidUno && game.rules.mustDeclareUno;
   const passReady = humanTurn && canPass;
@@ -376,14 +378,14 @@ export default function GameBoard({ gameApi, onReset, onOpenSettings }: GameBoar
         {/* ── Floating top bar: logo left, menu right ── */}
         <div style={{
           position: 'absolute', top: 0, left: 0, right: 0, zIndex: 30,
-          padding: '10px 12px',
+          padding: isCompactBoard ? '6px 8px' : '10px 12px',
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
           pointerEvents: 'none',
         }}>
           <h1 style={{
-            margin: 10, pointerEvents: 'auto',
+            margin: isCompactBoard ? 6 : 10, pointerEvents: 'auto',
             fontFamily: "'Bebas Neue', cursive",
-            fontSize: 28, letterSpacing: '0.02em', lineHeight: 1,
+            fontSize: isCompactBoard ? 24 : 28, letterSpacing: '0.02em', lineHeight: 1,
           }}>
             <span style={{ color: '#c0392b' }}>U</span>
             <span style={{ color: '#d4a017' }}>N</span>
@@ -394,23 +396,23 @@ export default function GameBoard({ gameApi, onReset, onOpenSettings }: GameBoar
               onClick={onOpenSettings}
               style={{
                 fontFamily: "'Courier Prime', monospace",
-                fontSize: 10,
+                fontSize: isCompactBoard ? 9 : 10,
                 fontWeight: 700,
                 letterSpacing: '0.14em',
                 textTransform: 'uppercase',
                 background: 'rgba(255,248,240,0.9)',
                 border: '1px solid rgba(26,15,0,0.18)',
                 color: 'rgba(26,15,0,0.4)',
-                padding: '6px 11px',
+                padding: isCompactBoard ? '5px 9px' : '6px 11px',
                 cursor: 'pointer',
                 transition: 'color 0.12s',
               }}
             >SETTINGS</button>
             <button className="menu-btn" onClick={() => setShowExitConfirm(true)} style={{
               fontFamily: "'Courier Prime', monospace",
-              fontSize: 10, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase',
+              fontSize: isCompactBoard ? 9 : 10, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase',
               background: 'rgba(255,248,240,0.9)', border: '1px solid rgba(26,15,0,0.18)',
-              color: 'rgba(26,15,0,0.4)', padding: '6px 11px', cursor: 'pointer',
+              color: 'rgba(26,15,0,0.4)', padding: isCompactBoard ? '5px 9px' : '6px 11px', cursor: 'pointer',
               transition: 'color 0.12s',
             }}>MENU</button>
           </div>
@@ -420,12 +422,12 @@ export default function GameBoard({ gameApi, onReset, onOpenSettings }: GameBoar
             OPPONENTS — flush to top with pt for the logo bar
         ════════════════════════════════════════ */}
         <section style={{
-          paddingTop: 44,          /* just enough to clear the floating logo */
-          paddingBottom: 8,
+          paddingTop: isCompactBoard ? 32 : 44,
+          paddingBottom: isCompactBoard ? 4 : 8,
           paddingInline: 12,
           display: 'flex',
           flexWrap: 'wrap',
-          gap: '8px 20px',
+          gap: isCompactBoard ? '4px 14px' : '8px 20px',
           justifyContent: 'center',
           alignItems: 'flex-start',
           flexShrink: 0,
@@ -454,8 +456,8 @@ export default function GameBoard({ gameApi, onReset, onOpenSettings }: GameBoar
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          gap: 12,
-          padding: '0 16px',
+          gap: isCompactBoard ? 6 : 12,
+          padding: isCompactBoard ? '0 8px' : '0 16px',
           overflow: 'hidden',
         }}>
 
@@ -491,7 +493,7 @@ export default function GameBoard({ gameApi, onReset, onOpenSettings }: GameBoar
           </div> */}
 
           {/* Draw pile + discard pile — ONE of each, side by side */}
-          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 32 }}>
+          <div style={{ display: 'flex', alignItems: 'flex-end', gap: isCompactBoard ? 14 : 32 }}>
 
             {/* Draw pile */}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
@@ -519,7 +521,7 @@ export default function GameBoard({ gameApi, onReset, onOpenSettings }: GameBoar
                   transition: 'filter 0.2s, opacity 0.2s, transform 0.12s',
                 }}
               >
-                <UnoCard card={{ id: '_draw', color: 'wild', value: 'wild' }} faceDown />
+                <UnoCard card={{ id: '_draw', color: 'wild', value: 'wild' }} faceDown sizeMultiplier={pileCardScale} />
               </button>
               <span style={{
                 fontFamily: "'Courier Prime', monospace", fontSize: 10,
@@ -528,7 +530,7 @@ export default function GameBoard({ gameApi, onReset, onOpenSettings }: GameBoar
             </div>
 
             {/* Thin divider */}
-            <div style={{ width: 1, height: 70, background: 'rgba(26,15,0,0.1)', alignSelf: 'center' }} />
+            <div style={{ width: 1, height: isCompactBoard ? 54 : 70, background: 'rgba(26,15,0,0.1)', alignSelf: 'center' }} />
 
             {/* Discard pile — only here, nowhere else */}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
@@ -539,7 +541,7 @@ export default function GameBoard({ gameApi, onReset, onOpenSettings }: GameBoar
               }}>DISCARD</span>
               {topDiscard && (
                 <div key={topDiscard.id} style={{ animation: 'cardIn 0.18s ease' }}>
-                  <UnoCard card={topDiscard} />
+                  <UnoCard card={topDiscard} sizeMultiplier={pileCardScale} />
                 </div>
               )}
             </div>
@@ -587,10 +589,12 @@ export default function GameBoard({ gameApi, onReset, onOpenSettings }: GameBoar
         <section style={{
           flexShrink: 0,
           borderTop: '1px solid rgba(26,15,0,0.1)',
-          padding: '10px 12px 20px',   /* 20px bottom = breathing room from edge */
+          padding: isCompactBoard ? '6px 8px 8px' : '10px 12px 20px',
+          maxHeight: isCompactBoard ? '38dvh' : '44dvh',
+          overflow: 'hidden',
           display: 'flex',
           flexDirection: 'column',
-          gap: 8,
+          gap: isCompactBoard ? 4 : 8,
         }}>
 
           {/* Player name + status + secondary actions */}
@@ -600,11 +604,11 @@ export default function GameBoard({ gameApi, onReset, onOpenSettings }: GameBoar
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <span style={{
-                fontFamily: "'Bebas Neue', cursive", fontSize: 20,
+                fontFamily: "'Bebas Neue', cursive", fontSize: isCompactBoard ? 17 : 20,
                 letterSpacing: '0.05em', color: '#1a0f00',
               }}>{localPlayer.name}</span>
               <span style={{
-                fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase',
+                fontSize: isCompactBoard ? 9 : 10, letterSpacing: '0.12em', textTransform: 'uppercase',
                 color: 'rgba(26,15,0,0.28)',
               }}>{humanTurn ? '— your turn' : '— waiting'}</span>
               {localPlayer.saidUno && localPlayer.hand.length <= 2 && (
@@ -623,9 +627,9 @@ export default function GameBoard({ gameApi, onReset, onOpenSettings }: GameBoar
                 onClick={unoReady ? () => sayUno(localPlayerIndex) : undefined}
                 disabled={!unoReady}
                 style={{
-                  fontFamily: "'Bebas Neue', cursive", fontSize: 18, letterSpacing: '0.1em',
+                  fontFamily: "'Bebas Neue', cursive", fontSize: isCompactBoard ? 15 : 18, letterSpacing: '0.1em',
                   background: '#c0392b', color: '#fff8f0',
-                  border: '2px solid #922b21', padding: '6px 14px',
+                  border: '2px solid #922b21', padding: isCompactBoard ? '4px 10px' : '6px 14px',
                   cursor: unoReady ? 'pointer' : 'default',
                   opacity: unoReady ? 1 : 0.28,
                   animation: unoReady ? 'blink 1.4s ease-in-out infinite' : 'none',
@@ -637,9 +641,9 @@ export default function GameBoard({ gameApi, onReset, onOpenSettings }: GameBoar
                 onClick={passReady ? pass : undefined}
                 disabled={!passReady}
                 style={{
-                  fontFamily: "'Bebas Neue', cursive", fontSize: 18, letterSpacing: '0.1em',
+                  fontFamily: "'Bebas Neue', cursive", fontSize: isCompactBoard ? 15 : 18, letterSpacing: '0.1em',
                   background: 'transparent', color: 'rgba(26,15,0,0.55)',
-                  border: '2px solid rgba(26,15,0,0.22)', padding: '6px 14px',
+                  border: '2px solid rgba(26,15,0,0.22)', padding: isCompactBoard ? '4px 10px' : '6px 14px',
                   cursor: passReady ? 'pointer' : 'default',
                   opacity: passReady ? 1 : 0.28,
                   transition: 'opacity 0.12s',
@@ -654,10 +658,10 @@ export default function GameBoard({ gameApi, onReset, onOpenSettings }: GameBoar
               alignItems: 'flex-end',
               justifyContent: 'center',
               minWidth: 'max-content',
-              paddingInline: 16,
-              paddingTop: 20,       /* room for upward arc lift */
-              paddingBottom: 20,
-              minHeight: '8rem',
+              paddingInline: isCompactBoard ? 8 : 16,
+              paddingTop: isCompactBoard ? 10 : 20,
+              paddingBottom: isCompactBoard ? 8 : 20,
+              minHeight: isCompactBoard ? '6.1rem' : '8rem',
             }}>
               {sortedHand.map((card, i) => {
                 const playable  = humanTurn && !botThinking && playableCardIds.has(card.id);
@@ -674,7 +678,7 @@ export default function GameBoard({ gameApi, onReset, onOpenSettings }: GameBoar
                     key={card.id}
                     className={playable ? 'playable-card' : ''}
                     style={{
-                      marginLeft: i === 0 ? 0 : -20,
+                      marginLeft: i === 0 ? 0 : (isCompactBoard ? -26 : -20),
                       zIndex: i,
                       position: 'relative',
                       // Arc: rotate around bottom-centre + lift edge cards down
@@ -691,6 +695,7 @@ export default function GameBoard({ gameApi, onReset, onOpenSettings }: GameBoar
                   >
                     <UnoCard
                       card={card}
+                      sizeMultiplier={handCardScale}
                       isPlayable={playable}
                       isSelected={isSelected}
                       onClick={undefined}
@@ -706,7 +711,7 @@ export default function GameBoard({ gameApi, onReset, onOpenSettings }: GameBoar
           <p style={{
             margin: 0, textAlign: 'center',
             fontFamily: "'Courier Prime', monospace",
-            fontSize: 10, letterSpacing: '0.08em', textTransform: 'uppercase',
+            fontSize: isCompactBoard ? 9 : 10, letterSpacing: '0.08em', textTransform: 'uppercase',
             color: 'rgba(26,15,0,0.24)',
           }}>{hint}</p>
 
