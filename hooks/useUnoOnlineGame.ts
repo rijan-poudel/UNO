@@ -1,0 +1,314 @@
+'use client';
+
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { io, type Socket } from 'socket.io-client';
+import type { GameState } from '../types/game';
+import type { Card, CardColor } from '../types/card';
+import type { GameRules } from '../types/rules';
+import type { Ack, MultiplayerAction, RoomSnapshot } from '../types/multiplayer';
+import { getPlayableCards } from '../lib/gameRules';
+
+interface FeedState {
+  room: RoomSnapshot | null;
+  game: GameState | null;
+  playerId: string | null;
+  pendingWild: Card | null;
+  drawnThisTurn: boolean;
+  log: string[];
+  error: string | null;
+  connected: boolean;
+}
+
+function describeAction(game: GameState): string {
+  const action = game.lastAction;
+  const name = (id: string) => game.players.find((p) => p.id === id)?.name ?? id;
+
+  switch (action.type) {
+    case 'play':
+      return `${name(action.playerId)} played ${action.card.color} ${action.card.value}${
+        action.chosenColor ? ` -> chose ${action.chosenColor}` : ''
+      }`;
+    case 'draw':
+      return `${name(action.playerId)} drew ${action.count} card${action.count !== 1 ? 's' : ''}`;
+    case 'pass':
+      return `${name(action.playerId)} passed`;
+    case 'declareUno':
+      return `${name(action.playerId)} said UNO`;
+    case 'callOut':
+      return `${name(action.callerId)} called out ${name(action.targetId)}`;
+    default:
+      return 'Game started';
+  }
+}
+
+export function useUnoOnlineGame() {
+  const socketRef = useRef<Socket | null>(null);
+  const [state, setState] = useState<FeedState>({
+    room: null,
+    game: null,
+    playerId: null,
+    pendingWild: null,
+    drawnThisTurn: false,
+    log: [],
+    error: null,
+    connected: false,
+  });
+
+  const previousTurnRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    const socketUrl =
+      process.env.NEXT_PUBLIC_SOCKET_URL
+      ?? `${window.location.protocol}//${window.location.hostname}:3001`;
+
+    const socket = io(socketUrl, {
+      transports: ['websocket'],
+    });
+
+    socketRef.current = socket;
+
+    socket.on('connect', () => {
+      setState((prev) => ({ ...prev, connected: true, error: null }));
+    });
+
+    socket.on('disconnect', () => {
+      setState((prev) => ({ ...prev, connected: false }));
+    });
+
+    socket.on('room:update', (room: RoomSnapshot) => {
+      setState((prev) => {
+        let nextLog = prev.log;
+        if (room.game) {
+          const actionLine = describeAction(room.game);
+          nextLog = [actionLine, ...prev.log.filter((entry) => entry !== actionLine)].slice(0, 30);
+        }
+
+        let drawnThisTurn = prev.drawnThisTurn;
+        if (room.game) {
+          const turn = room.game.turnCount;
+          if (previousTurnRef.current !== null && previousTurnRef.current !== turn) {
+            drawnThisTurn = false;
+          }
+
+          const localIndex = prev.playerId
+            ? room.game.players.findIndex((p) => p.id === prev.playerId)
+            : -1;
+          if (
+            localIndex >= 0 &&
+            room.game.lastAction.type === 'draw' &&
+            room.game.lastAction.playerId === prev.playerId &&
+            room.game.pendingDraw === 0 &&
+            room.game.currentPlayerIndex === localIndex
+          ) {
+            drawnThisTurn = true;
+          }
+
+          if (room.game.lastAction.type === 'play' || room.game.lastAction.type === 'pass') {
+            drawnThisTurn = false;
+          }
+
+          previousTurnRef.current = turn;
+        }
+
+        return {
+          ...prev,
+          room,
+          game: room.game,
+          log: nextLog,
+          drawnThisTurn,
+          error: null,
+        };
+      });
+    });
+
+    return () => {
+      socket.disconnect();
+      socketRef.current = null;
+    };
+  }, []);
+
+  const callAck = useCallback(<T,>(event: string, payload: object): Promise<Ack<T>> => {
+    const socket = socketRef.current;
+    if (!socket) return Promise.resolve({ ok: false, error: 'Socket not connected.' });
+
+    return new Promise((resolve) => {
+      socket.emit(event, payload, (ack: Ack<T>) => resolve(ack));
+    });
+  }, []);
+
+  const createRoom = useCallback(async (playerName: string) => {
+    const ack = await callAck<{ room: RoomSnapshot; playerId: string }>('room:create', { playerName });
+    if (!ack.ok) {
+      setState((prev) => ({ ...prev, error: ack.error }));
+      return false;
+    }
+
+    setState((prev) => ({
+      ...prev,
+      room: ack.data.room,
+      game: ack.data.room.game,
+      playerId: ack.data.playerId,
+      error: null,
+      log: ['Room created'],
+    }));
+    return true;
+  }, [callAck]);
+
+  const joinRoom = useCallback(async (roomId: string, playerName: string) => {
+    const ack = await callAck<{ room: RoomSnapshot; playerId: string }>('room:join', { roomId, playerName });
+    if (!ack.ok) {
+      setState((prev) => ({ ...prev, error: ack.error }));
+      return false;
+    }
+
+    setState((prev) => ({
+      ...prev,
+      room: ack.data.room,
+      game: ack.data.room.game,
+      playerId: ack.data.playerId,
+      error: null,
+      log: [`Joined room ${ack.data.room.roomId}`],
+    }));
+    return true;
+  }, [callAck]);
+
+  const startOnlineGame = useCallback(async (rules: Partial<GameRules>) => {
+    if (!state.room) return false;
+    const ack = await callAck<{ room: RoomSnapshot }>('room:start', { roomId: state.room.roomId, rules });
+    if (!ack.ok) {
+      setState((prev) => ({ ...prev, error: ack.error }));
+      return false;
+    }
+
+    setState((prev) => ({
+      ...prev,
+      room: ack.data.room,
+      game: ack.data.room.game,
+      error: null,
+      log: ['Game started', ...prev.log].slice(0, 30),
+    }));
+    return true;
+  }, [callAck, state.room]);
+
+  const sendAction = useCallback(async (action: MultiplayerAction) => {
+    if (!state.room) return;
+    const ack = await callAck<{ room: RoomSnapshot }>('game:action', {
+      roomId: state.room.roomId,
+      action,
+    });
+
+    if (!ack.ok) {
+      setState((prev) => ({ ...prev, error: ack.error }));
+    }
+  }, [callAck, state.room]);
+
+  const game = state.game;
+  const localPlayerIndex = useMemo(() => {
+    if (!game || !state.playerId) return 0;
+    const idx = game.players.findIndex((p) => p.id === state.playerId);
+    return idx >= 0 ? idx : 0;
+  }, [game, state.playerId]);
+
+  const currentPlayer = game?.players[game.currentPlayerIndex] ?? null;
+  const localPlayer = game?.players[localPlayerIndex] ?? null;
+  const isLocalTurn = !!game && game.currentPlayerIndex === localPlayerIndex;
+
+  const playableCardIds = new Set(
+    game && localPlayer && isLocalTurn
+      ? getPlayableCards(localPlayer.hand, game, localPlayerIndex).map((c) => c.id)
+      : [],
+  );
+
+  const canPass = state.drawnThisTurn && (game?.pendingDraw ?? 0) === 0;
+  const hasPendingStackOption = !!(
+    game && localPlayer && isLocalTurn && game.pendingDraw > 0 && playableCardIds.size > 0
+  );
+
+  const selectCard = useCallback((card: Card) => {
+    if (!game) return;
+    if (card.color === 'wild') {
+      setState((prev) => ({ ...prev, pendingWild: card }));
+      return;
+    }
+    void sendAction({ type: 'play', cardId: card.id });
+  }, [game, sendAction]);
+
+  const confirmWildColor = useCallback((color: CardColor) => {
+    setState((prev) => {
+      if (!prev.pendingWild) return prev;
+      void sendAction({ type: 'play', cardId: prev.pendingWild.id, chosenColor: color });
+      return { ...prev, pendingWild: null };
+    });
+  }, [sendAction]);
+
+  const cancelWild = useCallback(() => {
+    setState((prev) => ({ ...prev, pendingWild: null }));
+  }, []);
+
+  const drawCard = useCallback(() => {
+    void sendAction({ type: 'draw' });
+  }, [sendAction]);
+
+  const pass = useCallback(() => {
+    void sendAction({ type: 'pass' });
+  }, [sendAction]);
+
+  const sayUno = useCallback(() => {
+    void sendAction({ type: 'sayUno' });
+  }, [sendAction]);
+
+  const callOut = useCallback((_callerIndex: number, targetIndex: number) => {
+    if (!game) return;
+    const target = game.players[targetIndex];
+    if (!target) return;
+    void sendAction({ type: 'callOut', targetPlayerId: target.id });
+  }, [game, sendAction]);
+
+  const resetGame = useCallback(() => {
+    setState((prev) => ({
+      ...prev,
+      room: null,
+      game: null,
+      playerId: null,
+      pendingWild: null,
+      drawnThisTurn: false,
+      log: [],
+      error: null,
+    }));
+  }, []);
+
+  const startGame = useCallback(() => {
+    // No-op for compatibility with GameBoard typing.
+  }, []);
+
+  return {
+    game,
+    localPlayerIndex,
+    pendingWild: state.pendingWild,
+    drawnThisTurn: state.drawnThisTurn,
+    botThinking: false,
+    log: state.log,
+    currentPlayer,
+    localPlayer,
+    isLocalTurn,
+    playableCardIds,
+    canPass,
+    hasPendingStackOption,
+    startGame,
+    selectCard,
+    confirmWildColor,
+    cancelWild,
+    drawCard,
+    pass,
+    sayUno,
+    callOut,
+    resetGame,
+    connected: state.connected,
+    room: state.room,
+    playerId: state.playerId,
+    error: state.error,
+    createRoom,
+    joinRoom,
+    startOnlineGame,
+  };
+}
