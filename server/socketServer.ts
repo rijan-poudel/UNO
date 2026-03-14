@@ -45,6 +45,7 @@ function isAllowedOrigin(origin: string): boolean {
 
 interface ServerRoomPlayer extends RoomPlayer {
   socketId: string;
+  deviceId: string;
 }
 
 interface ServerRoom {
@@ -246,8 +247,9 @@ io.on('connection', (socket) => {
   socket.on('room:create', (payload: CreateRoomPayload, reply?: (ack: Ack<{ room: RoomSnapshot; playerId: string }>) => void) => {
     try {
       const playerName = payload.playerName?.trim();
-      if (!playerName) {
-        reply?.(ackError('Player name is required.'));
+      const deviceId = payload.deviceId?.trim();
+      if (!playerName || !deviceId) {
+        reply?.(ackError('Player name and device id are required.'));
         return;
       }
 
@@ -265,7 +267,7 @@ io.on('connection', (socket) => {
       const room: ServerRoom = {
         roomId,
         hostPlayerId: playerId,
-        players: [{ playerId, socketId: socket.id, name: playerName, connected: true }],
+        players: [{ playerId, socketId: socket.id, name: playerName, connected: true, deviceId }],
         started: false,
         game: null,
       };
@@ -285,8 +287,9 @@ io.on('connection', (socket) => {
     try {
       const playerName = payload.playerName?.trim();
       const roomId = payload.roomId?.trim().toUpperCase();
-      if (!playerName || !roomId) {
-        reply?.(ackError('Room code and player name are required.'));
+      const deviceId = payload.deviceId?.trim();
+      if (!playerName || !roomId || !deviceId) {
+        reply?.(ackError('Room code, player name and device id are required.'));
         return;
       }
 
@@ -304,13 +307,33 @@ io.on('connection', (socket) => {
         reply?.(ackError('Game already started for this room.'));
         return;
       }
+
+      const existingPlayerForDevice = room.players.find((p) => p.deviceId === deviceId);
+      if (existingPlayerForDevice) {
+        if (existingPlayerForDevice.connected) {
+          reply?.(ackError('This device is already connected in the room.'));
+          return;
+        }
+
+        existingPlayerForDevice.socketId = socket.id;
+        existingPlayerForDevice.connected = true;
+        existingPlayerForDevice.name = playerName;
+
+        playerBySocket.set(socket.id, { roomId, playerId: existingPlayerForDevice.playerId });
+        socket.join(roomId);
+
+        reply?.({ ok: true, data: { room: toSnapshot(room), playerId: existingPlayerForDevice.playerId } });
+        broadcastRoom(io, room);
+        return;
+      }
+
       if (room.players.length >= MAX_ROOM_PLAYERS) {
         reply?.(ackError('Room is full.'));
         return;
       }
 
       const playerId = makeNextPlayerId(room.players);
-      room.players.push({ playerId, socketId: socket.id, name: playerName, connected: true });
+      room.players.push({ playerId, socketId: socket.id, name: playerName, connected: true, deviceId });
       playerBySocket.set(socket.id, { roomId, playerId });
       socket.join(roomId);
 

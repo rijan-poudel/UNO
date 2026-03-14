@@ -4,13 +4,11 @@ import { useEffect, useState } from 'react';
 import type { GameRules } from '../types/rules';
 import { useUnoGame } from '../hooks/useUnoGame';
 import { useUnoOnlineGame } from '../hooks/useUnoOnlineGame';
-import GameSetup from '../components/GameSetup';
 import GameBoard from '../components/GameBoard';
 import OnlineLobby from '../components/OnlineLobby';
 import SettingsModal from '../components/SettingsModal';
 
 const SHARED_RULES_KEY = 'uno.shared.rules';
-const PREFERRED_MODE_KEY = 'uno.preferred.mode';
 const PREFERRED_THEME_KEY = 'uno.preferred.theme';
 
 type ThemeName = 'paper' | 'midnight' | 'forest' | 'sunset';
@@ -101,16 +99,6 @@ function getInitialSharedRules(): Partial<GameRules> {
   }
 }
 
-function getInitialMode(): 'local' | 'online' {
-  if (typeof window === 'undefined') return 'local';
-  try {
-    const raw = window.localStorage.getItem(PREFERRED_MODE_KEY);
-    return raw === 'online' ? 'online' : 'local';
-  } catch {
-    return 'local';
-  }
-}
-
 function getInitialTheme(): ThemeName {
   if (typeof window === 'undefined') return 'paper';
   try {
@@ -127,14 +115,14 @@ function getInitialTheme(): ThemeName {
  * level ensures both children share the same state instance.
  */
 export default function Home() {
-  const [mode, setMode] = useState<'local' | 'online'>(getInitialMode);
+  const [activeGameMode, setActiveGameMode] = useState<'online' | 'computer'>('online');
   const [theme, setTheme] = useState<ThemeName>(getInitialTheme);
   const [showSettings, setShowSettings] = useState(false);
   const [sharedRules, setSharedRules] = useState<Partial<GameRules>>(getInitialSharedRules);
 
   const localGameApi = useUnoGame();
   const onlineGameApi = useUnoOnlineGame();
-  const gameApi = mode === 'online' ? onlineGameApi : localGameApi;
+  const gameApi = activeGameMode === 'computer' ? localGameApi : onlineGameApi;
 
   useEffect(() => {
     try {
@@ -143,14 +131,6 @@ export default function Home() {
       // Ignore storage errors.
     }
   }, [sharedRules]);
-
-  useEffect(() => {
-    try {
-      window.localStorage.setItem(PREFERRED_MODE_KEY, mode);
-    } catch {
-      // Ignore storage errors.
-    }
-  }, [mode]);
 
   useEffect(() => {
     try {
@@ -175,50 +155,11 @@ export default function Home() {
   const setupControls = (
     <div style={{
       display: 'flex',
-      justifyContent: 'space-between',
+      justifyContent: 'flex-end',
       alignItems: 'center',
       gap: 12,
       flexWrap: 'wrap',
     }}>
-      <div style={{
-        display: 'inline-flex',
-        border: '1px solid var(--ui-line)',
-        background: 'var(--ui-surface)',
-      }}>
-        <button
-          type="button"
-          onClick={() => setMode('local')}
-          style={{
-            border: 'none',
-            background: mode === 'local' ? 'var(--ui-text)' : 'transparent',
-            color: mode === 'local' ? 'var(--ui-surface)' : 'var(--ui-text)',
-            padding: '8px 12px',
-            cursor: 'pointer',
-            fontSize: 11,
-            letterSpacing: '0.08em',
-            textTransform: 'uppercase',
-          }}
-        >
-          Play Local
-        </button>
-        <button
-          type="button"
-          onClick={() => setMode('online')}
-          style={{
-            border: 'none',
-            background: mode === 'online' ? 'var(--ui-text)' : 'transparent',
-            color: mode === 'online' ? 'var(--ui-surface)' : 'var(--ui-text)',
-            padding: '8px 12px',
-            cursor: 'pointer',
-            fontSize: 11,
-            letterSpacing: '0.08em',
-            textTransform: 'uppercase',
-          }}
-        >
-          Play Online
-        </button>
-      </div>
-
       <button
         type="button"
         onClick={cycleTheme}
@@ -258,26 +199,24 @@ export default function Home() {
   if (!gameApi.game) {
     return (
       <>
-        {mode === 'local' ? (
-          <GameSetup
-            controls={setupControls}
-            onStart={(names, botFlags) =>
-              localGameApi.startGame(names, sharedRules, botFlags)
-            }
-          />
-        ) : (
-          <OnlineLobby
-            controls={setupControls}
-            connected={onlineGameApi.connected}
-            room={onlineGameApi.room}
-            playerId={onlineGameApi.playerId}
-            error={onlineGameApi.error}
-            onCreateRoom={onlineGameApi.createRoom}
-            onJoinRoom={onlineGameApi.joinRoom}
-            onStartGame={() => onlineGameApi.startOnlineGame(sharedRules)}
-            onKickPlayer={onlineGameApi.kickPlayer}
-          />
-        )}
+        <OnlineLobby
+          controls={setupControls}
+          connected={onlineGameApi.connected}
+          room={onlineGameApi.room}
+          playerId={onlineGameApi.playerId}
+          error={onlineGameApi.error}
+          onCreateRoom={onlineGameApi.createRoom}
+          onJoinRoom={onlineGameApi.joinRoom}
+          onStartGame={() => {
+            setActiveGameMode('online');
+            return onlineGameApi.startOnlineGame(sharedRules);
+          }}
+          onPlayWithComputer={(playerName) => {
+            setActiveGameMode('computer');
+            localGameApi.startGame([playerName, 'Computer'], sharedRules, [false, true]);
+          }}
+          onKickPlayer={onlineGameApi.kickPlayer}
+        />
 
         <SettingsModal
           open={showSettings}
@@ -293,7 +232,10 @@ export default function Home() {
     <>
       <GameBoard
         gameApi={gameApi as ReturnType<typeof useUnoGame>}
-        onReset={() => gameApi.resetGame()}
+        onReset={() => {
+          gameApi.resetGame();
+          setActiveGameMode('online');
+        }}
         onOpenSettings={() => setShowSettings(true)}
         onCycleTheme={cycleTheme}
         currentThemeLabel={THEMES[theme].label}

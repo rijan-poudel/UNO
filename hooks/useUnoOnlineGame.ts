@@ -12,6 +12,101 @@ import { getBotMove, getBotPreferredColor } from '../lib/botSupport';
 const HUMAN_IDLE_TIMEOUT_MS = 12000;
 const HUMAN_IDLE_AFTER_DRAW_TIMEOUT_MS = 4500;
 const HUMAN_IDLE_WILD_PICK_TIMEOUT_MS = 3500;
+const ONLINE_DEVICE_ID_KEY = 'uno.online.deviceId';
+const ONLINE_RECENT_ROOMS_KEY = 'uno.online.recentRooms';
+const MAX_RECENT_ROOMS = 8;
+
+interface RecentRoomEntry {
+  roomId: string;
+  label: string;
+  lastVisitedAt: number;
+  lastPlayerName: string;
+}
+
+function getOrCreateDeviceId(): string {
+  if (typeof window === 'undefined') return 'server-device';
+
+  try {
+    const existing = window.localStorage.getItem(ONLINE_DEVICE_ID_KEY);
+    if (existing && existing.trim()) return existing.trim();
+
+    const generated = typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+      ? crypto.randomUUID()
+      : `device-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+    window.localStorage.setItem(ONLINE_DEVICE_ID_KEY, generated);
+    return generated;
+  } catch {
+    return `device-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+  }
+}
+
+function loadRecentRooms(): RecentRoomEntry[] {
+  if (typeof window === 'undefined') return [];
+
+  try {
+    const raw = window.localStorage.getItem(ONLINE_RECENT_ROOMS_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw) as unknown;
+    if (!Array.isArray(parsed)) return [];
+
+    return parsed
+      .filter((item): item is RecentRoomEntry => {
+        if (typeof item !== 'object' || item === null) return false;
+        const candidate = item as Partial<RecentRoomEntry>;
+        return typeof candidate.roomId === 'string'
+          && typeof candidate.label === 'string'
+          && typeof candidate.lastVisitedAt === 'number'
+          && typeof candidate.lastPlayerName === 'string';
+      })
+      .map((item) => ({
+        roomId: item.roomId.trim().toUpperCase().slice(0, 6),
+        label: item.label.trim(),
+        lastVisitedAt: item.lastVisitedAt,
+        lastPlayerName: item.lastPlayerName.trim(),
+      }))
+      .filter((item) => Boolean(item.roomId))
+      .sort((a, b) => b.lastVisitedAt - a.lastVisitedAt)
+      .slice(0, MAX_RECENT_ROOMS);
+  } catch {
+    return [];
+  }
+}
+
+function saveRecentRooms(entries: RecentRoomEntry[]) {
+  if (typeof window === 'undefined') return;
+
+  try {
+    window.localStorage.setItem(
+      ONLINE_RECENT_ROOMS_KEY,
+      JSON.stringify(entries.slice(0, MAX_RECENT_ROOMS)),
+    );
+  } catch {
+    // Ignore storage errors.
+  }
+}
+
+function rememberStartedRoom(room: RoomSnapshot, playerId: string | null) {
+  if (typeof window === 'undefined') return;
+  if (!room.roomId || !room.started || !room.game || !playerId) return;
+
+  const localPlayer = room.players.find((player) => player.playerId === playerId);
+  const playerName = localPlayer?.name?.trim() || 'Player';
+  const now = Date.now();
+  const prev = loadRecentRooms();
+  const existing = prev.find((entry) => entry.roomId === room.roomId);
+
+  const nextEntries = [
+    {
+      roomId: room.roomId,
+      label: existing?.label ?? '',
+      lastVisitedAt: now,
+      lastPlayerName: playerName,
+    },
+    ...prev.filter((entry) => entry.roomId !== room.roomId),
+  ].slice(0, MAX_RECENT_ROOMS);
+
+  saveRecentRooms(nextEntries);
+}
 
 interface FeedState {
   room: RoomSnapshot | null;
@@ -48,6 +143,8 @@ function describeAction(game: GameState): string {
 
 export function useUnoOnlineGame() {
   const socketRef = useRef<Socket | null>(null);
+  const [deviceId] = useState<string>(getOrCreateDeviceId);
+  const startedRoomHistoryRef = useRef<Set<string>>(new Set());
   const [state, setState] = useState<FeedState>({
     room: null,
     game: null,
@@ -145,6 +242,14 @@ export function useUnoOnlineGame() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!state.room?.roomId || !state.room.started || !state.room.game || !state.playerId) return;
+    if (startedRoomHistoryRef.current.has(state.room.roomId)) return;
+
+    rememberStartedRoom(state.room, state.playerId);
+    startedRoomHistoryRef.current.add(state.room.roomId);
+  }, [state.room, state.playerId]);
+
   const callAck = useCallback(<T,>(event: string, payload: object): Promise<Ack<T>> => {
     const socket = socketRef.current;
     if (!socket) return Promise.resolve({ ok: false, error: 'Socket not connected.' });
@@ -155,7 +260,7 @@ export function useUnoOnlineGame() {
   }, []);
 
   const createRoom = useCallback(async (playerName: string) => {
-    const ack = await callAck<{ room: RoomSnapshot; playerId: string }>('room:create', { playerName });
+    const ack = await callAck<{ room: RoomSnapshot; playerId: string }>('room:create', { playerName, deviceId });
     if (!ack.ok) {
       setState((prev) => ({ ...prev, error: ack.error }));
       return false;
@@ -170,10 +275,10 @@ export function useUnoOnlineGame() {
       log: ['Room created'],
     }));
     return true;
-  }, [callAck]);
+  }, [callAck, deviceId]);
 
   const joinRoom = useCallback(async (roomId: string, playerName: string) => {
-    const ack = await callAck<{ room: RoomSnapshot; playerId: string }>('room:join', { roomId, playerName });
+    const ack = await callAck<{ room: RoomSnapshot; playerId: string }>('room:join', { roomId, playerName, deviceId });
     if (!ack.ok) {
       setState((prev) => ({ ...prev, error: ack.error }));
       return false;
@@ -188,7 +293,7 @@ export function useUnoOnlineGame() {
       log: [`Joined room ${ack.data.room.roomId}`],
     }));
     return true;
-  }, [callAck]);
+  }, [callAck, deviceId]);
 
   const startOnlineGame = useCallback(async (rules: Partial<GameRules>) => {
     if (!state.room) return false;

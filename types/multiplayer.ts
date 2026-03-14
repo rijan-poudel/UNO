@@ -25,11 +25,13 @@ export type MultiplayerAction =
 
 export interface CreateRoomPayload {
   playerName: string;
+  deviceId: string;
 }
 
 export interface JoinRoomPayload {
   roomId: string;
   playerName: string;
+  deviceId: string;
 }
 
 export interface StartRoomPayload {
