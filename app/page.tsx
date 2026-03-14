@@ -11,6 +11,71 @@ import SettingsModal from '../components/SettingsModal';
 
 const SHARED_RULES_KEY = 'uno.shared.rules';
 const PREFERRED_MODE_KEY = 'uno.preferred.mode';
+const PREFERRED_THEME_KEY = 'uno.preferred.theme';
+
+type ThemeName = 'paper' | 'midnight' | 'forest' | 'sunset';
+
+const THEMES: Record<ThemeName, {
+  label: string;
+  vars: Record<string, string>;
+}> = {
+  paper: {
+    label: 'Light',
+    vars: {
+      '--ui-bg': '#fafafa',
+      '--ui-surface': '#ffffff',
+      '--ui-text': '#212121',
+      '--ui-muted': 'rgba(33,33,33,0.54)',
+      '--ui-line': 'rgba(0,0,0,0.12)',
+      '--ui-accent-red': '#e53935',
+      '--ui-accent-yellow': '#f9a825',
+      '--ui-accent-green': '#43a047',
+      '--ui-accent-blue': '#1e88e5',
+    },
+  },
+  midnight: {
+    label: 'Dark',
+    vars: {
+      '--ui-bg': '#121212',
+      '--ui-surface': '#1e1e1e',
+      '--ui-text': '#e0e0e0',
+      '--ui-muted': 'rgba(224,224,224,0.6)',
+      '--ui-line': 'rgba(255,255,255,0.12)',
+      '--ui-accent-red': '#ef5350',
+      '--ui-accent-yellow': '#fdd835',
+      '--ui-accent-green': '#66bb6a',
+      '--ui-accent-blue': '#42a5f5',
+    },
+  },
+  forest: {
+    label: 'Teal',
+    vars: {
+      '--ui-bg': '#e0f2f1',
+      '--ui-surface': '#ffffff',
+      '--ui-text': '#004d40',
+      '--ui-muted': 'rgba(0,77,64,0.6)',
+      '--ui-line': 'rgba(0,77,64,0.15)',
+      '--ui-accent-red': '#e53935',
+      '--ui-accent-yellow': '#f9a825',
+      '--ui-accent-green': '#00897b',
+      '--ui-accent-blue': '#1e88e5',
+    },
+  },
+  sunset: {
+    label: 'Purple',
+    vars: {
+      '--ui-bg': '#1a0033',
+      '--ui-surface': '#2d0057',
+      '--ui-text': '#ede7f6',
+      '--ui-muted': 'rgba(237,231,246,0.65)',
+      '--ui-line': 'rgba(237,231,246,0.18)',
+      '--ui-accent-red': '#ef9a9a',
+      '--ui-accent-yellow': '#fff59d',
+      '--ui-accent-green': '#a5d6a7',
+      '--ui-accent-blue': '#ce93d8',
+    },
+  },
+};
 
 const DEFAULT_SHARED_RULES: Partial<GameRules> = {
   stackDraw2: false,
@@ -46,6 +111,16 @@ function getInitialMode(): 'local' | 'online' {
   }
 }
 
+function getInitialTheme(): ThemeName {
+  if (typeof window === 'undefined') return 'paper';
+  try {
+    const raw = window.localStorage.getItem(PREFERRED_THEME_KEY);
+    return raw === 'midnight' || raw === 'forest' || raw === 'sunset' ? raw : 'paper';
+  } catch {
+    return 'paper';
+  }
+}
+
 /**
  * Root page — decides whether to show the pre-game setup screen
  * or the live game board.  A single useUnoGame() call at the top
@@ -53,6 +128,7 @@ function getInitialMode(): 'local' | 'online' {
  */
 export default function Home() {
   const [mode, setMode] = useState<'local' | 'online'>(getInitialMode);
+  const [theme, setTheme] = useState<ThemeName>(getInitialTheme);
   const [showSettings, setShowSettings] = useState(false);
   const [sharedRules, setSharedRules] = useState<Partial<GameRules>>(getInitialSharedRules);
 
@@ -76,6 +152,26 @@ export default function Home() {
     }
   }, [mode]);
 
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(PREFERRED_THEME_KEY, theme);
+    } catch {
+      // Ignore storage errors.
+    }
+
+    const root = document.documentElement;
+    const vars = THEMES[theme].vars;
+    for (const [name, value] of Object.entries(vars)) {
+      root.style.setProperty(name, value);
+    }
+  }, [theme]);
+
+  const cycleTheme = () => {
+    const order: ThemeName[] = ['paper', 'midnight', 'forest', 'sunset'];
+    const idx = order.indexOf(theme);
+    setTheme(order[(idx + 1) % order.length]);
+  };
+
   const setupControls = (
     <div style={{
       display: 'flex',
@@ -86,15 +182,16 @@ export default function Home() {
     }}>
       <div style={{
         display: 'inline-flex',
-        border: '1px solid rgba(26,15,0,0.24)',
-        background: 'rgba(255,248,240,0.95)',
+        border: '1px solid var(--ui-line)',
+        background: 'var(--ui-surface)',
       }}>
         <button
+          type="button"
           onClick={() => setMode('local')}
           style={{
             border: 'none',
-            background: mode === 'local' ? '#1a0f00' : 'transparent',
-            color: mode === 'local' ? '#fff8f0' : '#1a0f00',
+            background: mode === 'local' ? 'var(--ui-text)' : 'transparent',
+            color: mode === 'local' ? 'var(--ui-surface)' : 'var(--ui-text)',
             padding: '8px 12px',
             cursor: 'pointer',
             fontSize: 11,
@@ -105,11 +202,12 @@ export default function Home() {
           Play Local
         </button>
         <button
+          type="button"
           onClick={() => setMode('online')}
           style={{
             border: 'none',
-            background: mode === 'online' ? '#1a0f00' : 'transparent',
-            color: mode === 'online' ? '#fff8f0' : '#1a0f00',
+            background: mode === 'online' ? 'var(--ui-text)' : 'transparent',
+            color: mode === 'online' ? 'var(--ui-surface)' : 'var(--ui-text)',
             padding: '8px 12px',
             cursor: 'pointer',
             fontSize: 11,
@@ -122,11 +220,29 @@ export default function Home() {
       </div>
 
       <button
+        type="button"
+        onClick={cycleTheme}
+        style={{
+          border: '1px solid var(--ui-line)',
+          background: 'var(--ui-surface)',
+          color: 'var(--ui-text)',
+          padding: '8px 12px',
+          cursor: 'pointer',
+          fontSize: 11,
+          letterSpacing: '0.08em',
+          textTransform: 'uppercase',
+        }}
+      >
+        Theme: {THEMES[theme].label}
+      </button>
+
+      <button
+        type="button"
         onClick={() => setShowSettings(true)}
         style={{
-          border: '1px solid rgba(26,15,0,0.24)',
-          background: 'rgba(255,248,240,0.95)',
-          color: '#1a0f00',
+          border: '1px solid var(--ui-line)',
+          background: 'var(--ui-surface)',
+          color: 'var(--ui-text)',
           padding: '8px 12px',
           cursor: 'pointer',
           fontSize: 11,
@@ -178,6 +294,8 @@ export default function Home() {
         gameApi={gameApi as ReturnType<typeof useUnoGame>}
         onReset={() => gameApi.resetGame()}
         onOpenSettings={() => setShowSettings(true)}
+        onCycleTheme={cycleTheme}
+        currentThemeLabel={THEMES[theme].label}
       />
       <SettingsModal
         open={showSettings}

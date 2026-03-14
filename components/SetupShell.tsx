@@ -14,12 +14,12 @@ export default function  SetupShell({ subtitle, children, footer }: SetupShellPr
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Courier+Prime:wght@400;700&display=swap');
         *, *::before, *::after { box-sizing: border-box; }
-        .setup-input::placeholder { color: rgba(26,15,0,0.22); }
-        .setup-input:focus { outline: none; border-bottom-color: rgba(26,15,0,0.45) !important; }
+        .setup-input::placeholder { color: var(--ui-muted); }
+        .setup-input:focus { outline: none; border-bottom-color: var(--ui-text) !important; }
         .player-row:last-child { border-bottom: none !important; }
         .bot-btn:hover { opacity: 0.55; }
-        .remove-btn:hover { color: #c0392b !important; }
-        .add-btn:hover { border-color: rgba(26,15,0,0.32) !important; color: rgba(26,15,0,0.5) !important; }
+        .remove-btn:hover { color: var(--ui-accent-red) !important; }
+        .add-btn:hover { border-color: var(--ui-line) !important; color: var(--ui-text) !important; }
         .setup-primary-btn:hover { opacity: 0.75; }
       `}</style>
 
@@ -27,7 +27,8 @@ export default function  SetupShell({ subtitle, children, footer }: SetupShellPr
         style={{
           height: '100dvh',
           overflow: 'hidden',
-          color: '#1a0f00',
+          color: 'var(--ui-text)',
+          background: 'var(--ui-bg)',
           fontFamily: "'Courier Prime', monospace",
           padding: 'clamp(14px, 2.4vh, 28px) clamp(12px, 2.6vw, 28px)',
           display: 'flex',
@@ -63,14 +64,14 @@ export default function  SetupShell({ subtitle, children, footer }: SetupShellPr
               fontSize: 11,
               letterSpacing: '0.22em',
               textTransform: 'uppercase',
-              color: 'rgba(26,15,0,0.28)',
+              color: 'var(--ui-muted)',
             }}
           >
             {subtitle}
           </p>
         </div>
 
-        <div style={{ height: 1, background: 'rgba(26,15,0,0.1)', marginTop: -48 }} />
+        <div style={{ height: 1, background: 'var(--ui-line)', marginTop: -48 }} />
 
         <div
           style={{

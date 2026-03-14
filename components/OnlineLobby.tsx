@@ -126,7 +126,7 @@ export default function OnlineLobby({
       footer={
         !room ? (
           <>
-            <div style={{ height: 1, background: 'rgba(26,15,0,0.1)', marginBottom: 32 }} />
+            <div style={{ height: 1, background: 'var(--ui-line)', marginBottom: 32 }} />
             <button
               type="button"
               disabled={!canSubmitRoomForm}
@@ -137,8 +137,8 @@ export default function OnlineLobby({
               style={{
                 padding: '18px 0',
                 border: 'none',
-                background: '#1a0f00',
-                color: '#fff8f0',
+                background: 'var(--ui-text)',
+                color: 'var(--ui-surface)',
                 fontFamily: "'Bebas Neue', cursive",
                 fontSize: 22,
                 letterSpacing: '0.18em',
@@ -150,7 +150,7 @@ export default function OnlineLobby({
         ) :
         room && !room.started && isHost ? (
           <>
-            <div style={{ height: 1, background: 'rgba(26,15,0,0.1)', marginBottom: 32 }} />
+            <div style={{ height: 1, background: 'var(--ui-line)', marginBottom: 32 }} />
             <button
               type="button"
               disabled={busy || room.players.length < 2}
@@ -159,8 +159,8 @@ export default function OnlineLobby({
               style={{
                 padding: '18px 0',
                 border: 'none',
-                background: '#1a0f00',
-                color: '#fff8f0',
+                background: 'var(--ui-text)',
+                color: 'var(--ui-surface)',
                 fontFamily: "'Bebas Neue', cursive",
                 fontSize: 22,
                 letterSpacing: '0.18em',
@@ -175,7 +175,7 @@ export default function OnlineLobby({
       {controls}
 
       <div>
-        <p style={{ margin: 0, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: 'rgba(26,15,0,0.3)' }}>
+        <p style={{ margin: 0, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--ui-muted)' }}>
           01 / Players
         </p>
         <h2 style={{
@@ -187,17 +187,17 @@ export default function OnlineLobby({
         }}>Join the Table</h2>
       </div>
 
-      <p style={{ margin: 0, color: 'rgba(26,15,0,0.42)', fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+      <p style={{ margin: 0, color: 'var(--ui-muted)', fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
         Settings are shared with local mode
       </p>
 
-      <p style={{ margin: 0, color: 'rgba(26,15,0,0.6)', fontSize: 13 }}>
+      <p style={{ margin: 0, color: 'var(--ui-text)', fontSize: 13 }}>
         {connected ? 'Socket connected' : 'Connecting to multiplayer server...'}
       </p>
 
       {!room && (
         <>
-          <div style={{ display: 'inline-flex', border: '1px solid rgba(26,15,0,0.2)', width: 'fit-content' }}>
+          <div style={{ display: 'inline-flex', border: '1px solid var(--ui-line)', width: 'fit-content' }}>
             <button
               type="button"
               onClick={() => setPanel('create')}
@@ -205,8 +205,8 @@ export default function OnlineLobby({
                 border: 'none',
                 padding: '8px 12px',
                 cursor: 'pointer',
-                background: panel === 'create' ? '#1a0f00' : 'transparent',
-                color: panel === 'create' ? '#fff8f0' : '#1a0f00',
+                background: panel === 'create' ? 'var(--ui-text)' : 'transparent',
+                color: panel === 'create' ? 'var(--ui-surface)' : 'var(--ui-text)',
                 fontSize: 11,
                 letterSpacing: '0.08em',
                 textTransform: 'uppercase',
@@ -219,8 +219,8 @@ export default function OnlineLobby({
                 border: 'none',
                 padding: '8px 12px',
                 cursor: 'pointer',
-                background: panel === 'join' ? '#1a0f00' : 'transparent',
-                color: panel === 'join' ? '#fff8f0' : '#1a0f00',
+                background: panel === 'join' ? 'var(--ui-text)' : 'transparent',
+                color: panel === 'join' ? 'var(--ui-surface)' : 'var(--ui-text)',
                 fontSize: 11,
                 letterSpacing: '0.08em',
                 textTransform: 'uppercase',
@@ -228,7 +228,7 @@ export default function OnlineLobby({
             >Join</button>
           </div>
 
-          <div style={{ display: 'grid', gap: 12, borderTop: '1px solid rgba(26,15,0,0.08)', paddingTop: 12 }}>
+          <div style={{ display: 'grid', gap: 12, borderTop: '1px solid var(--ui-line)', paddingTop: 12 }}>
             <input
               value={playerName}
               onChange={(e) => setPlayerName(e.target.value)}
@@ -242,7 +242,7 @@ export default function OnlineLobby({
                 fontFamily: "'Courier Prime', monospace",
                 fontSize: 15,
                 fontWeight: 700,
-                color: '#1a0f00',
+                color: 'var(--ui-text)',
                 padding: '2px 0',
                 width: '100%',
                 transition: 'border-bottom-color 0.12s',
@@ -263,7 +263,7 @@ export default function OnlineLobby({
                   fontFamily: "'Courier Prime', monospace",
                   fontSize: 15,
                   fontWeight: 700,
-                  color: '#1a0f00',
+                  color: 'var(--ui-text)',
                   padding: '2px 0',
                   width: '100%',
                   transition: 'border-bottom-color 0.12s',
@@ -341,7 +341,7 @@ export default function OnlineLobby({
             )}
           </div>
 
-          <div style={{ display: 'grid', gap: 6, borderTop: '1px solid rgba(26,15,0,0.08)', paddingTop: 10 }}>
+          <div style={{ display: 'grid', gap: 6, borderTop: '1px solid var(--ui-line)', paddingTop: 10 }}>
             {room.players.map((player, i) => (
               <div key={player.playerId} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
                 <span>{i + 1}. {player.name}</span>
@@ -353,7 +353,7 @@ export default function OnlineLobby({
           </div>
 
           {!isHost && (
-            <p style={{ margin: 0, fontSize: 12, color: 'rgba(26,15,0,0.6)' }}>
+            <p style={{ margin: 0, fontSize: 12, color: 'var(--ui-muted)' }}>
               Waiting for host to start the game...
             </p>
           )}

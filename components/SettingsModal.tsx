@@ -25,6 +25,7 @@ const RULE_TOGGLES: RuleToggle[] = [
   { key: 'mustDeclareUno', label: 'Must call UNO', description: 'Missed UNO can be penalised.' },
   { key: 'allowStartingActionCard', label: 'Action start card', description: 'Action card can open the game.' },
   { key: 'allowDoublePlaySameNumber', label: 'Double play', description: 'Play two same-number cards at once.' },
+  { key: 'canFinishWithActionCard', label: 'Finish with action card', description: 'Players can go out on skip, reverse, +2 or wilds.' },
 ];
 
 function Toggle({ on, onClick }: { on: boolean; onClick: () => void }) {
@@ -114,6 +115,54 @@ export default function SettingsModal({ open, rules, onChange, onClose }: Settin
         <p style={{ margin: 0, fontSize: 11, color: 'rgba(26,15,0,0.45)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
           Controls / House Rules (shared by local and online)
         </p>
+
+        {/* ── Starting hand size stepper ────────────────────────────────── */}
+        <div style={{
+          display: 'grid', gridTemplateColumns: '1fr auto',
+          gap: 16, alignItems: 'center',
+          padding: '12px 0',
+          borderBottom: '1px solid rgba(26,15,0,0.08)',
+        }}>
+          <div>
+            <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: '#1a0f00' }}>Starting hand size</p>
+            <p style={{ margin: '3px 0 0', fontSize: 11, color: 'rgba(26,15,0,0.36)', lineHeight: 1.45 }}>How many cards each player is dealt at the start.</p>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <button
+              type="button"
+              onClick={() => {
+                const cur = rules.startingHandSize ?? defaultRules.startingHandSize;
+                if (cur > 1) onChange({ ...rules, startingHandSize: cur - 1 });
+              }}
+              style={{
+                width: 28, height: 28,
+                border: '1.5px solid rgba(26,15,0,0.2)',
+                background: 'transparent', color: '#1a0f00',
+                cursor: 'pointer', fontSize: 16, lineHeight: 1,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}
+            >−</button>
+            <span style={{
+              fontFamily: "'Courier Prime', monospace",
+              fontSize: 15, fontWeight: 700, color: '#1a0f00',
+              minWidth: 24, textAlign: 'center',
+            }}>{rules.startingHandSize ?? defaultRules.startingHandSize}</span>
+            <button
+              type="button"
+              onClick={() => {
+                const cur = rules.startingHandSize ?? defaultRules.startingHandSize;
+                if (cur < 15) onChange({ ...rules, startingHandSize: cur + 1 });
+              }}
+              style={{
+                width: 28, height: 28,
+                border: '1.5px solid rgba(26,15,0,0.2)',
+                background: 'transparent', color: '#1a0f00',
+                cursor: 'pointer', fontSize: 16, lineHeight: 1,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}
+            >+</button>
+          </div>
+        </div>
 
         <div style={{ display: 'grid' }}>
           {RULE_TOGGLES.map(({ key, label, description }, i) => {

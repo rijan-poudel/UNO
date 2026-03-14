@@ -218,16 +218,40 @@ export function useUnoOnlineGame() {
   const localPlayer = game?.players[localPlayerIndex] ?? null;
   const isLocalTurn = !!game && game.currentPlayerIndex === localPlayerIndex;
 
-  const playableCardIds = new Set(
-    game && localPlayer && isLocalTurn
-      ? getPlayableCards(localPlayer.hand, game, localPlayerIndex).map((c) => c.id)
-      : [],
+  const playableCardIds = useMemo(
+    () => new Set(
+      game && localPlayer && isLocalTurn
+        ? getPlayableCards(localPlayer.hand, game, localPlayerIndex).map((c) => c.id)
+        : [],
+    ),
+    [game, localPlayer, isLocalTurn, localPlayerIndex],
   );
 
   const canPass = state.drawnThisTurn && (game?.pendingDraw ?? 0) === 0;
   const hasPendingStackOption = !!(
     game && localPlayer && isLocalTurn && game.pendingDraw > 0 && playableCardIds.size > 0
   );
+
+  useEffect(() => {
+    if (!state.connected || !game || !localPlayer || !isLocalTurn) return;
+    if (!state.drawnThisTurn) return;
+    if ((game.pendingDraw ?? 0) > 0) return;
+    if (playableCardIds.size > 0) return;
+
+    const timer = window.setTimeout(() => {
+      void sendAction({ type: 'pass' });
+    }, 900);
+
+    return () => window.clearTimeout(timer);
+  }, [
+    state.connected,
+    state.drawnThisTurn,
+    game,
+    localPlayer,
+    isLocalTurn,
+    playableCardIds,
+    sendAction,
+  ]);
 
   const selectCard = useCallback((card: Card) => {
     if (!game) return;

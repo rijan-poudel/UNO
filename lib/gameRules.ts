@@ -7,7 +7,7 @@
 import type { Card, CardColor } from '../types/card';
 import type { GameState } from '../types/game';
 import type { GameRules } from '../types/rules';
-import { isWildCard, NUMBER_VALUES } from '../types/card';
+import { isWildCard, isActionCard, NUMBER_VALUES } from '../types/card';
 
 // ── Single-card play validation ───────────────────────────────────────────────
 
@@ -45,6 +45,13 @@ export function canPlayCard(
   }
 
   // Rule branch 3 — standard playability
+
+  // If the player is down to their last card and canFinishWithActionCard is false,
+  // block action/wild cards from being played as the final card.
+  const playerHand = state.players[playerIndex]?.hand ?? [];
+  if (!rules.canFinishWithActionCard && playerHand.length === 1 && isActionCard(card)) {
+    return false;
+  }
 
   // Wild cards (wild / wild4) are always playable when there is no pending draw.
   if (isWildCard(card)) return true;

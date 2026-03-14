@@ -87,6 +87,14 @@ export interface GameRules {
   // ── Player limits ─────────────────────────────────────────────────────────
   /** The maximum number of players allowed in a game. */
   maxPlayers: number;
+
+  // ── Win condition ─────────────────────────────────────────────────────────
+  /**
+   * If false, a player may NOT win by playing an action or wild card as their
+   * last card. The card is simply blocked — they must play a number card to go out.
+   * Default: true (standard UNO allows finishing on any card).
+   */
+  canFinishWithActionCard: boolean;
 }
 
 /** Sensible defaults matching standard UNO rules. */
@@ -103,4 +111,5 @@ export const defaultRules: GameRules = {
   drawUntilPlayable: false,
   allowStartingActionCard: true,
   maxPlayers: 10,
+  canFinishWithActionCard: true,
 };
