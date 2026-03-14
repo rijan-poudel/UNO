@@ -18,6 +18,7 @@ interface OnlineLobbyProps {
   onCreateRoom: (playerName: string) => Promise<boolean>;
   onJoinRoom: (roomId: string, playerName: string) => Promise<boolean>;
   onStartGame: () => Promise<boolean>;
+  onKickPlayer: (targetPlayerId: string) => Promise<boolean>;
 }
 
 export default function OnlineLobby({
@@ -29,11 +30,13 @@ export default function OnlineLobby({
   onCreateRoom,
   onJoinRoom,
   onStartGame,
+  onKickPlayer,
 }: OnlineLobbyProps) {
   const [playerName, setPlayerName] = useState('Player 1');
   const [roomCode, setRoomCode] = useState('');
   const [busy, setBusy] = useState(false);
   const [copyStatus, setCopyStatus] = useState<'code' | 'link' | null>(null);
+  const [kickToast, setKickToast] = useState<string | null>(null);
   const [panel, setPanel] = useState<'create' | 'join'>('create');
 
   useEffect(() => {
@@ -82,10 +85,17 @@ export default function OnlineLobby({
   }, [panel]);
 
   useEffect(() => {
+    if (!kickToast) return;
+    const timeout = window.setTimeout(() => setKickToast(null), 1800);
+    return () => window.clearTimeout(timeout);
+  }, [kickToast]);
+
+  useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const roomFromUrl = params.get('room');
     if (roomFromUrl) {
       setRoomCode(roomFromUrl.toUpperCase().slice(0, 6));
+      setPanel('join');
     }
   }, []);
 
@@ -119,6 +129,20 @@ export default function OnlineLobby({
     connected &&
     Boolean(playerName.trim()) &&
     (panel !== 'join' || Boolean(roomCode.trim()));
+
+  const requestKick = (targetPlayerId: string, targetName: string) => {
+    if (busy) return;
+    const approved = window.confirm(`Remove ${targetName} from this room?`);
+    if (!approved) return;
+
+    void wrap(async () => {
+      const removed = await onKickPlayer(targetPlayerId);
+      if (removed) {
+        setKickToast(`${targetName} removed from room.`);
+      }
+      return removed;
+    });
+  };
 
   return (
     <SetupShell
@@ -292,6 +316,7 @@ export default function OnlineLobby({
                   background: '#fff8f0',
                   fontFamily: "'Courier Prime', monospace",
                   letterSpacing: '0.08em',
+                  color: 'rgba(26,15,0,0.7)'
                 }}
               />
               <button
@@ -345,9 +370,30 @@ export default function OnlineLobby({
             {room.players.map((player, i) => (
               <div key={player.playerId} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
                 <span>{i + 1}. {player.name}</span>
-                <span style={{ color: player.connected ? '#1e6b3a' : '#c0392b' }}>
-                  {player.connected ? 'online' : 'offline'}
-                </span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{ color: player.connected ? '#1e6b3a' : '#c0392b' }}>
+                    {player.connected ? 'online' : 'offline'}
+                  </span>
+                  {isHost && player.playerId !== playerId && (
+                    <button
+                      type="button"
+                      disabled={busy}
+                      onClick={() => requestKick(player.playerId, player.name)}
+                      title={`Remove ${player.name}`}
+                      style={{
+                        border: '1px solid rgba(192,57,43,0.45)',
+                        background: '#fff8f0',
+                        color: '#c0392b',
+                        width: 22,
+                        height: 22,
+                        padding: 0,
+                        lineHeight: 1,
+                        fontSize: 14,
+                        cursor: busy ? 'default' : 'pointer',
+                      }}
+                    >x</button>
+                  )}
+                </div>
               </div>
             ))}
           </div>
@@ -355,6 +401,12 @@ export default function OnlineLobby({
           {!isHost && (
             <p style={{ margin: 0, fontSize: 12, color: 'var(--ui-muted)' }}>
               Waiting for host to start the game...
+            </p>
+          )}
+
+          {kickToast && (
+            <p style={{ margin: 0, fontSize: 11, color: '#1e6b3a', letterSpacing: '0.04em' }}>
+              {kickToast}
             </p>
           )}
         </>

@@ -275,6 +275,7 @@ export default function Home() {
             onCreateRoom={onlineGameApi.createRoom}
             onJoinRoom={onlineGameApi.joinRoom}
             onStartGame={() => onlineGameApi.startOnlineGame(sharedRules)}
+            onKickPlayer={onlineGameApi.kickPlayer}
           />
         )}
 

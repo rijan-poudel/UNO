@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import type { Card, CardColor } from "../types/card";
-import type { Player } from "../types/game";
+import type { GameState, Player } from "../types/game";
 import type { useUnoGame } from "../hooks/useUnoGame";
 import UnoCard from "./UnoCard";
 import ColorPicker from "./ColorPicker";
@@ -16,6 +16,15 @@ interface GameBoardProps {
   onCycleTheme: () => void;
   currentThemeLabel: string;
 }
+
+interface OnlineWinnerActions {
+  enabled: boolean;
+  isHost: boolean;
+  busy: boolean;
+  onPlayAgain: () => void;
+}
+
+const MATCH_TARGET_POINTS = 500;
 
 const ACTIVE_COLOR_META: Record<
   "red" | "yellow" | "green" | "blue",
@@ -70,15 +79,39 @@ function LiveFeed({ entries }: { entries: FeedEntry[] }) {
   );
 }
 
-// ── Score tracker ──────────────────────────────────────────────────────────────
-// Persists wins per player name across rounds within the same session
-function useScoreTracker() {
-  const [scores, setScores] = useState<Record<string, number>>({});
-  const recordWin = useCallback((name: string) => {
-    setScores(prev => ({ ...prev, [name]: (prev[name] ?? 0) + 1 }));
+function getCardPoints(card: Card): number {
+  switch (card.value) {
+    case "skip":
+    case "reverse":
+    case "draw2":
+      return 20;
+    case "wild":
+    case "wild4":
+      return 50;
+    default:
+      return Number(card.value);
+  }
+}
+
+function getRoundPoints(game: GameState, winnerId: string): number {
+  return game.players
+    .filter((player) => player.id !== winnerId)
+    .reduce(
+      (total, player) => total + player.hand.reduce((handTotal, card) => handTotal + getCardPoints(card), 0),
+      0,
+    );
+}
+
+function useMatchScoreTracker() {
+  const [pointsByPlayerId, setPointsByPlayerId] = useState<Record<string, number>>({});
+  const addRoundPoints = useCallback((playerId: string, points: number) => {
+    setPointsByPlayerId((prev) => ({
+      ...prev,
+      [playerId]: (prev[playerId] ?? 0) + points,
+    }));
   }, []);
-  const reset = useCallback(() => setScores({}), []);
-  return { scores, recordWin, reset };
+  const reset = useCallback(() => setPointsByPlayerId({}), []);
+  return { pointsByPlayerId, addRoundPoints, reset };
 }
 
 // ── Call-out flash overlay ─────────────────────────────────────────────────────
@@ -105,10 +138,10 @@ function CallOutFlash({ name }: { name: string }) {
 
 // ── Opponent strip ─────────────────────────────────────────────────────────────
 function OpponentStrip({
-  player, isCurrentTurn, showCallOut, onCallOut, cardScale,
+  player, isCurrentTurn, cardScale,
 }: {
   player: Player; isCurrentTurn: boolean;
-  showCallOut: boolean; onCallOut: () => void; cardScale: number;
+  cardScale: number;
 }) {
   const n = player.hand.length;
   const fans = Math.min(n, 6);
@@ -125,31 +158,6 @@ function OpponentStrip({
       transition: "opacity 0.3s ease",
       position: "relative",
     }}>
-      {/* CALL OUT — big, impossible to miss, floats above the fan */}
-      {showCallOut && (
-        <button
-          onClick={onCallOut}
-          style={{
-            position: "absolute",
-            top: -hiddenTop - 8,
-            left: "50%",
-            transform: "translateX(-50%)",
-            zIndex: 10,
-            fontFamily: "'Bebas Neue', cursive",
-            fontSize: 18,
-            letterSpacing: "0.1em",
-            background: "var(--ui-accent-red)",
-            color: "#fff",
-            border: "none",
-            padding: "7px 16px",
-            cursor: "pointer",
-            whiteSpace: "nowrap",
-            animation: "callOutAttention 0.7s ease-in-out infinite alternate",
-            boxShadow: "0 4px 20px rgba(192,57,43,0.5)",
-          }}
-        >😤 CALL OUT!</button>
-      )}
-
       {/* Fanned face-down cards */}
       <div style={{
         position: "relative", height: fanHeight, width: fanWidth,
@@ -210,11 +218,29 @@ function OpponentStrip({
 
 // ── Winner screen ──────────────────────────────────────────────────────────────
 function WinnerScreen({
-  winner, onReset, scores,
+  winner,
+  onExit,
+  onDealAgain,
+  dealAgainLabel,
+  dealAgainDisabled,
+  roundPoints,
+  winnerTotalPoints,
+  matchWinnerName,
+  scoreRows,
+  onlineActions,
 }: {
-  winner: Player; onReset: () => void; scores: Record<string, number>;
+  winner: Player;
+  onExit: () => void;
+  onDealAgain: () => void;
+  dealAgainLabel: string;
+  dealAgainDisabled: boolean;
+  roundPoints: number;
+  winnerTotalPoints: number;
+  matchWinnerName: string | null;
+  scoreRows: Array<{ playerId: string; name: string; points: number }>;
+  onlineActions?: OnlineWinnerActions;
 }) {
-  const leaders = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+  const rematchEnabled = onlineActions?.enabled ?? false;
   return (
     <div style={{
       position: "fixed", inset: 0, zIndex: 60, background: "var(--ui-bg)",
@@ -235,11 +261,32 @@ function WinnerScreen({
         <p style={{
           fontFamily: "'Courier Prime', monospace", fontSize: 13,
           color: "var(--ui-muted)", margin: "14px 0 0", letterSpacing: "0.08em",
-        }}>wins the round</p>
+        }}>
+          wins the round (+{roundPoints} points)
+        </p>
+        <p style={{
+          fontFamily: "'Courier Prime', monospace", fontSize: 12,
+          color: "var(--ui-muted)", margin: "8px 0 0", letterSpacing: "0.06em",
+          textTransform: "uppercase",
+        }}>{winnerTotalPoints} / {MATCH_TARGET_POINTS} points</p>
       </div>
 
+      {matchWinnerName && (
+        <p style={{
+          margin: 0,
+          fontFamily: "'Bebas Neue', cursive",
+          fontSize: "clamp(28px, 6vw, 40px)",
+          letterSpacing: "0.05em",
+          color: "var(--ui-accent-red)",
+          textTransform: "uppercase",
+          textAlign: "center",
+        }}>
+          {matchWinnerName} wins the match!
+        </p>
+      )}
+
       {/* Session scoreboard */}
-      {leaders.length > 0 && (
+      {scoreRows.length > 0 && (
         <div style={{
           width: "min(360px, 100%)",
           border: "1px solid var(--ui-line)",
@@ -250,9 +297,9 @@ function WinnerScreen({
             color: "var(--ui-muted)", margin: 0,
             padding: "6px 12px",
             borderBottom: "1px solid var(--ui-line)",
-          }}>Session scores</p>
-          {leaders.map(([name, wins]) => (
-            <div key={name} style={{
+          }}>Match points</p>
+          {scoreRows.map(({ playerId, name, points }) => (
+            <div key={playerId} style={{
               display: "flex", justifyContent: "space-between", alignItems: "center",
               padding: "8px 12px",
               borderBottom: "1px solid var(--ui-line)",
@@ -264,7 +311,7 @@ function WinnerScreen({
               <span style={{
                 fontFamily: "'Courier Prime', monospace", fontSize: 13,
                 fontWeight: 700, color: "var(--ui-text)",
-              }}>{wins} {wins === 1 ? "win" : "wins"}</span>
+              }}>{points} pts</span>
             </div>
           ))}
         </div>
@@ -272,7 +319,7 @@ function WinnerScreen({
 
       <div style={{ width: 1, height: 32, background: "var(--ui-line)" }} />
       <div style={{ display: "flex", gap: 10 }}>
-        <button onClick={onReset} style={{
+        <button onClick={onExit} style={{
           fontFamily: "'Courier Prime', monospace", fontSize: 11, fontWeight: 700,
           letterSpacing: "0.1em", textTransform: "uppercase",
           background: "transparent", border: "1px solid var(--ui-line)",
@@ -281,16 +328,37 @@ function WinnerScreen({
         }}
           onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.color = "var(--ui-text)")}
           onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.color = "var(--ui-muted)")}
-        >New players</button>
-        <button onClick={onReset} style={{
+        >Exit</button>
+        <button
+          onClick={onDealAgain}
+          disabled={dealAgainDisabled || Boolean(rematchEnabled && (!onlineActions?.isHost || onlineActions.busy))}
+          style={{
           fontFamily: "'Bebas Neue', cursive", fontSize: 22, letterSpacing: "0.14em",
           background: "var(--ui-text)", color: "var(--ui-bg)",
-          border: "none", padding: "12px 36px", cursor: "pointer", transition: "opacity 0.12s",
+          border: "none", padding: "12px 36px",
+          cursor: dealAgainDisabled || (rematchEnabled && (!onlineActions?.isHost || onlineActions.busy)) ? "default" : "pointer",
+          transition: "opacity 0.12s",
+          opacity: dealAgainDisabled || (rematchEnabled && (!onlineActions?.isHost || onlineActions.busy)) ? 0.5 : 1,
         }}
           onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.opacity = "0.7")}
           onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.opacity = "1")}
-        >Deal again</button>
+        >{dealAgainLabel}</button>
       </div>
+      {rematchEnabled && (
+        <p style={{
+          margin: 0,
+          fontFamily: "'Courier Prime', monospace",
+          fontSize: 11,
+          color: "var(--ui-muted)",
+          letterSpacing: "0.04em",
+          textTransform: "uppercase",
+          textAlign: "center",
+        }}>
+          {onlineActions?.isHost
+            ? "Play again starts a new round with the same room and players"
+            : "Only the room host can start the rematch"}
+        </p>
+      )}
     </div>
   );
 }
@@ -319,7 +387,9 @@ export default function GameBoard({
     selectCard, confirmWildColor, cancelWild, drawCard, sayUno, callOut, resetGame,
   } = gameApi;
 
-  const hasPendingStackOption: boolean = (gameApi as any).hasPendingStackOption ?? false;
+  const hasPendingStackOption = Boolean(
+    (gameApi as unknown as { hasPendingStackOption?: boolean }).hasPendingStackOption,
+  );
 
   const [feed, setFeed] = useState<FeedEntry[]>([]);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
@@ -328,24 +398,79 @@ export default function GameBoard({
   const [isPortraitMobile, setIsPortraitMobile] = useState(false);
   const [isCompactBoard, setIsCompactBoard] = useState(false);
   const [boardScale, setBoardScale] = useState(1);
+  const [rematchBusy, setRematchBusy] = useState(false);
+  const [lastRoundPoints, setLastRoundPoints] = useState(0);
 
-  const { scores, recordWin, reset: resetScores } = useScoreTracker();
+  const { pointsByPlayerId, addRoundPoints, reset: resetScores } = useMatchScoreTracker();
   const feedCounter = useRef(0);
   const prevLogRef = useRef<string[]>([]);
   const prevWinnerRef = useRef<string | null>(null);
+  const completedMatchRef = useRef(false);
 
-  // Record wins as they happen
+  const onlineApi = gameApi as unknown as {
+    room?: { hostPlayerId: string } | null;
+    playerId?: string | null;
+    startOnlineGame?: (rules: Record<string, unknown>) => Promise<boolean>;
+  };
+  const isOnlineMatch = Boolean(onlineApi.room);
+  const isOnlineHost = Boolean(onlineApi.room && onlineApi.playerId === onlineApi.room.hostPlayerId);
+
+  const handleOnlineRematch = useCallback(async () => {
+    if (!isOnlineMatch || !isOnlineHost || !onlineApi.startOnlineGame || !game) return;
+
+    setRematchBusy(true);
+    try {
+      await onlineApi.startOnlineGame(game.rules as unknown as Record<string, unknown>);
+    } finally {
+      setRematchBusy(false);
+    }
+  }, [isOnlineMatch, isOnlineHost, onlineApi, game]);
+
+  const handleLocalDealAgain = useCallback(() => {
+    if (!game) return;
+    gameApi.startGame(
+      game.players.map((player) => player.name),
+      game.rules,
+      game.players.map((player) => player.isBot),
+    );
+  }, [game, gameApi]);
+
+  // Record round points as they happen.
   useEffect(() => {
     if (game?.winnerId) {
-      const winner = game.players.find(p => p.id === game.winnerId);
-      if (winner && prevWinnerRef.current !== game.winnerId) {
+      if (prevWinnerRef.current !== game.winnerId) {
         prevWinnerRef.current = game.winnerId;
-        recordWin(winner.name);
+        const roundPoints = getRoundPoints(game, game.winnerId);
+        setLastRoundPoints(roundPoints);
+        addRoundPoints(game.winnerId, roundPoints);
       }
     } else {
       prevWinnerRef.current = null;
+      setLastRoundPoints(0);
+      if (completedMatchRef.current) {
+        resetScores();
+        completedMatchRef.current = false;
+      }
     }
-  }, [game?.winnerId]);
+  }, [game, addRoundPoints, resetScores]);
+
+  const scoreRows = game
+    ? game.players
+      .map((player) => ({
+        playerId: player.id,
+        name: player.name,
+        points: pointsByPlayerId[player.id] ?? 0,
+      }))
+      .sort((a, b) => b.points - a.points)
+    : [];
+
+  const matchWinner = scoreRows.find((row) => row.points >= MATCH_TARGET_POINTS) ?? null;
+
+  useEffect(() => {
+    if (game?.winnerId && matchWinner) {
+      completedMatchRef.current = true;
+    }
+  }, [game?.winnerId, matchWinner]);
 
   useEffect(() => {
     if (!log.length) return;
@@ -377,12 +502,71 @@ export default function GameBoard({
     return () => { window.removeEventListener("resize", update); window.removeEventListener("orientationchange", update); };
   }, []);
 
+  const humanTurn = Boolean(game && localPlayer && isLocalTurn && !localPlayer.isBot && !game.winnerId);
+  const drawDisabled = !game || botThinking || !!game.winnerId || (drawnThisTurn && game.pendingDraw === 0) || !humanTurn;
+
+  const unoReady = Boolean(
+    game && localPlayer && !localPlayer.isBot && !game.winnerId &&
+    localPlayer.hand.length >= 1 && localPlayer.hand.length <= 2 &&
+    !localPlayer.saidUno && game.rules.mustDeclareUno,
+  );
+
+  const canDeclareUnoNow = humanTurn && unoReady;
+
+  const callOutTarget = !humanTurn && game
+    ? game.players.find((p, idx) => idx !== localPlayerIndex && p.hand.length === 1 && !p.saidUno)
+    : undefined;
+  const callOutTargetIndex = callOutTarget && game
+    ? game.players.findIndex((p) => p.id === callOutTarget.id)
+    : -1;
+  const canCallOutNow = !humanTurn && Boolean(callOutTarget);
+  const hasPrimaryActionButton = canDeclareUnoNow || canCallOutNow;
+
+  const declareUno = useCallback(() => {
+    if (!unoReady) return;
+    sayUno(localPlayerIndex);
+    setShowUnoFlash(true);
+    window.setTimeout(() => setShowUnoFlash(false), 900);
+  }, [unoReady, sayUno, localPlayerIndex]);
+
+  // Wrap callOut to also show the flash
+  const handleCallOut = useCallback((callerIdx: number, targetIdx: number, targetName: string) => {
+    callOut(callerIdx, targetIdx);
+    setCallOutFlashName(targetName);
+    window.setTimeout(() => setCallOutFlashName(null), 1100);
+  }, [callOut]);
+
+  const triggerCallOut = useCallback(() => {
+    if (!callOutTarget || callOutTargetIndex < 0) return;
+    handleCallOut(localPlayerIndex, callOutTargetIndex, callOutTarget.name);
+  }, [callOutTarget, callOutTargetIndex, handleCallOut, localPlayerIndex]);
+
+  // Keyboard shortcuts: Space = draw, U = UNO / call-out
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      // Don't fire if user is typing in an input
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      if (e.key === " " || e.code === "Space") {
+        e.preventDefault();
+        if (humanTurn && !drawDisabled) drawCard();
+      }
+      if (e.key === "u" || e.key === "U") {
+        e.preventDefault();
+        if (canDeclareUnoNow) {
+          declareUno();
+        } else if (canCallOutNow) {
+          triggerCallOut();
+        }
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [humanTurn, drawDisabled, drawCard, declareUno, canDeclareUnoNow, canCallOutNow, triggerCallOut]);
+
   if (!game || !localPlayer || !currentPlayer) return null;
 
   const topDiscard = game.discardPile[game.discardPile.length - 1];
   const winner = game.winnerId ? game.players.find(p => p.id === game.winnerId) : null;
-  const humanTurn = isLocalTurn && !localPlayer.isBot && !game.winnerId;
-  const drawDisabled = botThinking || !!game.winnerId || (drawnThisTurn && game.pendingDraw === 0) || !humanTurn;
   const sortedHand = sortHand(localPlayer.hand);
   const opponents = game.players.filter((_, i) => i !== localPlayerIndex);
 
@@ -417,11 +601,6 @@ export default function GameBoard({
     ? Math.min(scaledByHeight, 1.0)   // compact viewport: cap at 1.0
     : Math.min(scaledByHeight, 1.3);  // full viewport: allow up to 1.3
 
-  const unoReady =
-    !localPlayer.isBot && !game.winnerId &&
-    localPlayer.hand.length >= 1 && localPlayer.hand.length <= 2 &&
-    !localPlayer.saidUno && game.rules.mustDeclareUno;
-
   const mustDrawNow = humanTurn && !drawDisabled && playableCardIds.size === 0;
 
   const hint = !humanTurn
@@ -437,39 +616,13 @@ export default function GameBoard({
   const ARC_SPREAD = 3.5;
   const ARC_LIFT   = 2.5;
 
-  const confirmExitGame = () => { setShowExitConfirm(false); resetGame(); onReset(); };
-
-  const declareUno = useCallback(() => {
-    if (!unoReady) return;
-    sayUno(localPlayerIndex);
-    setShowUnoFlash(true);
-    window.setTimeout(() => setShowUnoFlash(false), 900);
-  }, [unoReady, sayUno, localPlayerIndex]);
-
-  // Wrap callOut to also show the flash
-  const handleCallOut = useCallback((callerIdx: number, targetIdx: number, targetName: string) => {
-    callOut(callerIdx, targetIdx);
-    setCallOutFlashName(targetName);
-    window.setTimeout(() => setCallOutFlashName(null), 1100);
-  }, [callOut]);
-
-  // Keyboard shortcuts: Space = draw, U = UNO
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      // Don't fire if user is typing in an input
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
-      if (e.key === " " || e.code === "Space") {
-        e.preventDefault();
-        if (humanTurn && !drawDisabled) drawCard();
-      }
-      if (e.key === "u" || e.key === "U") {
-        e.preventDefault();
-        declareUno();
-      }
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [humanTurn, drawDisabled, drawCard, declareUno]);
+  const confirmExitGame = () => {
+    setShowExitConfirm(false);
+    resetScores();
+    completedMatchRef.current = false;
+    resetGame();
+    onReset();
+  };
 
   const requestLandscapeMode = async () => {
     try {
@@ -535,6 +688,26 @@ export default function GameBoard({
         .uno-btn:hover { opacity: 0.82 !important; }
         .menu-btn { transition: color 0.12s; }
         .menu-btn:hover { color: var(--ui-accent-red) !important; }
+
+        /* Keep the hand scrollbar inside the card zone (top edge), not at the panel bottom. */
+        .player-hand-scroll {
+          width: 100%;
+          overflow-x: auto;
+          overflow-y: hidden;
+          transform: rotateX(180deg);
+          scrollbar-gutter: stable both-edges;
+          scrollbar-width: thin;
+          scrollbar-color: color-mix(in srgb, var(--ui-muted) 55%, transparent) transparent;
+        }
+        .player-hand-scroll::-webkit-scrollbar { height: 10px; }
+        .player-hand-scroll::-webkit-scrollbar-track { background: transparent; }
+        .player-hand-scroll::-webkit-scrollbar-thumb {
+          background: color-mix(in srgb, var(--ui-muted) 55%, transparent);
+          border-radius: 999px;
+        }
+        .player-hand-scroll-content {
+          transform: rotateX(180deg);
+        }
       `}</style>
 
       <LiveFeed entries={feed} />
@@ -603,14 +776,11 @@ export default function GameBoard({
         }}>
           {opponents.map(player => {
             const idx = game.players.findIndex(p => p.id === player.id);
-            const showCallOut = humanTurn && player.hand.length === 1 && !player.saidUno && game.rules.mustDeclareUno;
             return (
               <OpponentStrip
                 key={player.id}
                 player={player}
                 isCurrentTurn={idx === game.currentPlayerIndex}
-                showCallOut={showCallOut}
-                onCallOut={() => handleCallOut(localPlayerIndex, idx, player.name)}
                 cardScale={handCardScale}
               />
             );
@@ -729,11 +899,14 @@ export default function GameBoard({
           position: "relative",
         }}>
 
-          {/* UNO button — top-right, absolute over the card area */}
-          {unoReady && (
-            <button className="uno-btn" onClick={declareUno} style={{
+          {/* UNO button — only shown on your own turn */}
+          {canDeclareUnoNow && (
+            <button
+              className="uno-btn"
+              onClick={declareUno}
+              style={{
               position: "absolute",
-              right: isCompactBoard ? 10 : 14,
+              right: isCompactBoard ? 34 : 46,
               top: isCompactBoard ? 8 : 10,
               zIndex: 22,
               fontFamily: "'Bebas Neue', cursive",
@@ -743,18 +916,40 @@ export default function GameBoard({
               padding: isCompactBoard ? "5px 11px" : "7px 15px",
               cursor: "pointer", opacity: 1,
               animation: "blink 1.4s ease-in-out infinite",
-            }}>UNO! (U)</button>
+            }}
+            >UNO! (U)</button>
+          )}
+
+          {/* Call-out button — only shown while waiting on opponents */}
+          {canCallOutNow && (
+            <button
+              className="uno-btn"
+              onClick={triggerCallOut}
+              style={{
+              position: "absolute",
+              right: isCompactBoard ? 34 : 46,
+              top: isCompactBoard ? 8 : 10,
+              zIndex: 22,
+              fontFamily: "'Bebas Neue', cursive",
+              fontSize: isCompactBoard ? 15 : 18, letterSpacing: "0.1em",
+              background: "var(--ui-accent-red)", color: "#fff",
+              border: "2px solid var(--ui-accent-red)",
+              padding: isCompactBoard ? "5px 11px" : "7px 15px",
+              cursor: "pointer", opacity: 1,
+              animation: "blink 1.4s ease-in-out infinite",
+            }}
+            >CALL OUT! (U)</button>
           )}
 
           {/* Card fan — scrollable, full height */}
-          <div style={{ overflowX: "auto", overflowY: "visible", width: "100%" }}>
-            <div style={{
+          <div className="player-hand-scroll">
+            <div className="player-hand-scroll-content" style={{
               display: "flex",
               alignItems: "flex-end",
               justifyContent: "center",
               minWidth: "max-content",
               paddingLeft:  isCompactBoard ? 16 : 24,
-              paddingRight: unoReady ? (isCompactBoard ? 90 : 110) : (isCompactBoard ? 16 : 24),
+              paddingRight: hasPrimaryActionButton ? (isCompactBoard ? 112 : 136) : (isCompactBoard ? 16 : 24),
               paddingTop:   isCompactBoard ? 12 : 16,
               paddingBottom: 0,
               height: isCompactBoard
@@ -845,12 +1040,12 @@ export default function GameBoard({
               }}>UNO</span>
             )}
 
-            {/* Session wins */}
-            {(scores[localPlayer.name] ?? 0) > 0 && (
+            {/* Match points */}
+            {(pointsByPlayerId[localPlayer.id] ?? 0) > 0 && (
               <span style={{
                 fontFamily: "'Courier Prime', monospace", fontSize: 9,
                 color: "var(--ui-muted)", letterSpacing: "0.06em", flexShrink: 0,
-              }}>{scores[localPlayer.name]}W</span>
+              }}>{pointsByPlayerId[localPlayer.id]} pts</span>
             )}
 
             {/* Separator dot */}
@@ -941,8 +1136,8 @@ export default function GameBoard({
             transform: "translate(-50%, -50%)",
             fontFamily: "'Bebas Neue', cursive",
             fontSize: "clamp(64px, 18vw, 180px)", lineHeight: 0.9,
-            color: "var(--ui-bg)",
-            textShadow: "0 0 0 #000, 0 10px 26px rgba(0,0,0,0.34), 0 0 24px rgba(192,57,43,0.45)",
+            color: "var(--ui-text)",
+            textShadow: "0 1px 0 color-mix(in srgb, var(--ui-bg) 70%, black), 0 10px 26px rgba(0,0,0,0.42), 0 0 28px color-mix(in srgb, var(--ui-accent-red) 70%, transparent)",
             animation: "unoFlashPop 0.9s cubic-bezier(0.22,1,0.36,1) forwards",
           }}>UNO!</div>
         </div>
@@ -951,8 +1146,37 @@ export default function GameBoard({
       {winner && (
         <WinnerScreen
           winner={winner}
-          scores={scores}
-          onReset={() => { resetGame(); onReset(); }}
+          roundPoints={lastRoundPoints}
+          winnerTotalPoints={pointsByPlayerId[winner.id] ?? 0}
+          matchWinnerName={matchWinner?.name ?? null}
+          scoreRows={scoreRows}
+          onExit={() => {
+            resetScores();
+            completedMatchRef.current = false;
+            resetGame();
+            onReset();
+          }}
+          onDealAgain={() => {
+            if (isOnlineMatch) {
+              void handleOnlineRematch();
+              return;
+            }
+            handleLocalDealAgain();
+          }}
+          dealAgainDisabled={isOnlineMatch && (!isOnlineHost || rematchBusy)}
+          dealAgainLabel={
+            isOnlineMatch
+              ? isOnlineHost
+                ? (rematchBusy ? "Starting..." : matchWinner ? "New Match" : "Play Again")
+                : "Waiting Host"
+              : matchWinner ? "New Match" : "Deal again"
+          }
+          onlineActions={isOnlineMatch ? {
+            enabled: true,
+            isHost: isOnlineHost,
+            busy: rematchBusy,
+            onPlayAgain: () => { void handleOnlineRematch(); },
+          } : undefined}
         />
       )}
     </>

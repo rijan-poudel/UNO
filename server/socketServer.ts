@@ -16,6 +16,7 @@ import type { GameState } from '../types/game';
 import type {
   Ack,
   CreateRoomPayload,
+  KickPlayerPayload,
   JoinRoomPayload,
   RoomActionPayload,
   RoomPlayer,
@@ -68,6 +69,15 @@ function makeRoomId(): string {
 
 function makePlayerId(existingCount: number): string {
   return `player_${existingCount}`;
+}
+
+function makeNextPlayerId(players: ServerRoomPlayer[]): string {
+  const existingIds = new Set(players.map((player) => player.playerId));
+  let cursor = 0;
+  while (existingIds.has(`player_${cursor}`)) {
+    cursor += 1;
+  }
+  return `player_${cursor}`;
 }
 
 function toSnapshot(room: ServerRoom): RoomSnapshot {
@@ -299,7 +309,7 @@ io.on('connection', (socket) => {
         return;
       }
 
-      const playerId = makePlayerId(room.players.length);
+      const playerId = makeNextPlayerId(room.players);
       room.players.push({ playerId, socketId: socket.id, name: playerName, connected: true });
       playerBySocket.set(socket.id, { roomId, playerId });
       socket.join(roomId);
@@ -347,6 +357,61 @@ io.on('connection', (socket) => {
 
       const snapshot = toSnapshot(room);
       io.to(roomId).emit('room:update', snapshot);
+      reply?.({ ok: true, data: { room: snapshot } });
+    } catch (error) {
+      reply?.(ackError((error as Error).message));
+    }
+  });
+
+  socket.on('room:kick', (payload: KickPlayerPayload, reply?: (ack: Ack<{ room: RoomSnapshot }>) => void) => {
+    try {
+      const roomId = payload.roomId?.trim().toUpperCase();
+      const targetPlayerId = payload.targetPlayerId?.trim();
+      if (!roomId || !targetPlayerId) {
+        reply?.(ackError('Room code and target player are required.'));
+        return;
+      }
+
+      const room = rooms.get(roomId);
+      if (!room) {
+        reply?.(ackError('Room not found.'));
+        return;
+      }
+
+      const actor = room.players.find((p) => p.socketId === socket.id);
+      if (!actor || actor.playerId !== room.hostPlayerId) {
+        reply?.(ackError('Only the host can remove players.'));
+        return;
+      }
+
+      if (room.started) {
+        reply?.(ackError('Cannot remove players after the game starts.'));
+        return;
+      }
+
+      if (targetPlayerId === room.hostPlayerId) {
+        reply?.(ackError('Host cannot remove themselves.'));
+        return;
+      }
+
+      const targetIndex = room.players.findIndex((p) => p.playerId === targetPlayerId);
+      if (targetIndex === -1) {
+        reply?.(ackError('Target player not found.'));
+        return;
+      }
+
+      const [removed] = room.players.splice(targetIndex, 1);
+      if (removed.socketId) {
+        const kickedSocket = io.sockets.sockets.get(removed.socketId);
+        if (kickedSocket) {
+          kickedSocket.leave(roomId);
+          kickedSocket.emit('room:kicked', { roomId, message: 'You were removed by the host.' });
+        }
+        playerBySocket.delete(removed.socketId);
+      }
+
+      const snapshot = toSnapshot(room);
+      io.to(room.roomId).emit('room:update', snapshot);
       reply?.({ ok: true, data: { room: snapshot } });
     } catch (error) {
       reply?.(ackError((error as Error).message));

@@ -13,7 +13,7 @@ import type { GameState, Player, LastAction } from '../types/game';
 import type { Card, CardColor } from '../types/card';
 import { isWildCard } from '../types/card';
 import { canPlayCard } from './gameRules';
-import { advanceTurn, getNextPlayerIndex } from './turns';
+import { advanceTurn } from './turns';
 import { shuffleDeck } from './deck';
 
 // ── Internal utilities ────────────────────────────────────────────────────────

@@ -11,7 +11,7 @@
 
 import { initializeGame } from './lib/gameSetup';
 import { canPlayCard, getPlayableCards } from './lib/gameRules';
-import { playCard, drawOneCard, drawRequiredCards, passTurn, declareUno, callOutUno } from './lib/gameActions';
+import { playCard, drawOneCard, drawRequiredCards, passTurn, declareUno } from './lib/gameActions';
 import { getBotMove, getBotPreferredColor } from './lib/botSupport';
 import { getNextPlayerIndex } from './lib/turns';
 import type { GameState } from './types/game';

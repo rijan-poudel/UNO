@@ -1,7 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import SetupShell from './SetupShell';
 
 interface PlayerRow {
@@ -45,16 +45,22 @@ function getInitialPlayers(): PlayerRow[] {
 
 export default function GameSetup({ onStart, controls }: GameSetupProps) {
   const [players, setPlayers] = useState<PlayerRow[]>(getInitialPlayers);
-  // Track which rows were just added so we can animate them in
-  const justAdded = useRef<Set<number>>(new Set());
+  // Track newly added row ids for one-shot enter animation.
+  const [justAddedIds, setJustAddedIds] = useState<Set<number>>(new Set());
 
   const addPlayer = () => {
     if (players.length >= MAX_PLAYERS) return;
     const uid = nextUid();
-    justAdded.current.add(uid);
+    setJustAddedIds((prev) => new Set(prev).add(uid));
     setPlayers(prev => [...prev, { name: `Player ${prev.length + 1}`, isBot: false, uid }]);
     // Clear the "just added" flag after animation completes
-    setTimeout(() => justAdded.current.delete(uid), 320);
+    setTimeout(() => {
+      setJustAddedIds((prev) => {
+        const next = new Set(prev);
+        next.delete(uid);
+        return next;
+      });
+    }, 320);
   };
 
   const removePlayer = (i: number) => {
@@ -156,7 +162,7 @@ export default function GameSetup({ onStart, controls }: GameSetupProps) {
         {/* Player rows */}
         <div>
           {players.map((player, index) => {
-            const isNew = justAdded.current.has(player.uid);
+            const isNew = justAddedIds.has(player.uid);
             return (
               <div
                 key={player.uid}

@@ -126,6 +126,19 @@ export function useUnoOnlineGame() {
       });
     });
 
+    socket.on('room:kicked', (payload?: { message?: string }) => {
+      setState((prev) => ({
+        ...prev,
+        room: null,
+        game: null,
+        playerId: null,
+        pendingWild: null,
+        drawnThisTurn: false,
+        log: [],
+        error: payload?.message ?? 'You were removed from the room.',
+      }));
+    });
+
     return () => {
       socket.disconnect();
       socketRef.current = null;
@@ -191,6 +204,27 @@ export function useUnoOnlineGame() {
       game: ack.data.room.game,
       error: null,
       log: ['Game started', ...prev.log].slice(0, 30),
+    }));
+    return true;
+  }, [callAck, state.room]);
+
+  const kickPlayer = useCallback(async (targetPlayerId: string) => {
+    if (!state.room) return false;
+    const ack = await callAck<{ room: RoomSnapshot }>('room:kick', {
+      roomId: state.room.roomId,
+      targetPlayerId,
+    });
+    if (!ack.ok) {
+      setState((prev) => ({ ...prev, error: ack.error }));
+      return false;
+    }
+
+    setState((prev) => ({
+      ...prev,
+      room: ack.data.room,
+      game: ack.data.room.game,
+      error: null,
+      log: ['Player removed by host', ...prev.log].slice(0, 30),
     }));
     return true;
   }, [callAck, state.room]);
@@ -392,5 +426,6 @@ export function useUnoOnlineGame() {
     createRoom,
     joinRoom,
     startOnlineGame,
+    kickPlayer,
   };
 }

@@ -37,6 +37,11 @@ export interface StartRoomPayload {
   rules?: Partial<GameRules>;
 }
 
+export interface KickPlayerPayload {
+  roomId: string;
+  targetPlayerId: string;
+}
+
 export interface RoomActionPayload {
   roomId: string;
   action: MultiplayerAction;
