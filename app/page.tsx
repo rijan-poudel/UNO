@@ -7,6 +7,7 @@ import { useUnoOnlineGame } from '../hooks/useUnoOnlineGame';
 import GameBoard from '../components/GameBoard';
 import OnlineLobby from '../components/OnlineLobby';
 import SettingsModal from '../components/SettingsModal';
+import { toast } from 'sonner';
 
 const SHARED_RULES_KEY = 'uno.shared.rules';
 const PREFERRED_THEME_KEY = 'uno.preferred.theme';
@@ -152,47 +153,142 @@ export default function Home() {
     setTheme(order[(idx + 1) % order.length]);
   };
 
-  const setupControls = (
-    <div style={{
-      display: 'flex',
-      justifyContent: 'flex-end',
-      alignItems: 'center',
-      gap: 12,
-      flexWrap: 'wrap',
-    }}>
-      <button
-        type="button"
-        onClick={cycleTheme}
-        style={{
-          border: '1px solid var(--ui-line)',
-          background: 'var(--ui-surface)',
-          color: 'var(--ui-text)',
-          padding: '8px 12px',
-          cursor: 'pointer',
-          fontSize: 11,
-          letterSpacing: '0.08em',
-          textTransform: 'uppercase',
-        }}
-      >
-        Theme: {THEMES[theme].label}
-      </button>
+  const copyFriendCode = async () => {
+    if (!onlineGameApi.friendCode) return;
+    try {
+      await navigator.clipboard.writeText(onlineGameApi.friendCode);
+      toast.success('Friend code copied.');
+    } catch {
+      toast.error('Could not copy friend code.');
+    }
+  };
 
-      <button
-        type="button"
-        onClick={() => setShowSettings(true)}
-        style={{
-          border: '1px solid var(--ui-line)',
-          background: 'var(--ui-surface)',
-          color: 'var(--ui-text)',
-          padding: '8px 12px',
-          cursor: 'pointer',
-          fontSize: 11,
-          letterSpacing: '0.08em',
-          textTransform: 'uppercase',
-        }}
-      >
-        Settings
-      </button>
+  const setupControls = (
+    <div className="setup-top-controls">
+      <style>{`
+        .setup-top-controls {
+          width: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 28px;
+        }
+        .setup-top-friend {
+          width: fit-content;
+          min-width: 0;
+          border: 1px solid var(--ui-line);
+          background: var(--ui-surface);
+          padding: 10px 12px;
+          display: grid;
+          gap: 4px;
+        }
+        .setup-top-friend-row {
+          display: grid;
+          grid-template-columns: auto auto auto;
+          justify-content: start;
+          align-items: center;
+          gap: 14px;
+        }
+        .setup-top-actions {
+          display: flex;
+          gap: 14px;
+          margin-left: 0;
+          flex-shrink: 0;
+        }
+        .setup-top-btn {
+          border: 1px solid var(--ui-line);
+          background: var(--ui-surface);
+          color: var(--ui-text);
+          padding: 9px 16px;
+          cursor: pointer;
+          font-size: 11px;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          white-space: nowrap;
+          width: auto;
+        }
+        @media (max-width: 860px) {
+          .setup-top-controls {
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr;
+            justify-content: center;
+            gap: 14px;
+          }
+          .setup-top-actions {
+            justify-content: center;
+            margin-left: 0;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+          }
+        }
+        @media (max-width: 560px) {
+          .setup-top-actions {
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+          }
+          .setup-top-btn {
+            width: 100%;
+            padding: 8px 12px;
+          }
+        }
+      `}</style>
+
+      <div className="setup-top-friend">
+        <div className="setup-top-friend-row">
+          <span style={{
+            fontSize: 10,
+            letterSpacing: '0.09em',
+            textTransform: 'uppercase',
+            color: 'var(--ui-muted)',
+          }}>
+            Friend
+          </span>
+
+          <span style={{
+            fontFamily: "'Courier Prime', monospace",
+            fontSize: 12,
+            letterSpacing: '0.08em',
+            color: 'var(--ui-text)',
+            maxWidth: '180px',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}>
+            {onlineGameApi.friendCode || '...'}
+          </span>
+
+          <button
+            type="button"
+            onClick={copyFriendCode}
+            className="setup-top-btn"
+            style={{
+              background: 'transparent',
+              padding: '4px 8px',
+              fontSize: 10,
+            }}
+          >Copy</button>
+        </div>
+
+      </div>
+
+      <div className="setup-top-actions">
+        <button
+          type="button"
+          onClick={cycleTheme}
+          className="setup-top-btn"
+        >
+          Theme: {THEMES[theme].label}
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setShowSettings(true)}
+          className="setup-top-btn"
+        >
+          Settings
+        </button>
+      </div>
     </div>
   );
 
@@ -204,9 +300,16 @@ export default function Home() {
           connected={onlineGameApi.connected}
           room={onlineGameApi.room}
           playerId={onlineGameApi.playerId}
+          friendCode={onlineGameApi.friendCode}
+          incomingInvites={onlineGameApi.incomingInvites}
           error={onlineGameApi.error}
+          onSyncPresence={onlineGameApi.syncPresence}
           onCreateRoom={onlineGameApi.createRoom}
           onJoinRoom={onlineGameApi.joinRoom}
+          onSendFriendInvite={onlineGameApi.sendFriendInvite}
+          onAcceptFriendInvite={onlineGameApi.acceptFriendInvite}
+          onDeclineFriendInvite={onlineGameApi.declineFriendInvite}
+          onLeaveRoom={onlineGameApi.leaveRoom}
           onStartGame={() => {
             setActiveGameMode('online');
             return onlineGameApi.startOnlineGame(sharedRules);

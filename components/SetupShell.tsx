@@ -6,9 +6,10 @@ interface SetupShellProps {
   subtitle: string;
   children: ReactNode;
   footer: ReactNode;
+  controls?: ReactNode;
 }
 
-export default function  SetupShell({ subtitle, children, footer }: SetupShellProps) {
+export default function SetupShell({ subtitle, children, footer, controls }: SetupShellProps) {
   return (
     <>
       <style>{`
@@ -69,9 +70,17 @@ export default function  SetupShell({ subtitle, children, footer }: SetupShellPr
           >
             {subtitle}
           </p>
+
+          {controls ? (
+            <div style={{ marginTop: 14, display: 'flex', justifyContent: 'center' }}>
+              <div style={{ width: 'min(620px, 100%)' }}>
+                {controls}
+              </div>
+            </div>
+          ) : null}
         </div>
 
-        <div style={{ height: 1, background: 'var(--ui-line)', marginTop: -48 }} />
+        <div style={{ height: 1, background: 'var(--ui-line)', marginTop: 0 }} />
 
         <div
           style={{

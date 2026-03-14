@@ -318,30 +318,16 @@ function WinnerScreen({
       )}
 
       <div style={{ width: 1, height: 32, background: "var(--ui-line)" }} />
-      <div style={{ display: "flex", gap: 10 }}>
-        <button onClick={onExit} style={{
-          fontFamily: "'Courier Prime', monospace", fontSize: 11, fontWeight: 700,
-          letterSpacing: "0.1em", textTransform: "uppercase",
-          background: "transparent", border: "1px solid var(--ui-line)",
-          color: "var(--ui-muted)", padding: "12px 20px", cursor: "pointer",
-          transition: "color 0.12s",
-        }}
-          onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.color = "var(--ui-text)")}
-          onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.color = "var(--ui-muted)")}
-        >Exit</button>
+      <div className="winner-actions">
+        <button onClick={onExit} className="winner-btn winner-btn-secondary">Exit</button>
         <button
           onClick={onDealAgain}
           disabled={dealAgainDisabled || Boolean(rematchEnabled && (!onlineActions?.isHost || onlineActions.busy))}
+          className="winner-btn winner-btn-primary"
           style={{
-          fontFamily: "'Bebas Neue', cursive", fontSize: 22, letterSpacing: "0.14em",
-          background: "var(--ui-text)", color: "var(--ui-bg)",
-          border: "none", padding: "12px 36px",
           cursor: dealAgainDisabled || (rematchEnabled && (!onlineActions?.isHost || onlineActions.busy)) ? "default" : "pointer",
-          transition: "opacity 0.12s",
           opacity: dealAgainDisabled || (rematchEnabled && (!onlineActions?.isHost || onlineActions.busy)) ? 0.5 : 1,
         }}
-          onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.opacity = "0.7")}
-          onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.opacity = "1")}
         >{dealAgainLabel}</button>
       </div>
       {rematchEnabled && (
@@ -520,7 +506,11 @@ export default function GameBoard({
     ? game.players.findIndex((p) => p.id === callOutTarget.id)
     : -1;
   const canCallOutNow = !humanTurn && Boolean(callOutTarget);
-  const hasPrimaryActionButton = canDeclareUnoNow || canCallOutNow;
+  const primaryActionLabel = canDeclareUnoNow
+    ? "UNO! (U)"
+    : canCallOutNow
+      ? "CALL OUT! (U)"
+      : null;
 
   const declareUno = useCallback(() => {
     if (!unoReady) return;
@@ -580,9 +570,18 @@ export default function GameBoard({
     game.activeColor && game.activeColor !== "wild"
       ? ACTIVE_COLOR_META[game.activeColor as "red" | "yellow" | "green" | "blue"]
       : null;
-  void activeColorMeta;
 
   const pileCardScale = boardScale;
+  const boardShellWidth = isCompactBoard
+    ? "min(1180px, calc(100vw - 16px))"
+    : "min(1360px, calc(100vw - 24px))";
+  const primaryStatusLabel = game.pendingDraw > 0
+    ? `+${game.pendingDraw} pending`
+    : activeColorMeta
+      ? `${activeColorMeta.label} active`
+      : game.direction === 1
+        ? "Clockwise"
+        : "Counter";
 
   // Dynamic hand card scale: shrink cards so they always fit above the info row.
   // Budget = total viewport height
@@ -689,6 +688,90 @@ export default function GameBoard({
         .menu-btn { transition: color 0.12s; }
         .menu-btn:hover { color: var(--ui-accent-red) !important; }
 
+        .board-top-actions {
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          align-items: center;
+          gap: 6px;
+          width: min(420px, 100%);
+        }
+        .board-top-btn {
+          font-family: 'Courier Prime', monospace;
+          font-size: 10px;
+          font-weight: 700;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          background: var(--ui-surface);
+          border: 1px solid var(--ui-line);
+          color: var(--ui-muted);
+          padding: 6px 10px;
+          cursor: pointer;
+          transition: color 0.12s ease, border-color 0.12s ease;
+          white-space: nowrap;
+        }
+        .board-top-btn:hover {
+          color: var(--ui-text);
+          border-color: color-mix(in srgb, var(--ui-line) 62%, var(--ui-text));
+        }
+
+        .winner-actions {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, auto));
+          gap: 10px;
+          align-items: center;
+          justify-content: center;
+          width: min(560px, 100%);
+        }
+        .winner-btn {
+          font-family: 'Courier Prime', monospace;
+          font-size: 11px;
+          font-weight: 700;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          border: 1px solid var(--ui-line);
+          padding: 12px 20px;
+          cursor: pointer;
+          transition: opacity 0.12s ease, color 0.12s ease;
+          white-space: nowrap;
+        }
+        .winner-btn-secondary {
+          background: transparent;
+          color: var(--ui-muted);
+        }
+        .winner-btn-secondary:hover {
+          color: var(--ui-text);
+        }
+        .winner-btn-primary {
+          font-family: 'Bebas Neue', cursive;
+          font-size: 22px;
+          letter-spacing: 0.14em;
+          border: none;
+          background: var(--ui-text);
+          color: var(--ui-bg);
+          padding: 12px 36px;
+        }
+        @media (max-width: 860px) {
+          .board-top-actions {
+            width: 100%;
+          }
+          .board-top-btn {
+            font-size: 9px;
+            padding: 5px 8px;
+          }
+        }
+        @media (max-width: 560px) {
+          .board-top-actions {
+            grid-template-columns: 1fr;
+          }
+          .winner-actions {
+            grid-template-columns: 1fr;
+          }
+          .winner-btn,
+          .winner-btn-primary {
+            width: 100%;
+          }
+        }
+
         /* Keep the hand scrollbar inside the card zone (top edge), not at the panel bottom. */
         .player-hand-scroll {
           width: 100%;
@@ -717,18 +800,27 @@ export default function GameBoard({
         height: "100dvh", overflow: "hidden",
         color: "var(--ui-text)", background: "var(--ui-bg)",
         fontFamily: "'Courier Prime', monospace",
-        display: "flex", flexDirection: "column",
+        display: "flex", justifyContent: "center",
       }}>
+
+        <div style={{
+          width: boardShellWidth,
+          height: "100%",
+          display: "grid",
+          gridTemplateRows: "auto auto minmax(0, 1fr) auto",
+          gap: isCompactBoard ? 6 : 10,
+          margin: "0 auto",
+        }}>
 
         {/* ── Header ── */}
         <div style={{
-          position: "absolute", top: 0, left: 0, right: 0, zIndex: 30,
-          padding: isCompactBoard ? "6px 8px" : "10px 12px",
+          zIndex: 30,
+          padding: isCompactBoard ? "8px 2px 0" : "12px 4px 0",
           display: "flex", justifyContent: "space-between", alignItems: "center",
-          pointerEvents: "none",
+          gap: 8,
         }}>
           <h1 style={{
-            margin: isCompactBoard ? 6 : 10, pointerEvents: "auto",
+            margin: 0,
             fontFamily: "'Bebas Neue', cursive",
             fontSize: isCompactBoard ? 30 : 38, letterSpacing: "0.02em", lineHeight: 1,
           }}>
@@ -736,43 +828,29 @@ export default function GameBoard({
             <span style={{ color: "var(--ui-accent-yellow)" }}>N</span>
             <span style={{ color: "var(--ui-accent-green)" }}>O</span>
           </h1>
-          <div style={{ display: "flex", alignItems: "center", gap: 6, pointerEvents: "auto" }}>
-            <button type="button" onClick={onCycleTheme} style={{
-              fontFamily: "'Courier Prime', monospace",
-              fontSize: isCompactBoard ? 9 : 10, fontWeight: 700,
-              letterSpacing: "0.14em", textTransform: "uppercase",
-              background: "var(--ui-surface)", border: "1px solid var(--ui-line)",
-              color: "var(--ui-muted)", padding: isCompactBoard ? "5px 9px" : "6px 11px",
-              cursor: "pointer", transition: "color 0.12s",
-            }}>Theme: {currentThemeLabel}</button>
-            <button onClick={onOpenSettings} style={{
-              fontFamily: "'Courier Prime', monospace",
-              fontSize: isCompactBoard ? 9 : 10, fontWeight: 700,
-              letterSpacing: "0.14em", textTransform: "uppercase",
-              background: "var(--ui-surface)", border: "1px solid var(--ui-line)",
-              color: "var(--ui-muted)", padding: isCompactBoard ? "5px 9px" : "6px 11px",
-              cursor: "pointer", transition: "color 0.12s",
-            }}>SETTINGS</button>
-            <button className="menu-btn" onClick={() => setShowExitConfirm(true)} style={{
-              fontFamily: "'Courier Prime', monospace",
-              fontSize: isCompactBoard ? 9 : 10, fontWeight: 700,
-              letterSpacing: "0.14em", textTransform: "uppercase",
-              background: "var(--ui-surface)", border: "1px solid var(--ui-line)",
-              color: "var(--ui-muted)", padding: isCompactBoard ? "5px 9px" : "6px 11px",
-              cursor: "pointer",
-            }}>MENU</button>
+          <div className="board-top-actions">
+            <button type="button" onClick={onCycleTheme} className="board-top-btn">
+              Theme: {currentThemeLabel}
+            </button>
+            <button type="button" onClick={onOpenSettings} className="board-top-btn">
+              Settings
+            </button>
+            <button type="button" className="board-top-btn menu-btn" onClick={() => setShowExitConfirm(true)}>
+              Menu
+            </button>
           </div>
         </div>
 
-        {/* ── Opponents — paddingTop clears floating header ── */}
+        {/* ── Opponents ── */}
         <section style={{
-          paddingTop: isCompactBoard ? 48 : 58,
-          paddingBottom: isCompactBoard ? 4 : 8,
-          paddingInline: 12,
-          display: "flex", flexWrap: "wrap",
-          gap: isCompactBoard ? "4px 14px" : "8px 20px",
-          justifyContent: "center", alignItems: "flex-start",
+          padding: isCompactBoard ? "2px 10px 8px" : "4px 14px 12px",
+          borderBlock: "1px solid var(--ui-line)",
+          display: "grid",
+          gridTemplateColumns: `repeat(${Math.max(opponents.length, 1)}, minmax(0, 1fr))`,
+          gap: isCompactBoard ? "6px 12px" : "8px 18px",
+          alignItems: "flex-start",
           flexShrink: 0,
+          overflowX: "auto",
         }}>
           {opponents.map(player => {
             const idx = game.players.findIndex(p => p.id === player.id);
@@ -810,7 +888,15 @@ export default function GameBoard({
             ) : null}
           </div>
 
-          <div style={{ display: "flex", alignItems: "flex-end", gap: isCompactBoard ? 14 : 32 }}>
+          <div style={{
+            width: "min(760px, 100%)",
+            border: "1px solid var(--ui-line)",
+            padding: isCompactBoard ? "16px 12px" : "20px 18px",
+            display: "grid",
+            gridTemplateColumns: "1fr auto 1fr",
+            alignItems: "end",
+            gap: isCompactBoard ? 12 : 22,
+          }}>
 
             {/* Draw pile */}
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
@@ -896,50 +982,9 @@ export default function GameBoard({
         <div style={{
           flexShrink: 0,
           borderTop: "1px solid var(--ui-line)",
-          position: "relative",
+          display: "grid",
+          gridTemplateRows: "minmax(0, 1fr) auto",
         }}>
-
-          {/* UNO button — only shown on your own turn */}
-          {canDeclareUnoNow && (
-            <button
-              className="uno-btn"
-              onClick={declareUno}
-              style={{
-              position: "absolute",
-              right: isCompactBoard ? 34 : 46,
-              top: isCompactBoard ? 8 : 10,
-              zIndex: 22,
-              fontFamily: "'Bebas Neue', cursive",
-              fontSize: isCompactBoard ? 15 : 18, letterSpacing: "0.1em",
-              background: "var(--ui-accent-red)", color: "#fff",
-              border: "2px solid var(--ui-accent-red)",
-              padding: isCompactBoard ? "5px 11px" : "7px 15px",
-              cursor: "pointer", opacity: 1,
-              animation: "blink 1.4s ease-in-out infinite",
-            }}
-            >UNO! (U)</button>
-          )}
-
-          {/* Call-out button — only shown while waiting on opponents */}
-          {canCallOutNow && (
-            <button
-              className="uno-btn"
-              onClick={triggerCallOut}
-              style={{
-              position: "absolute",
-              right: isCompactBoard ? 34 : 46,
-              top: isCompactBoard ? 8 : 10,
-              zIndex: 22,
-              fontFamily: "'Bebas Neue', cursive",
-              fontSize: isCompactBoard ? 15 : 18, letterSpacing: "0.1em",
-              background: "var(--ui-accent-red)", color: "#fff",
-              border: "2px solid var(--ui-accent-red)",
-              padding: isCompactBoard ? "5px 11px" : "7px 15px",
-              cursor: "pointer", opacity: 1,
-              animation: "blink 1.4s ease-in-out infinite",
-            }}
-            >CALL OUT! (U)</button>
-          )}
 
           {/* Card fan — scrollable, full height */}
           <div className="player-hand-scroll">
@@ -948,8 +993,8 @@ export default function GameBoard({
               alignItems: "flex-end",
               justifyContent: "center",
               minWidth: "max-content",
-              paddingLeft:  isCompactBoard ? 16 : 24,
-              paddingRight: hasPrimaryActionButton ? (isCompactBoard ? 112 : 136) : (isCompactBoard ? 16 : 24),
+              paddingLeft:  isCompactBoard ? 18 : 28,
+              paddingRight: isCompactBoard ? 18 : 28,
               paddingTop:   isCompactBoard ? 12 : 16,
               paddingBottom: 0,
               height: isCompactBoard
@@ -1003,69 +1048,109 @@ export default function GameBoard({
 
           {/* ── Info row — always below cards, never covered ── */}
           <div style={{
-            display: "flex",
+            display: "grid",
+            gridTemplateColumns: isCompactBoard ? "1fr" : "minmax(220px, auto) 1fr minmax(160px, auto)",
             alignItems: "center",
-            gap: 10,
+            gap: isCompactBoard ? 8 : 12,
             padding: isCompactBoard ? "6px 14px 8px" : "8px 18px 12px",
             borderTop: "1px solid var(--ui-line)",
-            flexWrap: "wrap",
           }}>
-            {/* Name */}
-            <span style={{
-              fontFamily: "'Bebas Neue', cursive",
-              fontSize: isCompactBoard ? 16 : 19,
-              letterSpacing: "0.05em",
-              color: "var(--ui-text)",
-              lineHeight: 1,
-              flexShrink: 0,
-            }}>{localPlayer.name}</span>
-
-            {/* Turn status */}
-            <span style={{
-              fontFamily: "'Courier Prime', monospace",
-              fontSize: isCompactBoard ? 9 : 10,
-              letterSpacing: "0.1em",
-              textTransform: "uppercase",
-              color: "var(--ui-muted)",
-              flexShrink: 0,
-            }}>{humanTurn ? "— your turn" : "— waiting"}</span>
-
-            {/* UNO declared badge */}
-            {localPlayer.saidUno && localPlayer.hand.length <= 2 && (
+            <div style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              flexWrap: "wrap",
+              justifyContent: isCompactBoard ? "center" : "flex-start",
+            }}>
               <span style={{
-                fontFamily: "'Courier Prime', monospace", fontSize: 8, fontWeight: 700,
-                letterSpacing: "0.14em", background: "var(--ui-accent-red)", color: "#fff",
-                padding: "2px 6px", animation: "blink 0.9s step-end infinite",
+                fontFamily: "'Bebas Neue', cursive",
+                fontSize: isCompactBoard ? 16 : 19,
+                letterSpacing: "0.05em",
+                color: "var(--ui-text)",
+                lineHeight: 1,
                 flexShrink: 0,
-              }}>UNO</span>
-            )}
+              }}>{localPlayer.name}</span>
 
-            {/* Match points */}
-            {(pointsByPlayerId[localPlayer.id] ?? 0) > 0 && (
               <span style={{
-                fontFamily: "'Courier Prime', monospace", fontSize: 9,
-                color: "var(--ui-muted)", letterSpacing: "0.06em", flexShrink: 0,
-              }}>{pointsByPlayerId[localPlayer.id]} pts</span>
-            )}
+                fontFamily: "'Courier Prime', monospace",
+                fontSize: isCompactBoard ? 9 : 10,
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+                color: "var(--ui-muted)",
+                flexShrink: 0,
+              }}>{humanTurn ? "Your turn" : "Waiting"}</span>
 
-            {/* Separator dot */}
-            <span style={{ color: "var(--ui-line)", flexShrink: 0 }}>·</span>
+              {localPlayer.saidUno && localPlayer.hand.length <= 2 && (
+                <span style={{
+                  fontFamily: "'Courier Prime', monospace", fontSize: 8, fontWeight: 700,
+                  letterSpacing: "0.14em", background: "var(--ui-accent-red)", color: "#fff",
+                  padding: "2px 6px", animation: "blink 0.9s step-end infinite",
+                  flexShrink: 0,
+                }}>UNO</span>
+              )}
 
-            {/* Hint — takes remaining space, truncates if needed */}
+              {(pointsByPlayerId[localPlayer.id] ?? 0) > 0 && (
+                <span style={{
+                  fontFamily: "'Courier Prime', monospace", fontSize: 9,
+                  color: "var(--ui-muted)", letterSpacing: "0.06em", flexShrink: 0,
+                }}>{pointsByPlayerId[localPlayer.id]} pts</span>
+              )}
+            </div>
+
             <span style={{
               fontFamily: "'Courier Prime', monospace",
               fontSize: isCompactBoard ? 9 : 10,
               letterSpacing: "0.06em",
               textTransform: "uppercase",
               color: "var(--ui-muted)",
-              flex: 1,
+              textAlign: "center",
               minWidth: 0,
               overflow: "hidden",
               textOverflow: "ellipsis",
               whiteSpace: "nowrap",
             }}>{hint}</span>
+
+            <div style={{
+              display: "flex",
+              justifyContent: isCompactBoard ? "center" : "flex-end",
+              minHeight: isCompactBoard ? 32 : 38,
+            }}>
+              {primaryActionLabel ? (
+                <button
+                  className="uno-btn"
+                  onClick={canDeclareUnoNow ? declareUno : triggerCallOut}
+                  style={{
+                    fontFamily: "'Bebas Neue', cursive",
+                    fontSize: isCompactBoard ? 15 : 18,
+                    letterSpacing: "0.1em",
+                    background: "var(--ui-accent-red)",
+                    color: "#fff",
+                    border: "2px solid var(--ui-accent-red)",
+                    padding: isCompactBoard ? "5px 11px" : "7px 15px",
+                    cursor: "pointer",
+                    opacity: 1,
+                    animation: "blink 1.4s ease-in-out infinite",
+                  }}
+                >{primaryActionLabel}</button>
+              ) : (
+                <span style={{
+                  fontFamily: "'Courier Prime', monospace",
+                  fontSize: isCompactBoard ? 9 : 10,
+                  fontWeight: 700,
+                  letterSpacing: "0.12em",
+                  textTransform: "uppercase",
+                  color: activeColorMeta ? activeColorMeta.fg : "var(--ui-muted)",
+                  background: activeColorMeta ? activeColorMeta.bg : "transparent",
+                  border: activeColorMeta ? "none" : "1px solid var(--ui-line)",
+                  padding: isCompactBoard ? "7px 10px" : "9px 12px",
+                  minWidth: isCompactBoard ? 132 : 148,
+                  textAlign: "center",
+                }}>{primaryStatusLabel}</span>
+              )}
+            </div>
           </div>
 
+        </div>
         </div>
       </div>
 

@@ -16,6 +16,15 @@ export interface RoomSnapshot {
   game: GameState | null;
 }
 
+export interface FriendInvite {
+  inviteId: string;
+  roomId: string;
+  fromPlayerId: string;
+  fromName: string;
+  fromFriendCode: string;
+  createdAt: number;
+}
+
 export type MultiplayerAction =
   | { type: 'play'; cardId: string; chosenColor?: CardColor }
   | { type: 'draw' }
@@ -26,6 +35,12 @@ export type MultiplayerAction =
 export interface CreateRoomPayload {
   playerName: string;
   deviceId: string;
+}
+
+export interface PresencePayload {
+  playerName: string;
+  deviceId: string;
+  friendCode: string;
 }
 
 export interface JoinRoomPayload {
@@ -44,9 +59,31 @@ export interface KickPlayerPayload {
   targetPlayerId: string;
 }
 
+export interface LeaveRoomPayload {
+  roomId: string;
+}
+
 export interface RoomActionPayload {
   roomId: string;
   action: MultiplayerAction;
+}
+
+export interface SendFriendInvitePayload {
+  targetFriendCode: string;
+  playerName: string;
+  deviceId: string;
+  friendCode: string;
+}
+
+export interface RespondFriendInvitePayload {
+  inviteId: string;
+  playerName: string;
+  deviceId: string;
+  friendCode: string;
+}
+
+export interface DismissFriendInvitePayload {
+  inviteId: string;
 }
 
 export interface AckSuccess<T> {
