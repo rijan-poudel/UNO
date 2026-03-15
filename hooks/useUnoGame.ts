@@ -25,6 +25,7 @@ import { getBotMove, getBotPreferredColor } from '../lib/botSupport';
 const HUMAN_IDLE_TIMEOUT_MS = 12000;
 const HUMAN_IDLE_AFTER_DRAW_TIMEOUT_MS = 4500;
 const HUMAN_IDLE_WILD_PICK_TIMEOUT_MS = 3500;
+const BOT_ACTION_DELAY_MS = 1150;
 
 // ── UI-layer state ────────────────────────────────────────────────────────────
 
@@ -213,19 +214,10 @@ export function useUnoGame() {
         console.error('drawRequiredCards error:', e);
       }
     } else {
-      // Voluntary draw. If no playable cards remain after drawing,
-      // auto-pass immediately so the player doesn't need an extra click.
+      // Voluntary draw. The board decides whether to offer play/pass or
+      // auto-pass after a short delay once the drawn card is visible.
       try {
         const afterDraw = drawOneCard(game, idx);
-        const playerAfterDraw = afterDraw.players[idx];
-        const playableAfterDraw = getPlayableCards(playerAfterDraw.hand, afterDraw, idx);
-
-        if (playableAfterDraw.length === 0) {
-          const autoPassed = passTurn(afterDraw, idx);
-          dispatch({ type: 'PLAY', game: autoPassed });
-          return;
-        }
-
         dispatch({ type: 'DRAW_ONE', game: afterDraw });
       } catch (e) {
         console.error('drawOneCard error:', e);
@@ -282,32 +274,43 @@ export function useUnoGame() {
 
     const timer = setTimeout(() => {
       try {
-        const move = getBotMove(game, game.currentPlayerIndex);
+        let botState = game;
+        const botIndex = botState.currentPlayerIndex;
+
+        const callOutTarget = botState.players.findIndex((player, idx) => (
+          idx !== botIndex && player.hand.length === 1 && !player.saidUno
+        ));
+
+        if (callOutTarget >= 0) {
+          botState = callOutUno(botState, botIndex, callOutTarget);
+        }
+
+        const move = getBotMove(botState, botIndex);
         let next: GameState;
 
         if (move.action === 'drawRequired') {
-          next = drawRequiredCards(game, game.currentPlayerIndex);
+          next = drawRequiredCards(botState, botIndex);
         } else if (move.action === 'draw') {
-          const afterDraw = drawOneCard(game, game.currentPlayerIndex);
-          const updatedHand = afterDraw.players[game.currentPlayerIndex].hand;
+          const afterDraw = drawOneCard(botState, botIndex);
+          const updatedHand = afterDraw.players[botIndex].hand;
           const drawnCard = updatedHand[updatedHand.length - 1];
 
-          if (drawnCard && canPlayCard(drawnCard, afterDraw, game.currentPlayerIndex)) {
+          if (drawnCard && canPlayCard(drawnCard, afterDraw, botIndex)) {
             const color =
               drawnCard.color === 'wild'
                 ? (move as { chosenColor?: CardColor }).chosenColor ?? 'red'
                 : undefined;
-            next = enginePlayCard(afterDraw, game.currentPlayerIndex, drawnCard.id, color);
+            next = enginePlayCard(afterDraw, botIndex, drawnCard.id, color);
           } else {
-            next = passTurn(afterDraw, game.currentPlayerIndex);
+            next = passTurn(afterDraw, botIndex);
           }
         } else {
-          next = enginePlayCard(game, game.currentPlayerIndex, move.cardId, move.chosenColor);
+          next = enginePlayCard(botState, botIndex, move.cardId, move.chosenColor);
         }
 
         // Auto-declare UNO for bot when hand drops to 1 card
-        if (!next.winnerId && next.players[game.currentPlayerIndex].hand.length === 1) {
-          next = declareUno(next, game.currentPlayerIndex);
+        if (!next.winnerId && next.players[botIndex].hand.length === 1) {
+          next = declareUno(next, botIndex);
         }
 
         dispatch({ type: 'PLAY', game: next });
@@ -315,7 +318,7 @@ export function useUnoGame() {
         console.error('Bot error:', e);
         dispatch({ type: 'BOT_THINKING', value: false });
       }
-    }, 800);
+    }, BOT_ACTION_DELAY_MS);
 
     return () => clearTimeout(timer);
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -348,16 +351,9 @@ export function useUnoGame() {
           return;
         }
 
-        // After drawing one card, either play if possible or pass.
+        // After drawing one card, end turn by passing unless the player
+        // explicitly chooses to play from the UI.
         if (drawnThisTurn) {
-          const move = getBotMove(game, game.currentPlayerIndex);
-
-          if (move.action === 'play') {
-            const next = enginePlayCard(game, game.currentPlayerIndex, move.cardId, move.chosenColor);
-            dispatch({ type: 'PLAY', game: next });
-            return;
-          }
-
           const next = passTurn(game, game.currentPlayerIndex);
           dispatch({ type: 'PLAY', game: next });
           return;
@@ -427,25 +423,31 @@ export function useUnoGame() {
     getPlayableCards(localPlayer.hand, game, localPlayerIndex).length > 0
   );
 
-  // Auto-resolve forced draws for humans if they cannot stack a response card.
+  // After a voluntary draw, auto-pass after a short delay if the drawn card
+  // still leaves no playable option.
   useEffect(() => {
     if (!game || game.winnerId) return;
     if (game.currentPlayerIndex !== localPlayerIndex) return;
 
     const player = game.players[localPlayerIndex];
     if (player.isBot) return;
-    if (game.pendingDraw <= 0) return;
+    if (!drawnThisTurn) return;
+    if ((game.pendingDraw ?? 0) > 0) return;
 
     const playable = getPlayableCards(player.hand, game, localPlayerIndex);
     if (playable.length > 0) return;
 
-    try {
-      const next = drawRequiredCards(game, localPlayerIndex);
-      dispatch({ type: 'PLAY', game: next });
-    } catch (e) {
-      console.error('auto drawRequiredCards error:', e);
-    }
-  }, [game, localPlayerIndex]);
+    const timer = window.setTimeout(() => {
+      try {
+        const next = passTurn(game, localPlayerIndex);
+        dispatch({ type: 'PLAY', game: next });
+      } catch (e) {
+        console.error('auto passTurn error:', e);
+      }
+    }, 900);
+
+    return () => window.clearTimeout(timer);
+  }, [game, localPlayerIndex, drawnThisTurn]);
 
   return {
     game,

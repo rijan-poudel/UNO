@@ -6,6 +6,7 @@ export interface RoomPlayer {
   playerId: string;
   name: string;
   connected: boolean;
+  isBot: boolean;
 }
 
 export interface RoomSnapshot {
@@ -57,6 +58,10 @@ export interface StartRoomPayload {
 export interface KickPlayerPayload {
   roomId: string;
   targetPlayerId: string;
+}
+
+export interface AddBotPayload {
+  roomId: string;
 }
 
 export interface LeaveRoomPayload {

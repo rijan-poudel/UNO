@@ -92,16 +92,16 @@ export default function UnoCard({
     return (
       <div style={{
         width: w, height: h, borderRadius: r,
-        background: 'color-mix(in srgb, var(--ui-surface) 72%, #000)',
-        border: `${Math.max(1, Math.round(1.5 * s))}px solid color-mix(in srgb, var(--ui-text) 28%, transparent)`,
+        background: '#1a0f00',
+        border: `${Math.max(1, Math.round(1.5 * s))}px solid rgba(255,248,240,0.15)`,
         flexShrink: 0, position: 'relative', overflow: 'hidden',
-        boxShadow: `${Math.round(1 * s)}px ${Math.round(2 * s)}px ${Math.round(6 * s)}px color-mix(in srgb, var(--ui-bg) 45%, black)`,
+        boxShadow: `${Math.round(1 * s)}px ${Math.round(2 * s)}px ${Math.round(6 * s)}px rgba(26,15,0,0.22)`,
       }}>
         <div style={{
           position: 'absolute', inset: Math.round(4 * s),
-          border: '1px solid color-mix(in srgb, var(--ui-text) 20%, transparent)',
+          border: '1px solid rgba(255,248,240,0.1)',
           borderRadius: Math.max(1, r - 1),
-          background: 'repeating-linear-gradient(45deg, color-mix(in srgb, var(--ui-text) 9%, transparent) 0, color-mix(in srgb, var(--ui-text) 9%, transparent) 1px, transparent 1px, transparent 6px)',
+          background: 'repeating-linear-gradient(45deg, rgba(255,248,240,0.03) 0, rgba(255,248,240,0.03) 1px, transparent 1px, transparent 6px)',
         }} />
         <div style={{
           position: 'absolute', inset: 0,
@@ -111,7 +111,7 @@ export default function UnoCard({
             fontFamily: "'Bebas Neue', cursive",
             fontSize: Math.round(13 * s),
             letterSpacing: '0.1em',
-            color: 'color-mix(in srgb, var(--ui-text) 62%, transparent)',
+            color: 'rgba(255,248,240,0.28)',
           }}>UNO</span>
         </div>
       </div>

@@ -15,6 +15,7 @@ import type { CardColor } from '../types/card';
 import type { GameState } from '../types/game';
 import type {
   Ack,
+  AddBotPayload,
   CreateRoomPayload,
   DismissFriendInvitePayload,
   FriendInvite,
@@ -117,6 +118,7 @@ function toSnapshot(room: ServerRoom): RoomSnapshot {
       playerId: p.playerId,
       name: p.name,
       connected: p.connected,
+      isBot: p.isBot,
     })),
     started: room.started,
     game: room.game,
@@ -133,7 +135,7 @@ function createRoomForPlayer(socketId: string, playerName: string, deviceId: str
   const room: ServerRoom = {
     roomId,
     hostPlayerId: playerId,
-    players: [{ playerId, socketId, name: playerName, connected: true, deviceId }],
+    players: [{ playerId, socketId, name: playerName, connected: true, deviceId, isBot: false }],
     started: false,
     game: null,
   };
@@ -162,9 +164,26 @@ function joinRoomAsPlayer(room: ServerRoom, socketId: string, playerName: string
   }
 
   const playerId = makeNextPlayerId(room.players);
-  room.players.push({ playerId, socketId, name: playerName, connected: true, deviceId });
+  room.players.push({ playerId, socketId, name: playerName, connected: true, deviceId, isBot: false });
   playerBySocket.set(socketId, { roomId: room.roomId, playerId });
   return playerId;
+}
+
+function nextBotName(room: ServerRoom): string {
+  const botCount = room.players.filter((player) => player.isBot).length;
+  return `Bot ${botCount + 1}`;
+}
+
+function addBotSeat(room: ServerRoom): void {
+  const playerId = makeNextPlayerId(room.players);
+  room.players.push({
+    playerId,
+    socketId: '',
+    deviceId: `bot:${room.roomId}:${playerId}`,
+    name: nextBotName(room),
+    connected: false,
+    isBot: true,
+  });
 }
 
 function upsertPresence(socketId: string, payload: PresencePayload): string {
@@ -253,7 +272,10 @@ function leaveRoomForSocket(socketId: string, ioServer: Server): void {
   } else {
     room.players.splice(playerIndex, 1);
     if (room.hostPlayerId === player.playerId && room.players.length > 0) {
-      room.hostPlayerId = room.players[0].playerId;
+      const nextHost = room.players.find((entry) => !entry.isBot && entry.connected)
+        ?? room.players.find((entry) => !entry.isBot)
+        ?? room.players[0];
+      room.hostPlayerId = nextHost.playerId;
     }
   }
 
@@ -360,13 +382,22 @@ function runOfflineBotTurns(room: ServerRoom): void {
     }
 
     const currentIndex = state.currentPlayerIndex;
-    const move = getBotMove(state, currentIndex);
-    let nextState: GameState = state;
+    let botState: GameState = state;
+    const callOutTargetIndex = botState.players.findIndex((player, idx) => (
+      idx !== currentIndex && player.hand.length === 1 && !player.saidUno
+    ));
+
+    if (callOutTargetIndex >= 0) {
+      botState = callOutUno(botState, currentIndex, callOutTargetIndex);
+    }
+
+    const move = getBotMove(botState, currentIndex);
+    let nextState: GameState = botState;
 
     if (move.action === 'drawRequired') {
-      nextState = drawRequiredCards(state, currentIndex);
+      nextState = drawRequiredCards(botState, currentIndex);
     } else if (move.action === 'draw') {
-      const afterDraw = drawOneCard(state, currentIndex);
+      const afterDraw = drawOneCard(botState, currentIndex);
       const updatedHand = afterDraw.players[currentIndex].hand;
       const drawnCard = updatedHand[updatedHand.length - 1];
 
@@ -379,7 +410,7 @@ function runOfflineBotTurns(room: ServerRoom): void {
         nextState = passTurn(afterDraw, currentIndex);
       }
     } else {
-      nextState = playCard(state, currentIndex, move.cardId, move.chosenColor);
+      nextState = playCard(botState, currentIndex, move.cardId, move.chosenColor);
     }
 
     if (!nextState.winnerId && nextState.players[currentIndex]?.hand.length === 1) {
@@ -674,7 +705,7 @@ io.on('connection', (socket) => {
       room.game = initializeGame(
         room.players.map((p) => p.name),
         payload.rules,
-        room.players.map(() => false),
+        room.players.map((p) => p.isBot),
       );
       removeInvitesForRoom(room.roomId, io);
 
@@ -682,6 +713,45 @@ io.on('connection', (socket) => {
 
       const snapshot = toSnapshot(room);
       io.to(roomId).emit('room:update', snapshot);
+      reply?.({ ok: true, data: { room: snapshot } });
+    } catch (error) {
+      reply?.(ackError((error as Error).message));
+    }
+  });
+
+  socket.on('room:add-bot', (payload: AddBotPayload, reply?: (ack: Ack<{ room: RoomSnapshot }>) => void) => {
+    try {
+      const roomId = payload.roomId?.trim().toUpperCase();
+      if (!roomId) {
+        reply?.(ackError('Room code is required.'));
+        return;
+      }
+
+      const room = rooms.get(roomId);
+      if (!room) {
+        reply?.(ackError('Room not found.'));
+        return;
+      }
+
+      const actor = room.players.find((p) => p.socketId === socket.id);
+      if (!actor || actor.playerId !== room.hostPlayerId) {
+        reply?.(ackError('Only the host can add bots.'));
+        return;
+      }
+
+      if (room.started) {
+        reply?.(ackError('Cannot add bots after the game starts.'));
+        return;
+      }
+
+      if (room.players.length >= MAX_ROOM_PLAYERS) {
+        reply?.(ackError('Room is full.'));
+        return;
+      }
+
+      addBotSeat(room);
+      const snapshot = toSnapshot(room);
+      io.to(room.roomId).emit('room:update', snapshot);
       reply?.({ ok: true, data: { room: snapshot } });
     } catch (error) {
       reply?.(ackError((error as Error).message));

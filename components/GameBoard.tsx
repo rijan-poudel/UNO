@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, type CSSProperties, type ReactNode } from "react";
 import type { Card, CardColor } from "../types/card";
 import type { GameState, Player } from "../types/game";
 import type { useUnoGame } from "../hooks/useUnoGame";
@@ -12,19 +12,11 @@ export type GameApi = ReturnType<typeof useUnoGame>;
 interface GameBoardProps {
   gameApi: GameApi;
   onReset: () => void;
+  onDealAgain: () => void;
   onOpenSettings: () => void;
   onCycleTheme: () => void;
   currentThemeLabel: string;
 }
-
-interface OnlineWinnerActions {
-  enabled: boolean;
-  isHost: boolean;
-  busy: boolean;
-  onPlayAgain: () => void;
-}
-
-const MATCH_TARGET_POINTS = 500;
 
 const ACTIVE_COLOR_META: Record<
   "red" | "yellow" | "green" | "blue",
@@ -43,6 +35,12 @@ const VALUE_ORDER: Record<string, number> = {
   skip: 10, reverse: 11, draw2: 12, wild: 13, wild4: 14,
 };
 
+const BOT_THINK_DELAY_MS = 10000;
+const HUMAN_IDLE_TIMEOUT_MS = 10000;
+const HUMAN_IDLE_AFTER_DRAW_TIMEOUT_MS = 10000;
+const HUMAN_IDLE_WILD_PICK_TIMEOUT_MS = 10000;
+const ACTION_FLASH_HOLD_MS = 980;
+
 function sortHand(cards: Card[]): Card[] {
   return [...cards].sort((a, b) => {
     const cd = (COLOR_ORDER[a.color] ?? 9) - (COLOR_ORDER[b.color] ?? 9);
@@ -53,24 +51,45 @@ function sortHand(cards: Card[]): Card[] {
 // ── Live feed ──────────────────────────────────────────────────────────────────
 interface FeedEntry { id: number; text: string }
 
+type ActionFlashTone = "red" | "yellow" | "green" | "blue" | "text";
+
+interface ActionFlashState {
+  text: string;
+  tone: ActionFlashTone;
+}
+
+interface TravelAnimation {
+  id: number;
+  card: Card;
+  faceDown: boolean;
+  from: { x: number; y: number };
+  to: { x: number; y: number };
+  rotationFrom: number;
+  rotationTo: number;
+  scale: number;
+  duration: number;
+  started: boolean;
+}
+
 function LiveFeed({ entries }: { entries: FeedEntry[] }) {
   if (!entries.length) return null;
   return (
     <div style={{
-      position: "fixed", top: 60, right: 10, zIndex: 40,
+      position: "fixed", top: 82, right: 14, zIndex: 40,
       display: "flex", flexDirection: "column", alignItems: "flex-end",
-      gap: 5, pointerEvents: "none", maxWidth: 240,
+      gap: 10, pointerEvents: "none", maxWidth: 320,
     }}>
       {entries.map((e, i) => (
         <div key={e.id} style={{
           fontFamily: "'Courier Prime', monospace",
-          fontSize: 10, letterSpacing: "0.06em", textTransform: "uppercase",
-          background: "var(--ui-surface)", border: "1px solid var(--ui-line)",
-          padding: "4px 10px",
-          color: i === 0 ? "var(--ui-text)" : "var(--ui-muted)",
-          opacity: i === 0 ? 1 : Math.max(0.18, 1 - i * 0.28),
+          fontSize: 10,
+          letterSpacing: "0.1em",
+          textTransform: "uppercase",
+          color: i === 0 ? "var(--ui-text)" : "color-mix(in srgb, var(--ui-muted) 78%, var(--ui-text) 22%)",
+          opacity: i === 0 ? 1 : Math.max(0.22, 1 - i * 0.26),
+          textShadow: "0 2px 8px rgba(26,15,0,0.22)",
           animation: i === 0 ? "feedIn 0.2s ease" : "none",
-          transition: "opacity 0.4s ease",
+          transition: "opacity 0.25s ease",
           whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
           maxWidth: "100%",
         }}>{e.text}</div>
@@ -79,39 +98,61 @@ function LiveFeed({ entries }: { entries: FeedEntry[] }) {
   );
 }
 
-function getCardPoints(card: Card): number {
-  switch (card.value) {
-    case "skip":
-    case "reverse":
-    case "draw2":
-      return 20;
-    case "wild":
-    case "wild4":
-      return 50;
-    default:
-      return Number(card.value);
-  }
+function ActionTray({ children }: { children: ReactNode }) {
+  return (
+    <div style={{
+      position: "absolute",
+      left: "50%",
+      bottom: "calc(100% + 12px)",
+      transform: "translateX(-50%)",
+      zIndex: 24,
+      width: "min(560px, calc(100vw - 32px))",
+      background: "var(--ui-surface)",
+      border: "1px solid var(--ui-line)",
+      padding: "12px 14px",
+      display: "grid",
+      gap: 12,
+      animation: "none",
+    }}>
+      {children}
+    </div>
+  );
 }
 
-function getRoundPoints(game: GameState, winnerId: string): number {
-  return game.players
-    .filter((player) => player.id !== winnerId)
-    .reduce(
-      (total, player) => total + player.hand.reduce((handTotal, card) => handTotal + getCardPoints(card), 0),
-      0,
-    );
+function AnimatedCards({ animations }: { animations: TravelAnimation[] }) {
+  if (!animations.length) return null;
+
+  return (
+    <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 50 }}>
+      {animations.map((animation) => (
+        <div
+          key={animation.id}
+          style={{
+            position: "fixed",
+            left: animation.started ? animation.to.x : animation.from.x,
+            top: animation.started ? animation.to.y : animation.from.y,
+            transform: `translate(-50%, -50%) rotate(${animation.started ? animation.rotationTo : animation.rotationFrom}deg) scale(${animation.scale})`,
+            transformOrigin: "center center",
+            transition: `left ${animation.duration}ms cubic-bezier(0.22,1,0.36,1), top ${animation.duration}ms cubic-bezier(0.22,1,0.36,1), transform ${animation.duration}ms cubic-bezier(0.22,1,0.36,1), opacity ${animation.duration}ms ease`,
+            opacity: animation.started ? 0.92 : 1,
+          }}
+        >
+          <UnoCard card={animation.card} faceDown={animation.faceDown} sizeMultiplier={0.78} />
+        </div>
+      ))}
+    </div>
+  );
 }
 
-function useMatchScoreTracker() {
-  const [pointsByPlayerId, setPointsByPlayerId] = useState<Record<string, number>>({});
-  const addRoundPoints = useCallback((playerId: string, points: number) => {
-    setPointsByPlayerId((prev) => ({
-      ...prev,
-      [playerId]: (prev[playerId] ?? 0) + points,
-    }));
+// ── Score tracker ──────────────────────────────────────────────────────────────
+// Persists wins per player name across rounds within the same session
+function useScoreTracker() {
+  const [scores, setScores] = useState<Record<string, number>>({});
+  const recordWin = useCallback((name: string) => {
+    setScores(prev => ({ ...prev, [name]: (prev[name] ?? 0) + 1 }));
   }, []);
-  const reset = useCallback(() => setPointsByPlayerId({}), []);
-  return { pointsByPlayerId, addRoundPoints, reset };
+  const reset = useCallback(() => setScores({}), []);
+  return { scores, recordWin, reset };
 }
 
 // ── Call-out flash overlay ─────────────────────────────────────────────────────
@@ -136,32 +177,78 @@ function CallOutFlash({ name }: { name: string }) {
   );
 }
 
-// ── Opponent strip ─────────────────────────────────────────────────────────────
-function OpponentStrip({
-  player, isCurrentTurn, cardScale,
-}: {
-  player: Player; isCurrentTurn: boolean;
-  cardScale: number;
-}) {
-  const n = player.hand.length;
-  const fans = Math.min(n, 6);
-  const overlap = Math.round(26 * cardScale);
-  const fanWidth = Math.max(28, (82 * cardScale) + Math.max(0, fans - 1) * overlap);
-  const fanHeight = 122 * cardScale + 12;
-  const fanMid = (fans - 1) / 2;
-  const hiddenTop = fanHeight * 0.48;
+function ActionFlash({ text, tone }: { text: string; tone: ActionFlashTone }) {
+  const colorByTone: Record<ActionFlashTone, string> = {
+    red: "var(--ui-accent-red)",
+    yellow: "var(--ui-accent-yellow)",
+    green: "var(--ui-accent-green)",
+    blue: "var(--ui-accent-blue)",
+    text: "var(--ui-text)",
+  };
 
   return (
     <div style={{
+      position: "fixed",
+      inset: 0,
+      zIndex: 86,
+      pointerEvents: "none",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+    }}>
+      <div style={{
+        fontFamily: "'Bebas Neue', cursive",
+        fontSize: "clamp(60px, 16vw, 170px)",
+        lineHeight: 0.9,
+        letterSpacing: "0.04em",
+        textTransform: "uppercase",
+        color: colorByTone[tone],
+        textShadow: "0 10px 26px rgba(0,0,0,0.30), 0 0 24px color-mix(in srgb, var(--ui-surface) 45%, var(--ui-bg) 55%)",
+        animation: "actionFlashPop 1s cubic-bezier(0.22,1,0.36,1) forwards",
+      }}>{text}</div>
+    </div>
+  );
+}
+
+// ── Opponent strip ─────────────────────────────────────────────────────────────
+function OpponentStrip({
+  player, isCurrentTurn, canCallOut, onCallOut, cardScale,
+}: {
+  player: Player; isCurrentTurn: boolean;
+  canCallOut: boolean; onCallOut: () => void; cardScale: number;
+}) {
+  const n = player.hand.length;
+  const opponentCardScale = cardScale * 0.88;
+  const fans = Math.min(n, 6);
+  const overlap = Math.round(26 * opponentCardScale);
+  const fanWidth = Math.max(28, (82 * opponentCardScale) + Math.max(0, fans - 1) * overlap);
+  const fanHeight = 122 * opponentCardScale + 8;
+  const fanMid = (fans - 1) / 2;
+
+  return (
+    <button
+      type="button"
+      onClick={canCallOut ? onCallOut : undefined}
+      style={{
+      background: "transparent",
+      border: canCallOut ? "1px solid var(--ui-accent-red)" : "1px solid transparent",
+      padding: canCallOut ? "0 6px 4px" : "0 6px 4px",
+      cursor: canCallOut ? "pointer" : "default",
+      textAlign: "center",
       display: "flex", flexDirection: "column", alignItems: "center", gap: 4,
-      opacity: isCurrentTurn ? 1 : 0.38,
+      opacity: canCallOut ? 1 : isCurrentTurn ? 1 : 0.38,
       transition: "opacity 0.3s ease",
       position: "relative",
+      animation: canCallOut ? "callOutAttention 0.7s ease-in-out infinite alternate" : "none",
     }}>
+
       {/* Fanned face-down cards */}
       <div style={{
-        position: "relative", height: fanHeight, width: fanWidth,
-        marginTop: -hiddenTop, flexShrink: 0,
+        position: "relative",
+        height: fanHeight,
+        width: fanWidth,
+        marginTop: 0,
+        flexShrink: 0,
       }}>
         {fans === 0 ? (
           <span style={{ fontFamily: "'Courier Prime', monospace", fontSize: 9, color: "var(--ui-muted)" }}>empty</span>
@@ -169,7 +256,7 @@ function OpponentStrip({
           <div key={i} style={{
             position: "absolute",
             left: i * overlap,
-            top: (10 * cardScale) - Math.abs(i - fanMid) * (2.6 * cardScale),
+            top: -Math.abs(i - fanMid) * (2.4 * opponentCardScale),
             transform: `rotate(${(i - fanMid) * -7}deg)`,
             transformOrigin: "top center",
             zIndex: i,
@@ -177,7 +264,7 @@ function OpponentStrip({
           }}>
             <UnoCard
               card={{ id: `_opp-${player.id}-${i}`, color: "wild", value: "wild" }}
-              faceDown sizeMultiplier={cardScale}
+              faceDown sizeMultiplier={opponentCardScale}
             />
           </div>
         ))}
@@ -194,7 +281,7 @@ function OpponentStrip({
         )}
         <span style={{
           fontFamily: "'Bebas Neue', cursive",
-          fontSize: 16, letterSpacing: "0.05em", color: "var(--ui-text)",
+          fontSize: 16, letterSpacing: "0.05em", color: canCallOut ? "var(--ui-accent-red)" : "var(--ui-text)",
         }}>
           {player.isBot ? "⌘ " : ""}{player.name}
         </span>
@@ -203,44 +290,38 @@ function OpponentStrip({
             fontFamily: "'Courier Prime', monospace",
             fontSize: 8, fontWeight: 700, letterSpacing: "0.12em",
             background: "var(--ui-accent-red)", color: "#fff", padding: "2px 5px",
-            animation: "blink 0.9s step-end infinite",
+            animation: isCurrentTurn ? "blink 0.9s step-end infinite" : "none",
           }}>UNO</span>
         )}
       </div>
 
       <span style={{
         fontFamily: "'Courier Prime', monospace",
-        fontSize: 9, color: "var(--ui-muted)", letterSpacing: "0.06em",
+        fontSize: 9, color: canCallOut ? "var(--ui-accent-red)" : "var(--ui-muted)", letterSpacing: "0.06em",
       }}>{n} {n === 1 ? "card" : "cards"}</span>
-    </div>
+      {canCallOut && (
+        <span style={{
+          fontFamily: "'Courier Prime', monospace",
+          fontSize: 8,
+          fontWeight: 700,
+          letterSpacing: "0.14em",
+          textTransform: "uppercase",
+          color: "var(--ui-accent-red)",
+        }}>Click to call UNO</span>
+      )}
+    </button>
   );
 }
 
 // ── Winner screen ──────────────────────────────────────────────────────────────
 function WinnerScreen({
-  winner,
-  onExit,
-  onDealAgain,
-  dealAgainLabel,
-  dealAgainDisabled,
-  roundPoints,
-  winnerTotalPoints,
-  matchWinnerName,
-  scoreRows,
-  onlineActions,
+  winner, onReset, onDealAgain, scores, players,
 }: {
-  winner: Player;
-  onExit: () => void;
-  onDealAgain: () => void;
-  dealAgainLabel: string;
-  dealAgainDisabled: boolean;
-  roundPoints: number;
-  winnerTotalPoints: number;
-  matchWinnerName: string | null;
-  scoreRows: Array<{ playerId: string; name: string; points: number }>;
-  onlineActions?: OnlineWinnerActions;
+  winner: Player; onReset: () => void; onDealAgain: () => void; scores: Record<string, number>; players: string[];
 }) {
-  const rematchEnabled = onlineActions?.enabled ?? false;
+  const leaders = players
+    .map((name) => [name, scores[name] ?? 0] as const)
+    .sort((a, b) => b[1] - a[1]);
   return (
     <div style={{
       position: "fixed", inset: 0, zIndex: 60, background: "var(--ui-bg)",
@@ -261,32 +342,11 @@ function WinnerScreen({
         <p style={{
           fontFamily: "'Courier Prime', monospace", fontSize: 13,
           color: "var(--ui-muted)", margin: "14px 0 0", letterSpacing: "0.08em",
-        }}>
-          wins the round (+{roundPoints} points)
-        </p>
-        <p style={{
-          fontFamily: "'Courier Prime', monospace", fontSize: 12,
-          color: "var(--ui-muted)", margin: "8px 0 0", letterSpacing: "0.06em",
-          textTransform: "uppercase",
-        }}>{winnerTotalPoints} / {MATCH_TARGET_POINTS} points</p>
+        }}>wins the round</p>
       </div>
 
-      {matchWinnerName && (
-        <p style={{
-          margin: 0,
-          fontFamily: "'Bebas Neue', cursive",
-          fontSize: "clamp(28px, 6vw, 40px)",
-          letterSpacing: "0.05em",
-          color: "var(--ui-accent-red)",
-          textTransform: "uppercase",
-          textAlign: "center",
-        }}>
-          {matchWinnerName} wins the match!
-        </p>
-      )}
-
       {/* Session scoreboard */}
-      {scoreRows.length > 0 && (
+      {leaders.length > 0 && (
         <div style={{
           width: "min(360px, 100%)",
           border: "1px solid var(--ui-line)",
@@ -297,9 +357,9 @@ function WinnerScreen({
             color: "var(--ui-muted)", margin: 0,
             padding: "6px 12px",
             borderBottom: "1px solid var(--ui-line)",
-          }}>Match points</p>
-          {scoreRows.map(({ playerId, name, points }) => (
-            <div key={playerId} style={{
+          }}>Session scores</p>
+          {leaders.map(([name, wins]) => (
+            <div key={name} style={{
               display: "flex", justifyContent: "space-between", alignItems: "center",
               padding: "8px 12px",
               borderBottom: "1px solid var(--ui-line)",
@@ -311,157 +371,242 @@ function WinnerScreen({
               <span style={{
                 fontFamily: "'Courier Prime', monospace", fontSize: 13,
                 fontWeight: 700, color: "var(--ui-text)",
-              }}>{points} pts</span>
+              }}>{wins} {wins === 1 ? "win" : "wins"}</span>
             </div>
           ))}
         </div>
       )}
 
-      <div style={{ width: 1, height: 32, background: "var(--ui-line)" }} />
-      <div className="winner-actions">
-        <button onClick={onExit} className="winner-btn winner-btn-secondary">Exit</button>
-        <button
-          onClick={onDealAgain}
-          disabled={dealAgainDisabled || Boolean(rematchEnabled && (!onlineActions?.isHost || onlineActions.busy))}
-          className="winner-btn winner-btn-primary"
-          style={{
-          cursor: dealAgainDisabled || (rematchEnabled && (!onlineActions?.isHost || onlineActions.busy)) ? "default" : "pointer",
-          opacity: dealAgainDisabled || (rematchEnabled && (!onlineActions?.isHost || onlineActions.busy)) ? 0.5 : 1,
+      <div style={{ display: "flex", gap: 10 }}>
+        <button onClick={onReset} style={{
+          fontFamily: "'Courier Prime', monospace", fontSize: 11, fontWeight: 700,
+          letterSpacing: "0.1em", textTransform: "uppercase",
+          background: "transparent", border: "1px solid var(--ui-line)",
+          color: "var(--ui-muted)", padding: "12px 20px", cursor: "pointer",
+          transition: "color 0.12s",
         }}
-        >{dealAgainLabel}</button>
+          onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.color = "var(--ui-text)")}
+          onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.color = "var(--ui-muted)")}
+        >New players</button>
+        <button onClick={onDealAgain} style={{
+          fontFamily: "'Bebas Neue', cursive", fontSize: 22, letterSpacing: "0.14em",
+          background: "var(--ui-text)", color: "var(--ui-bg)",
+          border: "none", padding: "12px 36px", cursor: "pointer", transition: "opacity 0.12s",
+        }}
+          onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.opacity = "0.7")}
+          onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.opacity = "1")}
+        >Deal again</button>
       </div>
-      {rematchEnabled && (
-        <p style={{
-          margin: 0,
-          fontFamily: "'Courier Prime', monospace",
-          fontSize: 11,
-          color: "var(--ui-muted)",
-          letterSpacing: "0.04em",
-          textTransform: "uppercase",
-          textAlign: "center",
-        }}>
-          {onlineActions?.isHost
-            ? "Play again starts a new round with the same room and players"
-            : "Only the room host can start the rematch"}
-        </p>
-      )}
-    </div>
-  );
-}
-
-function Thinking({ name }: { name: string }) {
-  return (
-    <div style={{
-      fontFamily: "'Courier Prime', monospace", fontSize: 11,
-      color: "var(--ui-muted)", letterSpacing: "0.12em", textTransform: "uppercase",
-      display: "flex", alignItems: "center", gap: 8,
-    }}>
-      <span style={{ animation: "blink 1.1s step-end infinite" }}>■</span>
-      {name} is thinking
-      <span style={{ animation: "blink 1.1s step-end 0.55s infinite" }}>■</span>
     </div>
   );
 }
 
 // ── Main board ─────────────────────────────────────────────────────────────────
 export default function GameBoard({
-  gameApi, onReset, onOpenSettings, onCycleTheme, currentThemeLabel,
+  gameApi, onReset, onDealAgain, onOpenSettings, onCycleTheme, currentThemeLabel,
 }: GameBoardProps) {
   const {
     game, localPlayerIndex, pendingWild, drawnThisTurn, botThinking,
     log, currentPlayer, localPlayer, isLocalTurn, playableCardIds,
-    selectCard, confirmWildColor, cancelWild, drawCard, sayUno, callOut, resetGame,
+    selectCard, confirmWildColor, cancelWild, drawCard, pass, sayUno, callOut, resetGame,
   } = gameApi;
 
-  const hasPendingStackOption = Boolean(
-    (gameApi as unknown as { hasPendingStackOption?: boolean }).hasPendingStackOption,
-  );
+  const hasPendingStackOption =
+    "hasPendingStackOption" in gameApi
+      ? Boolean((gameApi as { hasPendingStackOption?: boolean }).hasPendingStackOption)
+      : false;
 
   const [feed, setFeed] = useState<FeedEntry[]>([]);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
   const [showUnoFlash, setShowUnoFlash] = useState(false);
+  const [actionFlash, setActionFlash] = useState<ActionFlashState | null>(null);
   const [callOutFlashName, setCallOutFlashName] = useState<string | null>(null);
   const [isPortraitMobile, setIsPortraitMobile] = useState(false);
   const [isCompactBoard, setIsCompactBoard] = useState(false);
   const [boardScale, setBoardScale] = useState(1);
-  const [rematchBusy, setRematchBusy] = useState(false);
-  const [lastRoundPoints, setLastRoundPoints] = useState(0);
+  const [drawnCardId, setDrawnCardId] = useState<string | null>(null);
+  const [highlightedDrawnCardId, setHighlightedDrawnCardId] = useState<string | null>(null);
+  const [drawDecisionCardId, setDrawDecisionCardId] = useState<string | null>(null);
+  const [hoveredHandPosition, setHoveredHandPosition] = useState<number | null>(null);
+  const [animations, setAnimations] = useState<TravelAnimation[]>([]);
+  const [turnCountdownSeconds, setTurnCountdownSeconds] = useState(0);
+  const turnTransitionLocked = actionFlash !== null;
 
-  const { pointsByPlayerId, addRoundPoints, reset: resetScores } = useMatchScoreTracker();
+  const { scores, recordWin } = useScoreTracker();
   const feedCounter = useRef(0);
   const prevLogRef = useRef<string[]>([]);
   const prevWinnerRef = useRef<string | null>(null);
-  const completedMatchRef = useRef(false);
+  const prevActionKeyRef = useRef<string | null>(null);
+  const prevGameRef = useRef<GameState | null>(null);
+  const actionFlashTimerRef = useRef<number | null>(null);
+  const autoActionExecuteTimerRef = useRef<number | null>(null);
+  const turnTimerKeyRef = useRef<string | null>(null);
+  const turnTimerDeadlineRef = useRef<number>(0);
+  const prevLocalHandIdsRef = useRef<string[]>([]);
+  const pendingPlayRectRef = useRef<{ cardId: string; x: number; y: number } | null>(null);
+  const animationCounterRef = useRef(0);
+  const audioCtxRef = useRef<AudioContext | null>(null);
+  const drawPileRef = useRef<HTMLButtonElement | null>(null);
+  const discardPileRef = useRef<HTMLDivElement | null>(null);
+  const localHandRef = useRef<HTMLDivElement | null>(null);
+  const playerZoneRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const handCardRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
-  const onlineApi = gameApi as unknown as {
-    room?: { hostPlayerId: string } | null;
-    playerId?: string | null;
-    startOnlineGame?: (rules: Record<string, unknown>) => Promise<boolean>;
-  };
-  const isOnlineMatch = Boolean(onlineApi.room);
-  const isOnlineHost = Boolean(onlineApi.room && onlineApi.playerId === onlineApi.room.hostPlayerId);
+  const getElementCenter = useCallback((element: HTMLElement | null) => {
+    if (!element) return null;
+    const rect = element.getBoundingClientRect();
+    return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+  }, []);
 
-  const handleOnlineRematch = useCallback(async () => {
-    if (!isOnlineMatch || !isOnlineHost || !onlineApi.startOnlineGame || !game) return;
+  const queueAnimation = useCallback((animation: Omit<TravelAnimation, "id" | "started">) => {
+    animationCounterRef.current += 1;
+    const id = animationCounterRef.current;
 
-    setRematchBusy(true);
-    try {
-      await onlineApi.startOnlineGame(game.rules as unknown as Record<string, unknown>);
-    } finally {
-      setRematchBusy(false);
+    setAnimations((prev) => [...prev, { ...animation, id, started: false }]);
+
+    window.setTimeout(() => {
+      setAnimations((prev) => prev.map((item) => (item.id === id ? { ...item, started: true } : item)));
+    }, 16);
+
+    window.setTimeout(() => {
+      setAnimations((prev) => prev.filter((item) => item.id !== id));
+    }, animation.duration + 120);
+  }, []);
+
+  const animateDrawToPlayer = useCallback((playerId: string, count: number) => {
+    const from = getElementCenter(drawPileRef.current);
+    const to = playerId === localPlayer?.id
+      ? getElementCenter(localHandRef.current)
+      : getElementCenter(playerZoneRefs.current[playerId] ?? null);
+
+    if (!from || !to) return;
+
+    const visibleCount = Math.min(count, 4);
+    for (let index = 0; index < visibleCount; index += 1) {
+      const offset = (index - (visibleCount - 1) / 2) * 12;
+      window.setTimeout(() => {
+        queueAnimation({
+          card: { id: `_anim-draw-${playerId}-${index}`, color: "wild", value: "wild" },
+          faceDown: true,
+          from: { x: from.x + offset * 0.4, y: from.y - index * 2 },
+          to: { x: to.x + offset, y: to.y + (playerId === localPlayer?.id ? -18 : 0) },
+          rotationFrom: -10 + index * 4,
+          rotationTo: 6 - index * 3,
+          scale: 0.9,
+          duration: 300,
+        });
+      }, index * 70);
     }
-  }, [isOnlineMatch, isOnlineHost, onlineApi, game]);
+  }, [getElementCenter, localPlayer?.id, queueAnimation]);
 
-  const handleLocalDealAgain = useCallback(() => {
-    if (!game) return;
-    gameApi.startGame(
-      game.players.map((player) => player.name),
-      game.rules,
-      game.players.map((player) => player.isBot),
-    );
-  }, [game, gameApi]);
+  const animatePlayToDiscard = useCallback((playerId: string, card: Card) => {
+    const to = getElementCenter(discardPileRef.current);
+    if (!to) return;
 
-  // Record round points as they happen.
+    const pendingLocal = pendingPlayRectRef.current;
+    const from = playerId === localPlayer?.id && pendingLocal && pendingLocal.cardId === card.id
+      ? { x: pendingLocal.x, y: pendingLocal.y }
+      : playerId === localPlayer?.id
+        ? getElementCenter(localHandRef.current)
+        : getElementCenter(playerZoneRefs.current[playerId] ?? null);
+
+    pendingPlayRectRef.current = null;
+    if (!from) return;
+
+    queueAnimation({
+      card,
+      faceDown: false,
+      from,
+      to,
+      rotationFrom: playerId === localPlayer?.id ? 0 : -8,
+      rotationTo: -4,
+      scale: 0.92,
+      duration: 280,
+    });
+  }, [getElementCenter, localPlayer?.id, queueAnimation]);
+
+  const handleSelectCard = useCallback((card: Card, element: HTMLDivElement | null) => {
+    if (element) {
+      const rect = element.getBoundingClientRect();
+      pendingPlayRectRef.current = {
+        cardId: card.id,
+        x: rect.left + rect.width / 2,
+        y: rect.top + rect.height / 2,
+      };
+    }
+
+    selectCard(card);
+  }, [selectCard]);
+
+  const playUiBeep = useCallback((kind: "normal" | "warn" | "win") => {
+    try {
+      const AC = window.AudioContext || (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+      if (!AC) return;
+      if (!audioCtxRef.current) audioCtxRef.current = new AC();
+      const ctx = audioCtxRef.current;
+      const now = ctx.currentTime;
+
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "triangle";
+      osc.frequency.setValueAtTime(kind === "win" ? 740 : kind === "warn" ? 220 : 420, now);
+      if (kind === "win") osc.frequency.exponentialRampToValueAtTime(980, now + 0.12);
+      if (kind === "warn") osc.frequency.exponentialRampToValueAtTime(170, now + 0.12);
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(0.03, now + 0.015);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.14);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.15);
+    } catch {
+      // Audio can fail due to browser policies; ignore gracefully.
+    }
+  }, []);
+
+  const triggerActionFlash = useCallback((text: string, tone: ActionFlashTone) => {
+    if (actionFlashTimerRef.current !== null) {
+      window.clearTimeout(actionFlashTimerRef.current);
+    }
+    setActionFlash({ text, tone });
+    actionFlashTimerRef.current = window.setTimeout(() => {
+      setActionFlash(null);
+      actionFlashTimerRef.current = null;
+    }, ACTION_FLASH_HOLD_MS);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (actionFlashTimerRef.current !== null) {
+        window.clearTimeout(actionFlashTimerRef.current);
+      }
+      if (autoActionExecuteTimerRef.current !== null) {
+        window.clearTimeout(autoActionExecuteTimerRef.current);
+      }
+    };
+  }, []);
+
+  // Record wins as they happen
   useEffect(() => {
     if (game?.winnerId) {
-      if (prevWinnerRef.current !== game.winnerId) {
+      const winner = game.players.find(p => p.id === game.winnerId);
+      if (winner && prevWinnerRef.current !== game.winnerId) {
         prevWinnerRef.current = game.winnerId;
-        const roundPoints = getRoundPoints(game, game.winnerId);
-        setLastRoundPoints(roundPoints);
-        addRoundPoints(game.winnerId, roundPoints);
+        recordWin(winner.name);
       }
     } else {
       prevWinnerRef.current = null;
-      setLastRoundPoints(0);
-      if (completedMatchRef.current) {
-        resetScores();
-        completedMatchRef.current = false;
-      }
     }
-  }, [game, addRoundPoints, resetScores]);
-
-  const scoreRows = game
-    ? game.players
-      .map((player) => ({
-        playerId: player.id,
-        name: player.name,
-        points: pointsByPlayerId[player.id] ?? 0,
-      }))
-      .sort((a, b) => b.points - a.points)
-    : [];
-
-  const matchWinner = scoreRows.find((row) => row.points >= MATCH_TARGET_POINTS) ?? null;
-
-  useEffect(() => {
-    if (game?.winnerId && matchWinner) {
-      completedMatchRef.current = true;
-    }
-  }, [game?.winnerId, matchWinner]);
+  }, [game?.winnerId, game?.players, recordWin]);
 
   useEffect(() => {
     if (!log.length) return;
     const newest = log[0];
     if (newest && newest !== prevLogRef.current[0]) {
+      const lower = newest.toLowerCase();
+      if (lower.includes("wins") || lower.includes("winner")) playUiBeep("win");
+      else if (lower.includes("draw") || lower.includes("uno") || lower.includes("call out")) playUiBeep("warn");
+      else playUiBeep("normal");
       feedCounter.current += 1;
       const id = feedCounter.current;
       setFeed(prev => [{ id, text: newest }, ...prev].slice(0, 5));
@@ -469,7 +614,7 @@ export default function GameBoard({
       const t = window.setTimeout(() => setFeed(prev => prev.filter(e => e.id !== id)), 4000);
       return () => window.clearTimeout(t);
     }
-  }, [log]);
+  }, [log, playUiBeep]);
 
   useEffect(() => {
     const update = () => {
@@ -488,36 +633,151 @@ export default function GameBoard({
     return () => { window.removeEventListener("resize", update); window.removeEventListener("orientationchange", update); };
   }, []);
 
-  const humanTurn = Boolean(game && localPlayer && isLocalTurn && !localPlayer.isBot && !game.winnerId);
-  const drawDisabled = !game || botThinking || !!game.winnerId || (drawnThisTurn && game.pendingDraw === 0) || !humanTurn;
+  useEffect(() => {
+    if (!game || !localPlayer) return;
 
-  const unoReady = Boolean(
-    game && localPlayer && !localPlayer.isBot && !game.winnerId &&
-    localPlayer.hand.length >= 1 && localPlayer.hand.length <= 2 &&
-    !localPlayer.saidUno && game.rules.mustDeclareUno,
-  );
+    const currentIds = localPlayer.hand.map((card) => card.id);
+    const previousIds = prevLocalHandIdsRef.current;
 
-  const canDeclareUnoNow = humanTurn && unoReady;
+    if (previousIds.length > 0 && currentIds.length > previousIds.length) {
+      const newCard = localPlayer.hand.find((card) => !previousIds.includes(card.id)) ?? null;
+      if (newCard) {
+        prevLocalHandIdsRef.current = currentIds;
+        const revealTimer = window.setTimeout(() => {
+          setDrawnCardId(newCard.id);
+          setHighlightedDrawnCardId(newCard.id);
+        }, 0);
+        const glowTimer = window.setTimeout(() => {
+          setHighlightedDrawnCardId((active) => (active === newCard.id ? null : active));
+        }, 1800);
+        return () => {
+          window.clearTimeout(revealTimer);
+          window.clearTimeout(glowTimer);
+        };
+      }
+    }
 
-  const callOutTarget = !humanTurn && game
-    ? game.players.find((p, idx) => idx !== localPlayerIndex && p.hand.length === 1 && !p.saidUno)
-    : undefined;
-  const callOutTargetIndex = callOutTarget && game
-    ? game.players.findIndex((p) => p.id === callOutTarget.id)
-    : -1;
-  const canCallOutNow = !humanTurn && Boolean(callOutTarget);
-  const primaryActionLabel = canDeclareUnoNow
-    ? "UNO! (U)"
-    : canCallOutNow
-      ? "CALL OUT! (U)"
-      : null;
+    prevLocalHandIdsRef.current = currentIds;
+  }, [game, localPlayer]);
+
+  useEffect(() => {
+    if (!drawnCardId) return;
+    const element = handCardRefs.current[drawnCardId];
+    if (!element) return;
+    element.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+  }, [drawnCardId]);
+
+  useEffect(() => {
+    if (!game) return;
+
+    const actionKey = `${game.turnCount}:${JSON.stringify(game.lastAction)}`;
+    if (prevActionKeyRef.current === actionKey) return;
+    prevActionKeyRef.current = actionKey;
+
+    const action = game.lastAction;
+    if (action.type === "draw") {
+      animateDrawToPlayer(action.playerId, action.count);
+      return;
+    }
+
+    if (action.type === "callOut") {
+      const timer = window.setTimeout(() => {
+        animateDrawToPlayer(action.targetId, action.penalty);
+      }, ACTION_FLASH_HOLD_MS + 40);
+      return () => window.clearTimeout(timer);
+    }
+
+    if (action.type === "play") {
+      animatePlayToDiscard(action.playerId, action.card);
+    }
+  }, [game, animateDrawToPlayer, animatePlayToDiscard]);
+
+  useEffect(() => {
+    if (!game || !localPlayer) return;
+
+    const previous = prevGameRef.current;
+    prevGameRef.current = game;
+    if (!previous) return;
+
+    const action = game.lastAction;
+    const queueActionFlash = (text: string, tone: ActionFlashTone) => {
+      window.setTimeout(() => {
+        triggerActionFlash(text, tone);
+      }, 0);
+    };
+
+    if (action.type === "play") {
+      const actorIndex = previous.players.findIndex((player) => player.id === action.playerId);
+      const playerCount = previous.players.length;
+      const targetIndex = actorIndex >= 0
+        ? (actorIndex + previous.direction + playerCount) % playerCount
+        : -1;
+      const targetId = targetIndex >= 0 ? previous.players[targetIndex]?.id : null;
+      const chosenColor = action.chosenColor && action.chosenColor !== "wild" ? action.chosenColor : null;
+      const chosenTone = (chosenColor ?? "text") as ActionFlashTone;
+      const chosenLabel = chosenColor ? chosenColor.toUpperCase() : null;
+
+      if (action.card.value === "reverse") {
+        queueActionFlash("Reverse", "blue");
+        return;
+      }
+
+      if (action.card.value === "skip") {
+        queueActionFlash(targetId === localPlayer.id ? "You Were Skipped" : "Skip", "yellow");
+        return;
+      }
+
+      if (action.card.value === "draw2") {
+        queueActionFlash(targetId === localPlayer.id ? "+2 To You" : "+2", "red");
+        return;
+      }
+
+      if (action.card.value === "wild4") {
+        queueActionFlash(
+          `${targetId === localPlayer.id ? "+4 To You" : "+4"}${chosenLabel ? ` • ${chosenLabel}` : ""}`,
+          chosenLabel ? chosenTone : "red",
+        );
+        return;
+      }
+
+      if (action.card.value === "wild") {
+        queueActionFlash(chosenLabel ?? "Wild", chosenTone);
+      }
+      return;
+    }
+
+    if (action.type === "declareUno") {
+      const actorName = game.players.find((player) => player.id === action.playerId)?.name ?? "Player";
+      queueActionFlash(`${actorName} UNO!`, "red");
+      return;
+    }
+
+    if (action.type === "callOut") {
+      const callerName = game.players.find((player) => player.id === action.callerId)?.name ?? "Player";
+      const targetName = game.players.find((player) => player.id === action.targetId)?.name ?? "Player";
+      const calledYou = action.targetId === localPlayer.id;
+      queueActionFlash(
+        calledYou ? `CALLED OUT +${action.penalty}` : `${callerName} CALLED ${targetName}`,
+        "red",
+      );
+      return;
+    }
+
+    if (action.type === "draw" && action.count > 1 && action.playerId === localPlayer.id) {
+      queueActionFlash(`+${action.count} Cards`, "red");
+    }
+  }, [game, localPlayer, triggerActionFlash]);
+
+  const confirmExitGame = () => { setShowExitConfirm(false); resetGame(); onReset(); };
 
   const declareUno = useCallback(() => {
-    if (!unoReady) return;
+    if (!game || !localPlayer || !game.rules.mustDeclareUno || game.winnerId || !isLocalTurn) return;
+    if (localPlayer.isBot || localPlayer.saidUno) return;
+    if (localPlayer.hand.length < 1 || localPlayer.hand.length > 2) return;
     sayUno(localPlayerIndex);
     setShowUnoFlash(true);
     window.setTimeout(() => setShowUnoFlash(false), 900);
-  }, [unoReady, sayUno, localPlayerIndex]);
+  }, [game, localPlayer, sayUno, localPlayerIndex, isLocalTurn]);
 
   // Wrap callOut to also show the flash
   const handleCallOut = useCallback((callerIdx: number, targetIdx: number, targetName: string) => {
@@ -526,38 +786,196 @@ export default function GameBoard({
     window.setTimeout(() => setCallOutFlashName(null), 1100);
   }, [callOut]);
 
-  const triggerCallOut = useCallback(() => {
-    if (!callOutTarget || callOutTargetIndex < 0) return;
-    handleCallOut(localPlayerIndex, callOutTargetIndex, callOutTarget.name);
-  }, [callOutTarget, callOutTargetIndex, handleCallOut, localPlayerIndex]);
-
-  // Keyboard shortcuts: Space = draw, U = UNO / call-out
+  // Keyboard shortcuts: Space = draw, U = UNO
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       // Don't fire if user is typing in an input
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
       if (e.key === " " || e.code === "Space") {
         e.preventDefault();
-        if (humanTurn && !drawDisabled) drawCard();
+        if (!game || !localPlayer || !currentPlayer || game.winnerId) return;
+        const isHumanTurn = isLocalTurn && !localPlayer.isBot;
+        const isDrawDisabled = botThinking || turnTransitionLocked || (drawnThisTurn && game.pendingDraw === 0) || !isHumanTurn;
+        if (!isDrawDisabled) drawCard();
       }
       if (e.key === "u" || e.key === "U") {
         e.preventDefault();
-        if (canDeclareUnoNow) {
-          declareUno();
-        } else if (canCallOutNow) {
-          triggerCallOut();
-        }
+        if (turnTransitionLocked) return;
+        declareUno();
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [humanTurn, drawDisabled, drawCard, declareUno, canDeclareUnoNow, canCallOutNow, triggerCallOut]);
+  }, [
+    game,
+    localPlayer,
+    currentPlayer,
+    isLocalTurn,
+    botThinking,
+    turnTransitionLocked,
+    drawnThisTurn,
+    drawCard,
+    declareUno,
+  ]);
+
+  useEffect(() => {
+    if (!game || !localPlayer || !currentPlayer) return;
+    if (turnTransitionLocked) return;
+    if (autoActionExecuteTimerRef.current !== null) return;
+    const isHumanTurn = isLocalTurn && !localPlayer.isBot && !game.winnerId;
+    const isDrawDisabled = botThinking || !!game.winnerId || (drawnThisTurn && game.pendingDraw === 0) || !isHumanTurn;
+    const mustAutoDraw = isHumanTurn && !isDrawDisabled && game.pendingDraw === 0 && playableCardIds.size === 0;
+    if (!mustAutoDraw) return;
+
+    const timer = window.setTimeout(() => {
+      triggerActionFlash("Draw", "yellow");
+      autoActionExecuteTimerRef.current = window.setTimeout(() => {
+        autoActionExecuteTimerRef.current = null;
+        drawCard();
+      }, ACTION_FLASH_HOLD_MS + 40);
+    }, 650);
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [
+    game,
+    localPlayer,
+    currentPlayer,
+    isLocalTurn,
+    botThinking,
+    turnTransitionLocked,
+    drawnThisTurn,
+    playableCardIds,
+    triggerActionFlash,
+    drawCard,
+  ]);
+
+  useEffect(() => {
+    if (!game || !localPlayer || !currentPlayer) return;
+    if (turnTransitionLocked) return;
+    if (autoActionExecuteTimerRef.current !== null) return;
+    const isHumanTurn = isLocalTurn && !localPlayer.isBot && !game.winnerId;
+    const mustAutoDrawRequiredNow = isHumanTurn && game.pendingDraw > 0 && !hasPendingStackOption;
+    if (!mustAutoDrawRequiredNow) return;
+
+    const timer = window.setTimeout(() => {
+      triggerActionFlash(`Take +${game.pendingDraw}`, "red");
+      autoActionExecuteTimerRef.current = window.setTimeout(() => {
+        autoActionExecuteTimerRef.current = null;
+        drawCard();
+      }, ACTION_FLASH_HOLD_MS + 40);
+    }, 650);
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [
+    game,
+    localPlayer,
+    currentPlayer,
+    isLocalTurn,
+    turnTransitionLocked,
+    hasPendingStackOption,
+    triggerActionFlash,
+    drawCard,
+  ]);
+
+  useEffect(() => {
+    if (!game || !localPlayer || !currentPlayer || !drawnCardId) return;
+
+    const revealedCard = localPlayer.hand.find((card) => card.id === drawnCardId) ?? null;
+    if (!revealedCard) return;
+    const shouldShowDrawDecision = Boolean(
+      isLocalTurn
+      && !localPlayer.isBot
+      && drawnThisTurn
+    );
+
+    if (!shouldShowDrawDecision) return;
+
+    const revealedCardId = revealedCard.id;
+    const timer = window.setTimeout(() => setDrawDecisionCardId(revealedCardId), 0);
+    return () => window.clearTimeout(timer);
+  }, [
+    game,
+    localPlayer,
+    currentPlayer,
+    drawnCardId,
+    isLocalTurn,
+    drawnThisTurn,
+  ]);
+
+  useEffect(() => {
+    if (drawnThisTurn) return;
+    const timer = window.setTimeout(() => setDrawDecisionCardId(null), 0);
+    return () => window.clearTimeout(timer);
+  }, [drawnThisTurn, game?.turnCount, game?.currentPlayerIndex]);
+
+  useEffect(() => {
+    if (!game || !currentPlayer || game.winnerId) {
+      turnTimerKeyRef.current = null;
+      turnTimerDeadlineRef.current = 0;
+      const clearTimer = window.setTimeout(() => setTurnCountdownSeconds(0), 0);
+      return () => window.clearTimeout(clearTimer);
+    }
+
+    const turnKey = `${game.turnCount}:${game.currentPlayerIndex}`;
+    let durationMs = 0;
+    if (currentPlayer.isBot) {
+      durationMs = BOT_THINK_DELAY_MS;
+    } else if (isLocalTurn) {
+      durationMs = pendingWild
+        ? HUMAN_IDLE_WILD_PICK_TIMEOUT_MS
+        : drawnThisTurn
+          ? HUMAN_IDLE_AFTER_DRAW_TIMEOUT_MS
+          : HUMAN_IDLE_TIMEOUT_MS;
+    }
+
+    const now = Date.now();
+    const candidateDeadline = now + durationMs;
+
+    if (turnTimerKeyRef.current !== turnKey) {
+      turnTimerKeyRef.current = turnKey;
+      turnTimerDeadlineRef.current = candidateDeadline;
+    } else if (durationMs === 0) {
+      turnTimerDeadlineRef.current = now;
+    } else if (turnTimerDeadlineRef.current === 0) {
+      turnTimerDeadlineRef.current = candidateDeadline;
+    } else {
+      // Never extend the same turn timer (avoids "restart" feeling). Only shorten.
+      turnTimerDeadlineRef.current = Math.min(turnTimerDeadlineRef.current, candidateDeadline);
+    }
+
+    const sync = () => {
+      const nextSeconds = Math.max(0, Math.ceil((turnTimerDeadlineRef.current - Date.now()) / 1000));
+      setTurnCountdownSeconds(nextSeconds);
+    };
+
+    const initialTimer = window.setTimeout(sync, 0);
+    const tickTimer = window.setInterval(sync, 1000);
+
+    return () => {
+      window.clearTimeout(initialTimer);
+      window.clearInterval(tickTimer);
+    };
+  }, [
+    game,
+    game?.turnCount,
+    game?.currentPlayerIndex,
+    game?.winnerId,
+    currentPlayer,
+    isLocalTurn,
+    pendingWild,
+    drawnThisTurn,
+  ]);
 
   if (!game || !localPlayer || !currentPlayer) return null;
 
   const topDiscard = game.discardPile[game.discardPile.length - 1];
   const winner = game.winnerId ? game.players.find(p => p.id === game.winnerId) : null;
+  const humanTurn = isLocalTurn && !localPlayer.isBot && !game.winnerId;
+  const drawDisabled = botThinking || turnTransitionLocked || !!game.winnerId || (drawnThisTurn && game.pendingDraw === 0) || !humanTurn;
   const sortedHand = sortHand(localPlayer.hand);
+  const handCount = sortedHand.length;
   const opponents = game.players.filter((_, i) => i !== localPlayerIndex);
 
   const discardDisplayCard: Card | null = topDiscard
@@ -570,18 +988,9 @@ export default function GameBoard({
     game.activeColor && game.activeColor !== "wild"
       ? ACTIVE_COLOR_META[game.activeColor as "red" | "yellow" | "green" | "blue"]
       : null;
+  void activeColorMeta;
 
   const pileCardScale = boardScale;
-  const boardShellWidth = isCompactBoard
-    ? "min(1180px, calc(100vw - 16px))"
-    : "min(1360px, calc(100vw - 24px))";
-  const primaryStatusLabel = game.pendingDraw > 0
-    ? `+${game.pendingDraw} pending`
-    : activeColorMeta
-      ? `${activeColorMeta.label} active`
-      : game.direction === 1
-        ? "Clockwise"
-        : "Counter";
 
   // Dynamic hand card scale: shrink cards so they always fit above the info row.
   // Budget = total viewport height
@@ -593,35 +1002,60 @@ export default function GameBoard({
   // Card height at scale s = 122 * s. We add 40px for top padding + arc lift.
   // Solve: 122 * s + 40 <= budget  →  s = (budget - 40) / 122
   // Clamp between 0.65 (min readable) and 1.3 (max comfortable).
+  const unoButtonVisible = !localPlayer.isBot && !game.winnerId;
+  const unoReady =
+    humanTurn
+    && game.rules.mustDeclareUno
+    && !localPlayer.saidUno
+    && localPlayer.hand.length >= 1
+    && localPlayer.hand.length <= 2;
+
   const viewportH = typeof window !== "undefined" ? window.innerHeight : 700;
+  const viewportW = typeof window !== "undefined" ? window.innerWidth : 1200;
   const cardBudgetPx = viewportH - 120 - 220 - 36 - 20;
   const scaledByHeight = Math.max(0.65, Math.min(1.3, (cardBudgetPx - 40) / 122));
+  const reservedRightPx = 0;
+  const availableHandWidth = Math.max(220, viewportW - (isCompactBoard ? 34 : 52) - reservedRightPx);
+  const requiredHandWidthAtScale1 = 82 + Math.max(0, handCount - 1) * 26;
+  const scaledByWidth = availableHandWidth / Math.max(1, requiredHandWidthAtScale1);
   const handCardScale = boardScale < 1
-    ? Math.min(scaledByHeight, 1.0)   // compact viewport: cap at 1.0
-    : Math.min(scaledByHeight, 1.3);  // full viewport: allow up to 1.3
+    ? Math.max(0.42, Math.min(scaledByHeight, scaledByWidth, 1.0))   // compact viewport: cap at 1.0
+    : Math.max(0.42, Math.min(scaledByHeight, scaledByWidth, 1.3));  // full viewport: allow up to 1.3
 
-  const mustDrawNow = humanTurn && !drawDisabled && playableCardIds.size === 0;
+  const mustDrawNow = humanTurn && !turnTransitionLocked && !drawDisabled && playableCardIds.size === 0;
+  const mustAutoDrawRequired = humanTurn && !turnTransitionLocked && game.pendingDraw > 0 && !hasPendingStackOption;
+  const stackChoiceOpen = humanTurn && !turnTransitionLocked && game.pendingDraw > 0 && hasPendingStackOption;
+  const stackableDraw2Card = sortedHand.find((card) => playableCardIds.has(card.id) && card.value === "draw2") ?? null;
+  const stackableWild4Card = sortedHand.find((card) => playableCardIds.has(card.id) && card.value === "wild4") ?? null;
+  const preferredStackCard = stackableDraw2Card ?? stackableWild4Card;
+  const preferredStackLabel = preferredStackCard?.value === "wild4" ? "+4" : "+2";
+  const revealedDrawnCard = drawnCardId
+    ? localPlayer.hand.find((card) => card.id === drawnCardId) ?? null
+    : null;
+  const drawnPlayableCard = drawnThisTurn && revealedDrawnCard && playableCardIds.has(revealedDrawnCard.id)
+    ? revealedDrawnCard
+    : null;
+  const drawnChoiceOpen = humanTurn && !turnTransitionLocked && drawnThisTurn && !!revealedDrawnCard && drawDecisionCardId === revealedDrawnCard.id;
+  const directionLabel = game.direction === 1 ? "Clockwise" : "Counter-clockwise";
+  const directionSymbol = game.direction === 1 ? "⟳" : "⟲";
+  const showCountdown = turnCountdownSeconds > 0;
+  const timerUrgent = turnCountdownSeconds > 0 && turnCountdownSeconds <= 6;
+  const barHeight = isCompactBoard ? 42 : 50;
+  const headerPadding = isCompactBoard ? "4px 8px" : "6px 12px";
+  const footerPadding = isCompactBoard ? "4px 14px" : "6px 18px";
 
   const hint = !humanTurn
     ? `Waiting for ${currentPlayer.name}`
     : game.pendingDraw > 0
-      ? playableCardIds.size > 0 ? "Counter the draw, or accept it" : `No counter — draw +${game.pendingDraw}`
-      : drawnThisTurn ? "Play the drawn card, or auto-pass in a moment"
-      : playableCardIds.size > 0 ? "Tap a highlighted card to play · Space to draw · U for UNO"
-      : "No playable cards — draw to continue · Space to draw";
+      ? playableCardIds.size > 0 ? "Add to the stack, or take the cards" : `No counter — taking +${game.pendingDraw}`
+      : drawnThisTurn
+        ? drawnPlayableCard ? "Choose to play the drawn card, or pass" : "No playable draw — passing in a moment"
+        : playableCardIds.size > 0 ? "Tap a highlighted card to play · Space to draw · U for UNO"
+        : "No playable cards — drawing automatically";
 
-  const handCount = sortedHand.length;
   const handOverlap = Math.round(26 * handCardScale);
   const ARC_SPREAD = 3.5;
   const ARC_LIFT   = 2.5;
-
-  const confirmExitGame = () => {
-    setShowExitConfirm(false);
-    resetScores();
-    completedMatchRef.current = false;
-    resetGame();
-    onReset();
-  };
 
   const requestLandscapeMode = async () => {
     try {
@@ -648,6 +1082,15 @@ export default function GameBoard({
         @keyframes fadeUp  { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
         @keyframes feedIn  { from{opacity:0;transform:translateX(10px)} to{opacity:1;transform:translateX(0)} }
         @keyframes modalIn { from{opacity:0;transform:translateY(12px) scale(0.98)} to{opacity:1;transform:none} }
+        @keyframes timerPulse {
+          0%,100% { filter: drop-shadow(0 0 0 rgba(192,57,43,0.00)); }
+          50% { filter: drop-shadow(0 0 12px rgba(192,57,43,0.62)); }
+        }
+        @keyframes drewCardGlow {
+          0%   { transform: rotate(var(--card-rot, 0deg)) translateY(var(--card-lift, 0px)) scale(0.92); filter: drop-shadow(0 0 0 rgba(192,57,43,0)); }
+          35%  { transform: rotate(var(--card-rot, 0deg)) translateY(calc(var(--card-lift, 0px) - 18px)) scale(1.02); filter: drop-shadow(0 0 18px rgba(192,57,43,0.58)); }
+          100% { transform: rotate(var(--card-rot, 0deg)) translateY(var(--card-lift, 0px)) scale(1); filter: drop-shadow(0 0 0 rgba(192,57,43,0)); }
+        }
 
         @keyframes mustDrawPulse {
           0%,100% { filter: drop-shadow(0 0 0px rgba(192,57,43,0)); }
@@ -658,6 +1101,12 @@ export default function GameBoard({
           20% { opacity:1; transform:translate(-50%,-50%) scale(1.06); }
           75% { opacity:1; transform:translate(-50%,-50%) scale(1);    }
           100%{ opacity:0; transform:translate(-50%,-50%) scale(1.1);  }
+        }
+        @keyframes actionFlashPop {
+          0%  { opacity:0; transform:scale(0.68); }
+          18% { opacity:1; transform:scale(1.04); }
+          74% { opacity:1; transform:scale(1); }
+          100%{ opacity:0; transform:scale(1.08); }
         }
         @keyframes discardLand {
           0%  { transform:translateY(-16px) rotate(-10deg) scale(0.94); opacity:0.4; }
@@ -677,8 +1126,7 @@ export default function GameBoard({
           100%{ opacity:0; transform:scale(1.08); }
         }
 
-        .playable-card { transition: transform 0.15s cubic-bezier(0.22,1,0.36,1) !important; }
-        .playable-card:hover { z-index: 99 !important; }
+        .hand-card { transition: transform 0.18s cubic-bezier(0.22,1,0.36,1), filter 0.18s ease !important; }
 
         .draw-pile-btn { transition: filter 0.2s ease, opacity 0.2s ease, transform 0.15s ease; }
         .draw-pile-btn:hover:not(:disabled) { transform: translateY(-4px); }
@@ -687,180 +1135,91 @@ export default function GameBoard({
         .uno-btn:hover { opacity: 0.82 !important; }
         .menu-btn { transition: color 0.12s; }
         .menu-btn:hover { color: var(--ui-accent-red) !important; }
-
-        .board-top-actions {
-          display: grid;
-          grid-template-columns: repeat(3, minmax(0, 1fr));
-          align-items: center;
-          gap: 6px;
-          width: min(420px, 100%);
-        }
-        .board-top-btn {
-          font-family: 'Courier Prime', monospace;
-          font-size: 10px;
-          font-weight: 700;
-          letter-spacing: 0.14em;
-          text-transform: uppercase;
-          background: var(--ui-surface);
-          border: 1px solid var(--ui-line);
-          color: var(--ui-muted);
-          padding: 6px 10px;
-          cursor: pointer;
-          transition: color 0.12s ease, border-color 0.12s ease;
-          white-space: nowrap;
-        }
-        .board-top-btn:hover {
-          color: var(--ui-text);
-          border-color: color-mix(in srgb, var(--ui-line) 62%, var(--ui-text));
-        }
-
-        .winner-actions {
-          display: grid;
-          grid-template-columns: repeat(2, minmax(0, auto));
-          gap: 10px;
-          align-items: center;
-          justify-content: center;
-          width: min(560px, 100%);
-        }
-        .winner-btn {
-          font-family: 'Courier Prime', monospace;
-          font-size: 11px;
-          font-weight: 700;
-          letter-spacing: 0.1em;
-          text-transform: uppercase;
-          border: 1px solid var(--ui-line);
-          padding: 12px 20px;
-          cursor: pointer;
-          transition: opacity 0.12s ease, color 0.12s ease;
-          white-space: nowrap;
-        }
-        .winner-btn-secondary {
-          background: transparent;
-          color: var(--ui-muted);
-        }
-        .winner-btn-secondary:hover {
-          color: var(--ui-text);
-        }
-        .winner-btn-primary {
-          font-family: 'Bebas Neue', cursive;
-          font-size: 22px;
-          letter-spacing: 0.14em;
-          border: none;
-          background: var(--ui-text);
-          color: var(--ui-bg);
-          padding: 12px 36px;
-        }
-        @media (max-width: 860px) {
-          .board-top-actions {
-            width: 100%;
-          }
-          .board-top-btn {
-            font-size: 9px;
-            padding: 5px 8px;
-          }
-        }
-        @media (max-width: 560px) {
-          .board-top-actions {
-            grid-template-columns: 1fr;
-          }
-          .winner-actions {
-            grid-template-columns: 1fr;
-          }
-          .winner-btn,
-          .winner-btn-primary {
-            width: 100%;
-          }
-        }
-
-        /* Keep the hand scrollbar inside the card zone (top edge), not at the panel bottom. */
-        .player-hand-scroll {
-          width: 100%;
-          overflow-x: auto;
-          overflow-y: hidden;
-          transform: rotateX(180deg);
-          scrollbar-gutter: stable both-edges;
-          scrollbar-width: thin;
-          scrollbar-color: color-mix(in srgb, var(--ui-muted) 55%, transparent) transparent;
-        }
-        .player-hand-scroll::-webkit-scrollbar { height: 10px; }
-        .player-hand-scroll::-webkit-scrollbar-track { background: transparent; }
-        .player-hand-scroll::-webkit-scrollbar-thumb {
-          background: color-mix(in srgb, var(--ui-muted) 55%, transparent);
-          border-radius: 999px;
-        }
-        .player-hand-scroll-content {
-          transform: rotateX(180deg);
-        }
       `}</style>
 
       <LiveFeed entries={feed} />
+  <AnimatedCards animations={animations} />
+        {actionFlash && <ActionFlash text={actionFlash.text} tone={actionFlash.tone} />}
       {callOutFlashName && <CallOutFlash name={callOutFlashName} />}
 
       <div style={{
         height: "100dvh", overflow: "hidden",
         color: "var(--ui-text)", background: "var(--ui-bg)",
         fontFamily: "'Courier Prime', monospace",
-        display: "flex", justifyContent: "center",
+        display: "flex", flexDirection: "column",
       }}>
-
-        <div style={{
-          width: boardShellWidth,
-          height: "100%",
-          display: "grid",
-          gridTemplateRows: "auto auto minmax(0, 1fr) auto",
-          gap: isCompactBoard ? 6 : 10,
-          margin: "0 auto",
-        }}>
 
         {/* ── Header ── */}
         <div style={{
-          zIndex: 30,
-          padding: isCompactBoard ? "8px 2px 0" : "12px 4px 0",
+          position: "absolute", top: 0, left: 0, right: 0, zIndex: 30,
+          padding: headerPadding,
+          minHeight: barHeight,
           display: "flex", justifyContent: "space-between", alignItems: "center",
-          gap: 8,
+          pointerEvents: "none",
+          background: "var(--ui-bg)",
+          borderBottom: "1px solid var(--ui-line)",
         }}>
           <h1 style={{
-            margin: 0,
+            margin: 0, pointerEvents: "auto",
             fontFamily: "'Bebas Neue', cursive",
-            fontSize: isCompactBoard ? 30 : 38, letterSpacing: "0.02em", lineHeight: 1,
+            fontSize: isCompactBoard ? 26 : 32, letterSpacing: "0.02em", lineHeight: 1,
           }}>
             <span style={{ color: "var(--ui-accent-red)" }}>U</span>
             <span style={{ color: "var(--ui-accent-yellow)" }}>N</span>
             <span style={{ color: "var(--ui-accent-green)" }}>O</span>
           </h1>
-          <div className="board-top-actions">
-            <button type="button" onClick={onCycleTheme} className="board-top-btn">
-              Theme: {currentThemeLabel}
-            </button>
-            <button type="button" onClick={onOpenSettings} className="board-top-btn">
-              Settings
-            </button>
-            <button type="button" className="board-top-btn menu-btn" onClick={() => setShowExitConfirm(true)}>
-              Menu
-            </button>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, pointerEvents: "auto" }}>
+            <button type="button" onClick={onCycleTheme} style={{
+              fontFamily: "'Courier Prime', monospace",
+              fontSize: isCompactBoard ? 10 : 11, fontWeight: 700,
+              letterSpacing: "0.14em", textTransform: "uppercase",
+              background: "var(--ui-surface)", border: "1px solid var(--ui-line)",
+              color: "var(--ui-muted)", padding: isCompactBoard ? "6px 10px" : "8px 13px",
+              cursor: "pointer", transition: "color 0.12s",
+            }}>Theme: {currentThemeLabel}</button>
+            <button onClick={onOpenSettings} style={{
+              fontFamily: "'Courier Prime', monospace",
+              fontSize: isCompactBoard ? 10 : 11, fontWeight: 700,
+              letterSpacing: "0.14em", textTransform: "uppercase",
+              background: "var(--ui-surface)", border: "1px solid var(--ui-line)",
+              color: "var(--ui-muted)", padding: isCompactBoard ? "6px 10px" : "8px 13px",
+              cursor: "pointer", transition: "color 0.12s",
+            }}>SETTINGS</button>
+            <button className="menu-btn" onClick={() => setShowExitConfirm(true)} style={{
+              fontFamily: "'Courier Prime', monospace",
+              fontSize: isCompactBoard ? 10 : 11, fontWeight: 700,
+              letterSpacing: "0.14em", textTransform: "uppercase",
+              background: "var(--ui-surface)", border: "1px solid var(--ui-line)",
+              color: "var(--ui-muted)", padding: isCompactBoard ? "6px 10px" : "8px 13px",
+              cursor: "pointer",
+            }}>MENU</button>
           </div>
         </div>
 
-        {/* ── Opponents ── */}
+        {/* ── Opponents — paddingTop clears floating header ── */}
         <section style={{
-          padding: isCompactBoard ? "2px 10px 8px" : "4px 14px 12px",
-          borderBlock: "1px solid var(--ui-line)",
-          display: "grid",
-          gridTemplateColumns: `repeat(${Math.max(opponents.length, 1)}, minmax(0, 1fr))`,
-          gap: isCompactBoard ? "6px 12px" : "8px 18px",
-          alignItems: "flex-start",
+          paddingTop: isCompactBoard ? 40 : 48,
+          paddingBottom: isCompactBoard ? 4 : 8,
+          paddingInline: 12,
+          display: "flex", flexWrap: "wrap",
+          gap: isCompactBoard ? "4px 14px" : "8px 20px",
+          justifyContent: "center", alignItems: "flex-start",
           flexShrink: 0,
-          overflowX: "auto",
+          borderBottom: "1px solid var(--ui-line)",
         }}>
           {opponents.map(player => {
             const idx = game.players.findIndex(p => p.id === player.id);
+            const canCallOut = humanTurn && player.hand.length === 1 && !player.saidUno && game.rules.mustDeclareUno;
             return (
-              <OpponentStrip
-                key={player.id}
-                player={player}
-                isCurrentTurn={idx === game.currentPlayerIndex}
-                cardScale={handCardScale}
-              />
+              <div key={player.id} ref={(node) => { playerZoneRefs.current[player.id] = node; }}>
+                <OpponentStrip
+                  player={player}
+                  isCurrentTurn={idx === game.currentPlayerIndex}
+                  canCallOut={canCallOut}
+                  onCallOut={() => handleCallOut(localPlayerIndex, idx, player.name)}
+                  cardScale={handCardScale}
+                />
+              </div>
             );
           })}
         </section>
@@ -873,30 +1232,31 @@ export default function GameBoard({
           gap: isCompactBoard ? 6 : 12,
           padding: isCompactBoard ? "0 8px" : "0 16px",
           overflow: "hidden",
+          transform: isCompactBoard ? "translateY(-4px)" : "translateY(-10px)",
         }}>
 
-          <div style={{ minHeight: 20, display: "flex", alignItems: "center", justifyContent: "center" }}>
-            {botThinking ? (
-              <Thinking name={currentPlayer.name} />
-            ) : game.pendingDraw > 0 && humanTurn ? (
-              <span style={{
-                fontFamily: "'Courier Prime', monospace", fontSize: 11,
-                color: "var(--ui-accent-red)", letterSpacing: "0.1em", textTransform: "uppercase",
-                border: "1px solid var(--ui-accent-red)", padding: "3px 12px",
-                animation: "blink 2s step-end infinite",
-              }}>+{game.pendingDraw} incoming</span>
-            ) : null}
+          <div style={{
+            minHeight: 20,
+            width: "100%",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            paddingLeft: isCompactBoard ? 4 : 8,
+            paddingRight: isCompactBoard ? 6 : 10,
+          }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              {game.pendingDraw > 0 && humanTurn ? (
+                <span style={{
+                  fontFamily: "'Courier Prime', monospace", fontSize: 11,
+                  color: "var(--ui-accent-red)", letterSpacing: "0.1em", textTransform: "uppercase",
+                  border: "1px solid var(--ui-accent-red)", padding: "3px 12px",
+                  animation: "blink 2s step-end infinite",
+                }}>{hasPendingStackOption ? `+${game.pendingDraw} incoming` : `taking +${game.pendingDraw}`}</span>
+              ) : null}
+            </div>
           </div>
 
-          <div style={{
-            width: "min(760px, 100%)",
-            border: "1px solid var(--ui-line)",
-            padding: isCompactBoard ? "16px 12px" : "20px 18px",
-            display: "grid",
-            gridTemplateColumns: "1fr auto 1fr",
-            alignItems: "end",
-            gap: isCompactBoard ? 12 : 22,
-          }}>
+          <div style={{ display: "flex", alignItems: "flex-end", gap: isCompactBoard ? 14 : 32 }}>
 
             {/* Draw pile */}
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
@@ -905,6 +1265,7 @@ export default function GameBoard({
                 letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--ui-muted)",
               }}>DRAW PILE</span>
               <button
+                ref={drawPileRef}
                 className="draw-pile-btn"
                 onClick={drawDisabled ? undefined : drawCard}
                 disabled={drawDisabled}
@@ -912,8 +1273,8 @@ export default function GameBoard({
                   background: "none", border: "none", padding: 0,
                   cursor: drawDisabled ? "default" : "pointer",
                   opacity: drawDisabled ? 0.28 : 1,
-                  animation: mustDrawNow ? "mustDrawPulse 1.2s ease-in-out infinite" : "none",
-                  filter: !mustDrawNow && game.pendingDraw > 0 && humanTurn
+                  animation: mustDrawNow || mustAutoDrawRequired ? "mustDrawPulse 1.0s ease-in-out infinite" : "none",
+                  filter: !mustDrawNow && !mustAutoDrawRequired && game.pendingDraw > 0 && humanTurn
                     ? "drop-shadow(0 0 7px rgba(192,57,43,0.55))" : "none",
                 }}
               >
@@ -925,10 +1286,25 @@ export default function GameBoard({
               }}>{game.drawPile.length} left</span>
             </div>
 
-            <div style={{
-              width: 1, height: isCompactBoard ? 54 : 70,
-              background: "var(--ui-line)", alignSelf: "center",
-            }} />
+            {/* Direction indicator (aligned with piles) */}
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
+              <span style={{
+                fontFamily: "'Courier Prime', monospace", fontSize: 9,
+                letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--ui-muted)",
+              }}>TURN</span>
+              <span title={directionLabel} style={{
+                fontFamily: "'Courier Prime', monospace",
+                fontSize: Math.round((isCompactBoard ? 26 : 32) * pileCardScale),
+                lineHeight: 1,
+                color: "var(--ui-text)",
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: Math.round((isCompactBoard ? 34 : 42) * pileCardScale),
+                height: Math.round((isCompactBoard ? 34 : 42) * pileCardScale),
+                flexShrink: 0,
+              }}>{directionSymbol}</span>
+            </div>
 
             {/* Discard pile */}
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
@@ -937,7 +1313,7 @@ export default function GameBoard({
                 letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--ui-muted)",
               }}>DISCARD</span>
               {topDiscard && (
-                <div style={{ position: "relative", width: 120 * pileCardScale, height: 160 * pileCardScale }}>
+                <div ref={discardPileRef} style={{ position: "relative", width: 120 * pileCardScale, height: 160 * pileCardScale }}>
                   {game.discardPile.slice(-4).map((card, idx, arr) => {
                     const isTop = idx === arr.length - 1;
                     const displayCard = isTop && discardDisplayCard ? discardDisplayCard : card;
@@ -959,22 +1335,8 @@ export default function GameBoard({
                 </div>
               )}
             </div>
-          </div>
 
-          {humanTurn && game.pendingDraw > 0 && hasPendingStackOption && (
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, marginTop: 2 }}>
-              <button onClick={drawDisabled ? undefined : drawCard} disabled={drawDisabled} style={{
-                fontFamily: "'Bebas Neue', cursive", fontSize: 18, letterSpacing: "0.12em",
-                background: "var(--ui-accent-red)", color: "#fff",
-                border: "2px solid var(--ui-accent-red)", padding: "8px 24px",
-                cursor: drawDisabled ? "default" : "pointer", opacity: drawDisabled ? 0.4 : 1,
-              }}>TAKE +{game.pendingDraw}</button>
-              <span style={{
-                fontFamily: "'Courier Prime', monospace", fontSize: 10,
-                letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--ui-muted)",
-              }}>or play {game.pendingDrawType === "draw2" ? "+2" : "+4"} to stack</span>
-            </div>
-          )}
+          </div>
 
         </main>
 
@@ -982,60 +1344,282 @@ export default function GameBoard({
         <div style={{
           flexShrink: 0,
           borderTop: "1px solid var(--ui-line)",
-          display: "grid",
-          gridTemplateRows: "minmax(0, 1fr) auto",
+          position: "relative",
+          overflow: "visible",
+          zIndex: 12,
         }}>
 
+          {stackChoiceOpen && (
+            <ActionTray>
+              <div style={{ display: "grid", gap: 4 }}>
+                <p style={{
+                  margin: 0,
+                  fontFamily: "'Courier Prime', monospace",
+                  fontSize: 10,
+                  letterSpacing: "0.2em",
+                  textTransform: "uppercase",
+                  color: "var(--ui-muted)",
+                }}>Draw stack</p>
+                <p style={{
+                  margin: 0,
+                  fontFamily: "'Bebas Neue', cursive",
+                  fontSize: 28,
+                  letterSpacing: "0.04em",
+                  color: "var(--ui-text)",
+                  lineHeight: 1,
+                }}>+{game.pendingDraw} incoming</p>
+                <p style={{
+                  margin: 0,
+                  fontFamily: "'Courier Prime', monospace",
+                  fontSize: 11,
+                  letterSpacing: "0.06em",
+                  textTransform: "uppercase",
+                  color: "var(--ui-muted)",
+                  }}>
+                    {preferredStackCard?.value === "wild4"
+                      ? "You can counter with +4."
+                      : "You can counter with +2."} Stack now, or take the cards.
+                  </p>
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (turnTransitionLocked) return;
+                    if (!preferredStackCard) {
+                      drawCard();
+                      return;
+                    }
+                    if (game.rules.mustDeclareUno && !localPlayer.saidUno && localPlayer.hand.length === 2) {
+                      sayUno(localPlayerIndex);
+                    }
+                    handleSelectCard(preferredStackCard, handCardRefs.current[preferredStackCard.id] ?? null);
+                  }}
+                  style={{
+                    fontFamily: "'Bebas Neue', cursive",
+                    fontSize: 20,
+                    letterSpacing: "0.12em",
+                    background: "var(--ui-text)",
+                    color: "var(--ui-bg)",
+                    border: "none",
+                    padding: "12px 14px",
+                    cursor: "pointer",
+                  }}
+                >Add {preferredStackLabel}</button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (turnTransitionLocked) return;
+                    drawCard();
+                  }}
+                  style={{
+                    fontFamily: "'Courier Prime', monospace",
+                    fontSize: 10,
+                    fontWeight: 700,
+                    letterSpacing: "0.12em",
+                    textTransform: "uppercase",
+                    background: "transparent",
+                    border: "1px solid var(--ui-line)",
+                    color: "var(--ui-muted)",
+                    padding: "12px 14px",
+                    cursor: "pointer",
+                  }}
+                >Take +{game.pendingDraw}</button>
+              </div>
+            </ActionTray>
+          )}
+
+          {drawnChoiceOpen && revealedDrawnCard && (
+            <ActionTray>
+              <div style={{ display: "grid", gridTemplateColumns: "auto 1fr", gap: 12, alignItems: "center" }}>
+                <UnoCard card={revealedDrawnCard} sizeMultiplier={0.78} />
+                <div style={{ display: "grid", gap: 4 }}>
+                  <p style={{
+                    margin: 0,
+                    fontFamily: "'Courier Prime', monospace",
+                    fontSize: 10,
+                    letterSpacing: "0.2em",
+                    textTransform: "uppercase",
+                    color: "var(--ui-muted)",
+                  }}>Card drawn</p>
+                  <p style={{
+                    margin: 0,
+                    fontFamily: "'Bebas Neue', cursive",
+                    fontSize: 28,
+                    letterSpacing: "0.04em",
+                    color: "var(--ui-text)",
+                    lineHeight: 1,
+                  }}>{drawnPlayableCard ? "You can play this" : "Draw complete"}</p>
+                  <p style={{
+                    margin: 0,
+                    fontFamily: "'Courier Prime', monospace",
+                    fontSize: 11,
+                    letterSpacing: "0.06em",
+                    textTransform: "uppercase",
+                    color: "var(--ui-muted)",
+                  }}>{drawnPlayableCard
+                    ? "The new card is highlighted in your hand. Play it, or pass."
+                    : "Pass now to end turn, or keep playing from your hand."}</p>
+                </div>
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: drawnPlayableCard ? "1fr 1fr" : "1fr 1fr", gap: 8 }}>
+                {drawnPlayableCard && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (turnTransitionLocked) return;
+                      if (game.rules.mustDeclareUno && !localPlayer.saidUno && localPlayer.hand.length === 2) {
+                        sayUno(localPlayerIndex);
+                      }
+                      handleSelectCard(drawnPlayableCard, handCardRefs.current[drawnPlayableCard.id] ?? null);
+                    }}
+                    style={{
+                      fontFamily: "'Bebas Neue', cursive",
+                      fontSize: 20,
+                      letterSpacing: "0.12em",
+                      background: "var(--ui-text)",
+                      color: "var(--ui-bg)",
+                      border: "none",
+                      padding: "12px 14px",
+                      cursor: "pointer",
+                    }}
+                  >Play card</button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (turnTransitionLocked) return;
+                    pass();
+                  }}
+                  style={{
+                    fontFamily: "'Courier Prime', monospace",
+                    fontSize: 10,
+                    fontWeight: 700,
+                    letterSpacing: "0.12em",
+                    textTransform: "uppercase",
+                    background: "transparent",
+                    border: "1px solid var(--ui-line)",
+                    color: "var(--ui-muted)",
+                    padding: "12px 14px",
+                    cursor: "pointer",
+                  }}
+                >Pass</button>
+                {!drawnPlayableCard && (
+                  <button
+                    type="button"
+                    onClick={() => setDrawDecisionCardId(null)}
+                    style={{
+                      fontFamily: "'Courier Prime', monospace",
+                      fontSize: 10,
+                      fontWeight: 700,
+                      letterSpacing: "0.12em",
+                      textTransform: "uppercase",
+                      background: "transparent",
+                      border: "1px solid var(--ui-line)",
+                      color: "var(--ui-muted)",
+                      padding: "12px 14px",
+                      cursor: "pointer",
+                    }}
+                  >Keep turn</button>
+                )}
+              </div>
+            </ActionTray>
+          )}
+
           {/* Card fan — scrollable, full height */}
-          <div className="player-hand-scroll">
-            <div className="player-hand-scroll-content" style={{
+          <div style={{ overflow: "visible", width: "100%", position: "relative", zIndex: 13 }}>
+            <div ref={localHandRef} style={{
               display: "flex",
               alignItems: "flex-end",
               justifyContent: "center",
               minWidth: "max-content",
-              paddingLeft:  isCompactBoard ? 18 : 28,
-              paddingRight: isCompactBoard ? 18 : 28,
+              paddingLeft:  isCompactBoard ? 16 : 24,
+              paddingRight: isCompactBoard ? 16 : 24,
               paddingTop:   isCompactBoard ? 12 : 16,
               paddingBottom: 0,
               height: isCompactBoard
                 ? `${Math.round(122 * handCardScale) + 28}px`
                 : `${Math.round(122 * handCardScale) + 36}px`,
-            }}>
+              overflow: "visible",
+            }}
+              onMouseMove={(event) => {
+                if (event.target === event.currentTarget) {
+                  setHoveredHandPosition(null);
+                }
+              }}
+              onMouseLeave={() => setHoveredHandPosition(null)}
+            >
               {sortedHand.map((card, i) => {
-                const playable = humanTurn && !botThinking && playableCardIds.has(card.id);
+                const playable = humanTurn && !botThinking && !turnTransitionLocked && playableCardIds.has(card.id);
                 const isSelected = pendingWild?.id === card.id;
+                const isFreshDraw = card.id === highlightedDrawnCardId;
                 const mid = (handCount - 1) / 2;
                 const offset = i - mid;
                 const rotateDeg = offset * ARC_SPREAD;
                 const liftPx = Math.abs(offset) * ARC_LIFT;
-                const baseTransform = `rotate(${rotateDeg}deg) translateY(${isSelected ? liftPx - 14 : liftPx}px)`;
+                const hoverDistance = hoveredHandPosition === null ? 99 : Math.abs(i - hoveredHandPosition);
+                const gaussian = hoveredHandPosition === null
+                  ? 0
+                  : Math.exp(-((hoverDistance * hoverDistance) / (2 * 0.95 * 0.95)));
+                const dockScale = 1 + (0.22 * gaussian);
+                const dockLift = 15 * gaussian;
+                const horizontalPush = hoveredHandPosition === null
+                  ? 0
+                  : Math.sign(i - hoveredHandPosition) * (8 * gaussian);
+                const baseLift = isSelected ? liftPx - 14 : liftPx;
+                const baseTransform = `translateX(${horizontalPush}px) rotate(${rotateDeg}deg) translateY(${baseLift - dockLift}px) scale(${dockScale})`;
 
                 return (
                   <div
                     key={card.id}
-                    className={playable ? "playable-card" : ""}
+                    className="hand-card"
+                    ref={(node) => { handCardRefs.current[card.id] = node; }}
                     style={{
+                      "--card-rot": `${rotateDeg}deg`,
+                      "--card-lift": `${isSelected ? liftPx - 14 : liftPx}px`,
                       marginLeft: i === 0 ? 0 : -handOverlap,
-                      zIndex: playable ? i + 1 : i,
+                      zIndex: hoveredHandPosition === null
+                        ? (playable ? i + 1 : i)
+                        : i + Math.round(gaussian * 180),
                       position: "relative",
                       transform: baseTransform,
                       transformOrigin: "bottom center",
-                      transition: "transform 0.15s cubic-bezier(0.22,1,0.36,1)",
+                      transition: "transform 0.18s cubic-bezier(0.22,1,0.36,1)",
                       cursor: playable ? "pointer" : "default",
                       outline: isSelected ? "2px solid var(--ui-text)" : "none",
                       outlineOffset: 3,
-                      filter: playable ? "drop-shadow(0 2px 4px rgba(26,15,0,0.14))" : "none",
-                    }}
-                    onClick={playable ? () => selectCard(card) : undefined}
-                    onMouseEnter={e => {
-                      if (!playable) return;
-                      (e.currentTarget as HTMLDivElement).style.transform =
-                        `rotate(${rotateDeg}deg) translateY(${liftPx - 20}px)`;
-                    }}
-                    onMouseLeave={e => {
-                      (e.currentTarget as HTMLDivElement).style.transform = baseTransform;
+                      filter: isFreshDraw
+                        ? "drop-shadow(0 0 16px rgba(192,57,43,0.45))"
+                        : playable ? "drop-shadow(0 2px 4px rgba(26,15,0,0.14))" : "none",
+                      animation: isFreshDraw ? "drewCardGlow 0.6s cubic-bezier(0.22,1,0.36,1)" : "none",
+                    } as CSSProperties & Record<string, string | number>}
+                    onClick={playable ? (event) => handleSelectCard(card, event.currentTarget) : undefined}
+                    onMouseEnter={() => setHoveredHandPosition(i)}
+                    onMouseMove={(event) => {
+                      const rect = event.currentTarget.getBoundingClientRect();
+                      const normalized = (event.clientX - rect.left) / Math.max(1, rect.width);
+                      const finePosition = i + (normalized - 0.5) * 0.9;
+                      setHoveredHandPosition(finePosition);
                     }}
                   >
+                    {isFreshDraw && (
+                      <span style={{
+                        position: "absolute",
+                        left: "50%",
+                        top: -18,
+                        transform: "translateX(-50%)",
+                        fontFamily: "'Courier Prime', monospace",
+                        fontSize: 8,
+                        fontWeight: 700,
+                        letterSpacing: "0.16em",
+                        textTransform: "uppercase",
+                        color: "var(--ui-accent-red)",
+                        whiteSpace: "nowrap",
+                        zIndex: 3,
+                      }}>DREW</span>
+                    )}
                     <UnoCard
                       card={card} sizeMultiplier={handCardScale}
                       isPlayable={playable} isSelected={isSelected} onClick={undefined}
@@ -1048,109 +1632,136 @@ export default function GameBoard({
 
           {/* ── Info row — always below cards, never covered ── */}
           <div style={{
-            display: "grid",
-            gridTemplateColumns: isCompactBoard ? "1fr" : "minmax(220px, auto) 1fr minmax(160px, auto)",
+            display: "flex",
             alignItems: "center",
-            gap: isCompactBoard ? 8 : 12,
-            padding: isCompactBoard ? "6px 14px 8px" : "8px 18px 12px",
+            gap: 10,
+            padding: footerPadding,
+            minHeight: barHeight,
+            position: "relative",
+            zIndex: 320,
+            background: "var(--ui-bg)",
             borderTop: "1px solid var(--ui-line)",
+            flexWrap: "nowrap",
           }}>
-            <div style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 10,
-              flexWrap: "wrap",
-              justifyContent: isCompactBoard ? "center" : "flex-start",
-            }}>
-              <span style={{
-                fontFamily: "'Bebas Neue', cursive",
-                fontSize: isCompactBoard ? 16 : 19,
-                letterSpacing: "0.05em",
-                color: "var(--ui-text)",
-                lineHeight: 1,
-                flexShrink: 0,
-              }}>{localPlayer.name}</span>
+            {/* Name */}
+            <span style={{
+              fontFamily: "'Bebas Neue', cursive",
+              fontSize: isCompactBoard ? 16 : 19,
+              letterSpacing: "0.05em",
+              color: "var(--ui-text)",
+              lineHeight: 1,
+              flexShrink: 0,
+            }}>{localPlayer.name}</span>
 
+            {/* Turn status */}
+            <span style={{
+              fontFamily: "'Courier Prime', monospace",
+              fontSize: isCompactBoard ? 9 : 10,
+              letterSpacing: "0.1em",
+              textTransform: "uppercase",
+              color: "var(--ui-muted)",
+              flexShrink: 0,
+            }}>{humanTurn ? "— your turn" : "— waiting"}</span>
+
+            {/* UNO declared badge */}
+            {localPlayer.saidUno && localPlayer.hand.length <= 2 && (
+              <span style={{
+                fontFamily: "'Courier Prime', monospace", fontSize: 8, fontWeight: 700,
+                letterSpacing: "0.14em", background: "var(--ui-accent-red)", color: "#fff",
+                padding: "2px 6px", animation: isLocalTurn ? "blink 0.9s step-end infinite" : "none",
+                flexShrink: 0,
+              }}>UNO</span>
+            )}
+
+            {unoReady && (
               <span style={{
                 fontFamily: "'Courier Prime', monospace",
-                fontSize: isCompactBoard ? 9 : 10,
-                letterSpacing: "0.1em",
+                fontSize: 8,
+                fontWeight: 700,
+                letterSpacing: "0.14em",
                 textTransform: "uppercase",
-                color: "var(--ui-muted)",
+                color: "var(--ui-accent-red)",
                 flexShrink: 0,
-              }}>{humanTurn ? "Your turn" : "Waiting"}</span>
+              }}>say uno now</span>
+            )}
 
-              {localPlayer.saidUno && localPlayer.hand.length <= 2 && (
-                <span style={{
-                  fontFamily: "'Courier Prime', monospace", fontSize: 8, fontWeight: 700,
-                  letterSpacing: "0.14em", background: "var(--ui-accent-red)", color: "#fff",
-                  padding: "2px 6px", animation: "blink 0.9s step-end infinite",
-                  flexShrink: 0,
-                }}>UNO</span>
-              )}
+            {/* Session wins */}
+            {(scores[localPlayer.name] ?? 0) > 0 && (
+              <span style={{
+                fontFamily: "'Courier Prime', monospace", fontSize: 9,
+                color: "var(--ui-muted)", letterSpacing: "0.06em", flexShrink: 0,
+              }}>{scores[localPlayer.name]}W</span>
+            )}
 
-              {(pointsByPlayerId[localPlayer.id] ?? 0) > 0 && (
-                <span style={{
-                  fontFamily: "'Courier Prime', monospace", fontSize: 9,
-                  color: "var(--ui-muted)", letterSpacing: "0.06em", flexShrink: 0,
-                }}>{pointsByPlayerId[localPlayer.id]} pts</span>
-              )}
-            </div>
+            {/* Separator dot */}
+            <span style={{ color: "var(--ui-line)", flexShrink: 0 }}>·</span>
 
+            {/* Hint — takes remaining space, truncates if needed */}
             <span style={{
               fontFamily: "'Courier Prime', monospace",
               fontSize: isCompactBoard ? 9 : 10,
               letterSpacing: "0.06em",
               textTransform: "uppercase",
               color: "var(--ui-muted)",
-              textAlign: "center",
+              flex: 1,
               minWidth: 0,
               overflow: "hidden",
               textOverflow: "ellipsis",
               whiteSpace: "nowrap",
             }}>{hint}</span>
 
-            <div style={{
-              display: "flex",
-              justifyContent: isCompactBoard ? "center" : "flex-end",
-              minHeight: isCompactBoard ? 32 : 38,
-            }}>
-              {primaryActionLabel ? (
+            <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+              {unoButtonVisible && (
                 <button
+                  type="button"
+                  onClick={unoReady ? declareUno : undefined}
+                  disabled={!unoReady || turnTransitionLocked}
                   className="uno-btn"
-                  onClick={canDeclareUnoNow ? declareUno : triggerCallOut}
                   style={{
                     fontFamily: "'Bebas Neue', cursive",
-                    fontSize: isCompactBoard ? 15 : 18,
+                    fontSize: isCompactBoard ? 22 : 26,
                     letterSpacing: "0.1em",
-                    background: "var(--ui-accent-red)",
-                    color: "#fff",
-                    border: "2px solid var(--ui-accent-red)",
-                    padding: isCompactBoard ? "5px 11px" : "7px 15px",
-                    cursor: "pointer",
-                    opacity: 1,
-                    animation: "blink 1.4s ease-in-out infinite",
+                    background: unoReady ? "var(--ui-accent-red)" : "var(--ui-surface)",
+                    color: unoReady ? "#fff" : "var(--ui-muted)",
+                    border: unoReady ? "1px solid var(--ui-accent-red)" : "1px solid var(--ui-line)",
+                    padding: isCompactBoard ? "5px 12px 4px" : "7px 16px 6px",
+                    cursor: unoReady ? "pointer" : "default",
+                    opacity: unoReady ? 1 : 0.62,
+                    animation: unoReady ? "blink 1.2s step-end infinite" : "none",
+                    lineHeight: 1,
                   }}
-                >{primaryActionLabel}</button>
-              ) : (
+                  title={
+                    game.rules.mustDeclareUno
+                      ? (unoReady ? "Say UNO" : "UNO can be declared when you have 2 or 1 cards on your turn")
+                      : "UNO declaration is disabled in current rules"
+                  }
+                >UNO</button>
+              )}
+
+              {showCountdown && (
+                <div title="Turn timer" style={{
+                border: "none",
+                background: timerUrgent
+                  ? "color-mix(in srgb, var(--ui-accent-red) 74%, var(--ui-bg) 26%)"
+                  : "color-mix(in srgb, var(--ui-accent-blue) 36%, var(--ui-surface) 64%)",
+                color: timerUrgent ? "#fff8f0" : "var(--ui-text)",
+                padding: isCompactBoard ? "3px 10px 2px" : "4px 12px 3px",
+                minWidth: isCompactBoard ? 44 : 52,
+                textAlign: "center",
+                boxShadow: timerUrgent ? "0 0 0 1px color-mix(in srgb, var(--ui-accent-red) 72%, #000 28%), 0 6px 16px rgba(192,57,43,0.38)" : "0 4px 12px rgba(26,15,0,0.18)",
+                animation: timerUrgent ? "timerPulse 0.75s ease-in-out infinite" : "none",
+              }}>
                 <span style={{
-                  fontFamily: "'Courier Prime', monospace",
-                  fontSize: isCompactBoard ? 9 : 10,
-                  fontWeight: 700,
-                  letterSpacing: "0.12em",
-                  textTransform: "uppercase",
-                  color: activeColorMeta ? activeColorMeta.fg : "var(--ui-muted)",
-                  background: activeColorMeta ? activeColorMeta.bg : "transparent",
-                  border: activeColorMeta ? "none" : "1px solid var(--ui-line)",
-                  padding: isCompactBoard ? "7px 10px" : "9px 12px",
-                  minWidth: isCompactBoard ? 132 : 148,
-                  textAlign: "center",
-                }}>{primaryStatusLabel}</span>
+                  fontFamily: "'Bebas Neue', cursive",
+                  fontSize: isCompactBoard ? 24 : 30,
+                  lineHeight: 1,
+                  letterSpacing: "0.04em",
+                }}>{turnCountdownSeconds}</span>
+                </div>
               )}
             </div>
           </div>
 
-        </div>
         </div>
       </div>
 
@@ -1163,7 +1774,7 @@ export default function GameBoard({
           <div style={{
             width: "min(460px, 100%)", background: "var(--ui-surface)",
             border: "2px solid var(--ui-line)", padding: 20,
-            display: "grid", gap: 14, animation: "modalIn 0.16s ease",
+            display: "grid", gap: 14, animation: "none",
           }}>
             <p style={{ margin: 0, fontFamily: "'Bebas Neue', cursive", fontSize: 30, letterSpacing: "0.05em", color: "var(--ui-text)" }}>
               Leave This Match?
@@ -1221,8 +1832,8 @@ export default function GameBoard({
             transform: "translate(-50%, -50%)",
             fontFamily: "'Bebas Neue', cursive",
             fontSize: "clamp(64px, 18vw, 180px)", lineHeight: 0.9,
-            color: "var(--ui-text)",
-            textShadow: "0 1px 0 color-mix(in srgb, var(--ui-bg) 70%, black), 0 10px 26px rgba(0,0,0,0.42), 0 0 28px color-mix(in srgb, var(--ui-accent-red) 70%, transparent)",
+            color: "var(--ui-accent-red)",
+            textShadow: "0 10px 26px rgba(0,0,0,0.34), 0 0 24px color-mix(in srgb, var(--ui-accent-red) 72%, var(--ui-accent-yellow) 28%)",
             animation: "unoFlashPop 0.9s cubic-bezier(0.22,1,0.36,1) forwards",
           }}>UNO!</div>
         </div>
@@ -1231,37 +1842,10 @@ export default function GameBoard({
       {winner && (
         <WinnerScreen
           winner={winner}
-          roundPoints={lastRoundPoints}
-          winnerTotalPoints={pointsByPlayerId[winner.id] ?? 0}
-          matchWinnerName={matchWinner?.name ?? null}
-          scoreRows={scoreRows}
-          onExit={() => {
-            resetScores();
-            completedMatchRef.current = false;
-            resetGame();
-            onReset();
-          }}
-          onDealAgain={() => {
-            if (isOnlineMatch) {
-              void handleOnlineRematch();
-              return;
-            }
-            handleLocalDealAgain();
-          }}
-          dealAgainDisabled={isOnlineMatch && (!isOnlineHost || rematchBusy)}
-          dealAgainLabel={
-            isOnlineMatch
-              ? isOnlineHost
-                ? (rematchBusy ? "Starting..." : matchWinner ? "New Match" : "Play Again")
-                : "Waiting Host"
-              : matchWinner ? "New Match" : "Deal again"
-          }
-          onlineActions={isOnlineMatch ? {
-            enabled: true,
-            isHost: isOnlineHost,
-            busy: rematchBusy,
-            onPlayAgain: () => { void handleOnlineRematch(); },
-          } : undefined}
+          scores={scores}
+          players={game.players.map((player) => player.name)}
+          onReset={() => { resetGame(); onReset(); }}
+          onDealAgain={onDealAgain}
         />
       )}
     </>

@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from 'react';
 import type { FriendInvite, RoomSnapshot } from '../types/multiplayer';
 import { toast } from 'sonner';
 import SetupShell from './SetupShell';
+import { CountBadge, PrimaryButton, SectionDivider, SegmentedToggle, SetupIntro, UtilityButton } from './ui/PageChrome';
 
 const ONLINE_PLAYER_NAME_KEY = 'uno.online.playerName';
 const ONLINE_ROOM_CODE_KEY = 'uno.online.roomCode';
@@ -81,7 +82,9 @@ interface OnlineLobbyProps {
   friendCode: string;
   incomingInvites: FriendInvite[];
   error: string | null;
+  initialPanel?: 'create' | 'join';
   controls?: ReactNode;
+  onBack?: () => void;
   onSyncPresence: (playerName: string) => Promise<boolean>;
   onCreateRoom: (playerName: string) => Promise<boolean>;
   onJoinRoom: (roomId: string, playerName: string) => Promise<boolean>;
@@ -90,7 +93,7 @@ interface OnlineLobbyProps {
   onDeclineFriendInvite: (inviteId: string) => Promise<boolean>;
   onLeaveRoom: () => Promise<boolean>;
   onStartGame: () => Promise<boolean>;
-  onPlayWithComputer: (playerName: string) => void;
+  onAddBotSeat: () => Promise<boolean>;
   onKickPlayer: (targetPlayerId: string) => Promise<boolean>;
 }
 
@@ -101,7 +104,9 @@ export default function OnlineLobby({
   friendCode,
   incomingInvites,
   error,
+  initialPanel = 'create',
   controls,
+  onBack,
   onSyncPresence,
   onCreateRoom,
   onJoinRoom,
@@ -110,7 +115,7 @@ export default function OnlineLobby({
   onDeclineFriendInvite,
   onLeaveRoom,
   onStartGame,
-  onPlayWithComputer,
+  onAddBotSeat,
   onKickPlayer,
 }: OnlineLobbyProps) {
   const [playerName, setPlayerName] = useState('Player 1');
@@ -119,6 +124,8 @@ export default function OnlineLobby({
   const [friendCodeInput, setFriendCodeInput] = useState('');
   const [friends, setFriends] = useState<FriendEntry[]>([]);
   const [busy, setBusy] = useState(false);
+
+  const displayName = playerName.trim() || 'Player 1';
 
   useEffect(() => {
     try {
@@ -144,22 +151,16 @@ export default function OnlineLobby({
   }, []);
 
   useEffect(() => {
+    setPanel(initialPanel);
+  }, [initialPanel]);
+
+  useEffect(() => {
     if (!connected || !playerName.trim()) return;
     const timeout = window.setTimeout(() => {
       void onSyncPresence(playerName.trim());
     }, 180);
     return () => window.clearTimeout(timeout);
   }, [connected, playerName, onSyncPresence]);
-
-  useEffect(() => {
-    try {
-      if (playerName.trim()) {
-        window.localStorage.setItem(ONLINE_PLAYER_NAME_KEY, playerName.trim());
-      }
-    } catch {
-      // Ignore storage errors.
-    }
-  }, [playerName]);
 
   useEffect(() => {
     try {
@@ -192,6 +193,7 @@ export default function OnlineLobby({
   }, []);
 
   const isHost = useMemo(() => room?.hostPlayerId === playerId, [room, playerId]);
+  const isRoomFull = (room?.players.length ?? 0) >= 4;
 
   async function wrap(action: () => Promise<boolean>) {
     setBusy(true);
@@ -214,13 +216,13 @@ export default function OnlineLobby({
   const canSubmitRoomForm =
     !busy &&
     connected &&
-    Boolean(playerName.trim()) &&
+    Boolean(displayName) &&
     (panel !== 'join' || Boolean(roomCode.trim()));
 
   const canSendInvite =
     !busy &&
     connected &&
-    Boolean(playerName.trim()) &&
+    Boolean(displayName) &&
     normalizeCode(friendCodeInput).length >= 4;
 
   const rememberFriend = (rawCode: string, rawName?: string) => {
@@ -253,7 +255,7 @@ export default function OnlineLobby({
 
   const sendInviteToFriend = async (targetCode: string, targetName?: string) => {
     const normalizedCode = normalizeCode(targetCode);
-    const invited = await onSendFriendInvite(normalizedCode, playerName.trim());
+    const invited = await onSendFriendInvite(normalizedCode, displayName);
     if (invited) {
       rememberFriend(normalizedCode, targetName);
       toast.success(`Invite sent to ${targetName ?? normalizedCode}.`);
@@ -287,26 +289,14 @@ export default function OnlineLobby({
           readOnly
           style={{
             padding: '10px 12px',
-            border: '1px solid rgba(26,15,0,0.25)',
-            background: '#fff8f0',
+            border: '1px solid var(--ui-line)',
+            background: 'var(--ui-surface)',
             fontFamily: "'Courier Prime', monospace",
             letterSpacing: '0.08em',
-            color: 'rgba(26,15,0,0.7)'
+            color: 'var(--ui-text)',
           }}
         />
-        <button
-          onClick={() => copyText(room.roomId, 'Room code')}
-          style={{
-            padding: '10px 14px',
-            border: '1px solid rgba(26,15,0,0.3)',
-            background: '#fff8f0',
-            cursor: 'pointer',
-            fontSize: 11,
-            letterSpacing: '0.08em',
-            textTransform: 'uppercase',
-            color: 'rgba(26,15,0,0.7)'
-          }}
-        >Copy Code</button>
+        <UtilityButton onClick={() => { void copyText(room.roomId, 'Room code'); }} style={{ padding: '10px 14px' }}>Copy Code</UtilityButton>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 8 }}>
@@ -315,25 +305,13 @@ export default function OnlineLobby({
           readOnly
           style={{
             padding: '10px 12px',
-            border: '1px solid rgba(26,15,0,0.25)',
-            background: '#fff8f0',
+            border: '1px solid var(--ui-line)',
+            background: 'var(--ui-surface)',
             fontSize: 12,
-            color: 'rgba(26,15,0,0.7)',
+            color: 'var(--ui-text)',
           }}
         />
-        <button
-          onClick={() => copyText(shareLink, 'Invite link')}
-          style={{
-            padding: '10px 14px',
-            border: '1px solid rgba(26,15,0,0.3)',
-            background: '#fff8f0',
-            cursor: 'pointer',
-            fontSize: 11,
-            letterSpacing: '0.08em',
-            textTransform: 'uppercase',
-            color: 'rgba(26,15,0,0.7)'
-          }}
-        >Copy Link</button>
+        <UtilityButton onClick={() => { void copyText(shareLink, 'Invite link'); }} style={{ padding: '10px 14px' }}>Copy Link</UtilityButton>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 8 }}>
@@ -346,7 +324,7 @@ export default function OnlineLobby({
           style={{
             background: 'transparent',
             border: 'none',
-            borderBottom: '1px solid rgba(26,15,0,0.2)',
+            borderBottom: '1px solid var(--ui-line)',
             fontFamily: "'Courier Prime', monospace",
             fontSize: 13,
             color: 'var(--ui-text)',
@@ -368,13 +346,13 @@ export default function OnlineLobby({
           })}
           style={{
             padding: '10px 14px',
-            border: '1px solid rgba(26,15,0,0.3)',
-            background: '#fff8f0',
+            border: '1px solid var(--ui-line)',
+            background: 'var(--ui-surface)',
             cursor: canSendInvite ? 'pointer' : 'default',
             fontSize: 11,
             letterSpacing: '0.08em',
             textTransform: 'uppercase',
-            color: 'rgba(26,15,0,0.7)',
+            color: 'var(--ui-text)',
             opacity: canSendInvite ? 1 : 0.5,
           }}
         >Invite Friend</button>
@@ -390,180 +368,85 @@ export default function OnlineLobby({
       footer={
         !room ? (
           <>
-            <div style={{ height: 1, background: 'var(--ui-line)', marginBottom: 24 }} />
+            <SectionDivider style={{ marginBottom: 24 }} />
             <div style={{ display: 'grid', gap: 10 }}>
-              <button
-                type="button"
+              <PrimaryButton
                 disabled={!canSubmitRoomForm}
-                onClick={() => wrap(async () => {
-                  const ok = panel === 'join'
-                    ? await onJoinRoom(roomCode.trim(), playerName.trim())
-                    : await onCreateRoom(playerName.trim());
+                onClick={() => {
+                  void wrap(async () => {
+                    const ok = panel === 'join'
+                      ? await onJoinRoom(roomCode.trim(), displayName)
+                      : await onCreateRoom(displayName);
 
-                  if (ok) {
-                    toast.success(panel === 'join'
-                      ? `Joined room ${roomCode.trim().toUpperCase()}`
-                      : 'Room created.');
-                  }
-                  return ok;
-                })}
-                className="setup-primary-btn"
-                style={{
-                  padding: '18px 0',
-                  border: 'none',
-                  background: 'var(--ui-text)',
-                  color: 'var(--ui-surface)',
-                  fontFamily: "'Bebas Neue', cursive",
-                  fontSize: 24,
-                  letterSpacing: '0.2em',
-                  cursor: 'pointer',
-                  width: '100%',
-                }}
-              >{panel === 'join' ? 'JOIN ROOM' : 'CREATE ROOM'}</button>
+                    if (ok) {
+                      toast.success(panel === 'join'
+                        ? `Joined room ${roomCode.trim().toUpperCase()}`
+                        : 'Room created.');
+                    }
 
-              <button
-                type="button"
-                disabled={busy || !playerName.trim()}
-                onClick={() => onPlayWithComputer(playerName.trim())}
-                style={{
-                  padding: '13px 0',
-                  border: '2px solid color-mix(in srgb, var(--ui-accent-blue) 55%, var(--ui-line))',
-                  background: 'color-mix(in srgb, var(--ui-accent-blue) 14%, var(--ui-surface))',
-                  color: 'var(--ui-text)',
-                  fontFamily: "'Courier Prime', monospace",
-                  fontSize: 12,
-                  fontWeight: 700,
-                  letterSpacing: '0.13em',
-                  textTransform: 'uppercase',
-                  cursor: busy || !playerName.trim() ? 'default' : 'pointer',
-                  opacity: busy || !playerName.trim() ? 0.5 : 1,
-                  boxShadow: 'inset 0 0 0 1px color-mix(in srgb, var(--ui-accent-blue) 30%, transparent)',
-                  width: '100%',
+                    return ok;
+                  });
                 }}
-              >Quick Play vs Computer</button>
+                style={{ fontSize: 24, letterSpacing: '0.2em' }}
+              >{panel === 'join' ? 'JOIN ROOM' : 'CREATE ROOM'}</PrimaryButton>
             </div>
           </>
         ) : room && !room.started ? (
           <>
-            <div style={{ height: 1, background: 'var(--ui-line)', marginBottom: 24 }} />
+            <SectionDivider style={{ marginBottom: 24 }} />
             <div style={{ display: 'grid', gap: 10, gridTemplateColumns: isHost ? '1fr 1fr' : '1fr' }}>
-              <button
-                type="button"
+              <UtilityButton
                 disabled={busy}
-                onClick={() => wrap(async () => {
-                  const left = await onLeaveRoom();
-                  if (left) {
-                    toast.success('Left room.');
-                  }
-                  return left;
-                })}
-                style={{
-                  padding: '12px 0',
-                  border: '1px solid var(--ui-line)',
-                  background: 'transparent',
-                  color: 'var(--ui-text)',
-                  fontFamily: "'Courier Prime', monospace",
-                  fontSize: 11,
-                  fontWeight: 700,
-                  letterSpacing: '0.11em',
-                  textTransform: 'uppercase',
-                  cursor: busy ? 'default' : 'pointer',
-                  opacity: busy ? 0.5 : 1,
-                  width: '100%',
+                onClick={() => {
+                  void wrap(async () => {
+                    const left = await onLeaveRoom();
+                    if (left) {
+                      toast.success('Left room.');
+                    }
+                    return left;
+                  });
                 }}
-              >Back</button>
+                style={{ width: '100%', padding: '12px 0', color: 'var(--ui-text)', background: 'transparent' }}
+              >Leave Room</UtilityButton>
 
               {isHost && (
-                <button
-                  type="button"
+                <PrimaryButton
                   disabled={busy || room.players.length < 2}
-                  onClick={() => wrap(onStartGame)}
-                  className="setup-primary-btn"
-                  style={{
-                    padding: '18px 0',
-                    border: 'none',
-                    background: 'var(--ui-text)',
-                    color: 'var(--ui-surface)',
-                    fontFamily: "'Bebas Neue', cursive",
-                    fontSize: 22,
-                    letterSpacing: '0.18em',
-                    cursor: 'pointer',
-                    width: '100%',
+                  onClick={() => {
+                    void wrap(onStartGame);
                   }}
-                >Start Match</button>
+                >Start Match</PrimaryButton>
               )}
             </div>
           </>
         ) : <div />
       }
     >
-      <div>
-        <p style={{ margin: 0, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--ui-muted)' }}>
-          01 / Players
-        </p>
-        <h2 style={{
-          margin: '8px 0 0',
-          fontFamily: "'Bebas Neue', cursive",
-          fontSize: 34,
-          letterSpacing: '0.04em',
-          lineHeight: 1,
-        }}>Join the Table</h2>
-      </div>
-
-      <p style={{ margin: 0, color: 'var(--ui-muted)', fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
-        Create a room, join by code, or invite directly from your friends list
-      </p>
-
-      <p style={{ margin: 0, color: 'var(--ui-text)', fontSize: 13 }}>
-        {connected ? 'Socket connected' : 'Connecting to multiplayer server...'}
-      </p>
+      <SetupIntro
+        eyebrow="01 / Setup"
+        title="Play with Friends"
+        description={room
+          ? 'Manage seats, room code, and invites before the match starts'
+          : panel === 'join'
+            ? 'Join by room code or send an invite from your friends list'
+            : 'Create a room or invite friends directly from your saved list'}
+        onBack={onBack}
+        trailing={room ? <CountBadge current={room.players.length} total={4} alert={isRoomFull} /> : undefined}
+      />
 
       {!room && (
         <>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', border: '2px solid var(--ui-line)', width: '100%' }}>
-            <button
-              type="button"
-              onClick={() => setPanel('create')}
-              style={{
-                border: 'none',
-                padding: '14px 12px',
-                cursor: 'pointer',
-                background: panel === 'create' ? 'var(--ui-text)' : 'transparent',
-                color: panel === 'create' ? 'var(--ui-surface)' : 'var(--ui-text)',
-                fontSize: 13,
-                fontWeight: 700,
-                letterSpacing: '0.12em',
-                textTransform: 'uppercase',
-              }}
-            >Create</button>
-            <button
-              type="button"
-              onClick={() => setPanel('join')}
-              style={{
-                border: 'none',
-                padding: '14px 12px',
-                cursor: 'pointer',
-                background: panel === 'join' ? 'var(--ui-text)' : 'transparent',
-                color: panel === 'join' ? 'var(--ui-surface)' : 'var(--ui-text)',
-                fontSize: 13,
-                fontWeight: 700,
-                letterSpacing: '0.12em',
-                textTransform: 'uppercase',
-              }}
-            >Join</button>
-          </div>
-
-          <div style={{ display: 'grid', gap: 12, borderTop: '1px solid var(--ui-line)', paddingTop: 12 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 8, borderTop: '1px solid var(--ui-line)', paddingTop: 12 }}>
             <input
-              value={playerName}
-              onChange={(e) => setPlayerName(e.target.value)}
-              maxLength={18}
-              placeholder="Your name"
+              value={friendCodeInput}
+              onChange={(e) => setFriendCodeInput(e.target.value.toUpperCase())}
+              maxLength={8}
+              placeholder="FRIEND CODE"
               className="setup-input"
               style={{
                 background: 'transparent',
                 border: 'none',
-                borderBottom: '1px solid rgba(26,15,0,0.2)',
+                borderBottom: '1px solid var(--ui-line)',
                 fontFamily: "'Courier Prime', monospace",
                 fontSize: 15,
                 fontWeight: 700,
@@ -571,9 +454,43 @@ export default function OnlineLobby({
                 padding: '2px 0',
                 width: '100%',
                 transition: 'border-bottom-color 0.12s',
+                textTransform: 'uppercase',
               }}
             />
+            <button
+              type="button"
+              disabled={!canSendInvite}
+              onClick={() => wrap(async () => {
+                const invited = await sendInviteToFriend(friendCodeInput.trim());
+                if (invited) {
+                  setFriendCodeInput('');
+                }
+                return invited;
+              })}
+              style={{
+                padding: '10px 14px',
+                border: '1px solid var(--ui-line)',
+                background: 'transparent',
+                color: 'var(--ui-text)',
+                fontSize: 11,
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+                cursor: canSendInvite ? 'pointer' : 'default',
+                opacity: canSendInvite ? 1 : 0.5,
+              }}
+            >Send Invite</button>
+          </div>
 
+          <SegmentedToggle
+            value={panel}
+            onChange={setPanel}
+            options={[
+              { value: 'create', label: 'Create' },
+              { value: 'join', label: 'Join' },
+            ]}
+          />
+
+          <div style={{ display: 'grid', gap: 12, borderTop: '1px solid var(--ui-line)', paddingTop: 12 }}>
             {panel === 'join' && (
               <input
                 value={roomCode}
@@ -584,7 +501,7 @@ export default function OnlineLobby({
                 style={{
                   background: 'transparent',
                   border: 'none',
-                  borderBottom: '1px solid rgba(26,15,0,0.2)',
+                  borderBottom: '1px solid var(--ui-line)',
                   fontFamily: "'Courier Prime', monospace",
                   fontSize: 15,
                   fontWeight: 700,
@@ -596,51 +513,6 @@ export default function OnlineLobby({
                 }}
               />
             )}
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 8 }}>
-              <input
-                value={friendCodeInput}
-                onChange={(e) => setFriendCodeInput(e.target.value.toUpperCase())}
-                maxLength={8}
-                placeholder="FRIEND CODE"
-                className="setup-input"
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  borderBottom: '1px solid rgba(26,15,0,0.2)',
-                  fontFamily: "'Courier Prime', monospace",
-                  fontSize: 15,
-                  fontWeight: 700,
-                  color: 'var(--ui-text)',
-                  padding: '2px 0',
-                  width: '100%',
-                  transition: 'border-bottom-color 0.12s',
-                  textTransform: 'uppercase',
-                }}
-              />
-              <button
-                type="button"
-                disabled={!canSendInvite}
-                onClick={() => wrap(async () => {
-                  const invited = await sendInviteToFriend(friendCodeInput.trim());
-                  if (invited) {
-                    setFriendCodeInput('');
-                  }
-                  return invited;
-                })}
-                style={{
-                  padding: '10px 14px',
-                  border: '1px solid var(--ui-line)',
-                  background: 'transparent',
-                  color: 'var(--ui-text)',
-                  fontSize: 11,
-                  letterSpacing: '0.08em',
-                  textTransform: 'uppercase',
-                  cursor: canSendInvite ? 'pointer' : 'default',
-                  opacity: canSendInvite ? 1 : 0.5,
-                }}
-              >Send Invite</button>
-            </div>
 
           </div>
 
@@ -694,10 +566,10 @@ export default function OnlineLobby({
                     >Decline</button>
                     <button
                       type="button"
-                      disabled={busy || !playerName.trim()}
+                      disabled={busy || !displayName}
                       onClick={() => wrap(async () => {
                         rememberFriend(invite.fromFriendCode, invite.fromName);
-                        const accepted = await onAcceptFriendInvite(invite.inviteId, playerName.trim());
+                        const accepted = await onAcceptFriendInvite(invite.inviteId, displayName);
                         if (accepted) {
                           toast.success('Invite accepted.');
                         }
@@ -711,8 +583,8 @@ export default function OnlineLobby({
                         fontSize: 10,
                         letterSpacing: '0.12em',
                         textTransform: 'uppercase',
-                        cursor: busy || !playerName.trim() ? 'default' : 'pointer',
-                        opacity: busy || !playerName.trim() ? 0.5 : 1,
+                        cursor: busy || !displayName ? 'default' : 'pointer',
+                        opacity: busy || !displayName ? 0.5 : 1,
                       }}
                     >Accept</button>
                   </div>
@@ -749,7 +621,7 @@ export default function OnlineLobby({
 
                   <button
                     type="button"
-                    disabled={busy || !playerName.trim()}
+                    disabled={busy || !displayName}
                     onClick={() => wrap(() => sendInviteToFriend(friend.friendCode, friend.name))}
                     style={{
                       padding: '7px 9px',
@@ -759,8 +631,8 @@ export default function OnlineLobby({
                       fontSize: 10,
                       letterSpacing: '0.08em',
                       textTransform: 'uppercase',
-                      cursor: busy || !playerName.trim() ? 'default' : 'pointer',
-                      opacity: busy || !playerName.trim() ? 0.5 : 1,
+                      cursor: busy || !displayName ? 'default' : 'pointer',
+                      opacity: busy || !displayName ? 0.5 : 1,
                     }}
                   >Invite</button>
 
@@ -787,42 +659,103 @@ export default function OnlineLobby({
 
       {room && !room.started && (
         <>
-          <p style={{ margin: 0, fontSize: 14 }}>
-            Room code: <strong>{room.roomId}</strong>
-          </p>
-
           {roomActions}
 
           <div style={{ display: 'grid', gap: 6, borderTop: '1px solid var(--ui-line)', paddingTop: 10 }}>
             {room.players.map((player, i) => (
-              <div key={player.playerId} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
-                <span>{i + 1}. {player.name}</span>
+              <div
+                key={player.playerId}
+                className="player-row"
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'auto 1fr auto auto',
+                  gap: 12,
+                  alignItems: 'center',
+                  borderBottom: '1px solid var(--ui-line)',
+                  padding: '13px 0',
+                }}
+              >
+                <span style={{
+                  fontFamily: "'Courier Prime', monospace",
+                  fontSize: 10,
+                  color: 'var(--ui-muted)',
+                  letterSpacing: '0.06em',
+                  minWidth: 16,
+                  textAlign: 'right',
+                }}>{i + 1}</span>
+
+                <span style={{
+                  fontFamily: "'Courier Prime', monospace",
+                  fontSize: 15,
+                  fontWeight: 700,
+                  color: 'var(--ui-text)',
+                  minWidth: 0,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}>{player.name}</span>
+
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span style={{ color: player.connected ? '#1e6b3a' : '#c0392b' }}>
-                    {player.connected ? 'online' : 'offline'}
+                  <span style={{
+                    fontFamily: "'Courier Prime', monospace",
+                    fontSize: 10,
+                    fontWeight: 700,
+                    letterSpacing: '0.1em',
+                    textTransform: 'uppercase',
+                    background: player.isBot ? 'var(--ui-text)' : 'transparent',
+                    color: player.isBot ? 'var(--ui-bg)' : 'var(--ui-muted)',
+                    border: `1px solid ${player.isBot ? 'var(--ui-text)' : 'var(--ui-line)'}`,
+                    padding: '5px 10px',
+                    whiteSpace: 'nowrap',
+                  }}>
+                    {player.isBot ? 'Bot' : player.connected ? 'Online' : 'Offline'}
                   </span>
-                  {isHost && player.playerId !== playerId && (
-                    <button
-                      type="button"
-                      disabled={busy}
-                      onClick={() => requestKick(player.playerId, player.name)}
-                      title={`Remove ${player.name}`}
-                      style={{
-                        border: '1px solid rgba(192,57,43,0.45)',
-                        background: '#fff8f0',
-                        color: '#c0392b',
-                        width: 22,
-                        height: 22,
-                        padding: 0,
-                        lineHeight: 1,
-                        fontSize: 14,
-                        cursor: busy ? 'default' : 'pointer',
-                      }}
-                    >x</button>
-                  )}
                 </div>
+
+                {isHost && player.playerId !== playerId ? (
+                  <button
+                    type="button"
+                    disabled={busy}
+                    onClick={() => requestKick(player.playerId, player.name)}
+                    title={`Remove ${player.name}`}
+                    className="remove-btn"
+                    style={{
+                      border: 'none',
+                      background: 'transparent',
+                      color: 'var(--ui-muted)',
+                      fontSize: 20,
+                      lineHeight: 1,
+                      cursor: busy ? 'default' : 'pointer',
+                      padding: '4px',
+                    }}
+                  >×</button>
+                ) : <div style={{ width: 24 }} />}
               </div>
             ))}
+
+            {isHost && (
+              <button
+                type="button"
+                className="add-btn"
+                disabled={busy || room.players.length >= 4}
+                onClick={() => wrap(onAddBotSeat)}
+                style={{
+                  marginTop: 8,
+                  padding: '10px 12px',
+                  border: '1px dashed var(--ui-line)',
+                  background: 'transparent',
+                  color: 'var(--ui-muted)',
+                  fontFamily: "'Courier Prime', monospace",
+                  fontSize: 10,
+                  fontWeight: 700,
+                  letterSpacing: '0.12em',
+                  textTransform: 'uppercase',
+                  cursor: busy || room.players.length >= 4 ? 'default' : 'pointer',
+                  opacity: busy || room.players.length >= 4 ? 0.5 : 1,
+                  width: '100%',
+                }}
+              >+ Add Seat (Bot)</button>
+            )}
           </div>
 
           {!isHost && (

@@ -8,10 +8,10 @@ interface ColorPickerProps {
 }
 
 const COLORS: Array<{ color: CardColor; bg: string; text: string; border: string; label: string }> = [
-  { color: 'red',    bg: '#c0392b', text: '#fff8f0', border: '#922b21', label: 'Red'    },
-  { color: 'yellow', bg: '#d4a017', text: '#1a0f00', border: '#a07810', label: 'Yellow' },
-  { color: 'green',  bg: '#1e6b3a', text: '#fff8f0', border: '#145228', label: 'Green'  },
-  { color: 'blue',   bg: '#1a4f8a', text: '#fff8f0', border: '#103460', label: 'Blue'   },
+  { color: 'red',    bg: 'var(--ui-accent-red)',    text: '#fff8f0',       border: 'color-mix(in srgb, var(--ui-accent-red) 72%, #000 28%)', label: 'Red'    },
+  { color: 'yellow', bg: 'var(--ui-accent-yellow)', text: 'var(--ui-text)', border: 'color-mix(in srgb, var(--ui-accent-yellow) 72%, #000 28%)', label: 'Yellow' },
+  { color: 'green',  bg: 'var(--ui-accent-green)',  text: '#fff8f0',       border: 'color-mix(in srgb, var(--ui-accent-green) 72%, #000 28%)', label: 'Green'  },
+  { color: 'blue',   bg: 'var(--ui-accent-blue)',   text: '#fff8f0',       border: 'color-mix(in srgb, var(--ui-accent-blue) 72%, #000 28%)', label: 'Blue'   },
 ];
 
 export default function ColorPicker({ onSelect, onCancel }: ColorPickerProps) {
@@ -32,17 +32,17 @@ export default function ColorPicker({ onSelect, onCancel }: ColorPickerProps) {
         }
         .cp-btn:hover { opacity: 0.82; }
         .cp-btn:active { opacity: 0.6; }
-        .cp-cancel:hover { color: #1a0f00 !important; }
+        .cp-cancel:hover { color: var(--ui-text) !important; }
       `}</style>
 
-      {/* Backdrop — paper tint, not black glass */}
+      {/* Backdrop */}
       <div
         onClick={onCancel}
         style={{
           position: 'fixed',
           inset: 0,
           zIndex: 60,
-          background: 'rgba(255,248,240,0.72)',
+          background: 'color-mix(in srgb, var(--ui-bg) 22%, #000 8%)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -54,8 +54,8 @@ export default function ColorPicker({ onSelect, onCancel }: ColorPickerProps) {
           onClick={e => e.stopPropagation()}
           style={{
             width: 'min(480px, 100%)',
-            background: '#fff8f0',
-            border: '2px solid #1a0f00',
+            background: 'var(--ui-surface)',
+            border: '1px solid var(--ui-line)',
             padding: '32px 28px 24px',
             display: 'flex',
             flexDirection: 'column',
@@ -73,14 +73,14 @@ export default function ColorPicker({ onSelect, onCancel }: ColorPickerProps) {
               fontSize: 10,
               letterSpacing: '0.22em',
               textTransform: 'uppercase',
-              color: 'rgba(26,15,0,0.32)',
+              color: 'var(--ui-muted)',
             }}>Wild card played</p>
             <h2 style={{
               margin: '8px 0 0',
               fontFamily: "'Bebas Neue', cursive",
               fontSize: 32,
               letterSpacing: '0.04em',
-              color: '#1a0f00',
+              color: 'var(--ui-text)',
               lineHeight: 1,
             }}>Choose a colour</h2>
           </div>
@@ -118,7 +118,7 @@ export default function ColorPicker({ onSelect, onCancel }: ColorPickerProps) {
 
           {/* Divider + cancel */}
           <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
-            <div style={{ width: '100%', height: 1, background: 'rgba(26,15,0,0.08)' }} />
+            <div style={{ width: '100%', height: 1, background: 'var(--ui-line)' }} />
             <button
               onClick={onCancel}
               className="cp-cancel"
@@ -130,7 +130,7 @@ export default function ColorPicker({ onSelect, onCancel }: ColorPickerProps) {
                 textTransform: 'uppercase',
                 background: 'transparent',
                 border: 'none',
-                color: 'rgba(26,15,0,0.35)',
+                color: 'var(--ui-muted)',
                 cursor: 'pointer',
                 padding: '4px 0',
                 transition: 'color 0.12s',

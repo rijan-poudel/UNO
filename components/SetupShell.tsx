@@ -37,50 +37,18 @@ export default function SetupShell({ subtitle, children, footer, controls }: Set
         }}
       >
       <div
+        aria-label={subtitle}
         style={{
           width: 'min(1040px, 100%)',
           height: '100%',
           display: 'grid',
-          gridTemplateRows: 'auto auto minmax(0, 1fr) auto',
+          gridTemplateRows: 'auto minmax(0, 1fr) auto',
           gap: 'clamp(12px, 2.2vh, 30px)',
         }}
       >
-        <div style={{ textAlign: 'center' }}>
-          <h1
-            style={{
-              margin: 0,
-              fontFamily: "'Bebas Neue', cursive",
-              fontSize: 'clamp(72px, 14vw, 120px)',
-              letterSpacing: '0.02em',
-              lineHeight: 1,
-            }}
-          >
-            <span style={{ color: '#c0392b' }}>U</span>
-            <span style={{ color: '#d4a017' }}>N</span>
-            <span style={{ color: '#1e6b3a' }}>O</span>
-          </h1>
-          <p
-            style={{
-              margin: '12px 0 0',
-              fontSize: 11,
-              letterSpacing: '0.22em',
-              textTransform: 'uppercase',
-              color: 'var(--ui-muted)',
-            }}
-          >
-            {subtitle}
-          </p>
-
-          {controls ? (
-            <div style={{ marginTop: 14, display: 'flex', justifyContent: 'center' }}>
-              <div style={{ width: 'min(620px, 100%)' }}>
-                {controls}
-              </div>
-            </div>
-          ) : null}
+        <div>
+          {controls}
         </div>
-
-        <div style={{ height: 1, background: 'var(--ui-line)', marginTop: 0 }} />
 
         <div
           style={{

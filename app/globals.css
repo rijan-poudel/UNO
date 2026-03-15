@@ -35,3 +35,81 @@ body {
   min-height: 100dvh;
   overflow: hidden;
 }
+
+/*
+  Added from globals-patch.css.
+  Both GameSetup and GameBoard inherit this background.
+*/
+body {
+  background-color: #fff8f0;
+  margin: 0;
+}
+
+/* UNO toast theme for Sonner */
+.uno-toast {
+  background: var(--ui-surface, #fff8f0) !important;
+  color: var(--ui-text, #1a0f00) !important;
+  border: 1px solid var(--ui-line, rgba(26, 15, 0, 0.2)) !important;
+  border-left: 4px solid var(--ui-line, rgba(26, 15, 0, 0.2)) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  font-family: 'Courier Prime', monospace !important;
+}
+
+.uno-toast-title {
+  font-family: 'Bebas Neue', cursive !important;
+  font-size: 20px !important;
+  letter-spacing: 0.06em !important;
+  line-height: 1 !important;
+  color: var(--ui-text, #1a0f00) !important;
+  margin-bottom: 2px !important;
+}
+
+.uno-toast-description {
+  font-family: 'Courier Prime', monospace !important;
+  font-size: 11px !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+  color: var(--ui-muted, rgba(26, 15, 0, 0.65)) !important;
+}
+
+.uno-toast-action,
+.uno-toast-cancel,
+.uno-toast-close {
+  font-family: 'Courier Prime', monospace !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.uno-toast-action {
+  background: var(--ui-text, #1a0f00) !important;
+  color: var(--ui-bg, #fff8f0) !important;
+  border: none !important;
+}
+
+.uno-toast-cancel,
+.uno-toast-close {
+  background: transparent !important;
+  color: var(--ui-muted, rgba(26, 15, 0, 0.65)) !important;
+  border: 1px solid var(--ui-line, rgba(26, 15, 0, 0.2)) !important;
+}
+
+.uno-toast-success {
+  border-left-color: var(--ui-accent-green, #1e6b3a) !important;
+}
+
+.uno-toast-error {
+  border-left-color: var(--ui-accent-red, #c0392b) !important;
+}
+
+.uno-toast-warning {
+  border-left-color: var(--ui-accent-yellow, #d4a017) !important;
+}
+
+.uno-toast-info {
+  border-left-color: var(--ui-accent-blue, #1a4f8a) !important;
+}

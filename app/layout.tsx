@@ -31,10 +31,23 @@ export default function RootLayout({
         {children}
         <Toaster
           position="bottom-right"
-          richColors
+          richColors={false}
           closeButton
+          expand
           toastOptions={{
             duration: 2800,
+            classNames: {
+              toast: "uno-toast",
+              title: "uno-toast-title",
+              description: "uno-toast-description",
+              actionButton: "uno-toast-action",
+              cancelButton: "uno-toast-cancel",
+              closeButton: "uno-toast-close",
+              success: "uno-toast-success",
+              error: "uno-toast-error",
+              warning: "uno-toast-warning",
+              info: "uno-toast-info",
+            },
           }}
         />
       </body>

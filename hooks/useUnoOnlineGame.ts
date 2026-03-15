@@ -405,6 +405,26 @@ export function useUnoOnlineGame() {
     return true;
   }, [callAck, state.room]);
 
+  const addBotToRoom = useCallback(async () => {
+    if (!state.room) return false;
+    const ack = await callAck<{ room: RoomSnapshot }>('room:add-bot', {
+      roomId: state.room.roomId,
+    });
+    if (!ack.ok) {
+      setState((prev) => ({ ...prev, error: ack.error }));
+      return false;
+    }
+
+    setState((prev) => ({
+      ...prev,
+      room: ack.data.room,
+      game: ack.data.room.game,
+      error: null,
+      log: ['Bot seat added', ...prev.log].slice(0, 30),
+    }));
+    return true;
+  }, [callAck, state.room]);
+
   const sendFriendInvite = useCallback(async (targetFriendCode: string, playerName: string) => {
     const ack = await callAck<{ room: RoomSnapshot; playerId: string; invite: FriendInvite }>('friend:invite', {
       targetFriendCode,
@@ -612,14 +632,9 @@ export function useUnoOnlineGame() {
         return;
       }
 
-      // If player already drew this turn, auto-play if possible; else auto-pass.
+      // If player already drew this turn, end turn by passing unless they
+      // explicitly choose to play from the UI.
       if (state.drawnThisTurn) {
-        const move = getBotMove(game, localPlayerIndex);
-        if (move.action === 'play') {
-          void sendAction({ type: 'play', cardId: move.cardId, chosenColor: move.chosenColor });
-          return;
-        }
-
         void sendAction({ type: 'pass' });
         return;
       }
@@ -684,6 +699,7 @@ export function useUnoOnlineGame() {
     joinRoom,
     startOnlineGame,
     kickPlayer,
+    addBotToRoom,
     sendFriendInvite,
     acceptFriendInvite,
     declineFriendInvite,

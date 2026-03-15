@@ -3,6 +3,7 @@
 import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
 import SetupShell from './SetupShell';
+import { CountBadge, PrimaryButton, SectionDivider, SetupIntro } from './ui/PageChrome';
 
 interface PlayerRow {
   name: string;
@@ -13,6 +14,7 @@ interface PlayerRow {
 interface GameSetupProps {
   onStart: (names: string[], botFlags: boolean[]) => void;
   controls?: ReactNode;
+  onBack?: () => void;
 }
 
 const MAX_PLAYERS = 8;
@@ -37,13 +39,13 @@ function getInitialPlayers(): PlayerRow[] {
       .filter((item): item is string => typeof item === 'string')
       .map(n => n.trim()).filter(n => n.length > 0).slice(0, MAX_PLAYERS);
     if (names.length < 2) return defaults;
-    return names.map((name, i) => ({ name, isBot: i === 1, uid: nextUid() }));
+    return names.map((name, i) => ({ name, isBot: i !== 0, uid: nextUid() }));
   } catch {
     return defaults;
   }
 }
 
-export default function GameSetup({ onStart, controls }: GameSetupProps) {
+export default function GameSetup({ onStart, controls, onBack }: GameSetupProps) {
   const [players, setPlayers] = useState<PlayerRow[]>(getInitialPlayers);
   // Track newly added row ids for one-shot enter animation.
   const [justAddedIds, setJustAddedIds] = useState<Set<number>>(new Set());
@@ -52,7 +54,7 @@ export default function GameSetup({ onStart, controls }: GameSetupProps) {
     if (players.length >= MAX_PLAYERS) return;
     const uid = nextUid();
     setJustAddedIds((prev) => new Set(prev).add(uid));
-    setPlayers(prev => [...prev, { name: `Player ${prev.length + 1}`, isBot: false, uid }]);
+    setPlayers(prev => [...prev, { name: `Player ${prev.length + 1}`, isBot: true, uid }]);
     // Clear the "just added" flag after animation completes
     setTimeout(() => {
       setJustAddedIds((prev) => {
@@ -71,9 +73,6 @@ export default function GameSetup({ onStart, controls }: GameSetupProps) {
   const updateName = (i: number, name: string) =>
     setPlayers(prev => prev.map((p, idx) => idx === i ? { ...p, name } : p));
 
-  const toggleBot = (i: number) =>
-    setPlayers(prev => prev.map((p, idx) => idx === i ? { ...p, isBot: !p.isBot } : p));
-
   useEffect(() => {
     try {
       const names = players.map((p, i) => p.name.trim() || `Player ${i + 1}`);
@@ -83,7 +82,7 @@ export default function GameSetup({ onStart, controls }: GameSetupProps) {
 
   const handleStart = () => {
     const names = players.map((p, i) => p.name.trim() || `Player ${i + 1}`);
-    onStart(names, players.map(p => p.isBot));
+    onStart(names, players.map((_, idx) => idx !== 0));
   };
 
   const atMax = players.length >= MAX_PLAYERS;
@@ -98,7 +97,6 @@ export default function GameSetup({ onStart, controls }: GameSetupProps) {
         .setup-input { outline: none !important; }
         .setup-input::placeholder { color: var(--ui-muted); opacity: 0.5; }
         .setup-input:focus { border-bottom-color: var(--ui-text) !important; }
-        .bot-btn:hover   { opacity: 0.65; }
         .remove-btn:hover { color: var(--ui-accent-red) !important; }
         .add-btn:hover   { border-color: var(--ui-text) !important; color: var(--ui-text) !important; }
         .setup-primary-btn:hover { opacity: 0.78 !important; }
@@ -107,57 +105,21 @@ export default function GameSetup({ onStart, controls }: GameSetupProps) {
 
       <SetupShell
         subtitle="Local multiplayer"
+        controls={controls}
         footer={(
           <>
-            <div style={{ height: 1, background: 'var(--ui-line)', marginBottom: 32 }} />
-            <button
-              type="button"
-              onClick={handleStart}
-              className="setup-primary-btn"
-              style={{
-                fontFamily: "'Bebas Neue', cursive",
-                fontSize: 22,
-                letterSpacing: '0.18em',
-                background: 'var(--ui-text)',
-                color: 'var(--ui-surface)',
-                border: 'none',
-                padding: '18px 0',
-                cursor: 'pointer',
-                width: '100%',
-                transition: 'opacity 0.12s',
-              }}
-            >DEAL CARDS</button>
+            <SectionDivider style={{ marginBottom: 32 }} />
+            <PrimaryButton onClick={handleStart}>DEAL CARDS</PrimaryButton>
           </>
         )}
       >
-        {controls}
-
-        {/* Section header */}
-        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
-          <div>
-            <p style={{
-              margin: 0, fontSize: 10, letterSpacing: '0.22em',
-              textTransform: 'uppercase', color: 'var(--ui-muted)',
-            }}>01 / Players</p>
-            <h2 style={{
-              margin: '8px 0 0',
-              fontFamily: "'Bebas Neue', cursive",
-              fontSize: 34, letterSpacing: '0.04em', lineHeight: 1,
-            }}>Seat the Table</h2>
-          </div>
-
-          {/* Player count badge — always visible, changes colour at max */}
-          <span style={{
-            fontFamily: "'Courier Prime', monospace",
-            fontSize: 11,
-            letterSpacing: '0.1em',
-            color: atMax ? 'var(--ui-accent-red)' : 'var(--ui-muted)',
-            paddingBottom: 2,
-            transition: 'color 0.2s',
-          }}>
-            {players.length} / {MAX_PLAYERS}
-          </span>
-        </div>
+        <SetupIntro
+          eyebrow="01 / Setup"
+          title="Play with Computer"
+          description="Choose local seats and bot players for this device"
+          onBack={onBack}
+          trailing={<CountBadge current={players.length} total={MAX_PLAYERS} alert={atMax} />}
+        />
 
         {/* Player rows */}
         <div>
@@ -210,29 +172,22 @@ export default function GameSetup({ onStart, controls }: GameSetupProps) {
                   }}
                 />
 
-                {/* Human / Bot toggle — clearer label */}
-                <button
-                  type="button"
-                  onClick={() => toggleBot(index)}
-                  className="bot-btn"
-                  title={player.isBot ? 'Switch to human' : 'Switch to bot'}
+                <span
                   style={{
                     fontFamily: "'Courier Prime', monospace",
                     fontSize: 10,
                     fontWeight: 700,
                     letterSpacing: '0.1em',
                     textTransform: 'uppercase',
-                    background: player.isBot ? 'var(--ui-text)' : 'transparent',
-                    color: player.isBot ? 'var(--ui-bg)' : 'var(--ui-muted)',
-                    border: `1px solid ${player.isBot ? 'var(--ui-text)' : 'var(--ui-line)'}`,
+                    background: index === 0 ? 'transparent' : 'var(--ui-text)',
+                    color: index === 0 ? 'var(--ui-muted)' : 'var(--ui-bg)',
+                    border: `1px solid ${index === 0 ? 'var(--ui-line)' : 'var(--ui-text)'}`,
                     padding: '5px 10px',
-                    cursor: 'pointer',
                     whiteSpace: 'nowrap',
-                    transition: 'all 0.15s',
                   }}
                 >
-                  {player.isBot ? '⌘ Bot' : 'Human'}
-                </button>
+                  {index === 0 ? 'You' : 'Bot'}
+                </span>
 
                 {/* Remove — only when > 2 players */}
                 {players.length > 2 ? (
