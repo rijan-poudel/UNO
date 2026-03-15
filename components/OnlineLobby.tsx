@@ -20,6 +20,14 @@ interface FriendEntry {
   lastSeenAt: number;
 }
 
+function cleanFriendName(rawName: string | undefined, fallbackCode: string): string {
+  const trimmed = (rawName ?? '').trim().slice(0, 20);
+  const normalized = trimmed.toLowerCase();
+  const blocked = new Set(['friend', 'friends', 'player', 'unknown', 'guest']);
+  if (!trimmed || blocked.has(normalized)) return fallbackCode;
+  return trimmed;
+}
+
 function normalizeCode(value: string): string {
   return value.trim().toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 8);
 }
@@ -43,7 +51,7 @@ function loadFriends(): FriendEntry[] {
       })
       .map((item) => ({
         friendCode: normalizeCode(item.friendCode),
-        name: item.name.trim().slice(0, 20),
+        name: cleanFriendName(item.name, normalizeCode(item.friendCode)),
         lastSeenAt: item.lastSeenAt,
       }))
       .filter((item) => Boolean(item.friendCode))
@@ -280,7 +288,7 @@ export default function OnlineLobby({
       const nextEntries = [
         {
           friendCode: normalizedCode,
-          name: (rawName?.trim() || existing?.name || normalizedCode).slice(0, 20),
+          name: cleanFriendName(rawName?.trim() || existing?.name, normalizedCode),
           lastSeenAt: Date.now(),
         },
         ...prev.filter((entry) => entry.friendCode !== normalizedCode),

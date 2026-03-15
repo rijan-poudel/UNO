@@ -29,6 +29,14 @@ interface SavedFriendEntry {
   lastSeenAt: number;
 }
 
+function cleanFriendName(rawName: string | undefined, fallbackCode: string): string {
+  const trimmed = (rawName ?? '').trim().slice(0, 20);
+  const normalized = trimmed.toLowerCase();
+  const blocked = new Set(['friend', 'friends', 'player', 'unknown', 'guest']);
+  if (!trimmed || blocked.has(normalized)) return fallbackCode;
+  return trimmed;
+}
+
 interface OutgoingInvitePending {
   inviteId: string;
   targetFriendCode: string;
@@ -58,7 +66,7 @@ function loadSavedFriends(): SavedFriendEntry[] {
       })
       .map((item) => ({
         friendCode: normalizeFriendCode(item.friendCode),
-        name: item.name.trim().slice(0, 20),
+        name: cleanFriendName(item.name, normalizeFriendCode(item.friendCode)),
         lastSeenAt: item.lastSeenAt,
       }))
       .filter((item) => Boolean(item.friendCode))
@@ -80,7 +88,7 @@ function persistAcceptedFriend(rawCode: string, rawName?: string): void {
   const next = [
     {
       friendCode: code,
-      name: (rawName?.trim() || existing?.name || code).slice(0, 20),
+      name: cleanFriendName(rawName?.trim() || existing?.name, code),
       lastSeenAt: Date.now(),
     },
     ...prev.filter((entry) => entry.friendCode !== code),

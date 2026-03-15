@@ -77,12 +77,16 @@ type UiSfx =
   | "lose";
 
 const FILE_SFX_SOURCES: Partial<Record<UiSfx, string[]>> = {
-  draw2: ["/sfx/%2B2.wav", "/sfx/%2B4.wav"],
-  wild4: ["/sfx/%2B4.wav"],
-  reverse: ["/sfx/reverse.wav"],
-  skip: ["/sfx/skip.wav"],
-  win: ["/sfx/victory.wav"],
-  lose: ["/sfx/lost.wav"],
+  draw: ["/sfx/draw.wav", "/sfx/draw.mp3"],
+  draw2: ["/sfx/%2B2.wav", "/sfx/draw2.wav", "/sfx/draw2.mp3", "/sfx/%2B4.wav"],
+  wild4: ["/sfx/%2B4.wav", "/sfx/wild4.wav", "/sfx/wild4.mp3"],
+  reverse: ["/sfx/reverse.wav", "/sfx/reverse.mp3"],
+  skip: ["/sfx/skip.wav", "/sfx/skip.mp3"],
+  uno: ["/sfx/uno.wav", "/sfx/uno.mp3"],
+  shuffle: ["/sfx/shuffle.wav", "/sfx/shuffle.mp3"],
+  callOut: ["/sfx/callout.wav", "/sfx/callout.mp3"],
+  win: ["/sfx/victory.wav", "/sfx/victory.mp3"],
+  lose: ["/sfx/lost.wav", "/sfx/lost.mp3"],
 };
 
 const FILE_SFX_VOLUME: Partial<Record<UiSfx, number>> = {
@@ -99,14 +103,14 @@ const SYNTH_SFX_GAIN: Partial<Record<UiSfx, number>> = {
   draw: 0.85,
   draw2: 0.9,
   wild4: 0.85,
-  shuffleMotion: 0.7,
+  shuffleMotion: 1,
   skip: 0.9,
   reverse: 0.9,
   wild: 0.88,
   shuffle: 0.86,
   uno: 0.9,
   callOut: 0.9,
-  deal: 0.72,
+  deal: 1,
   win: 0.88,
   lose: 0.82,
 };
@@ -780,9 +784,9 @@ export default function GameBoard({
           playTone(now + 0.11, 220, 0.12, "sawtooth", 0.022, 150);
           break;
         case "shuffleMotion":
-          playTone(now, 330, 0.055, "sawtooth", 0.016, 270);
-          playTone(now + 0.045, 260, 0.055, "sawtooth", 0.016, 320);
-          playTone(now + 0.09, 360, 0.06, "triangle", 0.014, 290);
+          playTone(now, 330, 0.055, "sawtooth", 0.028, 270);
+          playTone(now + 0.045, 260, 0.055, "sawtooth", 0.028, 320);
+          playTone(now + 0.09, 360, 0.06, "triangle", 0.022, 290);
           break;
         case "skip":
           playTone(now, 640, 0.07, "square", 0.02);
@@ -810,7 +814,8 @@ export default function GameBoard({
           playTone(now + 0.1, 170, 0.12, "sawtooth", 0.02, 140);
           break;
         case "deal":
-          playTone(now, 360, 0.05, "triangle", 0.013, 300);
+          playTone(now, 360, 0.055, "triangle", 0.022, 300);
+          playTone(now + 0.04, 300, 0.05, "triangle", 0.018, 260);
           break;
         case "win":
           playTone(now, 520, 0.12, "triangle", 0.022, 760);
@@ -828,6 +833,39 @@ export default function GameBoard({
 
   const playUiSfx = useCallback((event: UiSfx) => {
     const fileCandidates = FILE_SFX_SOURCES[event] ?? [];
+    const layerSynthWithFile = event === "shuffle";
+    const chainFollowUpFile = event === "win" || event === "lose";
+    const followUpCandidates = chainFollowUpFile
+      ? [
+          ...fileCandidates.slice(1),
+          ...(event === "win"
+            ? ["/sfx/win.wav", "/sfx/win.mp3", "/sfx/victory_fx.wav", "/sfx/victory_fx.mp3"]
+            : ["/sfx/lose.wav", "/sfx/lose.mp3", "/sfx/loss.wav", "/sfx/loss.mp3", "/sfx/lost_fx.wav", "/sfx/lost_fx.mp3"]),
+        ]
+      : [];
+
+    const playFollowUp = (index: number) => {
+      if (index >= followUpCandidates.length) return;
+      const src = followUpCandidates[index];
+
+      let audio = fileSfxRef.current[src];
+      if (!audio) {
+        audio = new Audio(src);
+        audio.preload = "auto";
+        fileSfxRef.current[src] = audio;
+      }
+
+      audio.volume = Math.min(1, (FILE_SFX_VOLUME[event] ?? 0.34) * 0.95);
+      audio.currentTime = 0;
+
+      const playResult = audio.play();
+      if (playResult && typeof playResult.then === "function") {
+        void playResult.catch(() => {
+          playFollowUp(index + 1);
+        });
+      }
+    };
+
     if (typeof window !== "undefined" && typeof Audio !== "undefined" && fileCandidates.length > 0) {
       for (const src of fileCandidates) {
         let audio = fileSfxRef.current[src];
@@ -844,7 +882,22 @@ export default function GameBoard({
           void playResult.catch(() => {
             // If file playback fails, keep UX stable with synth fallback.
             playSynthSfx(event);
+            if (chainFollowUpFile && followUpCandidates.length > 0) {
+              playFollowUp(0);
+            }
           });
+        }
+
+        if (chainFollowUpFile && followUpCandidates.length > 0) {
+          audio.addEventListener("ended", () => {
+            window.setTimeout(() => {
+              playFollowUp(0);
+            }, 90);
+          }, { once: true });
+        }
+
+        if (layerSynthWithFile) {
+          playSynthSfx(event);
         }
         return;
       }
@@ -1046,6 +1099,7 @@ export default function GameBoard({
 
           const counts = order.map((playerId) => game.players.find((player) => player.id === playerId)?.hand.length ?? 0);
           const timer = window.setTimeout(() => {
+            playUiSfx("deal");
             playMotionShuffleSfx();
             animateDealSequence(order, counts, 'discard');
           }, 120);
@@ -1139,6 +1193,16 @@ export default function GameBoard({
     setShowUnoFlash(true);
     window.setTimeout(() => setShowUnoFlash(false), 900);
   }, [game, localPlayer, sayUno, localPlayerIndex]);
+
+  const autoDeclareUnoIfNeeded = useCallback(() => {
+    if (!game || !localPlayer || localPlayer.isBot) return;
+    if (!game.rules.mustDeclareUno || localPlayer.saidUno) return;
+    // Dialog play actions can immediately drop the hand to one card.
+    // Mirror pressing the UNO button right before the play resolves.
+    if (localPlayer.hand.length <= 2) {
+      declareUno();
+    }
+  }, [game, localPlayer, declareUno]);
 
   // Wrap callOut to also show the flash
   const handleCallOut = useCallback((callerIdx: number, targetIdx: number, targetName: string) => {
@@ -1750,9 +1814,7 @@ export default function GameBoard({
                       drawCard();
                       return;
                     }
-                    if (game.rules.mustDeclareUno && !localPlayer.saidUno && localPlayer.hand.length === 2) {
-                      sayUno(localPlayerIndex);
-                    }
+                    autoDeclareUnoIfNeeded();
                     handleSelectCard(preferredStackCard, handCardRefs.current[preferredStackCard.id] ?? null);
                   }}
                   style={{
@@ -1829,9 +1891,7 @@ export default function GameBoard({
                     type="button"
                     onClick={() => {
                       if (turnTransitionLocked) return;
-                      if (game.rules.mustDeclareUno && !localPlayer.saidUno && localPlayer.hand.length === 2) {
-                        sayUno(localPlayerIndex);
-                      }
+                      autoDeclareUnoIfNeeded();
                       handleSelectCard(drawnPlayableCard, handCardRefs.current[drawnPlayableCard.id] ?? null);
                     }}
                     style={{
