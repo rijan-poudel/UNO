@@ -29,7 +29,14 @@ export interface Player {
 
 export type LastAction =
   | { type: 'init' }
-  | { type: 'play'; playerId: string; card: Card; chosenColor?: CardColor }
+  | {
+      type: 'play';
+      playerId: string;
+      card: Card;
+      chosenColor?: CardColor;
+      discardAllCount?: number;
+      shuffledHands?: boolean;
+    }
   | { type: 'draw'; playerId: string; count: number }
   | { type: 'pass'; playerId: string }
   | { type: 'declareUno'; playerId: string }

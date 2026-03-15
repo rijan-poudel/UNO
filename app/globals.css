@@ -52,34 +52,39 @@ body {
   border: 1px solid var(--ui-line, rgba(26, 15, 0, 0.2)) !important;
   border-left: 4px solid var(--ui-line, rgba(26, 15, 0, 0.2)) !important;
   border-radius: 0 !important;
-  box-shadow: none !important;
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--ui-bg, #fff8f0) 40%, #000 60%) !important;
   font-family: 'Courier Prime', monospace !important;
+  padding: 10px 12px !important;
+  gap: 6px !important;
+  min-height: 0 !important;
+  width: min(320px, calc(100vw - 24px)) !important;
 }
 
 .uno-toast-title {
   font-family: 'Bebas Neue', cursive !important;
-  font-size: 20px !important;
-  letter-spacing: 0.06em !important;
+  font-size: 17px !important;
+  letter-spacing: 0.05em !important;
   line-height: 1 !important;
   color: var(--ui-text, #1a0f00) !important;
-  margin-bottom: 2px !important;
+  margin-bottom: 1px !important;
 }
 
 .uno-toast-description {
   font-family: 'Courier Prime', monospace !important;
-  font-size: 11px !important;
-  letter-spacing: 0.06em !important;
+  font-size: 10px !important;
+  letter-spacing: 0.05em !important;
   text-transform: uppercase !important;
   color: var(--ui-muted, rgba(26, 15, 0, 0.65)) !important;
+  line-height: 1.35 !important;
 }
 
 .uno-toast-action,
 .uno-toast-cancel,
 .uno-toast-close {
   font-family: 'Courier Prime', monospace !important;
-  font-size: 10px !important;
+  font-size: 9px !important;
   font-weight: 700 !important;
-  letter-spacing: 0.12em !important;
+  letter-spacing: 0.1em !important;
   text-transform: uppercase !important;
   border-radius: 0 !important;
   box-shadow: none !important;
@@ -96,6 +101,12 @@ body {
   background: transparent !important;
   color: var(--ui-muted, rgba(26, 15, 0, 0.65)) !important;
   border: 1px solid var(--ui-line, rgba(26, 15, 0, 0.2)) !important;
+}
+
+[data-sonner-toaster] {
+  --normal-bg: var(--ui-surface, #fff8f0) !important;
+  --normal-text: var(--ui-text, #1a0f00) !important;
+  --normal-border: var(--ui-line, rgba(26, 15, 0, 0.2)) !important;
 }
 
 .uno-toast-success {

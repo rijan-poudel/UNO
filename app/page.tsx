@@ -14,6 +14,8 @@ import { toast } from 'sonner';
 
 const SHARED_RULES_KEY   = 'uno.shared.rules';
 const PREFERRED_THEME_KEY = 'uno.preferred.theme';
+const ONLINE_PREFILL_FRIEND_CODE_KEY = 'uno.online.prefill.friendCode';
+const ONLINE_PLAYER_NAME_KEY = 'uno.online.playerName';
 
 type ThemeName = 'paper' | 'midnight' | 'forest' | 'sunset';
 
@@ -80,6 +82,7 @@ const DEFAULT_RULES: Partial<GameRules> = {
   stackDraw2: false, stackWild4: false, allowWild4OnDraw2: false,
   drawUntilPlayable: false, reverseActsAsSkipInTwoPlayer: true,
   mustDeclareUno: true, allowStartingActionCard: true,
+  allowDiscardAll: false, allowShuffleCard: false,
   allowDoublePlaySameNumber: false, maxPlayers: 4,
 };
 
@@ -88,7 +91,12 @@ function getInitialRules(): Partial<GameRules> {
   try {
     const raw = window.localStorage.getItem(SHARED_RULES_KEY);
     if (!raw) return DEFAULT_RULES;
-    return { ...DEFAULT_RULES, ...(JSON.parse(raw) as Partial<GameRules>) };
+    const parsed = JSON.parse(raw) as Partial<GameRules> & { shuffleHandsOnZero?: boolean };
+    return {
+      ...DEFAULT_RULES,
+      ...parsed,
+      allowShuffleCard: parsed.allowShuffleCard ?? parsed.shuffleHandsOnZero ?? DEFAULT_RULES.allowShuffleCard,
+    };
   } catch { return DEFAULT_RULES; }
 }
 
@@ -185,6 +193,28 @@ export default function Home() {
           themeLabel={label} onTheme={cycleTheme} onSettings={() => setShowS(true)}
           onComputer={() => { setMode('computer'); setView('computer'); }}
           onFriends={() => { setMode('online'); setPanel('create'); setView('friends'); }}
+          onCheckFriendOnline={online.checkFriendOnline}
+          onFriendQuickInvite={async (friendCode) => {
+            let playerName = 'Player 1';
+            try {
+              const stored = window.localStorage.getItem(ONLINE_PLAYER_NAME_KEY);
+              if (stored && stored.trim()) playerName = stored.trim().slice(0, 18);
+              window.localStorage.setItem(ONLINE_PREFILL_FRIEND_CODE_KEY, friendCode);
+            } catch {
+              // Ignore storage issues and still continue.
+            }
+
+            const invited = await online.sendFriendInvite(friendCode, playerName);
+            if (!invited) {
+              toast.error(online.error ?? 'Could not send invite.');
+              return false;
+            }
+
+            setMode('online');
+            setPanel('create');
+            setView('friends');
+            return true;
+          }}
         />
         {settingsModal}
       </>
@@ -215,6 +245,7 @@ export default function Home() {
         playerId={online.playerId}
         friendCode={online.friendCode}
         incomingInvites={online.incomingInvites}
+        outgoingInvites={online.outgoingInvites}
         error={online.error}
         onSyncPresence={online.syncPresence}
         onCreateRoom={online.createRoom}
@@ -226,6 +257,7 @@ export default function Home() {
         onStartGame={() => { setMode('online'); return online.startOnlineGame(rules); }}
         onAddBotSeat={online.addBotToRoom}
         onKickPlayer={online.kickPlayer}
+        onCheckFriendOnline={online.checkFriendOnline}
       />
       {settingsModal}
     </>

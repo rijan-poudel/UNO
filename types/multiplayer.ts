@@ -1,6 +1,6 @@
 import type { GameState } from './game';
 import type { GameRules } from './rules';
-import type { CardColor } from './card';
+import type { CardColor, CardValue } from './card';
 
 export interface RoomPlayer {
   playerId: string;
@@ -15,6 +15,11 @@ export interface RoomSnapshot {
   players: RoomPlayer[];
   started: boolean;
   game: GameState | null;
+  pendingColorChoice: {
+    playerId: string;
+    cardId: string;
+    cardValue: CardValue;
+  } | null;
 }
 
 export interface FriendInvite {
@@ -27,6 +32,8 @@ export interface FriendInvite {
 }
 
 export type MultiplayerAction =
+  | { type: 'prepareWild'; cardId: string }
+  | { type: 'cancelWildChoice' }
   | { type: 'play'; cardId: string; chosenColor?: CardColor }
   | { type: 'draw' }
   | { type: 'pass' }
@@ -89,6 +96,14 @@ export interface RespondFriendInvitePayload {
 
 export interface DismissFriendInvitePayload {
   inviteId: string;
+}
+
+export interface FriendStatusPayload {
+  friendCodes: string[];
+}
+
+export interface FriendStatusResponse {
+  statuses: Record<string, boolean>;
 }
 
 export interface AckSuccess<T> {

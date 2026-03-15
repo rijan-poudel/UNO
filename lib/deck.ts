@@ -30,7 +30,7 @@ function makeCard(color: CardColor, value: CardValue): Card {
 
 // ── Standard deck composition ────────────────────────────────────────────────
 
-const COLOR_ACTION_VALUES: ReadonlyArray<CardValue> = ['skip', 'reverse', 'draw2'];
+const COLOR_ACTION_VALUES: ReadonlyArray<CardValue> = ['skip', 'reverse', 'draw2', 'discardAll'];
 
 /**
  * Creates a fresh, unshuffled 108-card standard UNO deck:
@@ -70,6 +70,11 @@ export function createStandardUnoDeck(): Card[] {
   // Four wild-draw-4s
   for (let i = 0; i < 4; i++) {
     cards.push(makeCard('wild', 'wild4'));
+  }
+
+  // Four wild-shuffle cards
+  for (let i = 0; i < 4; i++) {
+    cards.push(makeCard('wild', 'shuffle'));
   }
 
   return cards;

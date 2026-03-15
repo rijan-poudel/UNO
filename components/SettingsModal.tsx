@@ -35,6 +35,8 @@ const RULE_TOGGLES: RuleToggle[] = [
   { key: 'stackDraw2', label: 'Stack +2', description: 'Chain draw-two cards together.' },
   { key: 'stackWild4', label: 'Stack +4', description: 'Chain wild-four cards together.' },
   { key: 'allowWild4OnDraw2', label: '+4 counters +2', description: 'Wild four can answer a draw two.' },
+  { key: 'allowDiscardAll', label: 'Discard All card', description: 'Enable the Discard All card that drops all cards in that card color.' },
+  { key: 'allowShuffleCard', label: 'Shuffle Hands card', description: 'Enable the wild shuffle card (choose color after shuffling all hands).' },
   { key: 'drawUntilPlayable', label: 'Draw until playable', description: 'Keep drawing until a card matches.' },
   { key: 'reverseActsAsSkipInTwoPlayer', label: 'Reverse = Skip (2p)', description: 'Reverse skips in heads-up.' },
   { key: 'mustDeclareUno', label: 'Must call UNO', description: 'Missed UNO can be penalised.' },

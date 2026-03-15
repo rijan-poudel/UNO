@@ -33,7 +33,9 @@ export default function RootLayout({
           position="bottom-right"
           richColors={false}
           closeButton
-          expand
+          expand={false}
+          visibleToasts={3}
+          offset={12}
           toastOptions={{
             duration: 2800,
             classNames: {

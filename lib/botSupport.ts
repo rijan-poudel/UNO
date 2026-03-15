@@ -72,7 +72,9 @@ export function getBotPreferredColor(hand: Card[]): CardColor {
 function scoreCard(card: Card): number {
   switch (card.value) {
     case 'wild4':   return 100;
+    case 'shuffle': return 92;
     case 'draw2':   return 80;
+    case 'discardAll': return 76;
     case 'skip':    return 70;
     case 'reverse': return 60;
     case 'wild':    return 50;

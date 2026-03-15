@@ -26,6 +26,7 @@ const HUMAN_IDLE_TIMEOUT_MS = 12000;
 const HUMAN_IDLE_AFTER_DRAW_TIMEOUT_MS = 4500;
 const HUMAN_IDLE_WILD_PICK_TIMEOUT_MS = 3500;
 const BOT_ACTION_DELAY_MS = 1150;
+const AUTO_PASS_AFTER_DRAW_MS = 2200;
 
 // ── UI-layer state ────────────────────────────────────────────────────────────
 
@@ -58,10 +59,18 @@ function describeAction(game: GameState): string {
   const name = (id: string) => game.players.find((p) => p.id === id)?.name ?? id;
 
   switch (a.type) {
-    case 'play':
+    case 'play': {
+      const extras: string[] = [];
+      if (a.discardAllCount && a.discardAllCount > 0) {
+        extras.push(`discarded ${a.discardAllCount} extra`);
+      }
+      if (a.shuffledHands) {
+        extras.push('shuffled all hands');
+      }
       return `${name(a.playerId)} played ${a.card.color} ${a.card.value}${
-        a.chosenColor ? ` → chose ${a.chosenColor}` : ''
-      }`;
+        a.chosenColor ? ` -> chose ${a.chosenColor}` : ''
+      }${extras.length ? ` (${extras.join(', ')})` : ''}`;
+    }
     case 'draw':
       return `${name(a.playerId)} drew ${a.count} card${a.count !== 1 ? 's' : ''}`;
     case 'pass':
@@ -444,7 +453,7 @@ export function useUnoGame() {
       } catch (e) {
         console.error('auto passTurn error:', e);
       }
-    }, 900);
+    }, AUTO_PASS_AFTER_DRAW_MS);
 
     return () => window.clearTimeout(timer);
   }, [game, localPlayerIndex, drawnThisTurn]);

@@ -32,7 +32,7 @@ const COLOR_ORDER: Record<string, number> = { red: 0, yellow: 1, green: 2, blue:
 const VALUE_ORDER: Record<string, number> = {
   "0": 0, "1": 1, "2": 2, "3": 3, "4": 4,
   "5": 5, "6": 6, "7": 7, "8": 8, "9": 9,
-  skip: 10, reverse: 11, draw2: 12, wild: 13, wild4: 14,
+  skip: 10, reverse: 11, draw2: 12, discardAll: 13, wild: 14, wild4: 15, shuffle: 16,
 };
 
 const BOT_THINK_DELAY_MS = 10000;
@@ -40,6 +40,8 @@ const HUMAN_IDLE_TIMEOUT_MS = 10000;
 const HUMAN_IDLE_AFTER_DRAW_TIMEOUT_MS = 10000;
 const HUMAN_IDLE_WILD_PICK_TIMEOUT_MS = 10000;
 const ACTION_FLASH_HOLD_MS = 980;
+const DEAL_ANIMATION_STAGGER_MS = 55;
+const DEAL_ANIMATION_DURATION_MS = 320;
 
 function sortHand(cards: Card[]): Card[] {
   return [...cards].sort((a, b) => {
@@ -106,12 +108,12 @@ function ActionTray({ children }: { children: ReactNode }) {
       bottom: "calc(100% + 12px)",
       transform: "translateX(-50%)",
       zIndex: 24,
-      width: "min(560px, calc(100vw - 32px))",
+      width: "min(560px, calc(100vw - 16px))",
       background: "var(--ui-surface)",
       border: "1px solid var(--ui-line)",
-      padding: "12px 14px",
+      padding: "10px 12px",
       display: "grid",
-      gap: 12,
+      gap: 10,
       animation: "none",
     }}>
       {children}
@@ -212,15 +214,16 @@ function ActionFlash({ text, tone }: { text: string; tone: ActionFlashTone }) {
 
 // ── Opponent strip ─────────────────────────────────────────────────────────────
 function OpponentStrip({
-  player, isCurrentTurn, canCallOut, onCallOut, cardScale,
+  player, isCurrentTurn, canCallOut, onCallOut, cardScale, compact = false,
 }: {
   player: Player; isCurrentTurn: boolean;
   canCallOut: boolean; onCallOut: () => void; cardScale: number;
+  compact?: boolean;
 }) {
   const n = player.hand.length;
-  const opponentCardScale = cardScale * 0.88;
-  const fans = Math.min(n, 6);
-  const overlap = Math.round(26 * opponentCardScale);
+  const opponentCardScale = cardScale * (compact ? 0.72 : 0.88);
+  const fans = Math.min(n, compact ? 4 : 6);
+  const overlap = Math.round((compact ? 18 : 26) * opponentCardScale);
   const fanWidth = Math.max(28, (82 * opponentCardScale) + Math.max(0, fans - 1) * overlap);
   const fanHeight = 122 * opponentCardScale + 8;
   const fanMid = (fans - 1) / 2;
@@ -281,7 +284,9 @@ function OpponentStrip({
         )}
         <span style={{
           fontFamily: "'Bebas Neue', cursive",
-          fontSize: 16, letterSpacing: "0.05em", color: canCallOut ? "var(--ui-accent-red)" : "var(--ui-text)",
+          fontSize: compact ? 13 : 16,
+          letterSpacing: "0.05em",
+          color: canCallOut ? "var(--ui-accent-red)" : "var(--ui-text)",
         }}>
           {player.isBot ? "⌘ " : ""}{player.name}
         </span>
@@ -297,12 +302,14 @@ function OpponentStrip({
 
       <span style={{
         fontFamily: "'Courier Prime', monospace",
-        fontSize: 9, color: canCallOut ? "var(--ui-accent-red)" : "var(--ui-muted)", letterSpacing: "0.06em",
+        fontSize: compact ? 8 : 9,
+        color: canCallOut ? "var(--ui-accent-red)" : "var(--ui-muted)",
+        letterSpacing: "0.06em",
       }}>{n} {n === 1 ? "card" : "cards"}</span>
       {canCallOut && (
         <span style={{
           fontFamily: "'Courier Prime', monospace",
-          fontSize: 8,
+          fontSize: compact ? 7 : 8,
           fontWeight: 700,
           letterSpacing: "0.14em",
           textTransform: "uppercase",
@@ -416,12 +423,17 @@ export default function GameBoard({
       ? Boolean((gameApi as { hasPendingStackOption?: boolean }).hasPendingStackOption)
       : false;
 
+  const wildPickerPlayerName =
+    "wildPickerPlayerName" in gameApi
+      ? ((gameApi as { wildPickerPlayerName?: string | null }).wildPickerPlayerName ?? null)
+      : null;
+
   const [feed, setFeed] = useState<FeedEntry[]>([]);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
   const [showUnoFlash, setShowUnoFlash] = useState(false);
   const [actionFlash, setActionFlash] = useState<ActionFlashState | null>(null);
   const [callOutFlashName, setCallOutFlashName] = useState<string | null>(null);
-  const [isPortraitMobile, setIsPortraitMobile] = useState(false);
+  const [isNarrowMobile, setIsNarrowMobile] = useState(false);
   const [isCompactBoard, setIsCompactBoard] = useState(false);
   const [boardScale, setBoardScale] = useState(1);
   const [drawnCardId, setDrawnCardId] = useState<string | null>(null);
@@ -445,6 +457,7 @@ export default function GameBoard({
   const prevLocalHandIdsRef = useRef<string[]>([]);
   const pendingPlayRectRef = useRef<{ cardId: string; x: number; y: number } | null>(null);
   const animationCounterRef = useRef(0);
+  const dealAnimationKeyRef = useRef<string | null>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
   const drawPileRef = useRef<HTMLButtonElement | null>(null);
   const discardPileRef = useRef<HTMLDivElement | null>(null);
@@ -523,6 +536,87 @@ export default function GameBoard({
       scale: 0.92,
       duration: 280,
     });
+  }, [getElementCenter, localPlayer?.id, queueAnimation]);
+
+  const animateDiscardAllToDiscard = useCallback((playerId: string, color: CardColor, count: number) => {
+    if (count <= 0) return;
+
+    const to = getElementCenter(discardPileRef.current);
+    const from = playerId === localPlayer?.id
+      ? getElementCenter(localHandRef.current)
+      : getElementCenter(playerZoneRefs.current[playerId] ?? null);
+
+    if (!from || !to) return;
+
+    const visibleCount = Math.min(count, 7);
+    for (let index = 0; index < visibleCount; index += 1) {
+      const spread = (index - (visibleCount - 1) / 2) * 10;
+      window.setTimeout(() => {
+        queueAnimation({
+          card: { id: `_anim-discard-all-${playerId}-${index}`, color, value: '0' },
+          faceDown: false,
+          from: {
+            x: from.x + spread,
+            y: from.y - Math.abs(spread) * 0.22,
+          },
+          to: {
+            x: to.x + (spread * 0.45),
+            y: to.y - (index % 3),
+          },
+          rotationFrom: -18 + (index * 5),
+          rotationTo: -5 + (index * 3),
+          scale: 0.88,
+          duration: 260,
+        });
+      }, index * 58);
+    }
+  }, [getElementCenter, localPlayer?.id, queueAnimation]);
+
+  const animateDealSequence = useCallback((
+    playerOrder: string[],
+    cardsPerPlayer: number[],
+    source: 'draw' | 'discard' = 'draw',
+  ) => {
+    const sourceElement = source === 'discard' ? discardPileRef.current : drawPileRef.current;
+    const fallbackSource = source === 'discard' ? drawPileRef.current : discardPileRef.current;
+    const from = getElementCenter(sourceElement) ?? getElementCenter(fallbackSource);
+
+    if (!from) return;
+
+    const maxCards = Math.max(0, ...cardsPerPlayer);
+    let step = 0;
+
+    for (let round = 0; round < maxCards; round += 1) {
+      playerOrder.forEach((playerId, playerIndex) => {
+        const count = cardsPerPlayer[playerIndex] ?? 0;
+        if (round >= count) return;
+
+        const to = playerId === localPlayer?.id
+          ? getElementCenter(localHandRef.current)
+          : getElementCenter(playerZoneRefs.current[playerId] ?? null);
+        if (!to) return;
+
+        const fanOffset = ((round % 5) - 2) * 10;
+        const stepIndex = step;
+        step += 1;
+
+        window.setTimeout(() => {
+          queueAnimation({
+            card: { id: `_anim-deal-${playerId}-${round}-${stepIndex}`, color: 'wild', value: 'wild' },
+            faceDown: true,
+            from: { x: from.x, y: from.y },
+            to: {
+              x: to.x + fanOffset,
+              y: to.y + (playerId === localPlayer?.id ? -14 : 0) - ((round % 3) * 2),
+            },
+            rotationFrom: -12 + ((stepIndex % 4) * 4),
+            rotationTo: -6 + ((round % 5) * 3),
+            scale: 0.86,
+            duration: DEAL_ANIMATION_DURATION_MS,
+          });
+        }, stepIndex * DEAL_ANIMATION_STAGGER_MS);
+      });
+    }
   }, [getElementCenter, localPlayer?.id, queueAnimation]);
 
   const handleSelectCard = useCallback((card: Card, element: HTMLDivElement | null) => {
@@ -623,9 +717,18 @@ export default function GameBoard({
       const shortViewport = window.innerHeight < 760;
       const narrowViewport = window.innerWidth < 1100;
       const tinyViewport = window.innerHeight < 680;
-      setIsPortraitMobile(portrait && mobileLike);
-      setIsCompactBoard(shortViewport || narrowViewport);
-      setBoardScale(tinyViewport ? 0.82 : shortViewport || narrowViewport ? 0.9 : 1);
+      const narrowPhone = window.innerWidth < 720;
+      setIsNarrowMobile(mobileLike && narrowPhone);
+      setIsCompactBoard(shortViewport || narrowViewport || (portrait && mobileLike));
+      setBoardScale(
+        portrait && mobileLike
+          ? (tinyViewport ? 0.64 : 0.72)
+          : tinyViewport
+            ? 0.82
+            : shortViewport || narrowViewport
+              ? 0.9
+              : 1,
+      );
     };
     update();
     window.addEventListener("resize", update);
@@ -669,6 +772,29 @@ export default function GameBoard({
 
   useEffect(() => {
     if (!game) return;
+    if (game.lastAction.type !== 'init') return;
+
+    const animationKey = game.players
+      .map((player) => `${player.id}:${player.hand.map((card) => card.id).join(',')}`)
+      .join('|');
+
+    if (dealAnimationKeyRef.current === animationKey) return;
+    dealAnimationKeyRef.current = animationKey;
+
+    const timer = window.setTimeout(() => {
+      animateDealSequence(
+        game.players.map((player) => player.id),
+        game.players.map((player) => player.hand.length),
+        'draw',
+      );
+    }, 120);
+
+    return () => window.clearTimeout(timer);
+  }, [game, animateDealSequence]);
+
+  useEffect(() => {
+    if (!game) return;
+    const previous = prevGameRef.current;
 
     const actionKey = `${game.turnCount}:${JSON.stringify(game.lastAction)}`;
     if (prevActionKeyRef.current === actionKey) return;
@@ -689,8 +815,31 @@ export default function GameBoard({
 
     if (action.type === "play") {
       animatePlayToDiscard(action.playerId, action.card);
+
+      if (action.card.value === 'discardAll' && action.discardAllCount && action.discardAllCount > 0) {
+        const timer = window.setTimeout(() => {
+          animateDiscardAllToDiscard(action.playerId, action.card.color, action.discardAllCount ?? 0);
+        }, 120);
+        return () => window.clearTimeout(timer);
+      }
+
+      if (action.shuffledHands && previous) {
+        const actorIndex = previous.players.findIndex((player) => player.id === action.playerId);
+        if (actorIndex >= 0) {
+          const order = Array.from({ length: game.players.length }, (_, index) => {
+            const seat = (actorIndex + previous.direction + (index * previous.direction) + game.players.length * 4) % game.players.length;
+            return game.players[seat]?.id;
+          }).filter((playerId): playerId is string => Boolean(playerId));
+
+          const counts = order.map((playerId) => game.players.find((player) => player.id === playerId)?.hand.length ?? 0);
+          const timer = window.setTimeout(() => {
+            animateDealSequence(order, counts, 'discard');
+          }, 120);
+          return () => window.clearTimeout(timer);
+        }
+      }
     }
-  }, [game, animateDrawToPlayer, animatePlayToDiscard]);
+  }, [game, animateDealSequence, animateDiscardAllToDiscard, animateDrawToPlayer, animatePlayToDiscard]);
 
   useEffect(() => {
     if (!game || !localPlayer) return;
@@ -707,12 +856,6 @@ export default function GameBoard({
     };
 
     if (action.type === "play") {
-      const actorIndex = previous.players.findIndex((player) => player.id === action.playerId);
-      const playerCount = previous.players.length;
-      const targetIndex = actorIndex >= 0
-        ? (actorIndex + previous.direction + playerCount) % playerCount
-        : -1;
-      const targetId = targetIndex >= 0 ? previous.players[targetIndex]?.id : null;
       const chosenColor = action.chosenColor && action.chosenColor !== "wild" ? action.chosenColor : null;
       const chosenTone = (chosenColor ?? "text") as ActionFlashTone;
       const chosenLabel = chosenColor ? chosenColor.toUpperCase() : null;
@@ -723,32 +866,35 @@ export default function GameBoard({
       }
 
       if (action.card.value === "skip") {
-        queueActionFlash(targetId === localPlayer.id ? "You Were Skipped" : "Skip", "yellow");
+        queueActionFlash("SKIP", "yellow");
         return;
       }
 
       if (action.card.value === "draw2") {
-        queueActionFlash(targetId === localPlayer.id ? "+2 To You" : "+2", "red");
         return;
       }
 
       if (action.card.value === "wild4") {
-        queueActionFlash(
-          `${targetId === localPlayer.id ? "+4 To You" : "+4"}${chosenLabel ? ` • ${chosenLabel}` : ""}`,
-          chosenLabel ? chosenTone : "red",
-        );
         return;
       }
 
       if (action.card.value === "wild") {
         queueActionFlash(chosenLabel ?? "Wild", chosenTone);
+        return;
+      }
+
+      if (action.card.value === "discardAll") {
+        return;
+      }
+
+      if (action.card.value === "shuffle") {
+        queueActionFlash(chosenLabel ? `Shuffle • ${chosenLabel}` : "Shuffle", chosenLabel ? chosenTone : "blue");
       }
       return;
     }
 
     if (action.type === "declareUno") {
-      const actorName = game.players.find((player) => player.id === action.playerId)?.name ?? "Player";
-      queueActionFlash(`${actorName} UNO!`, "red");
+      queueActionFlash("UNO", "red");
       return;
     }
 
@@ -763,21 +909,17 @@ export default function GameBoard({
       return;
     }
 
-    if (action.type === "draw" && action.count > 1 && action.playerId === localPlayer.id) {
-      queueActionFlash(`+${action.count} Cards`, "red");
-    }
   }, [game, localPlayer, triggerActionFlash]);
 
   const confirmExitGame = () => { setShowExitConfirm(false); resetGame(); onReset(); };
 
   const declareUno = useCallback(() => {
-    if (!game || !localPlayer || !game.rules.mustDeclareUno || game.winnerId || !isLocalTurn) return;
-    if (localPlayer.isBot || localPlayer.saidUno) return;
-    if (localPlayer.hand.length < 1 || localPlayer.hand.length > 2) return;
+    if (!game || !localPlayer || game.winnerId) return;
+    if (localPlayer.isBot) return;
     sayUno(localPlayerIndex);
     setShowUnoFlash(true);
     window.setTimeout(() => setShowUnoFlash(false), 900);
-  }, [game, localPlayer, sayUno, localPlayerIndex, isLocalTurn]);
+  }, [game, localPlayer, sayUno, localPlayerIndex]);
 
   // Wrap callOut to also show the flash
   const handleCallOut = useCallback((callerIdx: number, targetIdx: number, targetName: string) => {
@@ -800,7 +942,6 @@ export default function GameBoard({
       }
       if (e.key === "u" || e.key === "U") {
         e.preventDefault();
-        if (turnTransitionLocked) return;
         declareUno();
       }
     };
@@ -823,47 +964,14 @@ export default function GameBoard({
     if (turnTransitionLocked) return;
     if (autoActionExecuteTimerRef.current !== null) return;
     const isHumanTurn = isLocalTurn && !localPlayer.isBot && !game.winnerId;
-    const isDrawDisabled = botThinking || !!game.winnerId || (drawnThisTurn && game.pendingDraw === 0) || !isHumanTurn;
-    const mustAutoDraw = isHumanTurn && !isDrawDisabled && game.pendingDraw === 0 && playableCardIds.size === 0;
-    if (!mustAutoDraw) return;
-
-    const timer = window.setTimeout(() => {
-      triggerActionFlash("Draw", "yellow");
-      autoActionExecuteTimerRef.current = window.setTimeout(() => {
-        autoActionExecuteTimerRef.current = null;
-        drawCard();
-      }, ACTION_FLASH_HOLD_MS + 40);
-    }, 650);
-    return () => {
-      window.clearTimeout(timer);
-    };
-  }, [
-    game,
-    localPlayer,
-    currentPlayer,
-    isLocalTurn,
-    botThinking,
-    turnTransitionLocked,
-    drawnThisTurn,
-    playableCardIds,
-    triggerActionFlash,
-    drawCard,
-  ]);
-
-  useEffect(() => {
-    if (!game || !localPlayer || !currentPlayer) return;
-    if (turnTransitionLocked) return;
-    if (autoActionExecuteTimerRef.current !== null) return;
-    const isHumanTurn = isLocalTurn && !localPlayer.isBot && !game.winnerId;
     const mustAutoDrawRequiredNow = isHumanTurn && game.pendingDraw > 0 && !hasPendingStackOption;
     if (!mustAutoDrawRequiredNow) return;
 
     const timer = window.setTimeout(() => {
-      triggerActionFlash(`Take +${game.pendingDraw}`, "red");
       autoActionExecuteTimerRef.current = window.setTimeout(() => {
         autoActionExecuteTimerRef.current = null;
         drawCard();
-      }, ACTION_FLASH_HOLD_MS + 40);
+      }, 120);
     }, 650);
     return () => {
       window.clearTimeout(timer);
@@ -884,13 +992,18 @@ export default function GameBoard({
 
     const revealedCard = localPlayer.hand.find((card) => card.id === drawnCardId) ?? null;
     if (!revealedCard) return;
+    const isPlayableDrawnCard = playableCardIds.has(revealedCard.id);
     const shouldShowDrawDecision = Boolean(
       isLocalTurn
       && !localPlayer.isBot
       && drawnThisTurn
+      && isPlayableDrawnCard
     );
 
-    if (!shouldShowDrawDecision) return;
+    if (!shouldShowDrawDecision) {
+      const clearTimer = window.setTimeout(() => setDrawDecisionCardId(null), 0);
+      return () => window.clearTimeout(clearTimer);
+    }
 
     const revealedCardId = revealedCard.id;
     const timer = window.setTimeout(() => setDrawDecisionCardId(revealedCardId), 0);
@@ -902,6 +1015,7 @@ export default function GameBoard({
     drawnCardId,
     isLocalTurn,
     drawnThisTurn,
+    playableCardIds,
   ]);
 
   useEffect(() => {
@@ -1003,12 +1117,6 @@ export default function GameBoard({
   // Solve: 122 * s + 40 <= budget  →  s = (budget - 40) / 122
   // Clamp between 0.65 (min readable) and 1.3 (max comfortable).
   const unoButtonVisible = !localPlayer.isBot && !game.winnerId;
-  const unoReady =
-    humanTurn
-    && game.rules.mustDeclareUno
-    && !localPlayer.saidUno
-    && localPlayer.hand.length >= 1
-    && localPlayer.hand.length <= 2;
 
   const viewportH = typeof window !== "undefined" ? window.innerHeight : 700;
   const viewportW = typeof window !== "undefined" ? window.innerWidth : 1200;
@@ -1043,6 +1151,8 @@ export default function GameBoard({
   const barHeight = isCompactBoard ? 42 : 50;
   const headerPadding = isCompactBoard ? "4px 8px" : "6px 12px";
   const footerPadding = isCompactBoard ? "4px 14px" : "6px 18px";
+  const themeButtonLabel = isNarrowMobile ? "Theme" : `Theme: ${currentThemeLabel}`;
+  const settingsButtonLabel = isNarrowMobile ? "Prefs" : "Settings";
 
   const hint = !humanTurn
     ? `Waiting for ${currentPlayer.name}`
@@ -1056,20 +1166,6 @@ export default function GameBoard({
   const handOverlap = Math.round(26 * handCardScale);
   const ARC_SPREAD = 3.5;
   const ARC_LIFT   = 2.5;
-
-  const requestLandscapeMode = async () => {
-    try {
-      const root = document.documentElement as HTMLElement & { webkitRequestFullscreen?: () => Promise<void> | void };
-      if (!document.fullscreenElement) {
-        if (root.requestFullscreen) await root.requestFullscreen();
-        else if (root.webkitRequestFullscreen) root.webkitRequestFullscreen();
-      }
-      const ori = screen.orientation as ScreenOrientation & {
-        lock?: (o: "portrait" | "landscape" | "portrait-primary" | "portrait-secondary" | "landscape-primary" | "landscape-secondary" | "natural" | "any") => Promise<void>;
-      };
-      if (ori.lock) await ori.lock("landscape");
-    } catch { /* silently fail */ }
-  };
 
   return (
     <>
@@ -1138,8 +1234,8 @@ export default function GameBoard({
       `}</style>
 
       <LiveFeed entries={feed} />
-  <AnimatedCards animations={animations} />
-        {actionFlash && <ActionFlash text={actionFlash.text} tone={actionFlash.tone} />}
+      <AnimatedCards animations={animations} />
+      {actionFlash && <ActionFlash text={actionFlash.text} tone={actionFlash.tone} />}
       {callOutFlashName && <CallOutFlash name={callOutFlashName} />}
 
       <div style={{
@@ -1176,7 +1272,7 @@ export default function GameBoard({
               background: "var(--ui-surface)", border: "1px solid var(--ui-line)",
               color: "var(--ui-muted)", padding: isCompactBoard ? "6px 10px" : "8px 13px",
               cursor: "pointer", transition: "color 0.12s",
-            }}>Theme: {currentThemeLabel}</button>
+            }}>{themeButtonLabel}</button>
             <button onClick={onOpenSettings} style={{
               fontFamily: "'Courier Prime', monospace",
               fontSize: isCompactBoard ? 10 : 11, fontWeight: 700,
@@ -1184,7 +1280,7 @@ export default function GameBoard({
               background: "var(--ui-surface)", border: "1px solid var(--ui-line)",
               color: "var(--ui-muted)", padding: isCompactBoard ? "6px 10px" : "8px 13px",
               cursor: "pointer", transition: "color 0.12s",
-            }}>SETTINGS</button>
+            }}>{settingsButtonLabel}</button>
             <button className="menu-btn" onClick={() => setShowExitConfirm(true)} style={{
               fontFamily: "'Courier Prime', monospace",
               fontSize: isCompactBoard ? 10 : 11, fontWeight: 700,
@@ -1200,9 +1296,9 @@ export default function GameBoard({
         <section style={{
           paddingTop: isCompactBoard ? 40 : 48,
           paddingBottom: isCompactBoard ? 4 : 8,
-          paddingInline: 12,
+          paddingInline: isNarrowMobile ? 6 : 12,
           display: "flex", flexWrap: "wrap",
-          gap: isCompactBoard ? "4px 14px" : "8px 20px",
+          gap: isCompactBoard ? (isNarrowMobile ? "3px 8px" : "4px 14px") : "8px 20px",
           justifyContent: "center", alignItems: "flex-start",
           flexShrink: 0,
           borderBottom: "1px solid var(--ui-line)",
@@ -1218,6 +1314,7 @@ export default function GameBoard({
                   canCallOut={canCallOut}
                   onCallOut={() => handleCallOut(localPlayerIndex, idx, player.name)}
                   cardScale={handCardScale}
+                  compact={isNarrowMobile}
                 />
               </div>
             );
@@ -1230,9 +1327,9 @@ export default function GameBoard({
           display: "flex", flexDirection: "column",
           alignItems: "center", justifyContent: "center",
           gap: isCompactBoard ? 6 : 12,
-          padding: isCompactBoard ? "0 8px" : "0 16px",
+          padding: isCompactBoard ? (isNarrowMobile ? "0 4px" : "0 8px") : "0 16px",
           overflow: "hidden",
-          transform: isCompactBoard ? "translateY(-4px)" : "translateY(-10px)",
+          transform: isCompactBoard ? (isNarrowMobile ? "translateY(-1px)" : "translateY(-4px)") : "translateY(-10px)",
         }}>
 
           <div style={{
@@ -1256,7 +1353,7 @@ export default function GameBoard({
             </div>
           </div>
 
-          <div style={{ display: "flex", alignItems: "flex-end", gap: isCompactBoard ? 14 : 32 }}>
+          <div style={{ display: "flex", alignItems: "flex-end", gap: isCompactBoard ? (isNarrowMobile ? 8 : 14) : 32 }}>
 
             {/* Draw pile */}
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
@@ -1291,7 +1388,7 @@ export default function GameBoard({
               <span style={{
                 fontFamily: "'Courier Prime', monospace", fontSize: 9,
                 letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--ui-muted)",
-              }}>TURN</span>
+              }}>{isNarrowMobile ? "DIR" : "TURN"}</span>
               <span title={directionLabel} style={{
                 fontFamily: "'Courier Prime', monospace",
                 fontSize: Math.round((isCompactBoard ? 26 : 32) * pileCardScale),
@@ -1348,6 +1445,34 @@ export default function GameBoard({
           overflow: "visible",
           zIndex: 12,
         }}>
+
+          {unoButtonVisible && (
+            <button
+              type="button"
+              onClick={declareUno}
+              className="uno-btn"
+              style={{
+                position: "absolute",
+                left: "50%",
+                top: 0,
+                transform: "translate(-50%, -50%)",
+                zIndex: 40,
+                fontFamily: "'Bebas Neue', cursive",
+                fontSize: isNarrowMobile ? 20 : isCompactBoard ? 24 : 28,
+                letterSpacing: "0.1em",
+                background: "var(--ui-accent-red)",
+                color: "#fff",
+                border: "1px solid var(--ui-accent-red)",
+                padding: isNarrowMobile ? "4px 14px 3px" : isCompactBoard ? "5px 16px 4px" : "7px 20px 6px",
+                cursor: "pointer",
+                opacity: 1,
+                animation: "none",
+                lineHeight: 1,
+                boxShadow: "0 6px 14px rgba(26,15,0,0.28)",
+              }}
+              title="Say UNO"
+            >UNO</button>
+          )}
 
           {stackChoiceOpen && (
             <ActionTray>
@@ -1450,7 +1575,7 @@ export default function GameBoard({
                     letterSpacing: "0.04em",
                     color: "var(--ui-text)",
                     lineHeight: 1,
-                  }}>{drawnPlayableCard ? "You can play this" : "Draw complete"}</p>
+                  }}>{drawnPlayableCard ? "You can play this" : "No playable draw"}</p>
                   <p style={{
                     margin: 0,
                     fontFamily: "'Courier Prime', monospace",
@@ -1460,11 +1585,11 @@ export default function GameBoard({
                     color: "var(--ui-muted)",
                   }}>{drawnPlayableCard
                     ? "The new card is highlighted in your hand. Play it, or pass."
-                    : "Pass now to end turn, or keep playing from your hand."}</p>
+                    : "Passing shortly unless you end the turn now."}</p>
                 </div>
               </div>
 
-              <div style={{ display: "grid", gridTemplateColumns: drawnPlayableCard ? "1fr 1fr" : "1fr 1fr", gap: 8 }}>
+              <div style={{ display: "grid", gridTemplateColumns: drawnPlayableCard ? "1fr 1fr" : "1fr", gap: 8 }}>
                 {drawnPlayableCard && (
                   <button
                     type="button"
@@ -1505,25 +1630,7 @@ export default function GameBoard({
                     padding: "12px 14px",
                     cursor: "pointer",
                   }}
-                >Pass</button>
-                {!drawnPlayableCard && (
-                  <button
-                    type="button"
-                    onClick={() => setDrawDecisionCardId(null)}
-                    style={{
-                      fontFamily: "'Courier Prime', monospace",
-                      fontSize: 10,
-                      fontWeight: 700,
-                      letterSpacing: "0.12em",
-                      textTransform: "uppercase",
-                      background: "transparent",
-                      border: "1px solid var(--ui-line)",
-                      color: "var(--ui-muted)",
-                      padding: "12px 14px",
-                      cursor: "pointer",
-                    }}
-                  >Keep turn</button>
-                )}
+                >{drawnPlayableCard ? "Pass" : "Pass now"}</button>
               </div>
             </ActionTray>
           )}
@@ -1535,12 +1642,12 @@ export default function GameBoard({
               alignItems: "flex-end",
               justifyContent: "center",
               minWidth: "max-content",
-              paddingLeft:  isCompactBoard ? 16 : 24,
-              paddingRight: isCompactBoard ? 16 : 24,
-              paddingTop:   isCompactBoard ? 12 : 16,
+              paddingLeft:  isCompactBoard ? (isNarrowMobile ? 8 : 16) : 24,
+              paddingRight: isCompactBoard ? (isNarrowMobile ? 8 : 16) : 24,
+              paddingTop:   isCompactBoard ? (isNarrowMobile ? 8 : 12) : 16,
               paddingBottom: 0,
               height: isCompactBoard
-                ? `${Math.round(122 * handCardScale) + 28}px`
+                ? `${Math.round(122 * handCardScale) + (isNarrowMobile ? 20 : 28)}px`
                 : `${Math.round(122 * handCardScale) + 36}px`,
               overflow: "visible",
             }}
@@ -1636,12 +1743,12 @@ export default function GameBoard({
             alignItems: "center",
             gap: 10,
             padding: footerPadding,
-            minHeight: barHeight,
+            minHeight: isNarrowMobile ? 58 : barHeight,
             position: "relative",
             zIndex: 320,
             background: "var(--ui-bg)",
             borderTop: "1px solid var(--ui-line)",
-            flexWrap: "nowrap",
+            flexWrap: isNarrowMobile ? "wrap" : "nowrap",
           }}>
             {/* Name */}
             <span style={{
@@ -1656,7 +1763,7 @@ export default function GameBoard({
             {/* Turn status */}
             <span style={{
               fontFamily: "'Courier Prime', monospace",
-              fontSize: isCompactBoard ? 9 : 10,
+              fontSize: isNarrowMobile ? 8 : isCompactBoard ? 9 : 10,
               letterSpacing: "0.1em",
               textTransform: "uppercase",
               color: "var(--ui-muted)",
@@ -1673,18 +1780,6 @@ export default function GameBoard({
               }}>UNO</span>
             )}
 
-            {unoReady && (
-              <span style={{
-                fontFamily: "'Courier Prime', monospace",
-                fontSize: 8,
-                fontWeight: 700,
-                letterSpacing: "0.14em",
-                textTransform: "uppercase",
-                color: "var(--ui-accent-red)",
-                flexShrink: 0,
-              }}>say uno now</span>
-            )}
-
             {/* Session wins */}
             {(scores[localPlayer.name] ?? 0) > 0 && (
               <span style={{
@@ -1694,72 +1789,63 @@ export default function GameBoard({
             )}
 
             {/* Separator dot */}
-            <span style={{ color: "var(--ui-line)", flexShrink: 0 }}>·</span>
+            {!isNarrowMobile && <span style={{ color: "var(--ui-line)", flexShrink: 0 }}>·</span>}
 
             {/* Hint — takes remaining space, truncates if needed */}
-            <span style={{
-              fontFamily: "'Courier Prime', monospace",
-              fontSize: isCompactBoard ? 9 : 10,
-              letterSpacing: "0.06em",
-              textTransform: "uppercase",
-              color: "var(--ui-muted)",
-              flex: 1,
-              minWidth: 0,
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-            }}>{hint}</span>
+            {!isNarrowMobile && (
+              <span style={{
+                fontFamily: "'Courier Prime', monospace",
+                fontSize: isCompactBoard ? 9 : 10,
+                letterSpacing: "0.06em",
+                textTransform: "uppercase",
+                color: "var(--ui-muted)",
+                flex: 1,
+                minWidth: 0,
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}>{hint}</span>
+            )}
 
             <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
-              {unoButtonVisible && (
-                <button
-                  type="button"
-                  onClick={unoReady ? declareUno : undefined}
-                  disabled={!unoReady || turnTransitionLocked}
-                  className="uno-btn"
-                  style={{
-                    fontFamily: "'Bebas Neue', cursive",
-                    fontSize: isCompactBoard ? 22 : 26,
-                    letterSpacing: "0.1em",
-                    background: unoReady ? "var(--ui-accent-red)" : "var(--ui-surface)",
-                    color: unoReady ? "#fff" : "var(--ui-muted)",
-                    border: unoReady ? "1px solid var(--ui-accent-red)" : "1px solid var(--ui-line)",
-                    padding: isCompactBoard ? "5px 12px 4px" : "7px 16px 6px",
-                    cursor: unoReady ? "pointer" : "default",
-                    opacity: unoReady ? 1 : 0.62,
-                    animation: unoReady ? "blink 1.2s step-end infinite" : "none",
-                    lineHeight: 1,
-                  }}
-                  title={
-                    game.rules.mustDeclareUno
-                      ? (unoReady ? "Say UNO" : "UNO can be declared when you have 2 or 1 cards on your turn")
-                      : "UNO declaration is disabled in current rules"
-                  }
-                >UNO</button>
-              )}
-
               {showCountdown && (
                 <div title="Turn timer" style={{
                 border: "none",
                 background: timerUrgent
-                  ? "color-mix(in srgb, var(--ui-accent-red) 74%, var(--ui-bg) 26%)"
-                  : "color-mix(in srgb, var(--ui-accent-blue) 36%, var(--ui-surface) 64%)",
-                color: timerUrgent ? "#fff8f0" : "var(--ui-text)",
-                padding: isCompactBoard ? "3px 10px 2px" : "4px 12px 3px",
-                minWidth: isCompactBoard ? 44 : 52,
+                  ? "var(--ui-accent-red)"
+                  : "var(--ui-accent-blue)",
+                color: "#fff8f0",
+                padding: isNarrowMobile ? "2px 8px 1px" : isCompactBoard ? "3px 10px 2px" : "4px 12px 3px",
+                minWidth: isNarrowMobile ? 38 : isCompactBoard ? 44 : 52,
                 textAlign: "center",
-                boxShadow: timerUrgent ? "0 0 0 1px color-mix(in srgb, var(--ui-accent-red) 72%, #000 28%), 0 6px 16px rgba(192,57,43,0.38)" : "0 4px 12px rgba(26,15,0,0.18)",
+                boxShadow: timerUrgent
+                  ? "0 0 0 1px color-mix(in srgb, var(--ui-accent-red) 72%, #000 28%), 0 6px 16px rgba(192,57,43,0.38)"
+                  : "0 0 0 1px color-mix(in srgb, var(--ui-accent-blue) 72%, #000 28%), 0 6px 16px rgba(26,79,138,0.30)",
                 animation: timerUrgent ? "timerPulse 0.75s ease-in-out infinite" : "none",
               }}>
                 <span style={{
                   fontFamily: "'Bebas Neue', cursive",
-                  fontSize: isCompactBoard ? 24 : 30,
+                  fontSize: isNarrowMobile ? 20 : isCompactBoard ? 24 : 30,
                   lineHeight: 1,
                   letterSpacing: "0.04em",
                 }}>{turnCountdownSeconds}</span>
                 </div>
               )}
             </div>
+
+            {isNarrowMobile && (
+              <span style={{
+                width: "100%",
+                fontFamily: "'Courier Prime', monospace",
+                fontSize: 8,
+                letterSpacing: "0.06em",
+                textTransform: "uppercase",
+                color: "var(--ui-muted)",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}>{hint}</span>
+            )}
           </div>
 
         </div>
@@ -1800,30 +1886,47 @@ export default function GameBoard({
         </div>
       )}
 
-      {isPortraitMobile && !winner && (
+      {pendingWild && <ColorPicker onSelect={confirmWildColor} onCancel={cancelWild} />}
+
+      {!pendingWild && wildPickerPlayerName && (
         <div style={{
-          position: "fixed", inset: 0, zIndex: 85, background: "var(--ui-bg)",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          padding: 20, textAlign: "center",
+          position: "fixed",
+          inset: 0,
+          zIndex: 61,
+          background: "color-mix(in srgb, var(--ui-bg) 22%, #000 8%)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: 24,
+          pointerEvents: "none",
         }}>
-          <div style={{ display: "grid", gap: 12, maxWidth: 420 }}>
-            <p style={{ margin: 0, fontFamily: "'Bebas Neue', cursive", fontSize: 38, letterSpacing: "0.05em", color: "var(--ui-text)" }}>
-              Rotate To Landscape
-            </p>
-            <p style={{ margin: 0, fontFamily: "'Courier Prime', monospace", fontSize: 12, letterSpacing: "0.04em", color: "var(--ui-muted)", lineHeight: 1.6 }}>
-              This board is optimized for wide layout. Rotate your phone sideways for the best play experience.
-            </p>
-            <button onClick={requestLandscapeMode} style={{
-              border: "none", background: "var(--ui-text)", color: "var(--ui-bg)",
-              padding: "12px 16px", cursor: "pointer",
-              fontSize: 18, letterSpacing: "0.1em", textTransform: "uppercase",
+          <div style={{
+            width: "min(460px, 100%)",
+            background: "var(--ui-surface)",
+            border: "1px solid var(--ui-line)",
+            padding: "24px 20px",
+            textAlign: "center",
+            display: "grid",
+            gap: 8,
+          }}>
+            <p style={{
+              margin: 0,
+              fontFamily: "'Courier Prime', monospace",
+              fontSize: 10,
+              letterSpacing: "0.18em",
+              textTransform: "uppercase",
+              color: "var(--ui-muted)",
+            }}>Color selection</p>
+            <p style={{
+              margin: 0,
               fontFamily: "'Bebas Neue', cursive",
-            }}>Rotate / Fullscreen</button>
+              fontSize: 32,
+              letterSpacing: "0.05em",
+              color: "var(--ui-text)",
+            }}>{wildPickerPlayerName} is choosing a color</p>
           </div>
         </div>
       )}
-
-      {pendingWild && <ColorPicker onSelect={confirmWildColor} onCancel={cancelWild} />}
 
       {showUnoFlash && (
         <div style={{ position: "fixed", inset: 0, zIndex: 86, pointerEvents: "none" }}>
@@ -1835,7 +1938,7 @@ export default function GameBoard({
             color: "var(--ui-accent-red)",
             textShadow: "0 10px 26px rgba(0,0,0,0.34), 0 0 24px color-mix(in srgb, var(--ui-accent-red) 72%, var(--ui-accent-yellow) 28%)",
             animation: "unoFlashPop 0.9s cubic-bezier(0.22,1,0.36,1) forwards",
-          }}>UNO!</div>
+          }}>UNO</div>
         </div>
       )}
 

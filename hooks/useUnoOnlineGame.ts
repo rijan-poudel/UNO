@@ -7,21 +7,94 @@ import type { Card, CardColor } from '../types/card';
 import type { GameRules } from '../types/rules';
 import type { Ack, FriendInvite, MultiplayerAction, RoomSnapshot } from '../types/multiplayer';
 import { getPlayableCards } from '../lib/gameRules';
-import { getBotMove, getBotPreferredColor } from '../lib/botSupport';
+import { getBotPreferredColor } from '../lib/botSupport';
 
 const HUMAN_IDLE_TIMEOUT_MS = 12000;
 const HUMAN_IDLE_AFTER_DRAW_TIMEOUT_MS = 4500;
 const HUMAN_IDLE_WILD_PICK_TIMEOUT_MS = 3500;
+const AUTO_PASS_AFTER_DRAW_MS = 2200;
 const ONLINE_DEVICE_ID_KEY = 'uno.online.deviceId';
 const ONLINE_FRIEND_CODE_KEY = 'uno.online.friendCode';
 const ONLINE_RECENT_ROOMS_KEY = 'uno.online.recentRooms';
+const ONLINE_FRIENDS_KEY = 'uno.online.friends';
 const MAX_RECENT_ROOMS = 8;
+const MAX_FRIENDS = 16;
 
 interface RecentRoomEntry {
   roomId: string;
   label: string;
   lastVisitedAt: number;
   lastPlayerName: string;
+}
+
+interface SavedFriendEntry {
+  friendCode: string;
+  name: string;
+  lastSeenAt: number;
+}
+
+interface OutgoingInvitePending {
+  inviteId: string;
+  targetFriendCode: string;
+  targetName?: string;
+}
+
+function normalizeFriendCode(value: string): string {
+  return value.trim().toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 8);
+}
+
+function loadSavedFriends(): SavedFriendEntry[] {
+  if (typeof window === 'undefined') return [];
+
+  try {
+    const raw = window.localStorage.getItem(ONLINE_FRIENDS_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw) as unknown;
+    if (!Array.isArray(parsed)) return [];
+
+    return parsed
+      .filter((item): item is SavedFriendEntry => {
+        if (typeof item !== 'object' || item === null) return false;
+        const candidate = item as Partial<SavedFriendEntry>;
+        return typeof candidate.friendCode === 'string'
+          && typeof candidate.name === 'string'
+          && typeof candidate.lastSeenAt === 'number';
+      })
+      .map((item) => ({
+        friendCode: normalizeFriendCode(item.friendCode),
+        name: item.name.trim().slice(0, 20),
+        lastSeenAt: item.lastSeenAt,
+      }))
+      .filter((item) => Boolean(item.friendCode))
+      .sort((a, b) => b.lastSeenAt - a.lastSeenAt)
+      .slice(0, MAX_FRIENDS);
+  } catch {
+    return [];
+  }
+}
+
+function persistAcceptedFriend(rawCode: string, rawName?: string): void {
+  if (typeof window === 'undefined') return;
+
+  const code = normalizeFriendCode(rawCode);
+  if (!code) return;
+
+  const prev = loadSavedFriends();
+  const existing = prev.find((entry) => entry.friendCode === code);
+  const next = [
+    {
+      friendCode: code,
+      name: (rawName?.trim() || existing?.name || code).slice(0, 20),
+      lastSeenAt: Date.now(),
+    },
+    ...prev.filter((entry) => entry.friendCode !== code),
+  ].slice(0, MAX_FRIENDS);
+
+  try {
+    window.localStorage.setItem(ONLINE_FRIENDS_KEY, JSON.stringify(next));
+  } catch {
+    // Ignore storage errors.
+  }
 }
 
 function getOrCreateDeviceId(): string {
@@ -136,7 +209,7 @@ interface FeedState {
   playerId: string | null;
   friendCode: string;
   incomingInvites: FriendInvite[];
-  pendingWild: Card | null;
+  outgoingInvites: OutgoingInvitePending[];
   drawnThisTurn: boolean;
   log: string[];
   error: string | null;
@@ -148,10 +221,18 @@ function describeAction(game: GameState): string {
   const name = (id: string) => game.players.find((p) => p.id === id)?.name ?? id;
 
   switch (action.type) {
-    case 'play':
+    case 'play': {
+      const extras: string[] = [];
+      if (action.discardAllCount && action.discardAllCount > 0) {
+        extras.push(`discarded ${action.discardAllCount} extra`);
+      }
+      if (action.shuffledHands) {
+        extras.push('shuffled all hands');
+      }
       return `${name(action.playerId)} played ${action.card.color} ${action.card.value}${
         action.chosenColor ? ` -> chose ${action.chosenColor}` : ''
-      }`;
+      }${extras.length ? ` (${extras.join(', ')})` : ''}`;
+    }
     case 'draw':
       return `${name(action.playerId)} drew ${action.count} card${action.count !== 1 ? 's' : ''}`;
     case 'pass':
@@ -176,7 +257,7 @@ export function useUnoOnlineGame() {
     playerId: null,
     friendCode,
     incomingInvites: [],
-    pendingWild: null,
+    outgoingInvites: [],
     drawnThisTurn: false,
     log: [],
     error: null,
@@ -256,7 +337,7 @@ export function useUnoOnlineGame() {
         room: null,
         game: null,
         playerId: null,
-        pendingWild: null,
+        outgoingInvites: [],
         drawnThisTurn: false,
         log: [],
         error: payload?.message ?? 'You were removed from the room.',
@@ -277,6 +358,30 @@ export function useUnoOnlineGame() {
       setState((prev) => ({
         ...prev,
         incomingInvites: prev.incomingInvites.filter((invite) => invite.inviteId !== payload.inviteId),
+        outgoingInvites: prev.outgoingInvites.filter((invite) => invite.inviteId !== payload.inviteId),
+      }));
+    });
+
+    socket.on('friend:invite:accepted', (payload?: {
+      inviteId?: string;
+      targetFriendCode?: string;
+      targetName?: string;
+    }) => {
+      if (!payload?.inviteId || !payload?.targetFriendCode) return;
+      persistAcceptedFriend(payload.targetFriendCode, payload.targetName);
+      setState((prev) => ({
+        ...prev,
+        outgoingInvites: prev.outgoingInvites.filter((invite) => invite.inviteId !== payload.inviteId),
+        log: [`${payload.targetName ?? payload.targetFriendCode} accepted your invite`, ...prev.log].slice(0, 30),
+      }));
+    });
+
+    socket.on('friend:invite:declined', (payload?: { inviteId?: string; targetFriendCode?: string }) => {
+      if (!payload?.inviteId) return;
+      setState((prev) => ({
+        ...prev,
+        outgoingInvites: prev.outgoingInvites.filter((invite) => invite.inviteId !== payload.inviteId),
+        log: [`${payload.targetFriendCode ?? 'Friend'} declined invite`, ...prev.log].slice(0, 30),
       }));
     });
 
@@ -442,6 +547,14 @@ export function useUnoOnlineGame() {
       room: ack.data.room,
       game: ack.data.room.game,
       playerId: ack.data.playerId,
+      outgoingInvites: [
+        {
+          inviteId: ack.data.invite.inviteId,
+          targetFriendCode: ack.data.invite.toFriendCode,
+          targetName: undefined,
+        },
+        ...prev.outgoingInvites.filter((invite) => invite.inviteId !== ack.data.invite.inviteId),
+      ].slice(0, 10),
       error: null,
       log: [`Invite sent to ${targetFriendCode.toUpperCase()}`, ...prev.log].slice(0, 30),
     }));
@@ -449,6 +562,7 @@ export function useUnoOnlineGame() {
   }, [callAck, deviceId, friendCode]);
 
   const acceptFriendInvite = useCallback(async (inviteId: string, playerName: string) => {
+    const acceptedInvite = state.incomingInvites.find((invite) => invite.inviteId === inviteId) ?? null;
     const ack = await callAck<{ room: RoomSnapshot; playerId: string }>('friend:invite:accept', {
       inviteId,
       playerName,
@@ -469,8 +583,13 @@ export function useUnoOnlineGame() {
       error: null,
       log: [`Joined ${ack.data.room.roomId} from invite`, ...prev.log].slice(0, 30),
     }));
+
+    if (acceptedInvite) {
+      persistAcceptedFriend(acceptedInvite.fromFriendCode, acceptedInvite.fromName);
+    }
+
     return true;
-  }, [callAck, deviceId, friendCode]);
+  }, [callAck, deviceId, friendCode, state.incomingInvites]);
 
   const declineFriendInvite = useCallback(async (inviteId: string) => {
     const ack = await callAck<{ inviteId: string }>('friend:invite:decline', { inviteId });
@@ -501,7 +620,7 @@ export function useUnoOnlineGame() {
       room: null,
       game: null,
       playerId: null,
-      pendingWild: null,
+      outgoingInvites: [],
       drawnThisTurn: false,
       log: [],
       error: null,
@@ -521,6 +640,22 @@ export function useUnoOnlineGame() {
       setState((prev) => ({ ...prev, error: ack.error }));
     }
   }, [callAck, state.room]);
+
+  const checkFriendOnline = useCallback(async (friendCodes: string[]) => {
+    const normalized = Array.from(new Set(friendCodes.map((code) => normalizeFriendCode(code)).filter(Boolean)));
+    if (!normalized.length) return {} as Record<string, boolean>;
+
+    const ack = await callAck<{ statuses: Record<string, boolean> }>('friend:status', {
+      friendCodes: normalized,
+    });
+
+    if (!ack.ok) {
+      setState((prev) => ({ ...prev, error: ack.error }));
+      return {} as Record<string, boolean>;
+    }
+
+    return ack.data.statuses;
+  }, [callAck]);
 
   const game = state.game;
   const localPlayerIndex = useMemo(() => {
@@ -543,6 +678,19 @@ export function useUnoOnlineGame() {
   );
 
   const canPass = state.drawnThisTurn && (game?.pendingDraw ?? 0) === 0;
+  const pendingColorChoice = state.room?.pendingColorChoice ?? null;
+  const pendingWild = useMemo(() => {
+    if (!pendingColorChoice || !game || !state.playerId) return null;
+    if (pendingColorChoice.playerId !== state.playerId) return null;
+    const localSeat = game.players.findIndex((player) => player.id === state.playerId);
+    if (localSeat < 0) return null;
+    return game.players[localSeat].hand.find((card) => card.id === pendingColorChoice.cardId) ?? null;
+  }, [pendingColorChoice, game, state.playerId]);
+
+  const wildPickerPlayerName = useMemo(() => {
+    if (!pendingColorChoice || !state.room) return null;
+    return state.room.players.find((player) => player.playerId === pendingColorChoice.playerId)?.name ?? null;
+  }, [pendingColorChoice, state.room]);
   const hasPendingStackOption = !!(
     game && localPlayer && isLocalTurn && game.pendingDraw > 0 && playableCardIds.size > 0
   );
@@ -555,7 +703,7 @@ export function useUnoOnlineGame() {
 
     const timer = window.setTimeout(() => {
       void sendAction({ type: 'pass' });
-    }, 900);
+    }, AUTO_PASS_AFTER_DRAW_MS);
 
     return () => window.clearTimeout(timer);
   }, [
@@ -571,23 +719,20 @@ export function useUnoOnlineGame() {
   const selectCard = useCallback((card: Card) => {
     if (!game) return;
     if (card.color === 'wild') {
-      setState((prev) => ({ ...prev, pendingWild: card }));
+      void sendAction({ type: 'prepareWild', cardId: card.id });
       return;
     }
     void sendAction({ type: 'play', cardId: card.id });
   }, [game, sendAction]);
 
   const confirmWildColor = useCallback((color: CardColor) => {
-    setState((prev) => {
-      if (!prev.pendingWild) return prev;
-      void sendAction({ type: 'play', cardId: prev.pendingWild.id, chosenColor: color });
-      return { ...prev, pendingWild: null };
-    });
-  }, [sendAction]);
+    if (!pendingWild) return;
+    void sendAction({ type: 'play', cardId: pendingWild.id, chosenColor: color });
+  }, [pendingWild, sendAction]);
 
   const cancelWild = useCallback(() => {
-    setState((prev) => ({ ...prev, pendingWild: null }));
-  }, []);
+    void sendAction({ type: 'cancelWildChoice' });
+  }, [sendAction]);
 
   const drawCard = useCallback(() => {
     void sendAction({ type: 'draw' });
@@ -617,7 +762,7 @@ export function useUnoOnlineGame() {
   useEffect(() => {
     if (!state.connected || !game || game.winnerId || !localPlayer || !isLocalTurn) return;
 
-    const timeoutMs = state.pendingWild
+    const timeoutMs = pendingWild
       ? HUMAN_IDLE_WILD_PICK_TIMEOUT_MS
       : state.drawnThisTurn
         ? HUMAN_IDLE_AFTER_DRAW_TIMEOUT_MS
@@ -625,10 +770,9 @@ export function useUnoOnlineGame() {
 
     const timer = setTimeout(() => {
       // Wild chosen but color not confirmed: auto-pick preferred color.
-      if (state.pendingWild) {
+      if (pendingWild) {
         const color = getBotPreferredColor(localPlayer.hand);
-        setState((prev) => ({ ...prev, pendingWild: null }));
-        void sendAction({ type: 'play', cardId: state.pendingWild.id, chosenColor: color });
+        void sendAction({ type: 'play', cardId: pendingWild.id, chosenColor: color });
         return;
       }
 
@@ -653,8 +797,8 @@ export function useUnoOnlineGame() {
     return () => clearTimeout(timer);
   }, [
     state.connected,
-    state.pendingWild,
     state.drawnThisTurn,
+    pendingWild,
     game,
     localPlayer,
     localPlayerIndex,
@@ -669,7 +813,8 @@ export function useUnoOnlineGame() {
   return {
     game,
     localPlayerIndex,
-    pendingWild: state.pendingWild,
+    pendingWild,
+    wildPickerPlayerName,
     drawnThisTurn: state.drawnThisTurn,
     botThinking: false,
     log: state.log,
@@ -694,7 +839,9 @@ export function useUnoOnlineGame() {
     error: state.error,
     friendCode,
     incomingInvites: state.incomingInvites,
+    outgoingInvites: state.outgoingInvites,
     syncPresence,
+    checkFriendOnline,
     createRoom,
     joinRoom,
     startOnlineGame,

@@ -13,8 +13,10 @@ export type CardValue =
   | 'skip'
   | 'reverse'
   | 'draw2'
+  | 'discardAll'
   | 'wild'
-  | 'wild4';
+  | 'wild4'
+  | 'shuffle';
 
 /** A single UNO card. IDs are unique within a deck and stable across turns. */
 export interface Card {
@@ -33,7 +35,7 @@ export const NUMBER_VALUES: ReadonlyArray<CardValue> = [
 ];
 
 export const ACTION_VALUES: ReadonlyArray<CardValue> = [
-  'skip', 'reverse', 'draw2', 'wild', 'wild4',
+  'skip', 'reverse', 'draw2', 'discardAll', 'wild', 'wild4', 'shuffle',
 ];
 
 export const DRAW_VALUES: ReadonlyArray<CardValue> = ['draw2', 'wild4'];

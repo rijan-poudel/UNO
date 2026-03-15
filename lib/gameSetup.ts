@@ -94,7 +94,12 @@ export function initializeGame(
   }));
 
   // ── 4. Create and shuffle deck ────────────────────────────────────────────
-  let deck = shuffleDeck(createStandardUnoDeck());
+  let deck = createStandardUnoDeck().filter((card) => {
+    if (card.value === 'discardAll' && !mergedRules.allowDiscardAll) return false;
+    if (card.value === 'shuffle' && !mergedRules.allowShuffleCard) return false;
+    return true;
+  });
+  deck = shuffleDeck(deck);
 
   // ── 5. Deal starting hands ────────────────────────────────────────────────
   // Deal one card at a time around the table, matching physical UNO dealing.

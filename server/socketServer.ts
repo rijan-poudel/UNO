@@ -61,6 +61,7 @@ interface ServerRoom {
   players: ServerRoomPlayer[];
   started: boolean;
   game: RoomSnapshot['game'];
+  pendingColorChoice: RoomSnapshot['pendingColorChoice'];
 }
 
 interface PresenceRecord {
@@ -122,6 +123,7 @@ function toSnapshot(room: ServerRoom): RoomSnapshot {
     })),
     started: room.started,
     game: room.game,
+    pendingColorChoice: room.pendingColorChoice,
   };
 }
 
@@ -138,6 +140,7 @@ function createRoomForPlayer(socketId: string, playerName: string, deviceId: str
     players: [{ playerId, socketId, name: playerName, connected: true, deviceId, isBot: false }],
     started: false,
     game: null,
+    pendingColorChoice: null,
   };
 
   rooms.set(roomId, room);
@@ -236,6 +239,13 @@ function removeInvite(inviteId: string, ioServer: Server): void {
   }
 }
 
+function findSenderSocketIdForInvite(invite: PendingInviteRecord): string | null {
+  const senderMembership = Array.from(playerBySocket.entries()).find(([, membership]) => (
+    membership.playerId === invite.fromPlayerId && membership.roomId === invite.roomId
+  ));
+  return senderMembership ? senderMembership[0] : null;
+}
+
 function removeInvitesForRoom(roomId: string, ioServer: Server): void {
   for (const invite of pendingInvites.values()) {
     if (invite.roomId === roomId) {
@@ -326,12 +336,60 @@ function handleGameAction(room: ServerRoom, socketId: string, payload: RoomActio
 
   const { actorIndex } = ensureActorTurn(room, socketId);
   const state = room.game;
+  const activeChoice = room.pendingColorChoice;
+  const actorPlayerId = state.players[actorIndex]?.id;
 
   const action = payload.action;
 
+  if (activeChoice && activeChoice.playerId !== actorPlayerId) {
+    throw new Error('Waiting for active player to choose a color.');
+  }
+
+  if (activeChoice && action.type !== 'play' && action.type !== 'cancelWildChoice') {
+    throw new Error('Choose a color for the selected wild card first.');
+  }
+
   switch (action.type) {
+    case 'prepareWild': {
+      const card = state.players[actorIndex]?.hand.find((entry) => entry.id === action.cardId);
+      if (!card) {
+        throw new Error('Selected card is not in your hand.');
+      }
+      if (card.color !== 'wild') {
+        throw new Error('Only wild-style cards can open color picker.');
+      }
+      if (!canPlayCard(card, state, actorIndex)) {
+        throw new Error('That card cannot be played right now.');
+      }
+
+      room.pendingColorChoice = {
+        playerId: state.players[actorIndex].id,
+        cardId: card.id,
+        cardValue: card.value,
+      };
+      break;
+    }
+    case 'cancelWildChoice': {
+      if (!activeChoice) {
+        break;
+      }
+      if (activeChoice.playerId !== actorPlayerId) {
+        throw new Error('Only the active player can cancel color selection.');
+      }
+      room.pendingColorChoice = null;
+      break;
+    }
     case 'play': {
+      if (activeChoice) {
+        if (action.cardId !== activeChoice.cardId) {
+          throw new Error('You must finish the selected wild card first.');
+        }
+        if (!action.chosenColor || action.chosenColor === 'wild') {
+          throw new Error('Choose a color before playing this card.');
+        }
+      }
       room.game = playCard(state, actorIndex, action.cardId, action.chosenColor);
+      room.pendingColorChoice = null;
       break;
     }
     case 'draw': {
@@ -340,10 +398,12 @@ function handleGameAction(room: ServerRoom, socketId: string, payload: RoomActio
       } else {
         room.game = drawOneCard(state, actorIndex);
       }
+      room.pendingColorChoice = null;
       break;
     }
     case 'pass': {
       room.game = passTurn(state, actorIndex);
+      room.pendingColorChoice = null;
       break;
     }
     case 'sayUno': {
@@ -380,6 +440,8 @@ function runOfflineBotTurns(room: ServerRoom): void {
     if (roomPlayer?.connected) {
       break;
     }
+
+    room.pendingColorChoice = null;
 
     const currentIndex = state.currentPlayerIndex;
     let botState: GameState = state;
@@ -447,6 +509,28 @@ const io = new Server(httpServer, {
 });
 
 io.on('connection', (socket) => {
+  socket.on('friend:status', (
+    payload: { friendCodes?: string[] },
+    reply?: (ack: Ack<{ statuses: Record<string, boolean> }>) => void,
+  ) => {
+    try {
+      const codes = Array.isArray(payload.friendCodes)
+        ? payload.friendCodes
+        : [];
+
+      const statuses: Record<string, boolean> = {};
+      for (const code of codes) {
+        const normalized = normalizeFriendCode(code ?? '');
+        if (!normalized) continue;
+        statuses[normalized] = presenceByFriendCode.has(normalized);
+      }
+
+      reply?.({ ok: true, data: { statuses } });
+    } catch (error) {
+      reply?.(ackError((error as Error).message));
+    }
+  });
+
   socket.on('presence:update', (payload: PresencePayload, reply?: (ack: Ack<{ friendCode: string }>) => void) => {
     try {
       const friendCode = upsertPresence(socket.id, payload);
@@ -646,7 +730,16 @@ io.on('connection', (socket) => {
         : joinRoomAsPlayer(room, socket.id, playerName, deviceId);
       socket.join(room.roomId);
 
+      const senderSocketId = findSenderSocketIdForInvite(invite);
       removeInvite(invite.inviteId, io);
+      if (senderSocketId) {
+        io.to(senderSocketId).emit('friend:invite:accepted', {
+          inviteId: invite.inviteId,
+          roomId: invite.roomId,
+          targetFriendCode: invite.toFriendCode,
+          targetName: playerName,
+        });
+      }
       const snapshot = toSnapshot(room);
       broadcastRoom(io, room);
       reply?.({ ok: true, data: { room: snapshot, playerId } });
@@ -669,7 +762,15 @@ io.on('connection', (socket) => {
         return;
       }
 
+      const senderSocketId = findSenderSocketIdForInvite(invite);
       removeInvite(payload.inviteId, io);
+      if (senderSocketId) {
+        io.to(senderSocketId).emit('friend:invite:declined', {
+          inviteId: invite.inviteId,
+          roomId: invite.roomId,
+          targetFriendCode: invite.toFriendCode,
+        });
+      }
       reply?.({ ok: true, data: { inviteId: payload.inviteId } });
     } catch (error) {
       reply?.(ackError((error as Error).message));
@@ -702,6 +803,7 @@ io.on('connection', (socket) => {
       }
 
       room.started = true;
+      room.pendingColorChoice = null;
       room.game = initializeGame(
         room.players.map((p) => p.name),
         payload.rules,

@@ -21,22 +21,30 @@ const CARD_COLORS: Record<string, { bg: string; text: string; border: string; ov
 };
 
 const VALUE_LABELS: Record<string, string> = {
-  skip: '⊘', reverse: '↺', draw2: '+2', wild: '★', wild4: '+4',
+  skip: '⊘', reverse: '↺', draw2: '+2', discardAll: 'ALL', wild: '★', wild4: '+4', shuffle: 'S',
 };
 
 function getDisplayValue(value: string): string {
   return VALUE_LABELS[value] ?? value;
 }
 
+function getCenterDisplayValue(value: string): string {
+  if (value === 'shuffle') return 'SHUFFLE';
+  return getDisplayValue(value);
+}
+
 function getAccessibleLabel(color: string, value: string): string {
   const colorName = color === 'wild' ? '' : color + ' ';
   const valueName: Record<string, string> = {
-    skip: 'skip', reverse: 'reverse', draw2: 'draw two', wild: 'wild', wild4: 'wild draw four',
+    skip: 'skip', reverse: 'reverse', draw2: 'draw two', discardAll: 'discard all', wild: 'wild', wild4: 'wild draw four', shuffle: 'wild shuffle',
   };
   return `${colorName}${valueName[value] ?? value}`;
 }
 
 function WildCenter({ value, s }: { value: string; s: number }) {
+  const displayValue = getCenterDisplayValue(value);
+  const fontSize = value === 'shuffle' ? Math.round(8 * s) : Math.round(13 * s);
+
   return (
     <div style={{
       position: 'relative', width: '68%', height: '68%',
@@ -54,10 +62,12 @@ function WildCenter({ value, s }: { value: string; s: number }) {
         transform: 'rotate(15deg)',
       }}>
         <span style={{
-          fontSize: Math.round(13 * s), fontWeight: 700, color: '#fff8f0',
+          fontSize,
+          fontWeight: 700,
+          color: '#fff8f0',
           fontFamily: "'Courier Prime', Courier, monospace", letterSpacing: '-0.02em',
         }}>
-          {getDisplayValue(value)}
+          {displayValue}
         </span>
       </div>
     </div>

@@ -88,6 +88,17 @@ export interface GameRules {
   /** The maximum number of players allowed in a game. */
   maxPlayers: number;
 
+  // ── Extra house rules ──────────────────────────────────────────────────────
+  /** If true, include and enable the Discard All card rule. */
+  allowDiscardAll: boolean;
+
+  /**
+   * If true, include and enable the Wild Shuffle Hands card rule.
+   * Playing this card shuffles all players' hands and re-deals from the
+   * next player seat, then applies chosen color.
+   */
+  allowShuffleCard: boolean;
+
   // ── Win condition ─────────────────────────────────────────────────────────
   /**
    * If false, a player may NOT win by playing an action or wild card as their
@@ -111,5 +122,7 @@ export const defaultRules: GameRules = {
   drawUntilPlayable: false,
   allowStartingActionCard: true,
   maxPlayers: 10,
+  allowDiscardAll: false,
+  allowShuffleCard: false,
   canFinishWithActionCard: true,
 };

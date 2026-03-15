@@ -89,6 +89,38 @@ function updatePlayer(
   };
 }
 
+function shuffleHandsStartingFrom(
+  state: GameState,
+  startIndex: number,
+): GameState {
+  const counts = state.players.map((player) => player.hand.length);
+  const pooled = shuffleDeck(state.players.flatMap((player) => player.hand));
+  const totalToDeal = pooled.length;
+
+  const dealtHands: Card[][] = state.players.map(() => []);
+  const remainingBySeat = [...counts];
+  let cursor = 0;
+  let seat = startIndex;
+
+  while (cursor < totalToDeal) {
+    if (remainingBySeat[seat] > 0) {
+      dealtHands[seat].push(pooled[cursor]);
+      remainingBySeat[seat] -= 1;
+      cursor += 1;
+    }
+    seat = (seat + state.direction + state.players.length) % state.players.length;
+  }
+
+  return {
+    ...state,
+    players: state.players.map((player, index) => ({
+      ...player,
+      hand: dealtHands[index],
+      saidUno: false,
+    })),
+  };
+}
+
 // ── Card effect resolution ────────────────────────────────────────────────────
 
 /**
@@ -161,6 +193,13 @@ function resolveCardEffect(
       });
     }
 
+    case 'shuffle': {
+      return advanceTurn({
+        ...state,
+        activeColor: chosenColor!,
+      });
+    }
+
     // ── Number cards ────────────────────────────────────────────────────────
     default: {
       // No special effect — advance to the next player normally.
@@ -226,11 +265,39 @@ export function playCard(
     chosenColor,
   };
 
+  let discardAllCount = 0;
+  let postPlayHand = [...newHand];
+  const discardExtra: Card[] = [];
+
+  const isDiscardAllCard = card.value === 'discardAll' && card.color !== 'wild';
+  if (state.rules.allowDiscardAll && isDiscardAllCard) {
+    const kept: Card[] = [];
+    for (const handCard of postPlayHand) {
+      if (handCard.color === card.color) {
+        discardExtra.push(handCard);
+      } else {
+        kept.push(handCard);
+      }
+    }
+    postPlayHand = kept;
+    discardAllCount = discardExtra.length;
+  }
+
+  const postPlayPlayer: Player = {
+    ...updatedPlayer,
+    hand: postPlayHand,
+    saidUno: postPlayHand.length === 1 ? updatedPlayer.saidUno : false,
+  };
+
+  if (discardAllCount > 0) {
+    lastAction.discardAllCount = discardAllCount;
+  }
+
   // Apply the card to the discard pile and update active color.
   let newState: GameState = {
     ...state,
-    players: state.players.map((p, i) => (i === playerIndex ? updatedPlayer : p)),
-    discardPile: [...state.discardPile, card],
+    players: state.players.map((p, i) => (i === playerIndex ? postPlayPlayer : p)),
+    discardPile: [...state.discardPile, card, ...discardExtra],
     activeColor: newActiveColor,
     // Clear pending draw only for non-draw cards; draw cards add to it in resolveCardEffect.
     pendingDraw: card.value === 'draw2' || card.value === 'wild4' ? state.pendingDraw : 0,
@@ -241,9 +308,21 @@ export function playCard(
   };
 
   // ── Win condition ────────────────────────────────────────────────────────
-  if (newHand.length === 0) {
+  if (postPlayHand.length === 0) {
     // Player is out of cards — they win! Turn is not advanced.
     return { ...newState, winnerId: player.id };
+  }
+
+  if (state.rules.allowShuffleCard && card.value === 'shuffle') {
+    const nextSeat = (playerIndex + state.direction + state.players.length) % state.players.length;
+    newState = shuffleHandsStartingFrom(newState, nextSeat);
+    newState = {
+      ...newState,
+      lastAction: {
+        ...(newState.lastAction.type === 'play' ? newState.lastAction : lastAction),
+        shuffledHands: true,
+      },
+    };
   }
 
   // ── Apply card effects and advance turn ──────────────────────────────────

@@ -97,19 +97,30 @@ export default function HomeHub({
     [busy, playerName, friendCodeInput],
   );
 
-  const rememberFriend = (rawCode: string) => {
+  const rememberFriend = (rawCode: string, rawName?: string) => {
     const code = normalizeCode(rawCode);
     if (!code) return;
     setFriends(prev => {
       const existing = prev.find(e => e.friendCode === code);
       const next = [
-        { friendCode: code, name: existing?.name || 'Friend', lastSeenAt: Date.now() },
+        {
+          friendCode: code,
+          name: (rawName?.trim() || existing?.name || code).slice(0, 20),
+          lastSeenAt: Date.now(),
+        },
         ...prev.filter(e => e.friendCode !== code),
       ].slice(0, MAX_FRIENDS);
       saveFriends(next);
       return next;
     });
   };
+
+  useEffect(() => {
+    if (!incomingInvites.length) return;
+    incomingInvites.forEach((invite) => {
+      rememberFriend(invite.fromFriendCode, invite.fromName);
+    });
+  }, [incomingInvites]);
 
   const removeFriend = (rawCode: string) => {
     const code = normalizeCode(rawCode);

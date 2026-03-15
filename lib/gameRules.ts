@@ -38,6 +38,9 @@ export function canPlayCard(
   const { activeColor, pendingDraw, pendingDrawType, rules, discardPile } = state;
   const topDiscard = discardPile[discardPile.length - 1];
 
+  if (card.value === 'discardAll' && !rules.allowDiscardAll) return false;
+  if (card.value === 'shuffle' && !rules.allowShuffleCard) return false;
+
   // Rule branch 2 — pending draw means the player must resolve it before playing,
   // UNLESS stacking rules permit a valid counter-card.
   if (pendingDraw > 0 && pendingDrawType !== null) {

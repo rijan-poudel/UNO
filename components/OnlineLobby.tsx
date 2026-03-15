@@ -11,6 +11,7 @@ const ONLINE_PLAYER_NAME_KEY = 'uno.online.playerName';
 const ONLINE_ROOM_CODE_KEY = 'uno.online.roomCode';
 const ONLINE_PANEL_KEY = 'uno.online.panel';
 const ONLINE_FRIENDS_KEY = 'uno.online.friends';
+const ONLINE_PREFILL_FRIEND_CODE_KEY = 'uno.online.prefill.friendCode';
 const MAX_FRIENDS = 16;
 
 interface FriendEntry {
@@ -81,11 +82,13 @@ interface OnlineLobbyProps {
   playerId: string | null;
   friendCode: string;
   incomingInvites: FriendInvite[];
+  outgoingInvites: Array<{ inviteId: string; targetFriendCode: string; targetName?: string }>;
   error: string | null;
   initialPanel?: 'create' | 'join';
   controls?: ReactNode;
   onBack?: () => void;
   onSyncPresence: (playerName: string) => Promise<boolean>;
+  onCheckFriendOnline: (friendCodes: string[]) => Promise<Record<string, boolean>>;
   onCreateRoom: (playerName: string) => Promise<boolean>;
   onJoinRoom: (roomId: string, playerName: string) => Promise<boolean>;
   onSendFriendInvite: (targetFriendCode: string, playerName: string) => Promise<boolean>;
@@ -103,11 +106,13 @@ export default function OnlineLobby({
   playerId,
   friendCode,
   incomingInvites,
+  outgoingInvites,
   error,
   initialPanel = 'create',
   controls,
   onBack,
   onSyncPresence,
+  onCheckFriendOnline,
   onCreateRoom,
   onJoinRoom,
   onSendFriendInvite,
@@ -123,6 +128,7 @@ export default function OnlineLobby({
   const [panel, setPanel] = useState<'create' | 'join'>('create');
   const [friendCodeInput, setFriendCodeInput] = useState('');
   const [friends, setFriends] = useState<FriendEntry[]>([]);
+  const [onlineMap, setOnlineMap] = useState<Record<string, boolean>>({});
   const [busy, setBusy] = useState(false);
 
   const displayName = playerName.trim() || 'Player 1';
@@ -142,6 +148,12 @@ export default function OnlineLobby({
       const savedPanel = window.localStorage.getItem(ONLINE_PANEL_KEY);
       if (savedPanel === 'join' || savedPanel === 'create') {
         setPanel(savedPanel);
+      }
+
+      const prefillFriendCode = window.localStorage.getItem(ONLINE_PREFILL_FRIEND_CODE_KEY);
+      if (prefillFriendCode && prefillFriendCode.trim()) {
+        setFriendCodeInput(prefillFriendCode.trim().toUpperCase().slice(0, 8));
+        window.localStorage.removeItem(ONLINE_PREFILL_FRIEND_CODE_KEY);
       }
 
       setFriends(loadFriends());
@@ -184,6 +196,31 @@ export default function OnlineLobby({
   }, [error]);
 
   useEffect(() => {
+    if (!friends.length) {
+      setOnlineMap({});
+      return;
+    }
+
+    let disposed = false;
+    const refreshStatuses = async () => {
+      const statuses = await onCheckFriendOnline(friends.map((friend) => friend.friendCode));
+      if (!disposed) {
+        setOnlineMap(statuses);
+      }
+    };
+
+    void refreshStatuses();
+    const timer = window.setInterval(() => {
+      void refreshStatuses();
+    }, 12000);
+
+    return () => {
+      disposed = true;
+      window.clearInterval(timer);
+    };
+  }, [friends, onCheckFriendOnline]);
+
+  useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const roomFromUrl = params.get('room');
     if (roomFromUrl) {
@@ -194,6 +231,15 @@ export default function OnlineLobby({
 
   const isHost = useMemo(() => room?.hostPlayerId === playerId, [room, playerId]);
   const isRoomFull = (room?.players.length ?? 0) >= 4;
+  const sortedFriends = useMemo(
+    () => [...friends].sort((a, b) => {
+      const aOnline = onlineMap[a.friendCode] ? 1 : 0;
+      const bOnline = onlineMap[b.friendCode] ? 1 : 0;
+      if (aOnline !== bOnline) return bOnline - aOnline;
+      return b.lastSeenAt - a.lastSeenAt;
+    }),
+    [friends, onlineMap],
+  );
 
   async function wrap(action: () => Promise<boolean>) {
     setBusy(true);
@@ -234,7 +280,7 @@ export default function OnlineLobby({
       const nextEntries = [
         {
           friendCode: normalizedCode,
-          name: (rawName?.trim() || existing?.name || 'Friend').slice(0, 20),
+          name: (rawName?.trim() || existing?.name || normalizedCode).slice(0, 20),
           lastSeenAt: Date.now(),
         },
         ...prev.filter((entry) => entry.friendCode !== normalizedCode),
@@ -257,7 +303,6 @@ export default function OnlineLobby({
     const normalizedCode = normalizeCode(targetCode);
     const invited = await onSendFriendInvite(normalizedCode, displayName);
     if (invited) {
-      rememberFriend(normalizedCode, targetName);
       toast.success(`Invite sent to ${targetName ?? normalizedCode}.`);
     }
     return invited;
@@ -428,59 +473,14 @@ export default function OnlineLobby({
         description={room
           ? 'Manage seats, room code, and invites before the match starts'
           : panel === 'join'
-            ? 'Join by room code or send an invite from your friends list'
-            : 'Create a room or invite friends directly from your saved list'}
+            ? 'Join by room code'
+            : 'Create a room'}
         onBack={onBack}
         trailing={room ? <CountBadge current={room.players.length} total={4} alert={isRoomFull} /> : undefined}
       />
 
       {!room && (
         <>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 8, borderTop: '1px solid var(--ui-line)', paddingTop: 12 }}>
-            <input
-              value={friendCodeInput}
-              onChange={(e) => setFriendCodeInput(e.target.value.toUpperCase())}
-              maxLength={8}
-              placeholder="FRIEND CODE"
-              className="setup-input"
-              style={{
-                background: 'transparent',
-                border: 'none',
-                borderBottom: '1px solid var(--ui-line)',
-                fontFamily: "'Courier Prime', monospace",
-                fontSize: 15,
-                fontWeight: 700,
-                color: 'var(--ui-text)',
-                padding: '2px 0',
-                width: '100%',
-                transition: 'border-bottom-color 0.12s',
-                textTransform: 'uppercase',
-              }}
-            />
-            <button
-              type="button"
-              disabled={!canSendInvite}
-              onClick={() => wrap(async () => {
-                const invited = await sendInviteToFriend(friendCodeInput.trim());
-                if (invited) {
-                  setFriendCodeInput('');
-                }
-                return invited;
-              })}
-              style={{
-                padding: '10px 14px',
-                border: '1px solid var(--ui-line)',
-                background: 'transparent',
-                color: 'var(--ui-text)',
-                fontSize: 11,
-                letterSpacing: '0.08em',
-                textTransform: 'uppercase',
-                cursor: canSendInvite ? 'pointer' : 'default',
-                opacity: canSendInvite ? 1 : 0.5,
-              }}
-            >Send Invite</button>
-          </div>
-
           <SegmentedToggle
             value={panel}
             onChange={setPanel}
@@ -593,19 +593,47 @@ export default function OnlineLobby({
             </div>
           )}
 
-          {friends.length > 0 && (
+          {outgoingInvites.length > 0 && (
+            <div style={{ display: 'grid', gap: 8, borderTop: '1px solid var(--ui-line)', paddingTop: 10 }}>
+              <p style={{ margin: 0, fontSize: 10, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--ui-muted)' }}>
+                Pending requests
+              </p>
+              {outgoingInvites.slice(0, 4).map((invite) => (
+                <div
+                  key={invite.inviteId}
+                  style={{
+                    border: '1px solid var(--ui-line)',
+                    background: 'transparent',
+                    color: 'var(--ui-text)',
+                    padding: '10px 12px',
+                    display: 'grid',
+                    gap: 6,
+                  }}
+                >
+                  <span style={{ fontFamily: "'Courier Prime', monospace", fontSize: 12, letterSpacing: '0.06em' }}>
+                    Waiting for {(invite.targetName ?? invite.targetFriendCode)} to accept...
+                  </span>
+                  <span style={{ fontSize: 10, color: 'var(--ui-muted)', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+                    Invite sent
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {sortedFriends.length > 0 && (
             <div style={{ display: 'grid', gap: 8, borderTop: '1px solid var(--ui-line)', paddingTop: 10 }}>
               <p style={{ margin: 0, fontSize: 10, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--ui-muted)' }}>
                 Friends
               </p>
-              {friends.slice(0, 8).map((friend) => (
+              {sortedFriends.map((friend) => (
                 <div
                   key={friend.friendCode}
                   style={{
                     border: '1px solid var(--ui-line)',
                     padding: '8px 10px',
                     display: 'grid',
-                    gridTemplateColumns: '1fr auto auto',
+                    gridTemplateColumns: '1fr auto auto auto',
                     gap: 8,
                     alignItems: 'center',
                   }}
@@ -619,20 +647,30 @@ export default function OnlineLobby({
                     </p>
                   </div>
 
+                  <span style={{
+                    fontFamily: "'Courier Prime', monospace",
+                    fontSize: 9,
+                    fontWeight: 700,
+                    letterSpacing: '0.1em',
+                    textTransform: 'uppercase',
+                    color: onlineMap[friend.friendCode] ? 'var(--ui-accent-green)' : 'var(--ui-muted)',
+                    whiteSpace: 'nowrap',
+                  }}>{onlineMap[friend.friendCode] ? 'Online' : 'Offline'}</span>
+
                   <button
                     type="button"
-                    disabled={busy || !displayName}
+                    disabled={busy || !displayName || !onlineMap[friend.friendCode]}
                     onClick={() => wrap(() => sendInviteToFriend(friend.friendCode, friend.name))}
                     style={{
                       padding: '7px 9px',
                       border: '1px solid var(--ui-line)',
                       background: 'transparent',
-                      color: 'var(--ui-text)',
+                      color: onlineMap[friend.friendCode] ? 'var(--ui-text)' : 'var(--ui-muted)',
                       fontSize: 10,
                       letterSpacing: '0.08em',
                       textTransform: 'uppercase',
-                      cursor: busy || !displayName ? 'default' : 'pointer',
-                      opacity: busy || !displayName ? 0.5 : 1,
+                      cursor: busy || !displayName || !onlineMap[friend.friendCode] ? 'default' : 'pointer',
+                      opacity: busy || !displayName || !onlineMap[friend.friendCode] ? 0.5 : 1,
                     }}
                   >Invite</button>
 
