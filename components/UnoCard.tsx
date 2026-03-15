@@ -44,6 +44,7 @@ function getAccessibleLabel(color: string, value: string): string {
 function WildCenter({ value, s }: { value: string; s: number }) {
   const displayValue = getCenterDisplayValue(value);
   const fontSize = value === 'shuffle' ? Math.round(8 * s) : Math.round(13 * s);
+  const isShuffle = value === 'shuffle';
 
   return (
     <div style={{
@@ -57,14 +58,14 @@ function WildCenter({ value, s }: { value: string; s: number }) {
       <div style={{ position: 'absolute', inset: 0, background: '#1e6b3a', clipPath: 'polygon(50% 50%, 100% 100%, 0 100%)' }} />
       <div style={{ position: 'absolute', inset: 0, background: '#d4a017', clipPath: 'polygon(50% 50%, 0 100%, 0 0)' }} />
       <div style={{
-        position: 'absolute', inset: '28%', borderRadius: '50%', background: '#1a0f00',
+        position: 'absolute', inset: '28%', borderRadius: '50%', background: isShuffle ? '#fff8f0' : '#1a0f00',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         transform: 'rotate(15deg)',
       }}>
         <span style={{
           fontSize,
           fontWeight: 700,
-          color: '#fff8f0',
+          color: isShuffle ? '#1a0f00' : '#fff8f0',
           fontFamily: "'Courier Prime', Courier, monospace", letterSpacing: '-0.02em',
         }}>
           {displayValue}

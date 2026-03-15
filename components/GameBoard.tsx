@@ -60,6 +60,57 @@ interface ActionFlashState {
   tone: ActionFlashTone;
 }
 
+type UiSfx =
+  | "cardPlay"
+  | "draw"
+  | "draw2"
+  | "wild4"
+  | "shuffleMotion"
+  | "skip"
+  | "reverse"
+  | "wild"
+  | "shuffle"
+  | "uno"
+  | "callOut"
+  | "deal"
+  | "win"
+  | "lose";
+
+const FILE_SFX_SOURCES: Partial<Record<UiSfx, string[]>> = {
+  draw2: ["/sfx/%2B2.wav", "/sfx/%2B4.wav"],
+  wild4: ["/sfx/%2B4.wav"],
+  reverse: ["/sfx/reverse.wav"],
+  skip: ["/sfx/skip.wav"],
+  win: ["/sfx/victory.wav"],
+  lose: ["/sfx/lost.wav"],
+};
+
+const FILE_SFX_VOLUME: Partial<Record<UiSfx, number>> = {
+  draw2: 0.34,
+  wild4: 0.34,
+  reverse: 0.3,
+  skip: 0.3,
+  win: 0.42,
+  lose: 0.38,
+};
+
+const SYNTH_SFX_GAIN: Partial<Record<UiSfx, number>> = {
+  cardPlay: 0.9,
+  draw: 0.85,
+  draw2: 0.9,
+  wild4: 0.85,
+  shuffleMotion: 0.7,
+  skip: 0.9,
+  reverse: 0.9,
+  wild: 0.88,
+  shuffle: 0.86,
+  uno: 0.9,
+  callOut: 0.9,
+  deal: 0.72,
+  win: 0.88,
+  lose: 0.82,
+};
+
 interface TravelAnimation {
   id: number;
   card: Card;
@@ -208,6 +259,48 @@ function ActionFlash({ text, tone }: { text: string; tone: ActionFlashTone }) {
         textShadow: "0 10px 26px rgba(0,0,0,0.30), 0 0 24px color-mix(in srgb, var(--ui-surface) 45%, var(--ui-bg) 55%)",
         animation: "actionFlashPop 1s cubic-bezier(0.22,1,0.36,1) forwards",
       }}>{text}</div>
+    </div>
+  );
+}
+
+function VictoryConfetti() {
+  const palette = ["#c0392b", "#d4a017", "#1e6b3a", "#1a4f8a", "#fff8f0"];
+  const pieces = Array.from({ length: 40 }, (_, i) => ({
+    id: i,
+    left: `${(i * 97) % 100}%`,
+    delay: `${(i % 9) * 0.11}s`,
+    duration: `${2.1 + ((i % 7) * 0.22)}s`,
+    color: palette[i % palette.length],
+    size: 8 + (i % 5),
+    rotate: (i * 29) % 360,
+  }));
+
+  return (
+    <div style={{
+      position: "fixed",
+      inset: 0,
+      zIndex: 58,
+      pointerEvents: "none",
+      overflow: "hidden",
+    }}>
+      {pieces.map((piece) => (
+        <span
+          key={piece.id}
+          style={{
+            position: "absolute",
+            left: piece.left,
+            top: "-12%",
+            width: piece.size,
+            height: piece.size * 2.4,
+            background: piece.color,
+            borderRadius: 2,
+            opacity: 0.92,
+            transform: `rotate(${piece.rotate}deg)`,
+            animation: `confettiFall ${piece.duration} linear ${piece.delay} infinite`,
+            boxShadow: "0 2px 8px rgba(0,0,0,0.16)",
+          }}
+        />
+      ))}
     </div>
   );
 }
@@ -440,6 +533,7 @@ export default function GameBoard({
   const [highlightedDrawnCardId, setHighlightedDrawnCardId] = useState<string | null>(null);
   const [drawDecisionCardId, setDrawDecisionCardId] = useState<string | null>(null);
   const [hoveredHandPosition, setHoveredHandPosition] = useState<number | null>(null);
+  const [hoveredCardId, setHoveredCardId] = useState<string | null>(null);
   const [animations, setAnimations] = useState<TravelAnimation[]>([]);
   const [turnCountdownSeconds, setTurnCountdownSeconds] = useState(0);
   const turnTransitionLocked = actionFlash !== null;
@@ -459,6 +553,8 @@ export default function GameBoard({
   const animationCounterRef = useRef(0);
   const dealAnimationKeyRef = useRef<string | null>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
+  const fileSfxRef = useRef<Record<string, HTMLAudioElement>>({});
+  const lastMotionSfxAtRef = useRef(0);
   const drawPileRef = useRef<HTMLButtonElement | null>(null);
   const discardPileRef = useRef<HTMLDivElement | null>(null);
   const localHandRef = useRef<HTMLDivElement | null>(null);
@@ -632,31 +728,137 @@ export default function GameBoard({
     selectCard(card);
   }, [selectCard]);
 
-  const playUiBeep = useCallback((kind: "normal" | "warn" | "win") => {
+  const playSynthSfx = useCallback((event: UiSfx) => {
     try {
       const AC = window.AudioContext || (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
       if (!AC) return;
       if (!audioCtxRef.current) audioCtxRef.current = new AC();
       const ctx = audioCtxRef.current;
+      if (ctx.state === "suspended") {
+        void ctx.resume();
+      }
       const now = ctx.currentTime;
+      const gainScale = SYNTH_SFX_GAIN[event] ?? 0.85;
 
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = "triangle";
-      osc.frequency.setValueAtTime(kind === "win" ? 740 : kind === "warn" ? 220 : 420, now);
-      if (kind === "win") osc.frequency.exponentialRampToValueAtTime(980, now + 0.12);
-      if (kind === "warn") osc.frequency.exponentialRampToValueAtTime(170, now + 0.12);
-      gain.gain.setValueAtTime(0.0001, now);
-      gain.gain.exponentialRampToValueAtTime(0.03, now + 0.015);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.14);
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start(now);
-      osc.stop(now + 0.15);
+      const playTone = (
+        at: number,
+        freq: number,
+        duration: number,
+        type: OscillatorType,
+        gainPeak: number,
+        slideTo?: number,
+      ) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, at);
+        if (slideTo) {
+          osc.frequency.exponentialRampToValueAtTime(slideTo, at + duration);
+        }
+        gain.gain.setValueAtTime(0.0001, at);
+        gain.gain.exponentialRampToValueAtTime(gainPeak * gainScale, at + Math.min(0.02, duration * 0.4));
+        gain.gain.exponentialRampToValueAtTime(0.0001, at + duration);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(at);
+        osc.stop(at + duration + 0.01);
+      };
+
+      switch (event) {
+        case "cardPlay":
+          playTone(now, 420, 0.08, "triangle", 0.024, 360);
+          break;
+        case "draw":
+          playTone(now, 270, 0.09, "sine", 0.02, 210);
+          break;
+        case "draw2":
+          playTone(now, 290, 0.08, "square", 0.02, 240);
+          playTone(now + 0.08, 240, 0.08, "square", 0.02, 190);
+          break;
+        case "wild4":
+          playTone(now, 360, 0.1, "sawtooth", 0.02, 220);
+          playTone(now + 0.11, 220, 0.12, "sawtooth", 0.022, 150);
+          break;
+        case "shuffleMotion":
+          playTone(now, 330, 0.055, "sawtooth", 0.016, 270);
+          playTone(now + 0.045, 260, 0.055, "sawtooth", 0.016, 320);
+          playTone(now + 0.09, 360, 0.06, "triangle", 0.014, 290);
+          break;
+        case "skip":
+          playTone(now, 640, 0.07, "square", 0.02);
+          playTone(now + 0.08, 520, 0.07, "square", 0.018);
+          break;
+        case "reverse":
+          playTone(now, 260, 0.09, "triangle", 0.02, 480);
+          playTone(now + 0.09, 480, 0.08, "triangle", 0.018, 300);
+          break;
+        case "wild":
+          playTone(now, 320, 0.08, "sine", 0.018, 520);
+          playTone(now + 0.09, 560, 0.09, "triangle", 0.018, 700);
+          break;
+        case "shuffle":
+          playTone(now, 280, 0.07, "sawtooth", 0.016, 460);
+          playTone(now + 0.07, 360, 0.07, "sawtooth", 0.016, 240);
+          playTone(now + 0.14, 300, 0.08, "triangle", 0.018, 520);
+          break;
+        case "uno":
+          playTone(now, 610, 0.09, "triangle", 0.024);
+          playTone(now + 0.1, 760, 0.1, "triangle", 0.022);
+          break;
+        case "callOut":
+          playTone(now, 210, 0.1, "sawtooth", 0.02, 170);
+          playTone(now + 0.1, 170, 0.12, "sawtooth", 0.02, 140);
+          break;
+        case "deal":
+          playTone(now, 360, 0.05, "triangle", 0.013, 300);
+          break;
+        case "win":
+          playTone(now, 520, 0.12, "triangle", 0.022, 760);
+          playTone(now + 0.12, 760, 0.14, "triangle", 0.022, 980);
+          break;
+        case "lose":
+          playTone(now, 260, 0.11, "triangle", 0.02, 180);
+          playTone(now + 0.12, 180, 0.16, "triangle", 0.02, 120);
+          break;
+      }
     } catch {
       // Audio can fail due to browser policies; ignore gracefully.
     }
   }, []);
+
+  const playUiSfx = useCallback((event: UiSfx) => {
+    const fileCandidates = FILE_SFX_SOURCES[event] ?? [];
+    if (typeof window !== "undefined" && typeof Audio !== "undefined" && fileCandidates.length > 0) {
+      for (const src of fileCandidates) {
+        let audio = fileSfxRef.current[src];
+        if (!audio) {
+          audio = new Audio(src);
+          audio.preload = "auto";
+          fileSfxRef.current[src] = audio;
+        }
+        audio.volume = FILE_SFX_VOLUME[event] ?? 0.34;
+
+        audio.currentTime = 0;
+        const playResult = audio.play();
+        if (playResult && typeof playResult.then === "function") {
+          void playResult.catch(() => {
+            // If file playback fails, keep UX stable with synth fallback.
+            playSynthSfx(event);
+          });
+        }
+        return;
+      }
+    }
+
+    playSynthSfx(event);
+  }, [playSynthSfx]);
+
+  const playMotionShuffleSfx = useCallback(() => {
+    const now = Date.now();
+    if (now - lastMotionSfxAtRef.current < 120) return;
+    lastMotionSfxAtRef.current = now;
+    playUiSfx("shuffleMotion");
+  }, [playUiSfx]);
 
   const triggerActionFlash = useCallback((text: string, tone: ActionFlashTone) => {
     if (actionFlashTimerRef.current !== null) {
@@ -687,20 +889,17 @@ export default function GameBoard({
       if (winner && prevWinnerRef.current !== game.winnerId) {
         prevWinnerRef.current = game.winnerId;
         recordWin(winner.name);
+        playUiSfx(winner.id === localPlayer?.id ? "win" : "lose");
       }
     } else {
       prevWinnerRef.current = null;
     }
-  }, [game?.winnerId, game?.players, recordWin]);
+  }, [game?.winnerId, game?.players, localPlayer?.id, playUiSfx, recordWin]);
 
   useEffect(() => {
     if (!log.length) return;
     const newest = log[0];
     if (newest && newest !== prevLogRef.current[0]) {
-      const lower = newest.toLowerCase();
-      if (lower.includes("wins") || lower.includes("winner")) playUiBeep("win");
-      else if (lower.includes("draw") || lower.includes("uno") || lower.includes("call out")) playUiBeep("warn");
-      else playUiBeep("normal");
       feedCounter.current += 1;
       const id = feedCounter.current;
       setFeed(prev => [{ id, text: newest }, ...prev].slice(0, 5));
@@ -708,7 +907,7 @@ export default function GameBoard({
       const t = window.setTimeout(() => setFeed(prev => prev.filter(e => e.id !== id)), 4000);
       return () => window.clearTimeout(t);
     }
-  }, [log, playUiBeep]);
+  }, [log]);
 
   useEffect(() => {
     const update = () => {
@@ -780,6 +979,8 @@ export default function GameBoard({
 
     if (dealAnimationKeyRef.current === animationKey) return;
     dealAnimationKeyRef.current = animationKey;
+    playUiSfx("deal");
+    playMotionShuffleSfx();
 
     const timer = window.setTimeout(() => {
       animateDealSequence(
@@ -790,7 +991,7 @@ export default function GameBoard({
     }, 120);
 
     return () => window.clearTimeout(timer);
-  }, [game, animateDealSequence]);
+  }, [game, animateDealSequence, playMotionShuffleSfx, playUiSfx]);
 
   useEffect(() => {
     if (!game) return;
@@ -802,11 +1003,13 @@ export default function GameBoard({
 
     const action = game.lastAction;
     if (action.type === "draw") {
+      playUiSfx("draw");
       animateDrawToPlayer(action.playerId, action.count);
       return;
     }
 
     if (action.type === "callOut") {
+      playUiSfx("callOut");
       const timer = window.setTimeout(() => {
         animateDrawToPlayer(action.targetId, action.penalty);
       }, ACTION_FLASH_HOLD_MS + 40);
@@ -814,9 +1017,19 @@ export default function GameBoard({
     }
 
     if (action.type === "play") {
+      playMotionShuffleSfx();
       animatePlayToDiscard(action.playerId, action.card);
 
+      if (action.card.value === "skip") playUiSfx("skip");
+      else if (action.card.value === "reverse") playUiSfx("reverse");
+      else if (action.card.value === "draw2") playUiSfx("draw2");
+      else if (action.card.value === "wild4") playUiSfx("wild4");
+      else if (action.card.value === "wild") playUiSfx("wild");
+      else if (action.card.value === "shuffle") playUiSfx("shuffle");
+      else playUiSfx("cardPlay");
+
       if (action.card.value === 'discardAll' && action.discardAllCount && action.discardAllCount > 0) {
+        playMotionShuffleSfx();
         const timer = window.setTimeout(() => {
           animateDiscardAllToDiscard(action.playerId, action.card.color, action.discardAllCount ?? 0);
         }, 120);
@@ -833,13 +1046,14 @@ export default function GameBoard({
 
           const counts = order.map((playerId) => game.players.find((player) => player.id === playerId)?.hand.length ?? 0);
           const timer = window.setTimeout(() => {
+            playMotionShuffleSfx();
             animateDealSequence(order, counts, 'discard');
           }, 120);
           return () => window.clearTimeout(timer);
         }
       }
     }
-  }, [game, animateDealSequence, animateDiscardAllToDiscard, animateDrawToPlayer, animatePlayToDiscard]);
+  }, [game, animateDealSequence, animateDiscardAllToDiscard, animateDrawToPlayer, animatePlayToDiscard, playMotionShuffleSfx, playUiSfx]);
 
   useEffect(() => {
     if (!game || !localPlayer) return;
@@ -894,11 +1108,16 @@ export default function GameBoard({
     }
 
     if (action.type === "declareUno") {
+      playUiSfx("uno");
       queueActionFlash("UNO", "red");
       return;
     }
 
     if (action.type === "callOut") {
+      if (action.callerId === action.targetId) {
+        queueActionFlash(`FALSE CALL +${action.penalty}`, "red");
+        return;
+      }
       const callerName = game.players.find((player) => player.id === action.callerId)?.name ?? "Player";
       const targetName = game.players.find((player) => player.id === action.targetId)?.name ?? "Player";
       const calledYou = action.targetId === localPlayer.id;
@@ -909,7 +1128,7 @@ export default function GameBoard({
       return;
     }
 
-  }, [game, localPlayer, triggerActionFlash]);
+  }, [game, localPlayer, playUiSfx, triggerActionFlash]);
 
   const confirmExitGame = () => { setShowExitConfirm(false); resetGame(); onReset(); };
 
@@ -1161,7 +1380,17 @@ export default function GameBoard({
       : drawnThisTurn
         ? drawnPlayableCard ? "Choose to play the drawn card, or pass" : "No playable draw — passing in a moment"
         : playableCardIds.size > 0 ? "Tap a highlighted card to play · Space to draw · U for UNO"
-        : "No playable cards — drawing automatically";
+        : "No playable cards — draw from pile";
+
+  const hoveredCard = hoveredCardId
+    ? sortedHand.find((card) => card.id === hoveredCardId) ?? null
+    : null;
+
+  const hoveredCardHint = hoveredCard
+    ? `${hoveredCard.color === "wild" ? "" : `${hoveredCard.color} `}${hoveredCard.value}`.toUpperCase().replace("WILD4", "WILD +4")
+    : null;
+
+  const infoLine = hoveredCardHint ? `CARD: ${hoveredCardHint}` : hint;
 
   const handOverlap = Math.round(26 * handCardScale);
   const ARC_SPREAD = 3.5;
@@ -1220,6 +1449,11 @@ export default function GameBoard({
           18% { opacity:1; transform:scale(1.05); }
           75% { opacity:1; transform:scale(1); }
           100%{ opacity:0; transform:scale(1.08); }
+        }
+        @keyframes confettiFall {
+          0% { transform: translateY(-16vh) rotate(0deg); opacity: 0; }
+          10% { opacity: 0.96; }
+          100% { transform: translateY(118vh) rotate(760deg); opacity: 0.9; }
         }
 
         .hand-card { transition: transform 0.18s cubic-bezier(0.22,1,0.36,1), filter 0.18s ease !important; }
@@ -1453,7 +1687,7 @@ export default function GameBoard({
               className="uno-btn"
               style={{
                 position: "absolute",
-                left: "50%",
+                left: "82%",
                 top: 0,
                 transform: "translate(-50%, -50%)",
                 zIndex: 40,
@@ -1654,9 +1888,13 @@ export default function GameBoard({
               onMouseMove={(event) => {
                 if (event.target === event.currentTarget) {
                   setHoveredHandPosition(null);
+                  setHoveredCardId(null);
                 }
               }}
-              onMouseLeave={() => setHoveredHandPosition(null)}
+              onMouseLeave={() => {
+                setHoveredHandPosition(null);
+                setHoveredCardId(null);
+              }}
             >
               {sortedHand.map((card, i) => {
                 const playable = humanTurn && !botThinking && !turnTransitionLocked && playableCardIds.has(card.id);
@@ -1703,7 +1941,10 @@ export default function GameBoard({
                       animation: isFreshDraw ? "drewCardGlow 0.6s cubic-bezier(0.22,1,0.36,1)" : "none",
                     } as CSSProperties & Record<string, string | number>}
                     onClick={playable ? (event) => handleSelectCard(card, event.currentTarget) : undefined}
-                    onMouseEnter={() => setHoveredHandPosition(i)}
+                    onMouseEnter={() => {
+                      setHoveredHandPosition(i);
+                      setHoveredCardId(card.id);
+                    }}
                     onMouseMove={(event) => {
                       const rect = event.currentTarget.getBoundingClientRect();
                       const normalized = (event.clientX - rect.left) / Math.max(1, rect.width);
@@ -1804,7 +2045,7 @@ export default function GameBoard({
                 overflow: "hidden",
                 textOverflow: "ellipsis",
                 whiteSpace: "nowrap",
-              }}>{hint}</span>
+              }}>{infoLine}</span>
             )}
 
             <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
@@ -1844,7 +2085,7 @@ export default function GameBoard({
                 overflow: "hidden",
                 textOverflow: "ellipsis",
                 whiteSpace: "nowrap",
-              }}>{hint}</span>
+              }}>{infoLine}</span>
             )}
           </div>
 
@@ -1943,13 +2184,16 @@ export default function GameBoard({
       )}
 
       {winner && (
-        <WinnerScreen
-          winner={winner}
-          scores={scores}
-          players={game.players.map((player) => player.name)}
-          onReset={() => { resetGame(); onReset(); }}
-          onDealAgain={onDealAgain}
-        />
+        <>
+          <VictoryConfetti />
+          <WinnerScreen
+            winner={winner}
+            scores={scores}
+            players={game.players.map((player) => player.name)}
+            onReset={() => { resetGame(); onReset(); }}
+            onDealAgain={onDealAgain}
+          />
+        </>
       )}
     </>
   );

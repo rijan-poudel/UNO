@@ -10,7 +10,7 @@ import {
   callOutUno,
 } from '../lib/gameActions';
 import { getBotMove } from '../lib/botSupport';
-import { canPlayCard } from '../lib/gameRules';
+import { canJumpInPlay, canPlayCard } from '../lib/gameRules';
 import type { CardColor } from '../types/card';
 import type { GameState } from '../types/game';
 import type {
@@ -307,7 +307,7 @@ function ackError<T>(message: string): Ack<T> {
   return { ok: false, error: message };
 }
 
-function ensureActorTurn(room: ServerRoom, socketId: string): { actorIndex: number; actorPlayerId: string } {
+function ensureActor(room: ServerRoom, socketId: string): { actorIndex: number; actorPlayerId: string } {
   if (!room.game) {
     throw new Error('Game is not started yet.');
   }
@@ -322,10 +322,6 @@ function ensureActorTurn(room: ServerRoom, socketId: string): { actorIndex: numb
     throw new Error('Player not found in active game state.');
   }
 
-  if (room.game.currentPlayerIndex !== actorIndex) {
-    throw new Error('It is not your turn.');
-  }
-
   return { actorIndex, actorPlayerId: actor.playerId };
 }
 
@@ -334,10 +330,16 @@ function handleGameAction(room: ServerRoom, socketId: string, payload: RoomActio
     throw new Error('Game has not started.');
   }
 
-  const { actorIndex } = ensureActorTurn(room, socketId);
+  const { actorIndex } = ensureActor(room, socketId);
   const state = room.game;
   const activeChoice = room.pendingColorChoice;
   const actorPlayerId = state.players[actorIndex]?.id;
+  const isActorTurn = state.currentPlayerIndex === actorIndex;
+  const requireTurn = () => {
+    if (!isActorTurn) {
+      throw new Error('It is not your turn.');
+    }
+  };
 
   const action = payload.action;
 
@@ -351,6 +353,7 @@ function handleGameAction(room: ServerRoom, socketId: string, payload: RoomActio
 
   switch (action.type) {
     case 'prepareWild': {
+      requireTurn();
       const card = state.players[actorIndex]?.hand.find((entry) => entry.id === action.cardId);
       if (!card) {
         throw new Error('Selected card is not in your hand.');
@@ -370,6 +373,7 @@ function handleGameAction(room: ServerRoom, socketId: string, payload: RoomActio
       break;
     }
     case 'cancelWildChoice': {
+      requireTurn();
       if (!activeChoice) {
         break;
       }
@@ -380,6 +384,12 @@ function handleGameAction(room: ServerRoom, socketId: string, payload: RoomActio
       break;
     }
     case 'play': {
+      if (!isActorTurn) {
+        const jumpInCard = state.players[actorIndex]?.hand.find((entry) => entry.id === action.cardId);
+        if (!jumpInCard || !canJumpInPlay(jumpInCard, state)) {
+          throw new Error('Only exact-match jump-in plays are allowed out of turn.');
+        }
+      }
       if (activeChoice) {
         if (action.cardId !== activeChoice.cardId) {
           throw new Error('You must finish the selected wild card first.');
@@ -393,6 +403,7 @@ function handleGameAction(room: ServerRoom, socketId: string, payload: RoomActio
       break;
     }
     case 'draw': {
+      requireTurn();
       if (state.pendingDraw > 0) {
         room.game = drawRequiredCards(state, actorIndex);
       } else {
@@ -402,15 +413,18 @@ function handleGameAction(room: ServerRoom, socketId: string, payload: RoomActio
       break;
     }
     case 'pass': {
+      requireTurn();
       room.game = passTurn(state, actorIndex);
       room.pendingColorChoice = null;
       break;
     }
     case 'sayUno': {
+      requireTurn();
       room.game = declareUno(state, actorIndex);
       break;
     }
     case 'callOut': {
+      requireTurn();
       const targetIndex = state.players.findIndex((p) => p.id === action.targetPlayerId);
       if (targetIndex === -1) {
         throw new Error('Target player not found.');

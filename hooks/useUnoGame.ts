@@ -20,11 +20,8 @@ import {
   callOutUno,
 } from '../lib/gameActions';
 import { canPlayCard, getPlayableCards } from '../lib/gameRules';
-import { getBotMove, getBotPreferredColor } from '../lib/botSupport';
+import { getBotMove } from '../lib/botSupport';
 
-const HUMAN_IDLE_TIMEOUT_MS = 12000;
-const HUMAN_IDLE_AFTER_DRAW_TIMEOUT_MS = 4500;
-const HUMAN_IDLE_WILD_PICK_TIMEOUT_MS = 3500;
 const BOT_ACTION_DELAY_MS = 1150;
 const AUTO_PASS_AFTER_DRAW_MS = 2200;
 
@@ -332,83 +329,6 @@ export function useUnoGame() {
     return () => clearTimeout(timer);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [game?.currentPlayerIndex, game?.turnCount, game?.winnerId]);
-
-  // ── Human idle auto-play ────────────────────────────────────────────────
-  // If the local human does not act in time, the turn is auto-resolved
-  // using the same action heuristics as bots.
-
-  useEffect(() => {
-    if (!game || game.winnerId) return;
-    if (game.currentPlayerIndex !== localPlayerIndex) return;
-
-    const currentPlayer = game.players[game.currentPlayerIndex];
-    if (currentPlayer.isBot) return;
-
-    const timeoutMs = pendingWild
-      ? HUMAN_IDLE_WILD_PICK_TIMEOUT_MS
-      : drawnThisTurn
-        ? HUMAN_IDLE_AFTER_DRAW_TIMEOUT_MS
-        : HUMAN_IDLE_TIMEOUT_MS;
-
-    const timer = setTimeout(() => {
-      try {
-        // If a wild card is waiting for color choice, auto-pick best color.
-        if (pendingWild) {
-          const color = getBotPreferredColor(currentPlayer.hand);
-          const next = enginePlayCard(game, game.currentPlayerIndex, pendingWild.id, color);
-          dispatch({ type: 'PLAY', game: next });
-          return;
-        }
-
-        // After drawing one card, end turn by passing unless the player
-        // explicitly chooses to play from the UI.
-        if (drawnThisTurn) {
-          const next = passTurn(game, game.currentPlayerIndex);
-          dispatch({ type: 'PLAY', game: next });
-          return;
-        }
-
-        // Normal turn resolution.
-        const move = getBotMove(game, game.currentPlayerIndex);
-        let next: GameState;
-
-        if (move.action === 'drawRequired') {
-          next = drawRequiredCards(game, game.currentPlayerIndex);
-        } else if (move.action === 'draw') {
-          const afterDraw = drawOneCard(game, game.currentPlayerIndex);
-          const updatedHand = afterDraw.players[game.currentPlayerIndex].hand;
-          const drawnCard = updatedHand[updatedHand.length - 1];
-
-          if (drawnCard && canPlayCard(drawnCard, afterDraw, game.currentPlayerIndex)) {
-            const color =
-              drawnCard.color === 'wild'
-                ? (move as { chosenColor?: CardColor }).chosenColor ?? 'red'
-                : undefined;
-            next = enginePlayCard(afterDraw, game.currentPlayerIndex, drawnCard.id, color);
-          } else {
-            next = passTurn(afterDraw, game.currentPlayerIndex);
-          }
-        } else {
-          next = enginePlayCard(game, game.currentPlayerIndex, move.cardId, move.chosenColor);
-        }
-
-        if (!next.winnerId && next.players[game.currentPlayerIndex].hand.length === 1) {
-          next = declareUno(next, game.currentPlayerIndex);
-        }
-
-        dispatch({ type: 'PLAY', game: next });
-      } catch (e) {
-        console.error('Human idle auto-play error:', e);
-      }
-    }, timeoutMs);
-
-    return () => clearTimeout(timer);
-  }, [
-    game,
-    localPlayerIndex,
-    pendingWild,
-    drawnThisTurn,
-  ]);
 
   // ── Derived values ────────────────────────────────────────────────────────
 

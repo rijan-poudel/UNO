@@ -51,9 +51,11 @@ export interface GameRules {
   /**
    * If true, any player holding an exact duplicate of the current top card
    * (same color AND value) may "jump in" out of turn.
-   * TODO: jump-in interrupt logic is not yet fully implemented in game actions.
    */
   allowJumpIn: boolean;
+
+  /** If true, an invalid UNO call-out penalizes the caller by +2 cards. */
+  penalizeFalseCallOut: boolean;
 
   // ── Two-player special cases ──────────────────────────────────────────────
   /**
@@ -117,6 +119,7 @@ export const defaultRules: GameRules = {
   allowDoublePlaySameNumber: false,
   allowDoublePlayExactMatchOnly: false,
   allowJumpIn: false,
+  penalizeFalseCallOut: false,
   reverseActsAsSkipInTwoPlayer: true,
   mustDeclareUno: true,
   drawUntilPlayable: false,

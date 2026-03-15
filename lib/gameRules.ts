@@ -9,6 +9,16 @@ import type { GameState } from '../types/game';
 import type { GameRules } from '../types/rules';
 import { isWildCard, isActionCard, NUMBER_VALUES } from '../types/card';
 
+export function canJumpInPlay(card: Card, state: GameState): boolean {
+  if (!state.rules.allowJumpIn) return false;
+  if (state.pendingDraw > 0) return false;
+
+  const topDiscard = state.discardPile[state.discardPile.length - 1];
+  if (!topDiscard) return false;
+
+  return card.color === topDiscard.color && card.value === topDiscard.value;
+}
+
 // ── Single-card play validation ───────────────────────────────────────────────
 
 /**
@@ -31,8 +41,7 @@ export function canPlayCard(
 ): boolean {
   // Rule branch 1 — turn guard
   if (playerIndex !== state.currentPlayerIndex) {
-    // TODO: When allowJumpIn is true, check for exact-match jump-in separately.
-    return false;
+    return canJumpInPlay(card, state);
   }
 
   const { activeColor, pendingDraw, pendingDrawType, rules, discardPile } = state;

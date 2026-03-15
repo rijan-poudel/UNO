@@ -12,7 +12,7 @@
 import type { GameState, Player, LastAction } from '../types/game';
 import type { Card, CardColor } from '../types/card';
 import { isWildCard } from '../types/card';
-import { canPlayCard } from './gameRules';
+import { canJumpInPlay, canPlayCard } from './gameRules';
 import { advanceTurn } from './turns';
 import { shuffleDeck } from './deck';
 
@@ -93,21 +93,14 @@ function shuffleHandsStartingFrom(
   state: GameState,
   startIndex: number,
 ): GameState {
-  const counts = state.players.map((player) => player.hand.length);
   const pooled = shuffleDeck(state.players.flatMap((player) => player.hand));
-  const totalToDeal = pooled.length;
-
   const dealtHands: Card[][] = state.players.map(() => []);
-  const remainingBySeat = [...counts];
-  let cursor = 0;
   let seat = startIndex;
 
-  while (cursor < totalToDeal) {
-    if (remainingBySeat[seat] > 0) {
-      dealtHands[seat].push(pooled[cursor]);
-      remainingBySeat[seat] -= 1;
-      cursor += 1;
-    }
+  // True shuffle-hands behavior: pool every hand and deal one-by-one in turn order
+  // starting from the next player after the shuffle card is played.
+  for (const card of pooled) {
+    dealtHands[seat].push(card);
     seat = (seat + state.direction + state.players.length) % state.players.length;
   }
 
@@ -227,16 +220,25 @@ export function playCard(
 ): GameState {
   if (state.winnerId) throw new Error('Game is already over.');
 
+  const isJumpIn = playerIndex !== state.currentPlayerIndex;
+  const effectiveState = isJumpIn
+    ? { ...state, currentPlayerIndex: playerIndex }
+    : state;
+
   const player = state.players[playerIndex];
 
   // Remove the card from hand — throws if not found.
   const { card, newHand } = removeCardById(player.hand, cardId);
 
   // Validate legality (also checks turn ownership).
-  if (!canPlayCard(card, state, playerIndex)) {
+  if (!canPlayCard(card, effectiveState, playerIndex)) {
     throw new Error(
       `Card "${card.color} ${card.value}" cannot be played in the current state.`,
     );
+  }
+
+  if (isJumpIn && !canJumpInPlay(card, state)) {
+    throw new Error('Jump-in is only allowed with an exact match to the top discard.');
   }
 
   // Wild cards require a color choice.
@@ -270,7 +272,7 @@ export function playCard(
   const discardExtra: Card[] = [];
 
   const isDiscardAllCard = card.value === 'discardAll' && card.color !== 'wild';
-  if (state.rules.allowDiscardAll && isDiscardAllCard) {
+  if (effectiveState.rules.allowDiscardAll && isDiscardAllCard) {
     const kept: Card[] = [];
     for (const handCard of postPlayHand) {
       if (handCard.color === card.color) {
@@ -295,14 +297,14 @@ export function playCard(
 
   // Apply the card to the discard pile and update active color.
   let newState: GameState = {
-    ...state,
-    players: state.players.map((p, i) => (i === playerIndex ? postPlayPlayer : p)),
-    discardPile: [...state.discardPile, card, ...discardExtra],
+    ...effectiveState,
+    players: effectiveState.players.map((p, i) => (i === playerIndex ? postPlayPlayer : p)),
+    discardPile: [...effectiveState.discardPile, card, ...discardExtra],
     activeColor: newActiveColor,
     // Clear pending draw only for non-draw cards; draw cards add to it in resolveCardEffect.
-    pendingDraw: card.value === 'draw2' || card.value === 'wild4' ? state.pendingDraw : 0,
+    pendingDraw: card.value === 'draw2' || card.value === 'wild4' ? effectiveState.pendingDraw : 0,
     pendingDrawType: card.value === 'draw2' || card.value === 'wild4'
-      ? state.pendingDrawType
+      ? effectiveState.pendingDrawType
       : null,
     lastAction,
   };
@@ -313,8 +315,8 @@ export function playCard(
     return { ...newState, winnerId: player.id };
   }
 
-  if (state.rules.allowShuffleCard && card.value === 'shuffle') {
-    const nextSeat = (playerIndex + state.direction + state.players.length) % state.players.length;
+  if (effectiveState.rules.allowShuffleCard && card.value === 'shuffle') {
+    const nextSeat = (playerIndex + effectiveState.direction + effectiveState.players.length) % effectiveState.players.length;
     newState = shuffleHandsStartingFrom(newState, nextSeat);
     newState = {
       ...newState,
@@ -335,8 +337,8 @@ export function playCard(
 
 /**
  * Draw exactly one card from the draw pile (voluntary draw when no playable card).
- * The player does NOT automatically play the drawn card — the caller must
- * subsequently call passTurn() (or playCard if the drawn card is playable).
+ * With drawUntilPlayable enabled, this draws until a playable card appears or
+ * the deck is exhausted.
  *
  * Throws if there is a pendingDraw greater than zero (use drawRequiredCards instead).
  */
@@ -355,7 +357,32 @@ export function drawOneCard(
   }
 
   const player = state.players[playerIndex];
-  const { drawn, state: afterDraw } = drawCardsFromPile(state, 1);
+  const drawn: Card[] = [];
+  let afterDraw = state;
+
+  const drawOnce = () => {
+    const result = drawCardsFromPile(afterDraw, 1);
+    afterDraw = result.state;
+    if (result.drawn.length > 0) {
+      drawn.push(result.drawn[0]);
+    }
+  };
+
+  drawOnce();
+
+  if (state.rules.drawUntilPlayable) {
+    while (drawn.length > 0) {
+      const latestCard = drawn[drawn.length - 1];
+      if (canPlayCard(latestCard, afterDraw, playerIndex)) {
+        break;
+      }
+      const beforeCount = drawn.length;
+      drawOnce();
+      if (drawn.length === beforeCount) {
+        break;
+      }
+    }
+  }
 
   if (drawn.length === 0) {
     // Edge case: no cards available anywhere. Pass the turn.
@@ -371,10 +398,6 @@ export function drawOneCard(
     ...updated,
     lastAction: { type: 'draw', playerId: player.id, count: drawn.length },
   };
-
-  // TODO: if rules.drawUntilPlayable is true, check whether the drawn card is
-  // playable. If not, recursively draw again until one is found or the deck
-  // is exhausted. Currently draws exactly one card regardless of playability.
 
   return updated;
   // NOTE: The caller is responsible for calling passTurn() (or playCard())
@@ -487,8 +510,8 @@ export function declareUno(
  *   - The target player has NOT declared UNO (saidUno === false).
  *
  * On a valid call-out, the target draws 2 penalty cards.
- * On an invalid call-out, the caller draws 2 penalty cards (optional — disabled here;
- * add a `penaliseFalseCaller` rule flag to enable).
+ * On an invalid call-out, the caller optionally draws 2 cards when
+ * rules.penalizeFalseCallOut is enabled.
  */
 export function callOutUno(
   state: GameState,
@@ -502,9 +525,24 @@ export function callOutUno(
   const isValidCallOut = target.hand.length === 1 && !target.saidUno;
 
   if (!isValidCallOut) {
-    // Invalid call-out — no penalty applied in this version.
-    // TODO: Optionally penalise the caller (add penaliseFalseCaller rule).
-    return state;
+    if (!state.rules.penalizeFalseCallOut) return state;
+
+    const penalty = 2;
+    const { drawn, state: afterDraw } = drawCardsFromPile(state, penalty);
+    const updatedCaller = updatePlayer(afterDraw, callerIndex, {
+      hand: [...caller.hand, ...drawn],
+      saidUno: false,
+    });
+
+    return {
+      ...updatedCaller,
+      lastAction: {
+        type: 'callOut',
+        callerId: caller.id,
+        targetId: caller.id,
+        penalty,
+      },
+    };
   }
 
   const penalty = 2;
