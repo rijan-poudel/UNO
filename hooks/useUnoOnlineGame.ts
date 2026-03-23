@@ -7,6 +7,7 @@ import type { Card, CardColor } from '../types/card';
 import type { GameRules } from '../types/rules';
 import type { Ack, FriendInvite, MultiplayerAction, RoomSnapshot } from '../types/multiplayer';
 import { getPlayableCards } from '../lib/gameRules';
+import { voiceUiConnected, voiceUiDisconnected, voiceUiRoomJoined } from '../lib/voiceAnnouncer';
 
 const AUTO_PASS_AFTER_DRAW_MS = 2200;
 const ONLINE_DEVICE_ID_KEY = 'uno.online.deviceId';
@@ -269,6 +270,7 @@ export function useUnoOnlineGame() {
   });
 
   const previousTurnRef = useRef<number | null>(null);
+  const announcedRoomIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     const socketUrl =
@@ -283,10 +285,12 @@ export function useUnoOnlineGame() {
 
     socket.on('connect', () => {
       setState((prev) => ({ ...prev, connected: true, error: null }));
+      voiceUiConnected();
     });
 
     socket.on('disconnect', () => {
       setState((prev) => ({ ...prev, connected: false }));
+      voiceUiDisconnected();
     });
 
     socket.on('room:update', (room: RoomSnapshot) => {
@@ -394,6 +398,17 @@ export function useUnoOnlineGame() {
       socketRef.current = null;
     };
   }, []);
+
+  useEffect(() => {
+    const id = state.room?.roomId ?? null;
+    if (!id) {
+      announcedRoomIdRef.current = null;
+      return;
+    }
+    if (announcedRoomIdRef.current === id) return;
+    announcedRoomIdRef.current = id;
+    voiceUiRoomJoined();
+  }, [state.room?.roomId]);
 
   useEffect(() => {
     if (!state.room?.roomId || !state.room.started || !state.room.game || !state.playerId) return;

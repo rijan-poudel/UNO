@@ -1,39 +1,39 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+    --background: #ffffff;
+    --foreground: #171717;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+    --font-sans: var(--font-geist-sans);
+    --font-mono: var(--font-geist-mono);
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #fff8f0;
-    /* --foreground: #ededed; */
-  }
+    :root {
+        --background: #fff8f0;
+        /* --foreground: #ededed; */
+    }
 }
 
 body {
-  background: var(--background);
-  /* color: var(--foreground); */
-  font-family: Arial, Helvetica, sans-serif;
-  margin: 0;
+    background: var(--background);
+    /* color: var(--foreground); */
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
 }
 
 html,
 body {
-  height: 100%;
+    height: 100%;
 }
 
 body {
-  min-height: 100dvh;
-  overflow: hidden;
+    min-height: 100dvh;
+    overflow: hidden;
 }
 
 /*
@@ -41,86 +41,229 @@ body {
   Both GameSetup and GameBoard inherit this background.
 */
 body {
-  background-color: #fff8f0;
-  margin: 0;
+    background-color: #fff8f0;
+    margin: 0;
 }
 
 /* UNO toast theme for Sonner */
 .uno-toast {
-  background: var(--ui-surface, #fff8f0) !important;
-  color: var(--ui-text, #1a0f00) !important;
-  border: 1px solid var(--ui-line, rgba(26, 15, 0, 0.2)) !important;
-  border-left: 4px solid var(--ui-line, rgba(26, 15, 0, 0.2)) !important;
-  border-radius: 0 !important;
-  box-shadow: 0 10px 24px color-mix(in srgb, var(--ui-bg, #fff8f0) 40%, #000 60%) !important;
-  font-family: 'Courier Prime', monospace !important;
-  padding: 10px 12px !important;
-  gap: 6px !important;
-  min-height: 0 !important;
-  width: min(320px, calc(100vw - 24px)) !important;
+    background: var(--ui-surface, #fff8f0) !important;
+    color: var(--ui-text, #1a0f00) !important;
+    border: 1px solid var(--ui-line, rgba(26, 15, 0, 0.2)) !important;
+    border-left: 4px solid var(--ui-line, rgba(26, 15, 0, 0.2)) !important;
+    border-radius: 0 !important;
+    box-shadow: 0 10px 24px
+        color-mix(in srgb, var(--ui-bg, #fff8f0) 40%, #000 60%) !important;
+    font-family: "Courier Prime", monospace !important;
+    padding: 10px 12px !important;
+    gap: 6px !important;
+    min-height: 0 !important;
+    width: min(320px, calc(100vw - 24px)) !important;
 }
 
 .uno-toast-title {
-  font-family: 'Bebas Neue', cursive !important;
-  font-size: 17px !important;
-  letter-spacing: 0.05em !important;
-  line-height: 1 !important;
-  color: var(--ui-text, #1a0f00) !important;
-  margin-bottom: 1px !important;
+    font-family: "Bebas Neue", cursive !important;
+    font-size: 17px !important;
+    letter-spacing: 0.05em !important;
+    line-height: 1 !important;
+    color: var(--ui-text, #1a0f00) !important;
+    margin-bottom: 1px !important;
 }
 
 .uno-toast-description {
-  font-family: 'Courier Prime', monospace !important;
-  font-size: 10px !important;
-  letter-spacing: 0.05em !important;
-  text-transform: uppercase !important;
-  color: var(--ui-muted, rgba(26, 15, 0, 0.65)) !important;
-  line-height: 1.35 !important;
+    font-family: "Courier Prime", monospace !important;
+    font-size: 10px !important;
+    letter-spacing: 0.05em !important;
+    text-transform: uppercase !important;
+    color: var(--ui-muted, rgba(26, 15, 0, 0.65)) !important;
+    line-height: 1.35 !important;
 }
 
 .uno-toast-action,
 .uno-toast-cancel,
 .uno-toast-close {
-  font-family: 'Courier Prime', monospace !important;
-  font-size: 9px !important;
-  font-weight: 700 !important;
-  letter-spacing: 0.1em !important;
-  text-transform: uppercase !important;
-  border-radius: 0 !important;
-  box-shadow: none !important;
+    font-family: "Courier Prime", monospace !important;
+    font-size: 9px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.1em !important;
+    text-transform: uppercase !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
 }
 
 .uno-toast-action {
-  background: var(--ui-text, #1a0f00) !important;
-  color: var(--ui-bg, #fff8f0) !important;
-  border: none !important;
+    background: var(--ui-text, #1a0f00) !important;
+    color: var(--ui-bg, #fff8f0) !important;
+    border: none !important;
 }
 
 .uno-toast-cancel,
 .uno-toast-close {
-  background: transparent !important;
-  color: var(--ui-muted, rgba(26, 15, 0, 0.65)) !important;
-  border: 1px solid var(--ui-line, rgba(26, 15, 0, 0.2)) !important;
+    background: transparent !important;
+    color: var(--ui-muted, rgba(26, 15, 0, 0.65)) !important;
+    border: 1px solid var(--ui-line, rgba(26, 15, 0, 0.2)) !important;
 }
 
 [data-sonner-toaster] {
-  --normal-bg: var(--ui-surface, #fff8f0) !important;
-  --normal-text: var(--ui-text, #1a0f00) !important;
-  --normal-border: var(--ui-line, rgba(26, 15, 0, 0.2)) !important;
+    --normal-bg: var(--ui-surface, #fff8f0) !important;
+    --normal-text: var(--ui-text, #1a0f00) !important;
+    --normal-border: var(--ui-line, rgba(26, 15, 0, 0.2)) !important;
 }
 
 .uno-toast-success {
-  border-left-color: var(--ui-accent-green, #1e6b3a) !important;
+    border-left-color: var(--ui-accent-green, #1e6b3a) !important;
 }
 
 .uno-toast-error {
-  border-left-color: var(--ui-accent-red, #c0392b) !important;
+    border-left-color: var(--ui-accent-red, #c0392b) !important;
 }
 
 .uno-toast-warning {
-  border-left-color: var(--ui-accent-yellow, #d4a017) !important;
+    border-left-color: var(--ui-accent-yellow, #d4a017) !important;
 }
 
 .uno-toast-info {
-  border-left-color: var(--ui-accent-blue, #1a4f8a) !important;
+    border-left-color: var(--ui-accent-blue, #1a4f8a) !important;
 }
+
+/* Volume slider theme (shared across all UI themes)
+   - Uses CSS variables that defer to the active theme colors (set on :root by the app).
+   - .volume-slider.music and .volume-slider.sfx switch the accent color for each slider.
+   - The visual filled portion is rendered by background gradients; JS may update the inline gradient for precise fill,
+     but these rules provide consistent base styling and cross-browser thumb visuals.
+*/
+:root {
+    --slider-height: 8px;
+    --slider-thumb-size: 16px;
+    --slider-accent-default: var(--ui-accent-blue);
+    --slider-track-bg: var(--ui-line);
+    --slider-thumb-bg: var(--ui-text);
+    --slider-thumb-border: var(--ui-bg);
+}
+
+/* Theme-aware accents per slider (can be overridden by adding these classes) */
+.volume-slider.music {
+    --slider-accent: var(--ui-accent-blue, var(--slider-accent-default));
+}
+.volume-slider.sfx {
+    --slider-accent: var(--ui-accent-green, var(--slider-accent-default));
+}
+
+/* Base track */
+.volume-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: var(--slider-height);
+    border-radius: 999px;
+    background: linear-gradient(
+        to right,
+        var(--slider-accent, var(--slider-accent-default)) 50%,
+        var(--slider-track-bg) 50%
+    );
+    outline: none;
+    cursor: pointer;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.06);
+    transition: box-shadow 120ms ease;
+}
+
+/* WebKit track (keep transparent, we use background on the input element itself) */
+.volume-slider::-webkit-slider-runnable-track {
+    height: var(--slider-height);
+    background: transparent;
+    border: none;
+    border-radius: 999px;
+}
+
+/* WebKit thumb */
+.volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: var(--slider-thumb-size);
+    height: var(--slider-thumb-size);
+    border-radius: 50%;
+    background: var(--slider-thumb-bg);
+    border: 2px solid var(--slider-thumb-border);
+    margin-top: calc((var(--slider-height) - var(--slider-thumb-size)) / 2);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+    transition:
+        transform 140ms ease,
+        box-shadow 140ms ease;
+}
+
+/* Hover / active feedback for WebKit */
+.volume-slider:hover::-webkit-slider-thumb {
+    transform: scale(1.06);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.22);
+}
+.volume-slider:active::-webkit-slider-thumb {
+    transform: scale(0.98);
+}
+
+/* Firefox track and thumb */
+.volume-slider::-moz-range-track {
+    height: var(--slider-height);
+    background: transparent;
+    border: none;
+    border-radius: 999px;
+}
+
+.volume-slider::-moz-range-progress {
+    background: var(--slider-accent, var(--slider-accent-default));
+    height: var(--slider-height);
+    border-radius: 999px;
+}
+
+.volume-slider::-moz-range-thumb {
+    width: var(--slider-thumb-size);
+    height: var(--slider-thumb-size);
+    border-radius: 50%;
+    background: var(--slider-thumb-bg);
+    border: 2px solid var(--slider-thumb-border);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+}
+
+/* MS Edge / IE fallback */
+.volume-slider::-ms-track {
+    height: var(--slider-height);
+    background: transparent;
+    border-color: transparent;
+    color: transparent;
+}
+.volume-slider::-ms-fill-lower {
+    background: var(--slider-accent, var(--slider-accent-default));
+    border-radius: 999px;
+}
+.volume-slider::-ms-fill-upper {
+    background: var(--slider-track-bg);
+    border-radius: 999px;
+}
+.volume-slider::-ms-thumb {
+    width: var(--slider-thumb-size);
+    height: var(--slider-thumb-size);
+    border-radius: 50%;
+    background: var(--slider-thumb-bg);
+    border: 2px solid var(--slider-thumb-border);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+}
+
+/* Compact inline variants (used where we render small controls) */
+.volume-slider.inline {
+    width: 90px;
+    height: calc(var(--slider-height) * 0.9);
+    --slider-thumb-size: 14px;
+}
+
+/* Accessible focus ring */
+.volume-slider:focus {
+    box-shadow: 0 0 0 4px
+        color-mix(
+            in srgb,
+            var(--slider-accent, var(--slider-accent-default)) 18%,
+            transparent
+        );
+}
+
+/* Utility: let individual sliders override the fill position via inline style background.
+   Example (set by JS): input.style.background = `linear-gradient(to right, var(--slider-accent) ${percent}%, var(--slider-track-bg) ${percent}%)`
+*/
