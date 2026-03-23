@@ -11,8 +11,6 @@ export interface AudioSettings {
   chimesEnabled: boolean;
   /** In-game board announcer (plays from game events). */
   voiceInGame: boolean;
-  /** Lobby, connection, menus — anything outside the active board. */
-  voiceOutsideGame: boolean;
   /** Volume for background music (0-1) */
   musicVolume: number;
   /** Volume for sound effects (0-1) */
@@ -22,7 +20,6 @@ export interface AudioSettings {
 export const defaultAudioSettings: AudioSettings = {
   chimesEnabled: true,
   voiceInGame: true,
-  voiceOutsideGame: true,
   musicVolume: 0.7,
   sfxVolume: 0.8,
 };
@@ -37,14 +34,24 @@ function parseStored(raw: string | null): Partial<AudioSettings> {
     if (typeof o.chimesEnabled === "boolean")
       next.chimesEnabled = o.chimesEnabled;
     if (typeof o.voiceInGame === "boolean") next.voiceInGame = o.voiceInGame;
-    if (typeof o.voiceOutsideGame === "boolean")
-      next.voiceOutsideGame = o.voiceOutsideGame;
     if (typeof o.musicVolume === "number") next.musicVolume = o.musicVolume;
     if (typeof o.sfxVolume === "number") next.sfxVolume = o.sfxVolume;
     return next;
   } catch {
     return {};
   }
+}
+
+export function uiToStoredVolume(uiValue: number): number {
+  const CAP = 0.6;
+  const clamped = Math.max(0, Math.min(1, uiValue));
+  return CAP * Math.pow(clamped, 2.3);
+}
+
+export function storedToUiVolume(stored: number): number {
+  const CAP = 0.6;
+  const clamped = Math.max(0, Math.min(CAP, stored));
+  return Math.pow(clamped / CAP, 1 / 2.3);
 }
 
 export function getAudioSettings(): AudioSettings {

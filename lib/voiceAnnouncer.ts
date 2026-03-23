@@ -69,6 +69,9 @@ function categoryEnabled(category: VoiceCategory): boolean {
 function tryPlayPath(path: string, volume: number, onFail: () => void): void {
   if (typeof window === "undefined" || typeof Audio === "undefined") return;
 
+  const s = getAudioSettings();
+  const effectiveVolume = volume * (s.sfxVolume ?? 0.8);
+
   let audio = audioCache[path];
   if (!audio) {
     audio = new Audio(path);
@@ -76,7 +79,7 @@ function tryPlayPath(path: string, volume: number, onFail: () => void): void {
     audioCache[path] = audio;
   }
 
-  audio.volume = Math.min(1, Math.max(0, volume));
+  audio.volume = Math.min(1, Math.max(0, effectiveVolume));
   audio.currentTime = 0;
 
   const onErr = () => {
