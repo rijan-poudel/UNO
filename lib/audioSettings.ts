@@ -47,27 +47,6 @@ function parseStored(raw: string | null): Partial<AudioSettings> {
   }
 }
 
-/**
- * Convert a UI slider value (0..1) to the actual stored volume (0..1).
- * Quadratic curve with a soft cap so low values are much quieter
- * while the top end never gets too loud.
- */
-export function uiToStoredVolume(ui: number): number {
-  const CAP = 0.6;
-  const clamped = Math.max(0, Math.min(1, ui));
-  return CAP * Math.pow(clamped, 2.3);
-}
-
-/**
- * Convert a stored volume (0..1) to the UI slider value (0..1).
- * Inverse of uiToStoredVolume with the same cap.
- */
-export function storedToUiVolume(stored: number): number {
-  const CAP = 0.6;
-  const clamped = Math.max(0, Math.min(CAP, stored));
-  return Math.pow(clamped / CAP, 1 / 2.3);
-}
-
 export function getAudioSettings(): AudioSettings {
   if (typeof window === "undefined") return { ...defaultAudioSettings };
   try {
