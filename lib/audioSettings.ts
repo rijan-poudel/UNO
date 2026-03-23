@@ -65,7 +65,7 @@ export function uiToStoredVolume(ui: number): number {
 export function storedToUiVolume(stored: number): number {
   const CAP = 0.6;
   const clamped = Math.max(0, Math.min(CAP, stored));
-  return CAP === 0 ? 0 : Math.pow(clamped / CAP, 1 / 2.3);
+  return Math.pow(clamped / CAP, 1 / 2.3);
 }
 
 export function getAudioSettings(): AudioSettings {
