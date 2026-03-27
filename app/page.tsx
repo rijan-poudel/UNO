@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import type { GameRules } from "../types/rules";
 import { useUnoGame } from "../hooks/useUnoGame";
 import { useUnoOnlineGame } from "../hooks/useUnoOnlineGame";
+import { useAudioManager } from "../hooks/useAudioManager";
 import GameBoard from "../components/GameBoard";
 import GameSetup from "../components/GameSetup";
 import HomeScreen from "../components/home/HomeScreen";
@@ -117,14 +118,14 @@ function getInitialRules(): Partial<GameRules> {
 }
 
 function getInitialTheme(): ThemeName {
-  if (typeof window === "undefined") return "paper";
+  if (typeof window === "undefined") return "midnight";
   try {
     const raw = window.localStorage.getItem(PREFERRED_THEME_KEY);
-    return raw === "midnight" || raw === "forest" || raw === "sunset"
+    return raw === "paper" || raw === "forest" || raw === "sunset"
       ? raw
-      : "paper";
+      : "midnight";
   } catch {
-    return "paper";
+    return "midnight";
   }
 }
 
@@ -133,10 +134,11 @@ export default function Home() {
   const [mode, setMode] = useState<"online" | "computer">("computer");
   const [view, setView] = useState<"home" | "computer" | "friends">("home");
   const [panel, setPanel] = useState<"create" | "join">("create");
-  const [theme, setTheme] = useState<ThemeName>("paper");
+  const [theme, setTheme] = useState<ThemeName>("midnight");
   const [showS, setShowS] = useState(false);
   const [rules, setRules] = useState<Partial<GameRules>>(DEFAULT_RULES);
   const [mounted, setMounted] = useState(false);
+  const { playMusic, setMusicContext } = useAudioManager();
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -170,9 +172,31 @@ export default function Home() {
       root.style.setProperty(k, v);
   }, [theme, mounted]);
 
+  useEffect(() => {
+    const activeContext = api.game ? "game" : "lobby";
+    setMusicContext(activeContext);
+    playMusic(activeContext);
+  }, [api.game, playMusic, setMusicContext]);
+
+  useEffect(() => {
+    const startMusic = () => {
+      const activeContext = api.game ? "game" : "lobby";
+      setMusicContext(activeContext);
+      playMusic(activeContext);
+    };
+    window.addEventListener("pointerdown", startMusic, { once: true });
+    return () => window.removeEventListener("pointerdown", startMusic);
+  }, [api.game, playMusic, setMusicContext]);
+
   const cycleTheme = () => {
     const order: ThemeName[] = ["paper", "midnight", "forest", "sunset"];
     setTheme((p) => order[(order.indexOf(p) + 1) % order.length]);
+  };
+
+  const selectTheme = (themeName: string) => {
+    if (themeName === 'paper' || themeName === 'midnight' || themeName === 'forest' || themeName === 'sunset') {
+      setTheme(themeName);
+    }
   };
 
   const copyCode = async () => {
@@ -245,7 +269,7 @@ export default function Home() {
       <>
         <HomeScreen
           themeLabel={label}
-          onTheme={cycleTheme}
+          onSelectTheme={selectTheme}
           onSettings={() => setShowS(true)}
           onComputer={() => {
             setMode("computer");
@@ -256,6 +280,7 @@ export default function Home() {
             setPanel("create");
             setView("friends");
           }}
+          incomingInvites={online.incomingInvites}
           onCheckFriendOnline={online.checkFriendOnline}
           onFriendQuickInvite={async (friendCode) => {
             let playerName = "Player 1";

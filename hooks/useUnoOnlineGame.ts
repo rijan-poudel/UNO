@@ -5,7 +5,13 @@ import { io, type Socket } from 'socket.io-client';
 import type { GameState } from '../types/game';
 import type { Card, CardColor } from '../types/card';
 import type { GameRules } from '../types/rules';
-import type { Ack, FriendInvite, MultiplayerAction, RoomSnapshot } from '../types/multiplayer';
+import type {
+  Ack,
+  FriendInvite,
+  FriendPresenceState,
+  MultiplayerAction,
+  RoomSnapshot,
+} from '../types/multiplayer';
 import { getPlayableCards } from '../lib/gameRules';
 import { voiceUiConnected, voiceUiDisconnected, voiceUiRoomJoined } from '../lib/voiceAnnouncer';
 
@@ -662,15 +668,15 @@ export function useUnoOnlineGame() {
 
   const checkFriendOnline = useCallback(async (friendCodes: string[]) => {
     const normalized = Array.from(new Set(friendCodes.map((code) => normalizeFriendCode(code)).filter(Boolean)));
-    if (!normalized.length) return {} as Record<string, boolean>;
+    if (!normalized.length) return {} as Record<string, FriendPresenceState>;
 
-    const ack = await callAck<{ statuses: Record<string, boolean> }>('friend:status', {
+    const ack = await callAck<{ statuses: Record<string, FriendPresenceState> }>('friend:status', {
       friendCodes: normalized,
     });
 
     if (!ack.ok) {
       setState((prev) => ({ ...prev, error: ack.error }));
-      return {} as Record<string, boolean>;
+      return {} as Record<string, FriendPresenceState>;
     }
 
     return ack.data.statuses;

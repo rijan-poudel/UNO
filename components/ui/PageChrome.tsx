@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type CSSProperties, type MouseEvent, type ReactNode } from 'react';
+import { useState, useEffect, useRef, type CSSProperties, type MouseEvent, type ReactNode } from 'react';
 
 const SECONDARY_BUTTON_STYLE: CSSProperties = {
   fontFamily: "'Courier Prime', monospace",
@@ -154,11 +154,28 @@ export function HomeUtilityBar({
   themeLabel,
   onTheme,
   onSettings,
+  onFriends,
 }: {
   themeLabel: string;
   onTheme: () => void;
   onSettings: () => void;
+  onFriends?: () => void;
 }) {
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const settingsRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(e: Event) {
+      if (settingsRef.current && !settingsRef.current.contains(e.target as Node)) {
+        setSettingsOpen(false);
+      }
+    }
+    if (settingsOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [settingsOpen]);
+
   return (
     <div
       style={{
@@ -171,8 +188,212 @@ export function HomeUtilityBar({
       }}
     >
       <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
-        <UtilityButton onClick={onTheme}>Theme: {themeLabel}</UtilityButton>
-        <UtilityButton onClick={onSettings}>Settings</UtilityButton>
+        {/* Settings Popover */}
+        <div ref={settingsRef} style={{ position: 'relative' }}>
+          <button
+            onClick={() => setSettingsOpen(!settingsOpen)}
+            title="Settings"
+            style={{
+              background: 'var(--ui-surface)',
+              border: '1px solid var(--ui-line)',
+              color: 'var(--ui-muted)',
+              padding: '6px 11px',
+              cursor: 'pointer',
+              fontFamily: "'Courier Prime', monospace",
+              fontSize: 14,
+              fontWeight: 700,
+              transition: 'all 0.12s',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = 'var(--ui-text)';
+              e.currentTarget.style.borderColor = 'var(--ui-text)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = 'var(--ui-muted)';
+              e.currentTarget.style.borderColor = 'var(--ui-line)';
+            }}
+          >
+            ⚙️
+          </button>
+
+          {settingsOpen && (
+            <div
+              style={{
+                position: 'absolute',
+                top: 'calc(100% + 8px)',
+                right: 0,
+                background: 'var(--ui-surface)',
+                border: '1px solid var(--ui-line)',
+                boxShadow: '0 10px 24px rgba(0,0,0,0.3)',
+                zIndex: 1000,
+                minWidth: 200,
+              }}
+            >
+              {/* Profile */}
+              <button
+                onClick={() => {
+                  onSettings();
+                  setSettingsOpen(false);
+                }}
+                style={{
+                  width: '100%',
+                  background: 'transparent',
+                  border: 'none',
+                  borderBottom: '1px solid var(--ui-line)',
+                  padding: '10px 14px',
+                  textAlign: 'left',
+                  cursor: 'pointer',
+                  color: 'var(--ui-text)',
+                  fontSize: 12,
+                  fontFamily: "'Courier Prime', monospace",
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  transition: 'all 0.12s',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'var(--ui-text)';
+                  e.currentTarget.style.color = 'var(--ui-bg)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'transparent';
+                  e.currentTarget.style.color = 'var(--ui-text)';
+                }}
+              >
+                <span>👤</span> Profile
+              </button>
+
+              {/* Controls */}
+              <button
+                onClick={() => {
+                  onSettings();
+                  setSettingsOpen(false);
+                }}
+                style={{
+                  width: '100%',
+                  background: 'transparent',
+                  border: 'none',
+                  borderBottom: '1px solid var(--ui-line)',
+                  padding: '10px 14px',
+                  textAlign: 'left',
+                  cursor: 'pointer',
+                  color: 'var(--ui-text)',
+                  fontSize: 12,
+                  fontFamily: "'Courier Prime', monospace",
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  transition: 'all 0.12s',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'var(--ui-text)';
+                  e.currentTarget.style.color = 'var(--ui-bg)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'transparent';
+                  e.currentTarget.style.color = 'var(--ui-text)';
+                }}
+              >
+                <span>🎮</span> Controls
+              </button>
+
+              {/* Audio */}
+              <button
+                onClick={() => {
+                  onSettings();
+                  setSettingsOpen(false);
+                }}
+                style={{
+                  width: '100%',
+                  background: 'transparent',
+                  border: 'none',
+                  borderBottom: '1px solid var(--ui-line)',
+                  padding: '10px 14px',
+                  textAlign: 'left',
+                  cursor: 'pointer',
+                  color: 'var(--ui-text)',
+                  fontSize: 12,
+                  fontFamily: "'Courier Prime', monospace",
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  transition: 'all 0.12s',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'var(--ui-text)';
+                  e.currentTarget.style.color = 'var(--ui-bg)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'transparent';
+                  e.currentTarget.style.color = 'var(--ui-text)';
+                }}
+              >
+                <span>🔊</span> Audio
+              </button>
+
+              {/* Theme */}
+              <button
+                onClick={() => {
+                  onTheme();
+                }}
+                style={{
+                  width: '100%',
+                  background: 'transparent',
+                  border: 'none',
+                  padding: '10px 14px',
+                  textAlign: 'left',
+                  cursor: 'pointer',
+                  color: 'var(--ui-text)',
+                  fontSize: 12,
+                  fontFamily: "'Courier Prime', monospace",
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  transition: 'all 0.12s',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'var(--ui-text)';
+                  e.currentTarget.style.color = 'var(--ui-bg)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'transparent';
+                  e.currentTarget.style.color = 'var(--ui-text)';
+                }}
+              >
+                <span>🎨</span> Theme: {themeLabel}
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Friends Button */}
+        {onFriends && (
+          <button
+            onClick={onFriends}
+            title="Friends"
+            style={{
+              background: 'var(--ui-surface)',
+              border: '1px solid var(--ui-line)',
+              color: 'var(--ui-muted)',
+              padding: '6px 11px',
+              cursor: 'pointer',
+              fontFamily: "'Courier Prime', monospace",
+              fontSize: 14,
+              fontWeight: 700,
+              transition: 'all 0.12s',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = 'var(--ui-text)';
+              e.currentTarget.style.borderColor = 'var(--ui-text)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = 'var(--ui-muted)';
+              e.currentTarget.style.borderColor = 'var(--ui-line)';
+            }}
+          >
+            👥
+          </button>
+        )}
       </div>
     </div>
   );
@@ -187,6 +408,21 @@ export function SetupUtilityBar({
   onTheme: () => void;
   onSettings: () => void;
 }) {
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const settingsRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(e: Event) {
+      if (settingsRef.current && !settingsRef.current.contains(e.target as Node)) {
+        setSettingsOpen(false);
+      }
+    }
+    if (settingsOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [settingsOpen]);
+
   return (
     <div
       style={{
@@ -202,8 +438,183 @@ export function SetupUtilityBar({
       <UnoWordmark compact />
 
       <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
-        <UtilityButton onClick={onTheme}>Theme: {themeLabel}</UtilityButton>
-        <UtilityButton onClick={onSettings}>Settings</UtilityButton>
+        {/* Settings Popover */}
+        <div ref={settingsRef} style={{ position: 'relative' }}>
+          <button
+            onClick={() => setSettingsOpen(!settingsOpen)}
+            title="Settings"
+            style={{
+              background: 'var(--ui-surface)',
+              border: '1px solid var(--ui-line)',
+              color: 'var(--ui-muted)',
+              padding: '6px 11px',
+              cursor: 'pointer',
+              fontFamily: "'Courier Prime', monospace",
+              fontSize: 14,
+              fontWeight: 700,
+              transition: 'all 0.12s',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = 'var(--ui-text)';
+              e.currentTarget.style.borderColor = 'var(--ui-text)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = 'var(--ui-muted)';
+              e.currentTarget.style.borderColor = 'var(--ui-line)';
+            }}
+          >
+            ⚙️
+          </button>
+
+          {settingsOpen && (
+            <div
+              style={{
+                position: 'absolute',
+                top: 'calc(100% + 8px)',
+                right: 0,
+                background: 'var(--ui-surface)',
+                border: '1px solid var(--ui-line)',
+                boxShadow: '0 10px 24px rgba(0,0,0,0.3)',
+                zIndex: 1000,
+                minWidth: 200,
+              }}
+            >
+              {/* Profile */}
+              <button
+                onClick={() => {
+                  onSettings();
+                  setSettingsOpen(false);
+                }}
+                style={{
+                  width: '100%',
+                  background: 'transparent',
+                  border: 'none',
+                  borderBottom: '1px solid var(--ui-line)',
+                  padding: '10px 14px',
+                  textAlign: 'left',
+                  cursor: 'pointer',
+                  color: 'var(--ui-text)',
+                  fontSize: 12,
+                  fontFamily: "'Courier Prime', monospace",
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  transition: 'all 0.12s',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'var(--ui-text)';
+                  e.currentTarget.style.color = 'var(--ui-bg)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'transparent';
+                  e.currentTarget.style.color = 'var(--ui-text)';
+                }}
+              >
+                <span>👤</span> Profile
+              </button>
+
+              {/* Controls */}
+              <button
+                onClick={() => {
+                  onSettings();
+                  setSettingsOpen(false);
+                }}
+                style={{
+                  width: '100%',
+                  background: 'transparent',
+                  border: 'none',
+                  borderBottom: '1px solid var(--ui-line)',
+                  padding: '10px 14px',
+                  textAlign: 'left',
+                  cursor: 'pointer',
+                  color: 'var(--ui-text)',
+                  fontSize: 12,
+                  fontFamily: "'Courier Prime', monospace",
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  transition: 'all 0.12s',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'var(--ui-text)';
+                  e.currentTarget.style.color = 'var(--ui-bg)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'transparent';
+                  e.currentTarget.style.color = 'var(--ui-text)';
+                }}
+              >
+                <span>🎮</span> Controls
+              </button>
+
+              {/* Audio */}
+              <button
+                onClick={() => {
+                  onSettings();
+                  setSettingsOpen(false);
+                }}
+                style={{
+                  width: '100%',
+                  background: 'transparent',
+                  border: 'none',
+                  borderBottom: '1px solid var(--ui-line)',
+                  padding: '10px 14px',
+                  textAlign: 'left',
+                  cursor: 'pointer',
+                  color: 'var(--ui-text)',
+                  fontSize: 12,
+                  fontFamily: "'Courier Prime', monospace",
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  transition: 'all 0.12s',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'var(--ui-text)';
+                  e.currentTarget.style.color = 'var(--ui-bg)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'transparent';
+                  e.currentTarget.style.color = 'var(--ui-text)';
+                }}
+              >
+                <span>🔊</span> Audio
+              </button>
+
+              {/* Theme */}
+              <button
+                onClick={() => {
+                  onTheme();
+                }}
+                style={{
+                  width: '100%',
+                  background: 'transparent',
+                  border: 'none',
+                  padding: '10px 14px',
+                  textAlign: 'left',
+                  cursor: 'pointer',
+                  color: 'var(--ui-text)',
+                  fontSize: 12,
+                  fontFamily: "'Courier Prime', monospace",
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  transition: 'all 0.12s',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'var(--ui-text)';
+                  e.currentTarget.style.color = 'var(--ui-bg)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'transparent';
+                  e.currentTarget.style.color = 'var(--ui-text)';
+                }}
+              >
+                <span>🎨</span> Theme: {themeLabel}
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

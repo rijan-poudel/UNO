@@ -9,6 +9,10 @@ import ColorPicker from "./ColorPicker";
 import { announceBoardFromTransition, announceBoardWinner } from "../lib/voiceAnnouncer";
 import { playShuffleMotionChime, playTableChime, primeTableAudioFromUserGesture } from "../lib/tableChimes";
 import { useAudioManager } from "../hooks/useAudioManager";
+import {
+  isMusicEnabledForContext,
+  setMusicEnabledForContext,
+} from "../lib/audioSettings";
 
 export type GameApi = ReturnType<typeof useUnoGame>;
 
@@ -410,8 +414,8 @@ function WinnerScreen({
 export default function GameBoard({
   gameApi, onReset, onDealAgain, onOpenSettings, onCycleTheme, currentThemeLabel,
 }: GameBoardProps) {
-  // Audio manager for music and SFX (must be first in component)
-  const { playMusic, pauseMusic, playCardMixing, playCardThrowing } = useAudioManager();
+  // Audio manager for SFX and shared background music control
+  const { playCardMixing, playCardThrowing } = useAudioManager();
 
   const {
     game, localPlayerIndex, pendingWild, drawnThisTurn, botThinking,
@@ -419,38 +423,17 @@ export default function GameBoard({
     selectCard, confirmWildColor, cancelWild, drawCard, pass, sayUno, callOut, resetGame,
   } = gameApi;
 
-  // Start music when the game starts (not just on pointerdown)
-  useEffect(() => {
-    if (game && !game.winnerId) {
-      playMusic();
-    }
-  }, [game, playMusic]);
+  const [gameMusicEnabled, setGameMusicEnabled] = useState<boolean>(() =>
+    typeof window === "undefined" ? true : isMusicEnabledForContext("game"),
+  );
 
-  // Stop music when the game ends
   useEffect(() => {
-    if (game?.winnerId) {
-      pauseMusic();
-    }
-  }, [game?.winnerId, pauseMusic]);
-
-  // Listen for music volume changes and update music element immediately
-  useEffect(() => {
-    const handler = () => {
-      // This will trigger the useAudioManager's event listener to update volume
-      // (already implemented in useAudioManager)
+    const sync = () => {
+      setGameMusicEnabled(isMusicEnabledForContext("game"));
     };
-    window.addEventListener("uno:audio-settings", handler);
-    return () => window.removeEventListener("uno:audio-settings", handler);
+    window.addEventListener("uno:audio-settings", sync);
+    return () => window.removeEventListener("uno:audio-settings", sync);
   }, []);
-
-  // Ensure music starts on first user gesture (for autoplay policy)
-  useEffect(() => {
-    const handler = () => {
-      playMusic();
-    };
-    window.addEventListener("pointerdown", handler, { once: true });
-    return () => window.removeEventListener("pointerdown", handler);
-  }, [playMusic]);
 
   const hasPendingStackOption =
     "hasPendingStackOption" in gameApi
@@ -465,6 +448,7 @@ export default function GameBoard({
   const [feed, setFeed] = useState<FeedEntry[]>([]);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
   const [showUnoFlash, setShowUnoFlash] = useState(false);
+  const [showUnoDeclaredBadge, setShowUnoDeclaredBadge] = useState(false);
   const [actionFlash, setActionFlash] = useState<ActionFlashState | null>(null);
   const [callOutFlashName, setCallOutFlashName] = useState<string | null>(null);
   const [isNarrowMobile, setIsNarrowMobile] = useState(false);
@@ -487,9 +471,11 @@ export default function GameBoard({
   const prevGameRef = useRef<GameState | null>(null);
   const actionFlashTimerRef = useRef<number | null>(null);
   const autoActionExecuteTimerRef = useRef<number | null>(null);
+  const unoBadgeResetTimerRef = useRef<number | null>(null);
   const turnTimerKeyRef = useRef<string | null>(null);
   const turnTimerDeadlineRef = useRef<number>(0);
   const prevLocalHandIdsRef = useRef<string[]>([]);
+  const prevLocalHandCountRef = useRef<number | null>(null);
   const pendingPlayRectRef = useRef<{ cardId: string; x: number; y: number } | null>(null);
   const animationCounterRef = useRef(0);
   const dealAnimationKeyRef = useRef<string | null>(null);
@@ -667,8 +653,18 @@ export default function GameBoard({
       };
     }
 
+    if (showUnoDeclaredBadge) {
+      if (unoBadgeResetTimerRef.current !== null) {
+        window.clearTimeout(unoBadgeResetTimerRef.current);
+      }
+      unoBadgeResetTimerRef.current = window.setTimeout(() => {
+        setShowUnoDeclaredBadge(false);
+        unoBadgeResetTimerRef.current = null;
+      }, 1000);
+    }
+
     selectCard(card);
-  }, [selectCard]);
+  }, [showUnoDeclaredBadge, selectCard]);
 
   const triggerActionFlash = useCallback((text: string, tone: ActionFlashTone) => {
     if (actionFlashTimerRef.current !== null) {
@@ -689,8 +685,42 @@ export default function GameBoard({
       if (autoActionExecuteTimerRef.current !== null) {
         window.clearTimeout(autoActionExecuteTimerRef.current);
       }
+      if (unoBadgeResetTimerRef.current !== null) {
+        window.clearTimeout(unoBadgeResetTimerRef.current);
+      }
     };
   }, []);
+
+  useEffect(() => {
+    if (!localPlayer || localPlayer.isBot) {
+      prevLocalHandCountRef.current = null;
+      return;
+    }
+
+    const currentHandCount = localPlayer.hand.length;
+    const previousHandCount = prevLocalHandCountRef.current;
+
+    if (!localPlayer.saidUno) {
+      if (unoBadgeResetTimerRef.current !== null) {
+        window.clearTimeout(unoBadgeResetTimerRef.current);
+        unoBadgeResetTimerRef.current = null;
+      }
+      prevLocalHandCountRef.current = currentHandCount;
+      return;
+    }
+
+    if (previousHandCount !== null && currentHandCount < previousHandCount) {
+      if (unoBadgeResetTimerRef.current !== null) {
+        window.clearTimeout(unoBadgeResetTimerRef.current);
+      }
+      unoBadgeResetTimerRef.current = window.setTimeout(() => {
+        setShowUnoDeclaredBadge(false);
+        unoBadgeResetTimerRef.current = null;
+      }, 1000);
+    }
+
+    prevLocalHandCountRef.current = currentHandCount;
+  }, [localPlayer]);
 
   // Record wins as they happen
   useEffect(() => {
@@ -950,6 +980,11 @@ export default function GameBoard({
     if (!game || !localPlayer || game.winnerId) return;
     if (localPlayer.isBot) return;
     sayUno(localPlayerIndex);
+    if (unoBadgeResetTimerRef.current !== null) {
+      window.clearTimeout(unoBadgeResetTimerRef.current);
+      unoBadgeResetTimerRef.current = null;
+    }
+    setShowUnoDeclaredBadge(true);
     setShowUnoFlash(true);
     window.setTimeout(() => setShowUnoFlash(false), 900);
   }, [game, localPlayer, sayUno, localPlayerIndex]);
@@ -1195,6 +1230,9 @@ export default function GameBoard({
   const headerPadding = isCompactBoard ? "4px 8px" : "6px 12px";
   const footerPadding = isCompactBoard ? "4px 14px" : "6px 18px";
   const themeButtonLabel = isNarrowMobile ? "Theme" : `Theme: ${currentThemeLabel}`;
+  const musicButtonLabel = isNarrowMobile
+    ? (gameMusicEnabled ? "Music On" : "Music Off")
+    : (gameMusicEnabled ? "Music: On" : "Music: Off");
   const settingsButtonLabel = isNarrowMobile ? "Prefs" : "Settings";
 
   const hint = !humanTurn
@@ -1334,6 +1372,28 @@ export default function GameBoard({
               color: "var(--ui-muted)", padding: isCompactBoard ? "6px 10px" : "8px 13px",
               cursor: "pointer", transition: "color 0.12s",
             }}>{themeButtonLabel}</button>
+            <button
+              type="button"
+              onClick={() => {
+                const next = !gameMusicEnabled;
+                setMusicEnabledForContext("game", next);
+                setGameMusicEnabled(next);
+              }}
+              style={{
+                fontFamily: "'Courier Prime', monospace",
+                fontSize: isCompactBoard ? 10 : 11,
+                fontWeight: 700,
+                letterSpacing: "0.14em",
+                textTransform: "uppercase",
+                background: "var(--ui-surface)",
+                border: "1px solid var(--ui-line)",
+                color: gameMusicEnabled ? "var(--ui-muted)" : "var(--ui-accent-red)",
+                padding: isCompactBoard ? "6px 10px" : "8px 13px",
+                cursor: "pointer",
+                transition: "color 0.12s",
+              }}
+              title="Toggle game music"
+            >{musicButtonLabel}</button>
             <button onClick={onOpenSettings} style={{
               fontFamily: "'Courier Prime', monospace",
               fontSize: isCompactBoard ? 10 : 11, fontWeight: 700,
@@ -1835,7 +1895,7 @@ export default function GameBoard({
             }}>{humanTurn ? "— your turn" : "— waiting"}</span>
 
             {/* UNO declared badge */}
-            {localPlayer.saidUno && localPlayer.hand.length <= 2 && (
+            {showUnoDeclaredBadge && localPlayer.saidUno && localPlayer.hand.length <= 2 && (
               <span style={{
                 fontFamily: "'Courier Prime', monospace", fontSize: 8, fontWeight: 700,
                 letterSpacing: "0.14em", background: "var(--ui-accent-red)", color: "#fff",

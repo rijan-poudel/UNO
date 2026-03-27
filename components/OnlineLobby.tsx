@@ -2,7 +2,7 @@
 
 import type { ReactNode } from 'react';
 import { useEffect, useMemo, useState } from 'react';
-import type { FriendInvite, RoomSnapshot } from '../types/multiplayer';
+import type { FriendInvite, FriendPresenceState, RoomSnapshot } from '../types/multiplayer';
 import { toast } from 'sonner';
 import SetupShell from './SetupShell';
 import { CountBadge, PrimaryButton, SectionDivider, SegmentedToggle, SetupIntro, UtilityButton } from './ui/PageChrome';
@@ -96,7 +96,7 @@ interface OnlineLobbyProps {
   controls?: ReactNode;
   onBack?: () => void;
   onSyncPresence: (playerName: string) => Promise<boolean>;
-  onCheckFriendOnline: (friendCodes: string[]) => Promise<Record<string, boolean>>;
+  onCheckFriendOnline: (friendCodes: string[]) => Promise<Record<string, FriendPresenceState>>;
   onCreateRoom: (playerName: string) => Promise<boolean>;
   onJoinRoom: (roomId: string, playerName: string) => Promise<boolean>;
   onSendFriendInvite: (targetFriendCode: string, playerName: string) => Promise<boolean>;
@@ -136,7 +136,7 @@ export default function OnlineLobby({
   const [panel, setPanel] = useState<'create' | 'join'>('create');
   const [friendCodeInput, setFriendCodeInput] = useState('');
   const [friends, setFriends] = useState<FriendEntry[]>([]);
-  const [onlineMap, setOnlineMap] = useState<Record<string, boolean>>({});
+  const [presenceMap, setPresenceMap] = useState<Record<string, FriendPresenceState>>({});
   const [busy, setBusy] = useState(false);
 
   const displayName = playerName.trim() || 'Player 1';
@@ -205,7 +205,7 @@ export default function OnlineLobby({
 
   useEffect(() => {
     if (!friends.length) {
-      setOnlineMap({});
+      setPresenceMap({});
       return;
     }
 
@@ -213,7 +213,7 @@ export default function OnlineLobby({
     const refreshStatuses = async () => {
       const statuses = await onCheckFriendOnline(friends.map((friend) => friend.friendCode));
       if (!disposed) {
-        setOnlineMap(statuses);
+        setPresenceMap(statuses);
       }
     };
 
@@ -241,12 +241,17 @@ export default function OnlineLobby({
   const isRoomFull = (room?.players.length ?? 0) >= 4;
   const sortedFriends = useMemo(
     () => [...friends].sort((a, b) => {
-      const aOnline = onlineMap[a.friendCode] ? 1 : 0;
-      const bOnline = onlineMap[b.friendCode] ? 1 : 0;
+      const rank = (state: FriendPresenceState | undefined) => {
+        if (state === 'playing') return 2;
+        if (state === 'online') return 1;
+        return 0;
+      };
+      const aOnline = rank(presenceMap[a.friendCode]);
+      const bOnline = rank(presenceMap[b.friendCode]);
       if (aOnline !== bOnline) return bOnline - aOnline;
       return b.lastSeenAt - a.lastSeenAt;
     }),
-    [friends, onlineMap],
+    [friends, presenceMap],
   );
 
   async function wrap(action: () => Promise<boolean>) {
@@ -634,7 +639,21 @@ export default function OnlineLobby({
               <p style={{ margin: 0, fontSize: 10, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--ui-muted)' }}>
                 Friends
               </p>
-              {sortedFriends.map((friend) => (
+              {sortedFriends.map((friend) => {
+                const presence = presenceMap[friend.friendCode] ?? 'offline';
+                const isInviteAllowed = presence !== 'offline';
+                const statusColor = presence === 'playing'
+                  ? 'var(--ui-accent-blue)'
+                  : presence === 'online'
+                    ? 'var(--ui-accent-green)'
+                    : 'var(--ui-muted)';
+                const statusLabel = presence === 'playing'
+                  ? 'Playing'
+                  : presence === 'online'
+                    ? 'Online'
+                    : 'Offline';
+
+                return (
                 <div
                   key={friend.friendCode}
                   style={{
@@ -661,24 +680,24 @@ export default function OnlineLobby({
                     fontWeight: 700,
                     letterSpacing: '0.1em',
                     textTransform: 'uppercase',
-                    color: onlineMap[friend.friendCode] ? 'var(--ui-accent-green)' : 'var(--ui-muted)',
+                    color: statusColor,
                     whiteSpace: 'nowrap',
-                  }}>{onlineMap[friend.friendCode] ? 'Online' : 'Offline'}</span>
+                  }}>{statusLabel}</span>
 
                   <button
                     type="button"
-                    disabled={busy || !displayName || !onlineMap[friend.friendCode]}
+                    disabled={busy || !displayName || !isInviteAllowed}
                     onClick={() => wrap(() => sendInviteToFriend(friend.friendCode, friend.name))}
                     style={{
                       padding: '7px 9px',
                       border: '1px solid var(--ui-line)',
                       background: 'transparent',
-                      color: onlineMap[friend.friendCode] ? 'var(--ui-text)' : 'var(--ui-muted)',
+                      color: isInviteAllowed ? 'var(--ui-text)' : 'var(--ui-muted)',
                       fontSize: 10,
                       letterSpacing: '0.08em',
                       textTransform: 'uppercase',
-                      cursor: busy || !displayName || !onlineMap[friend.friendCode] ? 'default' : 'pointer',
-                      opacity: busy || !displayName || !onlineMap[friend.friendCode] ? 0.5 : 1,
+                      cursor: busy || !displayName || !isInviteAllowed ? 'default' : 'pointer',
+                      opacity: busy || !displayName || !isInviteAllowed ? 0.5 : 1,
                     }}
                   >Invite</button>
 
@@ -697,7 +716,8 @@ export default function OnlineLobby({
                     title={`Remove ${friend.name}`}
                   >×</button>
                 </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </>

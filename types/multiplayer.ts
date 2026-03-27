@@ -102,8 +102,10 @@ export interface FriendStatusPayload {
   friendCodes: string[];
 }
 
+export type FriendPresenceState = 'offline' | 'online' | 'playing';
+
 export interface FriendStatusResponse {
-  statuses: Record<string, boolean>;
+  statuses: Record<string, FriendPresenceState>;
 }
 
 export interface AckSuccess<T> {

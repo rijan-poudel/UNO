@@ -18,6 +18,7 @@ import type {
   AddBotPayload,
   CreateRoomPayload,
   DismissFriendInvitePayload,
+  FriendPresenceState,
   FriendInvite,
   KickPlayerPayload,
   LeaveRoomPayload,
@@ -525,18 +526,27 @@ const io = new Server(httpServer, {
 io.on('connection', (socket) => {
   socket.on('friend:status', (
     payload: { friendCodes?: string[] },
-    reply?: (ack: Ack<{ statuses: Record<string, boolean> }>) => void,
+    reply?: (ack: Ack<{ statuses: Record<string, FriendPresenceState> }>) => void,
   ) => {
     try {
       const codes = Array.isArray(payload.friendCodes)
         ? payload.friendCodes
         : [];
 
-      const statuses: Record<string, boolean> = {};
+      const statuses: Record<string, FriendPresenceState> = {};
       for (const code of codes) {
         const normalized = normalizeFriendCode(code ?? '');
         if (!normalized) continue;
-        statuses[normalized] = presenceByFriendCode.has(normalized);
+
+        const presence = presenceByFriendCode.get(normalized);
+        if (!presence) {
+          statuses[normalized] = 'offline';
+          continue;
+        }
+
+        statuses[normalized] = playerBySocket.has(presence.socketId)
+          ? 'playing'
+          : 'online';
       }
 
       reply?.({ ok: true, data: { statuses } });

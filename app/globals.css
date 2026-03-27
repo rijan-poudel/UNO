@@ -41,7 +41,7 @@ body {
   Both GameSetup and GameBoard inherit this background.
 */
 body {
-    background-color: #fff8f0;
+    background-color: #121212;
     margin: 0;
 }
 

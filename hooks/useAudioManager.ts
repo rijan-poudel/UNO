@@ -1,58 +1,84 @@
-import { useEffect, useRef } from "react";
-import { getAudioSettings } from "../lib/audioSettings";
+import { useEffect } from "react";
+import {
+  getAudioSettings,
+  isMusicEnabledForContext,
+  type MusicContext,
+} from "../lib/audioSettings";
+
+let globalMusic: HTMLAudioElement | null = null;
+let globalCardMixing: HTMLAudioElement | null = null;
+let globalCardThrowing: HTMLAudioElement | null = null;
+let activeMusicContext: MusicContext = "lobby";
+
+function ensureMusicElement(): HTMLAudioElement {
+  if (!globalMusic) {
+    globalMusic = new Audio("/audios/background_music.wav");
+    globalMusic.loop = true;
+  }
+  return globalMusic;
+}
+
+function getContextMusicVolume(): number {
+  const settings = getAudioSettings();
+  const enabled = isMusicEnabledForContext(activeMusicContext);
+  return enabled ? settings.musicVolume ?? 0.7 : 0;
+}
+
+function applyMusicVolume(): void {
+  if (!globalMusic) return;
+  globalMusic.volume = getContextMusicVolume();
+}
 
 export function useAudioManager() {
-  // Background music
-  const musicRef = useRef<HTMLAudioElement | null>(null);
-  // Card SFX
-  const cardMixingRef = useRef<HTMLAudioElement | null>(null);
-  const cardThrowingRef = useRef<HTMLAudioElement | null>(null);
+  const setMusicContext = (context: MusicContext) => {
+    activeMusicContext = context;
+    applyMusicVolume();
+  };
 
   // Play background music (looped)
-  const playMusic = () => {
-    if (!musicRef.current) {
-      musicRef.current = new Audio("/audios/background_music.mp3");
-      musicRef.current.loop = true;
+  const playMusic = (context?: MusicContext) => {
+    if (context) {
+      activeMusicContext = context;
     }
-    const settings = getAudioSettings();
-    musicRef.current.volume = settings.musicVolume ?? 0.7;
-    musicRef.current.play().catch(() => {});
+    const music = ensureMusicElement();
+    applyMusicVolume();
+    music.play().catch(() => {});
   };
 
   // Pause background music
   const pauseMusic = () => {
-    musicRef.current?.pause();
+    globalMusic?.pause();
   };
 
   // Play card mixing sound
   const playCardMixing = () => {
-    if (!cardMixingRef.current) {
-      cardMixingRef.current = new Audio("/audios/card_mixing.mp3");
+    if (!globalCardMixing) {
+      globalCardMixing = new Audio("/audios/card_mixing.mp3");
     }
     const settings = getAudioSettings();
-    cardMixingRef.current.volume = settings.sfxVolume ?? 0.8;
-    cardMixingRef.current.currentTime = 0;
-    cardMixingRef.current.play().catch(() => {});
+    globalCardMixing.volume = settings.sfxVolume ?? 0.8;
+    globalCardMixing.currentTime = 0;
+    globalCardMixing.play().catch(() => {});
   };
 
   // Play card throwing sound (lower volume)
   const playCardThrowing = () => {
-    if (!cardThrowingRef.current) {
-      cardThrowingRef.current = new Audio("/audios/card_throwing.mp3");
+    if (!globalCardThrowing) {
+      globalCardThrowing = new Audio("/audios/card_throwing.mp3");
     }
     const settings = getAudioSettings();
-    cardThrowingRef.current.volume = (settings.sfxVolume ?? 0.8) * 0.5;
-    cardThrowingRef.current.currentTime = 0;
-    cardThrowingRef.current.play().catch(() => {});
+    globalCardThrowing.volume = (settings.sfxVolume ?? 0.8) * 0.5;
+    globalCardThrowing.currentTime = 0;
+    globalCardThrowing.play().catch(() => {});
   };
 
-  // React to volume changes
+  // React to volume/context changes
   useEffect(() => {
     const handler = () => {
+      applyMusicVolume();
       const settings = getAudioSettings();
-      if (musicRef.current) musicRef.current.volume = settings.musicVolume ?? 0.7;
-      if (cardMixingRef.current) cardMixingRef.current.volume = settings.sfxVolume ?? 0.8;
-      if (cardThrowingRef.current) cardThrowingRef.current.volume = (settings.sfxVolume ?? 0.8) * 0.5;
+      if (globalCardMixing) globalCardMixing.volume = settings.sfxVolume ?? 0.8;
+      if (globalCardThrowing) globalCardThrowing.volume = (settings.sfxVolume ?? 0.8) * 0.5;
     };
     window.addEventListener("uno:audio-settings", handler);
     return () => window.removeEventListener("uno:audio-settings", handler);
@@ -61,6 +87,7 @@ export function useAudioManager() {
   return {
     playMusic,
     pauseMusic,
+    setMusicContext,
     playCardMixing,
     playCardThrowing,
   };
