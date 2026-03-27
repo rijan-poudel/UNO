@@ -36,7 +36,6 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: `
               (function() {
-                const PREFERRED_THEME_KEY = 'uno.preferred.theme';
                 const themeVars = {
                   paper: {
                     '--ui-bg': '#fafafa',
@@ -83,15 +82,8 @@ export default function RootLayout({
                     '--ui-accent-blue': '#ce93d8',
                   },
                 };
-                
-                let theme = 'midnight';
-                try {
-                  const stored = localStorage.getItem(PREFERRED_THEME_KEY);
-                  if (stored && (stored === 'paper' || stored === 'forest' || stored === 'sunset')) {
-                    theme = stored;
-                  }
-                } catch {}
-                
+
+                const theme = 'midnight';
                 const vars = themeVars[theme] || themeVars.midnight;
                 Object.entries(vars).forEach(([key, value]) => {
                   document.documentElement.style.setProperty(key, value);

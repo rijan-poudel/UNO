@@ -6,14 +6,11 @@ import type { GameState, Player } from "../types/game";
 import type { useUnoGame } from "../hooks/useUnoGame";
 import UnoCard from "./UnoCard";
 import ColorPicker from "./ColorPicker";
+import ProfileChip from "./ProfileChip";
 import { announceBoardFromTransition, announceBoardWinner } from "../lib/voiceAnnouncer";
 import { playShuffleMotionChime, playTableChime, primeTableAudioFromUserGesture } from "../lib/tableChimes";
 import { useAudioManager } from "../hooks/useAudioManager";
-import {
-  isMusicEnabledForContext,
-  setMusicEnabledForContext,
-} from "../lib/audioSettings";
-import { AlertTriangle } from "lucide-react";
+import { AudioLines, Gamepad2, LogOut, Settings, User } from "lucide-react";
 
 export type GameApi = ReturnType<typeof useUnoGame>;
 
@@ -21,7 +18,7 @@ interface GameBoardProps {
   gameApi: GameApi;
   onReset: () => void;
   onDealAgain: () => void;
-  onOpenSettings: () => void;
+  onOpenSettings: (tab?: "profile" | "controls" | "audio") => void;
   onCycleTheme: () => void;
   currentThemeLabel: string;
 }
@@ -82,6 +79,33 @@ function ActionTray({ children }: { children: ReactNode }) {
   );
 }
 
+function GameCard({
+  card,
+  scale,
+  faceDown = false,
+  isPlayable = false,
+  isSelected = false,
+  onClick,
+}: {
+  card: Card;
+  scale: number;
+  faceDown?: boolean;
+  isPlayable?: boolean;
+  isSelected?: boolean;
+  onClick?: () => void;
+}) {
+  return (
+    <UnoCard
+      card={card}
+      faceDown={faceDown}
+      sizeMultiplier={scale}
+      isPlayable={isPlayable}
+      isSelected={isSelected}
+      onClick={onClick}
+    />
+  );
+}
+
 function AnimatedCards({ animations }: { animations: TravelAnimation[] }) {
   if (!animations.length) return null;
 
@@ -118,31 +142,6 @@ function useScoreTracker() {
   return { scores, recordWin, reset };
 }
 
-// ── Call-out flash overlay ─────────────────────────────────────────────────────
-// Big centred flash when you catch someone who forgot UNO
-function CallOutFlash({ name }: { name: string }) {
-  return (
-    <div style={{
-      position: "fixed", inset: 0, zIndex: 87, pointerEvents: "none",
-      display: "flex", alignItems: "center", justifyContent: "center",
-    }}>
-      <div style={{
-        fontFamily: "'Bebas Neue', cursive",
-        fontSize: "clamp(40px, 10vw, 80px)",
-        lineHeight: 1,
-        color: "var(--ui-accent-red)",
-        textAlign: "center",
-        animation: "callOutPop 1.1s cubic-bezier(0.22,1,0.36,1) forwards",
-      }}>
-        <span style={{ display: "inline-flex", alignItems: "center", gap: 10 }}>
-          <AlertTriangle size={42} strokeWidth={2.6} />
-          {name}
-        </span>
-        <br />forgot UNO!
-      </div>
-    </div>
-  );
-}
 
 function ActionFlash({ text, tone }: { text: string; tone: ActionFlashTone }) {
   const colorByTone: Record<ActionFlashTone, string> = {
@@ -228,12 +227,16 @@ function OpponentStrip({
   compact?: boolean;
 }) {
   const n = player.hand.length;
-  const opponentCardScale = cardScale * (compact ? 0.72 : 0.88);
+  const opponentCardScale = cardScale;
   const fans = Math.min(n, compact ? 4 : 6);
-  const overlap = Math.round((compact ? 18 : 26) * opponentCardScale);
-  const fanWidth = Math.max(28, (82 * opponentCardScale) + Math.max(0, fans - 1) * overlap);
-  const fanHeight = 122 * opponentCardScale + 8;
+  const extraFanCards = Math.max(0, fans - 4);
+  const fanCompaction = extraFanCards > 0 ? Math.max(0.6, 1 - (extraFanCards * 0.18)) : 1;
+  const effectiveFanScale = opponentCardScale * fanCompaction;
+  const overlap = Math.round((compact ? 18 : 26) * effectiveFanScale * (extraFanCards > 0 ? 0.84 : 1));
+  const fanWidth = Math.max(28, (82 * effectiveFanScale) + Math.max(0, fans - 1) * overlap);
+  const fanHeight = 122 * effectiveFanScale + 8;
   const fanMid = (fans - 1) / 2;
+  const turnBoost = isCurrentTurn ? 1.08 : 1;
 
   return (
     <button
@@ -266,15 +269,16 @@ function OpponentStrip({
           <div key={i} style={{
             position: "absolute",
             left: i * overlap,
-            top: -Math.abs(i - fanMid) * (2.4 * opponentCardScale),
-            transform: `rotate(${(i - fanMid) * -7}deg)`,
-            transformOrigin: "top center",
-            zIndex: i,
+            top: -Math.abs(i - fanMid) * (2.2 * effectiveFanScale),
+            transform: `rotate(${(i - fanMid) * -7}deg) scale(${turnBoost})`,
+            transformOrigin: "bottom center",
+            zIndex: isCurrentTurn ? i + 30 : i,
             transition: "transform 0.2s ease, opacity 0.2s ease",
           }}>
-            <UnoCard
+            <GameCard
               card={{ id: `_opp-${player.id}-${i}`, color: "wild", value: "wild" }}
-              faceDown sizeMultiplier={opponentCardScale}
+              faceDown
+              scale={effectiveFanScale}
             />
           </div>
         ))}
@@ -289,14 +293,14 @@ function OpponentStrip({
             animation: "dot 1.1s ease-in-out infinite", flexShrink: 0,
           }} />
         )}
-        <span style={{
-          fontFamily: "'Bebas Neue', cursive",
-          fontSize: compact ? 13 : 16,
-          letterSpacing: "0.05em",
-          color: canCallOut ? "var(--ui-accent-red)" : "var(--ui-text)",
-        }}>
-          {player.isBot ? "⌘ " : ""}{player.name}
-        </span>
+        <ProfileChip
+          name={player.name}
+          seed={player.id}
+          compact
+          textColor={canCallOut ? "var(--ui-accent-red)" : "var(--ui-text)"}
+          maxNameWidth={compact ? 88 : 116}
+          ringColor={player.saidUno && n === 1 ? "var(--ui-accent-red)" : undefined}
+        />
         {player.saidUno && n === 1 && (
           <span style={{
             fontFamily: "'Courier Prime', monospace",
@@ -307,12 +311,6 @@ function OpponentStrip({
         )}
       </div>
 
-      <span style={{
-        fontFamily: "'Courier Prime', monospace",
-        fontSize: compact ? 8 : 9,
-        color: canCallOut ? "var(--ui-accent-red)" : "var(--ui-muted)",
-        letterSpacing: "0.06em",
-      }}>{n} {n === 1 ? "card" : "cards"}</span>
       {canCallOut && (
         <span style={{
           fontFamily: "'Courier Prime', monospace",
@@ -424,21 +422,9 @@ export default function GameBoard({
 
   const {
     game, localPlayerIndex, pendingWild, drawnThisTurn, botThinking,
-    log, currentPlayer, localPlayer, isLocalTurn, playableCardIds,
+    currentPlayer, localPlayer, isLocalTurn, playableCardIds,
     selectCard, confirmWildColor, cancelWild, drawCard, pass, sayUno, callOut, resetGame,
   } = gameApi;
-
-  const [gameMusicEnabled, setGameMusicEnabled] = useState<boolean>(() =>
-    typeof window === "undefined" ? true : isMusicEnabledForContext("game"),
-  );
-
-  useEffect(() => {
-    const sync = () => {
-      setGameMusicEnabled(isMusicEnabledForContext("game"));
-    };
-    window.addEventListener("uno:audio-settings", sync);
-    return () => window.removeEventListener("uno:audio-settings", sync);
-  }, []);
 
   const hasPendingStackOption =
     "hasPendingStackOption" in gameApi
@@ -450,12 +436,11 @@ export default function GameBoard({
       ? ((gameApi as { wildPickerPlayerName?: string | null }).wildPickerPlayerName ?? null)
       : null;
 
-  const [feed, setFeed] = useState<FeedEntry[]>([]);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
+  const [showGameSettingsMenu, setShowGameSettingsMenu] = useState(false);
   const [showUnoFlash, setShowUnoFlash] = useState(false);
   const [showUnoDeclaredBadge, setShowUnoDeclaredBadge] = useState(false);
   const [actionFlash, setActionFlash] = useState<ActionFlashState | null>(null);
-  const [callOutFlashName, setCallOutFlashName] = useState<string | null>(null);
   const [isNarrowMobile, setIsNarrowMobile] = useState(false);
   const [isCompactBoard, setIsCompactBoard] = useState(false);
   const [boardScale, setBoardScale] = useState(1);
@@ -469,8 +454,6 @@ export default function GameBoard({
   const turnTransitionLocked = actionFlash !== null;
 
   const { scores, recordWin } = useScoreTracker();
-  const feedCounter = useRef(0);
-  const prevLogRef = useRef<string[]>([]);
   const prevWinnerRef = useRef<string | null>(null);
   const prevActionKeyRef = useRef<string | null>(null);
   const prevGameRef = useRef<GameState | null>(null);
@@ -487,6 +470,7 @@ export default function GameBoard({
   const drawPileRef = useRef<HTMLButtonElement | null>(null);
   const discardPileRef = useRef<HTMLDivElement | null>(null);
   const localHandRef = useRef<HTMLDivElement | null>(null);
+  const gameSettingsRef = useRef<HTMLDivElement | null>(null);
   const playerZoneRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const handCardRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
@@ -743,19 +727,6 @@ export default function GameBoard({
   }, [game?.winnerId, game?.players, game?.turnCount, localPlayer?.id, recordWin]);
 
   useEffect(() => {
-    if (!log.length) return;
-    const newest = log[0];
-    if (newest && newest !== prevLogRef.current[0]) {
-      feedCounter.current += 1;
-      const id = feedCounter.current;
-      setFeed(prev => [{ id, text: newest }, ...prev].slice(0, 5));
-      prevLogRef.current = log;
-      const t = window.setTimeout(() => setFeed(prev => prev.filter(e => e.id !== id)), 4000);
-      return () => window.clearTimeout(t);
-    }
-  }, [log]);
-
-  useEffect(() => {
     const update = () => {
       const portrait = window.matchMedia("(orientation: portrait)").matches;
       const mobileLike = Math.min(window.innerWidth, window.innerHeight) <= 900;
@@ -858,9 +829,12 @@ export default function GameBoard({
 
     if (action.type === "callOut") {
       playTableChime("callOut");
+      const callOutFlashDelay = action.callerId === action.targetId
+        ? ACTION_FLASH_HOLD_MS + 40
+        : (ACTION_FLASH_HOLD_MS * 2) + 80;
       const timer = window.setTimeout(() => {
         animateDrawToPlayer(action.targetId, action.penalty);
-      }, ACTION_FLASH_HOLD_MS + 40);
+      }, callOutFlashDelay);
       return () => window.clearTimeout(timer);
     }
 
@@ -967,14 +941,11 @@ export default function GameBoard({
         queueActionFlash(`FALSE CALL +${action.penalty}`, "red");
         return;
       }
-      const callerName = game.players.find((player) => player.id === action.callerId)?.name ?? "Player";
-      const targetName = game.players.find((player) => player.id === action.targetId)?.name ?? "Player";
-      const calledYou = action.targetId === localPlayer.id;
-      queueActionFlash(
-        calledYou ? `CALLED OUT +${action.penalty}` : `${callerName} CALLED ${targetName}`,
-        "red",
-      );
-      return;
+      queueActionFlash("UNO", "red");
+      const timer = window.setTimeout(() => {
+        triggerActionFlash(`+${action.penalty}`, "yellow");
+      }, ACTION_FLASH_HOLD_MS + 40);
+      return () => window.clearTimeout(timer);
     }
 
   }, [game, localPlayer, triggerActionFlash]);
@@ -1004,11 +975,8 @@ export default function GameBoard({
     }
   }, [game, localPlayer, declareUno]);
 
-  // Wrap callOut to also show the flash
-  const handleCallOut = useCallback((callerIdx: number, targetIdx: number, targetName: string) => {
+  const handleCallOut = useCallback((callerIdx: number, targetIdx: number) => {
     callOut(callerIdx, targetIdx);
-    setCallOutFlashName(targetName);
-    window.setTimeout(() => setCallOutFlashName(null), 1100);
   }, [callOut]);
 
   // Keyboard shortcuts: Space = draw, U = UNO
@@ -1187,8 +1155,6 @@ export default function GameBoard({
       : null;
   void activeColorMeta;
 
-  const pileCardScale = boardScale;
-
   // Dynamic hand card scale: shrink cards so they always fit above the info row.
   // Budget = total viewport height
   //   minus opponents section (~120px typical)
@@ -1209,9 +1175,12 @@ export default function GameBoard({
   const availableHandWidth = Math.max(220, viewportW - (isCompactBoard ? 34 : 52) - reservedRightPx);
   const requiredHandWidthAtScale1 = 82 + Math.max(0, handCount - 1) * 26;
   const scaledByWidth = availableHandWidth / Math.max(1, requiredHandWidthAtScale1);
-  const handCardScale = boardScale < 1
+  const gameCardScale = boardScale < 1
     ? Math.max(0.42, Math.min(scaledByHeight, scaledByWidth, 1.0))   // compact viewport: cap at 1.0
     : Math.max(0.42, Math.min(scaledByHeight, scaledByWidth, 1.3));  // full viewport: allow up to 1.3
+  const localHandCardScale = gameCardScale;
+  const localTurnBoost = isLocalTurn && !game.winnerId ? 1.08 : 1;
+  const pileCardScale = gameCardScale;
 
   const mustDrawNow = humanTurn && !turnTransitionLocked && !drawDisabled && playableCardIds.size === 0;
   const mustAutoDrawRequired = humanTurn && !turnTransitionLocked && game.pendingDraw > 0 && !hasPendingStackOption;
@@ -1231,14 +1200,6 @@ export default function GameBoard({
   const directionSymbol = game.direction === 1 ? "⟳" : "⟲";
   const showCountdown = turnCountdownSeconds > 0;
   const timerUrgent = turnCountdownSeconds > 0 && turnCountdownSeconds <= 6;
-  const barHeight = isCompactBoard ? 42 : 50;
-  const headerPadding = isCompactBoard ? "4px 8px" : "6px 12px";
-  const footerPadding = isCompactBoard ? "4px 14px" : "6px 18px";
-  const themeButtonLabel = isNarrowMobile ? "Theme" : `Theme: ${currentThemeLabel}`;
-  const musicButtonLabel = isNarrowMobile
-    ? (gameMusicEnabled ? "Music On" : "Music Off")
-    : (gameMusicEnabled ? "Music: On" : "Music: Off");
-  const settingsButtonLabel = isNarrowMobile ? "Prefs" : "Settings";
 
   const hint = !humanTurn
     ? `Waiting for ${currentPlayer.name}`
@@ -1259,9 +1220,21 @@ export default function GameBoard({
 
   const infoLine = hoveredCardHint ? `CARD: ${hoveredCardHint}` : hint;
 
-  const handOverlap = Math.round(26 * handCardScale);
+  const handOverlap = Math.round(26 * localHandCardScale);
+  const localHandSidePadding = isCompactBoard ? (isNarrowMobile ? 82 : 120) : 132;
   const ARC_SPREAD = 3.5;
   const ARC_LIFT   = 2.5;
+
+  useEffect(() => {
+    if (!showGameSettingsMenu) return;
+    const handleClickOutside = (event: MouseEvent) => {
+      if (gameSettingsRef.current && !gameSettingsRef.current.contains(event.target as Node)) {
+        setShowGameSettingsMenu(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showGameSettingsMenu]);
 
   return (
     <>
@@ -1272,7 +1245,6 @@ export default function GameBoard({
         @keyframes blink   { 0%,100%{opacity:1} 50%{opacity:0.15} }
         @keyframes dot     { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.3;transform:scale(0.6)} }
         @keyframes fadeUp  { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
-        @keyframes feedIn  { from{opacity:0;transform:translateX(10px)} to{opacity:1;transform:translateX(0)} }
         @keyframes modalIn { from{opacity:0;transform:translateY(12px) scale(0.98)} to{opacity:1;transform:none} }
         @keyframes timerPulse {
           0%,100% { filter: drop-shadow(0 0 0 rgba(192,57,43,0.00)); }
@@ -1307,8 +1279,8 @@ export default function GameBoard({
         }
         /* Call out button pulses up and down to demand attention */
         @keyframes callOutAttention {
-          from { transform: translateX(-50%) translateY(0) scale(1); }
-          to   { transform: translateX(-50%) translateY(-4px) scale(1.04); }
+          from { transform: translateY(0) scale(1); }
+          to   { transform: translateY(-4px) scale(1.04); }
         }
         /* Call out flash centre screen */
         @keyframes callOutPop {
@@ -1330,14 +1302,10 @@ export default function GameBoard({
 
         .uno-btn { transition: opacity 0.12s; }
         .uno-btn:hover { opacity: 0.82 !important; }
-        .menu-btn { transition: color 0.12s; }
-        .menu-btn:hover { color: var(--ui-accent-red) !important; }
       `}</style>
 
-      <LiveFeed entries={feed} />
       <AnimatedCards animations={animations} />
       {actionFlash && <ActionFlash text={actionFlash.text} tone={actionFlash.tone} />}
-      {callOutFlashName && <CallOutFlash name={callOutFlashName} />}
 
       <div
         onPointerDownCapture={() => primeTableAudioFromUserGesture()}
@@ -1348,86 +1316,222 @@ export default function GameBoard({
         display: "flex", flexDirection: "column",
       }}
       >
-
-        {/* ── Header ── */}
-        <div style={{
-          position: "absolute", top: 0, left: 0, right: 0, zIndex: 30,
-          padding: headerPadding,
-          minHeight: barHeight,
-          display: "flex", justifyContent: "space-between", alignItems: "center",
-          pointerEvents: "none",
-          background: "var(--ui-bg)",
-          borderBottom: "1px solid var(--ui-line)",
-        }}>
-          <h1 style={{
-            margin: 0, pointerEvents: "auto",
-            fontFamily: "'Bebas Neue', cursive",
-            fontSize: isCompactBoard ? 26 : 32, letterSpacing: "0.02em", lineHeight: 1,
-          }}>
-            <span style={{ color: "var(--ui-accent-red)" }}>U</span>
-            <span style={{ color: "var(--ui-accent-yellow)" }}>N</span>
-            <span style={{ color: "var(--ui-accent-green)" }}>O</span>
-          </h1>
-          <div style={{ display: "flex", alignItems: "center", gap: 6, pointerEvents: "auto" }}>
-            <button type="button" onClick={onCycleTheme} style={{
-              fontFamily: "'Courier Prime', monospace",
-              fontSize: isCompactBoard ? 10 : 11, fontWeight: 700,
-              letterSpacing: "0.14em", textTransform: "uppercase",
-              background: "var(--ui-surface)", border: "1px solid var(--ui-line)",
-              color: "var(--ui-muted)", padding: isCompactBoard ? "6px 10px" : "8px 13px",
-              cursor: "pointer", transition: "color 0.12s",
-            }}>{themeButtonLabel}</button>
-            <button
-              type="button"
-              onClick={() => {
-                const next = !gameMusicEnabled;
-                setMusicEnabledForContext("game", next);
-                setGameMusicEnabled(next);
-              }}
-              style={{
-                fontFamily: "'Courier Prime', monospace",
-                fontSize: isCompactBoard ? 10 : 11,
-                fontWeight: 700,
-                letterSpacing: "0.14em",
-                textTransform: "uppercase",
-                background: "var(--ui-surface)",
-                border: "1px solid var(--ui-line)",
-                color: gameMusicEnabled ? "var(--ui-muted)" : "var(--ui-accent-red)",
-                padding: isCompactBoard ? "6px 10px" : "8px 13px",
-                cursor: "pointer",
-                transition: "color 0.12s",
-              }}
-              title="Toggle game music"
-            >{musicButtonLabel}</button>
-            <button onClick={onOpenSettings} style={{
-              fontFamily: "'Courier Prime', monospace",
-              fontSize: isCompactBoard ? 10 : 11, fontWeight: 700,
-              letterSpacing: "0.14em", textTransform: "uppercase",
-              background: "var(--ui-surface)", border: "1px solid var(--ui-line)",
-              color: "var(--ui-muted)", padding: isCompactBoard ? "6px 10px" : "8px 13px",
-              cursor: "pointer", transition: "color 0.12s",
-            }}>{settingsButtonLabel}</button>
-            <button className="menu-btn" onClick={() => setShowExitConfirm(true)} style={{
-              fontFamily: "'Courier Prime', monospace",
-              fontSize: isCompactBoard ? 10 : 11, fontWeight: 700,
-              letterSpacing: "0.14em", textTransform: "uppercase",
-              background: "var(--ui-surface)", border: "1px solid var(--ui-line)",
-              color: "var(--ui-muted)", padding: isCompactBoard ? "6px 10px" : "8px 13px",
-              cursor: "pointer",
-            }}>MENU</button>
+        <div
+          ref={gameSettingsRef}
+          style={{
+            position: "absolute",
+            bottom: isNarrowMobile ? 12 : 16,
+            right: isNarrowMobile ? 8 : 12,
+            zIndex: 44,
+            display: "flex",
+            alignItems: "center",
+            gap: isNarrowMobile ? 8 : 10,
+          }}
+        >
+          <div
+            style={{
+              pointerEvents: "none",
+              display: "flex",
+              alignItems: "center",
+              transform: "scale(1.2)",
+              transformOrigin: "center right",
+            }}
+          >
+            <ProfileChip
+              name={localPlayer.name}
+              seed={localPlayer.id}
+              compact={false}
+              maxNameWidth={isNarrowMobile ? 110 : 144}
+              ringColor={localPlayer.saidUno && localPlayer.hand.length === 1 ? "var(--ui-accent-red)" : undefined}
+              ringWidth={2.5}
+            />
           </div>
+
+          <button
+            type="button"
+            onClick={() => setShowGameSettingsMenu((prev) => !prev)}
+            title="Settings"
+            style={{
+              width: isNarrowMobile ? 40 : 44,
+              height: isNarrowMobile ? 40 : 44,
+              border: "none",
+              background: "var(--ui-surface)",
+              color: "var(--ui-text)",
+              display: "grid",
+              placeItems: "center",
+              cursor: "pointer",
+              boxShadow: "0 6px 14px rgba(0,0,0,0.18)",
+            }}
+          >
+            <Settings size={18} strokeWidth={2.4} />
+          </button>
+
+          {showGameSettingsMenu ? (
+            <div
+              style={{
+                position: "absolute",
+                bottom: "calc(100% + 8px)",
+                right: 0,
+                minWidth: 220,
+                border: "1px solid var(--ui-line)",
+                background: "var(--ui-surface)",
+                boxShadow: "0 12px 28px rgba(0,0,0,0.24)",
+                display: "grid",
+                zIndex: 45,
+              }}
+            >
+              <div
+                style={{
+                  padding: "12px 18px",
+                  borderBottom: "1px solid var(--ui-line)",
+                  fontSize: 12,
+                  fontWeight: 700,
+                  letterSpacing: "0.06em",
+                  textTransform: "uppercase",
+                  color: "color-mix(in oklab, var(--ui-text) 72%, transparent)",
+                  fontFamily: "'Courier Prime', monospace",
+                }}
+              >
+                Settings
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  onOpenSettings("profile");
+                  setShowGameSettingsMenu(false);
+                }}
+                style={{
+                  border: "none",
+                  borderBottom: "1px solid var(--ui-line)",
+                  background: "transparent",
+                  color: "var(--ui-text)",
+                  padding: "10px 12px",
+                  textAlign: "left",
+                  fontFamily: "'Courier Prime', monospace",
+                  fontSize: 11,
+                  letterSpacing: "0.08em",
+                  textTransform: "uppercase",
+                  cursor: "pointer",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 8,
+                }}
+              >
+                <User size={14} strokeWidth={2.5} />
+                Profile
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  onOpenSettings("controls");
+                  setShowGameSettingsMenu(false);
+                }}
+                style={{
+                  border: "none",
+                  borderBottom: "1px solid var(--ui-line)",
+                  background: "transparent",
+                  color: "var(--ui-text)",
+                  padding: "10px 12px",
+                  textAlign: "left",
+                  fontFamily: "'Courier Prime', monospace",
+                  fontSize: 11,
+                  letterSpacing: "0.08em",
+                  textTransform: "uppercase",
+                  cursor: "pointer",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 8,
+                }}
+              >
+                <Gamepad2 size={14} strokeWidth={2.5} />
+                Controls
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  onOpenSettings("audio");
+                  setShowGameSettingsMenu(false);
+                }}
+                style={{
+                  border: "none",
+                  borderBottom: "1px solid var(--ui-line)",
+                  background: "transparent",
+                  color: "var(--ui-text)",
+                  padding: "10px 12px",
+                  textAlign: "left",
+                  fontFamily: "'Courier Prime', monospace",
+                  fontSize: 11,
+                  letterSpacing: "0.08em",
+                  textTransform: "uppercase",
+                  cursor: "pointer",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 8,
+                }}
+              >
+                <AudioLines size={14} strokeWidth={2.5} />
+                Audio settings
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  onCycleTheme();
+                  setShowGameSettingsMenu(false);
+                }}
+                style={{
+                  border: "none",
+                  borderBottom: "1px solid var(--ui-line)",
+                  background: "transparent",
+                  color: "var(--ui-text)",
+                  padding: "10px 12px",
+                  textAlign: "left",
+                  fontFamily: "'Courier Prime', monospace",
+                  fontSize: 11,
+                  letterSpacing: "0.08em",
+                  textTransform: "uppercase",
+                  cursor: "pointer",
+                }}
+              >
+                Theme: {currentThemeLabel}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowGameSettingsMenu(false);
+                  setShowExitConfirm(true);
+                }}
+                style={{
+                  border: "none",
+                  background: "color-mix(in oklab, var(--ui-accent-red) 14%, transparent)",
+                  color: "var(--ui-accent-red)",
+                  padding: "10px 12px",
+                  textAlign: "left",
+                  fontFamily: "'Courier Prime', monospace",
+                  fontSize: 11,
+                  letterSpacing: "0.08em",
+                  textTransform: "uppercase",
+                  cursor: "pointer",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 8,
+                }}
+              >
+                <LogOut size={14} strokeWidth={2.5} />
+                Leave game
+              </button>
+            </div>
+          ) : null}
         </div>
 
         {/* ── Opponents — paddingTop clears floating header ── */}
         <section style={{
-          paddingTop: isCompactBoard ? 40 : 48,
+          paddingTop: isCompactBoard ? 12 : 18,
           paddingBottom: isCompactBoard ? 4 : 8,
           paddingInline: isNarrowMobile ? 6 : 12,
           display: "flex", flexWrap: "wrap",
           gap: isCompactBoard ? (isNarrowMobile ? "3px 8px" : "4px 14px") : "8px 20px",
           justifyContent: "center", alignItems: "flex-start",
           flexShrink: 0,
-          borderBottom: "1px solid var(--ui-line)",
         }}>
           {opponents.map(player => {
             const idx = game.players.findIndex(p => p.id === player.id);
@@ -1438,8 +1542,8 @@ export default function GameBoard({
                   player={player}
                   isCurrentTurn={idx === game.currentPlayerIndex}
                   canCallOut={canCallOut}
-                  onCallOut={() => handleCallOut(localPlayerIndex, idx, player.name)}
-                  cardScale={handCardScale}
+                  onCallOut={() => handleCallOut(localPlayerIndex, idx)}
+                  cardScale={gameCardScale}
                   compact={isNarrowMobile}
                 />
               </div>
@@ -1456,6 +1560,7 @@ export default function GameBoard({
           padding: isCompactBoard ? (isNarrowMobile ? "0 4px" : "0 8px") : "0 16px",
           overflow: "hidden",
           transform: isCompactBoard ? (isNarrowMobile ? "translateY(-1px)" : "translateY(-4px)") : "translateY(-10px)",
+          position: "relative",
         }}>
 
           <div style={{
@@ -1501,7 +1606,7 @@ export default function GameBoard({
                     ? "drop-shadow(0 0 7px rgba(192,57,43,0.55))" : "none",
                 }}
               >
-                <UnoCard card={{ id: "_draw", color: "wild", value: "wild" }} faceDown sizeMultiplier={pileCardScale} />
+                <GameCard card={{ id: "_draw", color: "wild", value: "wild" }} faceDown scale={pileCardScale} />
               </button>
               <span style={{
                 fontFamily: "'Courier Prime', monospace", fontSize: 10,
@@ -1536,7 +1641,14 @@ export default function GameBoard({
                 letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--ui-muted)",
               }}>DISCARD</span>
               {topDiscard && (
-                <div ref={discardPileRef} style={{ position: "relative", width: 120 * pileCardScale, height: 160 * pileCardScale }}>
+                <div
+                  ref={discardPileRef}
+                  style={{
+                    position: "relative",
+                    width: Math.round((82 * pileCardScale) + (18 * pileCardScale)),
+                    height: Math.round((122 * pileCardScale) + (20 * pileCardScale)),
+                  }}
+                >
                   {game.discardPile.slice(-4).map((card, idx, arr) => {
                     const isTop = idx === arr.length - 1;
                     const displayCard = isTop && discardDisplayCard ? discardDisplayCard : card;
@@ -1551,7 +1663,7 @@ export default function GameBoard({
                         animation: isTop ? "discardLand 0.24s cubic-bezier(0.22,1,0.36,1)" : "none",
                         willChange: isTop ? "transform, opacity" : "auto",
                       }}>
-                        <UnoCard card={displayCard} sizeMultiplier={pileCardScale} />
+                        <GameCard card={displayCard} scale={pileCardScale} />
                       </div>
                     );
                   })}
@@ -1566,7 +1678,6 @@ export default function GameBoard({
         {/* ── Player panel ── */}
         <div style={{
           flexShrink: 0,
-          borderTop: "1px solid var(--ui-line)",
           position: "relative",
           overflow: "visible",
           zIndex: 12,
@@ -1764,13 +1875,13 @@ export default function GameBoard({
               alignItems: "flex-end",
               justifyContent: "center",
               minWidth: "max-content",
-              paddingLeft:  isCompactBoard ? (isNarrowMobile ? 8 : 16) : 24,
-              paddingRight: isCompactBoard ? (isNarrowMobile ? 8 : 16) : 24,
+              paddingLeft:  localHandSidePadding,
+              paddingRight: localHandSidePadding,
               paddingTop:   isCompactBoard ? (isNarrowMobile ? 8 : 12) : 16,
               paddingBottom: 0,
               height: isCompactBoard
-                ? `${Math.round(122 * handCardScale) + (isNarrowMobile ? 20 : 28)}px`
-                : `${Math.round(122 * handCardScale) + 36}px`,
+                ? `${Math.round(122 * localHandCardScale) + (isNarrowMobile ? 20 : 28)}px`
+                : `${Math.round(122 * localHandCardScale) + 36}px`,
               overflow: "visible",
             }}
               onMouseMove={(event) => {
@@ -1802,7 +1913,7 @@ export default function GameBoard({
                   ? 0
                   : Math.sign(i - hoveredHandPosition) * (8 * gaussian);
                 const baseLift = isSelected ? liftPx - 14 : liftPx;
-                const baseTransform = `translateX(${horizontalPush}px) rotate(${rotateDeg}deg) translateY(${baseLift - dockLift}px) scale(${dockScale})`;
+                const baseTransform = `translateX(${horizontalPush}px) rotate(${rotateDeg}deg) translateY(${baseLift - dockLift}px) scale(${dockScale * localTurnBoost})`;
 
                 return (
                   <div
@@ -1856,125 +1967,16 @@ export default function GameBoard({
                         zIndex: 3,
                       }}>DREW</span>
                     )}
-                    <UnoCard
-                      card={card} sizeMultiplier={handCardScale}
-                      isPlayable={playable} isSelected={isSelected} onClick={undefined}
+                    <GameCard
+                      card={card}
+                      scale={localHandCardScale}
+                      isPlayable={playable}
+                      isSelected={isSelected}
                     />
                   </div>
                 );
               })}
             </div>
-          </div>
-
-          {/* ── Info row — always below cards, never covered ── */}
-          <div style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 10,
-            padding: footerPadding,
-            minHeight: isNarrowMobile ? 58 : barHeight,
-            position: "relative",
-            zIndex: 320,
-            background: "var(--ui-bg)",
-            borderTop: "1px solid var(--ui-line)",
-            flexWrap: isNarrowMobile ? "wrap" : "nowrap",
-          }}>
-            {/* Name */}
-            <span style={{
-              fontFamily: "'Bebas Neue', cursive",
-              fontSize: isCompactBoard ? 16 : 19,
-              letterSpacing: "0.05em",
-              color: "var(--ui-text)",
-              lineHeight: 1,
-              flexShrink: 0,
-            }}>{localPlayer.name}</span>
-
-            {/* Turn status */}
-            <span style={{
-              fontFamily: "'Courier Prime', monospace",
-              fontSize: isNarrowMobile ? 8 : isCompactBoard ? 9 : 10,
-              letterSpacing: "0.1em",
-              textTransform: "uppercase",
-              color: "var(--ui-muted)",
-              flexShrink: 0,
-            }}>{humanTurn ? "— your turn" : "— waiting"}</span>
-
-            {/* UNO declared badge */}
-            {showUnoDeclaredBadge && localPlayer.saidUno && localPlayer.hand.length <= 2 && (
-              <span style={{
-                fontFamily: "'Courier Prime', monospace", fontSize: 8, fontWeight: 700,
-                letterSpacing: "0.14em", background: "var(--ui-accent-red)", color: "#fff",
-                padding: "2px 6px", animation: isLocalTurn ? "blink 0.9s step-end infinite" : "none",
-                flexShrink: 0,
-              }}>UNO</span>
-            )}
-
-            {/* Session wins */}
-            {(scores[localPlayer.name] ?? 0) > 0 && (
-              <span style={{
-                fontFamily: "'Courier Prime', monospace", fontSize: 9,
-                color: "var(--ui-muted)", letterSpacing: "0.06em", flexShrink: 0,
-              }}>{scores[localPlayer.name]}W</span>
-            )}
-
-            {/* Separator dot */}
-            {!isNarrowMobile && <span style={{ color: "var(--ui-line)", flexShrink: 0 }}>·</span>}
-
-            {/* Hint — takes remaining space, truncates if needed */}
-            {!isNarrowMobile && (
-              <span style={{
-                fontFamily: "'Courier Prime', monospace",
-                fontSize: isCompactBoard ? 9 : 10,
-                letterSpacing: "0.06em",
-                textTransform: "uppercase",
-                color: "var(--ui-muted)",
-                flex: 1,
-                minWidth: 0,
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                whiteSpace: "nowrap",
-              }}>{infoLine}</span>
-            )}
-
-            <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
-              {showCountdown && (
-                <div title="Turn timer" style={{
-                border: "none",
-                background: timerUrgent
-                  ? "var(--ui-accent-red)"
-                  : "var(--ui-accent-blue)",
-                color: "#fff8f0",
-                padding: isNarrowMobile ? "2px 8px 1px" : isCompactBoard ? "3px 10px 2px" : "4px 12px 3px",
-                minWidth: isNarrowMobile ? 38 : isCompactBoard ? 44 : 52,
-                textAlign: "center",
-                boxShadow: timerUrgent
-                  ? "0 0 0 1px color-mix(in srgb, var(--ui-accent-red) 72%, #000 28%), 0 6px 16px rgba(192,57,43,0.38)"
-                  : "0 0 0 1px color-mix(in srgb, var(--ui-accent-blue) 72%, #000 28%), 0 6px 16px rgba(26,79,138,0.30)",
-                animation: timerUrgent ? "timerPulse 0.75s ease-in-out infinite" : "none",
-              }}>
-                <span style={{
-                  fontFamily: "'Bebas Neue', cursive",
-                  fontSize: isNarrowMobile ? 20 : isCompactBoard ? 24 : 30,
-                  lineHeight: 1,
-                  letterSpacing: "0.04em",
-                }}>{turnCountdownSeconds}</span>
-                </div>
-              )}
-            </div>
-
-            {isNarrowMobile && (
-              <span style={{
-                width: "100%",
-                fontFamily: "'Courier Prime', monospace",
-                fontSize: 8,
-                letterSpacing: "0.06em",
-                textTransform: "uppercase",
-                color: "var(--ui-muted)",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                whiteSpace: "nowrap",
-              }}>{infoLine}</span>
-            )}
           </div>
 
         </div>
@@ -2100,8 +2102,6 @@ export default function GameBoard({
   );
 }
 
-// ── Live feed types ───────────────────────────────────────────────────────
-interface FeedEntry { id: number; text: string }
 type ActionFlashTone = "red" | "yellow" | "green" | "blue" | "text";
 interface ActionFlashState {
   text: string;
@@ -2118,33 +2118,5 @@ interface TravelAnimation {
   scale: number;
   duration: number;
   started: boolean;
-}
-
-// ── Live feed component ────────────────────────────────────────────────────
-function LiveFeed({ entries }: { entries: FeedEntry[] }) {
-  if (!entries.length) return null;
-  return (
-    <div style={{
-      position: "fixed", top: 82, right: 14, zIndex: 40,
-      display: "flex", flexDirection: "column", alignItems: "flex-end",
-      gap: 10, pointerEvents: "none", maxWidth: 320,
-    }}>
-      {entries.map((e, i) => (
-        <div key={e.id} style={{
-          fontFamily: "'Courier Prime', monospace",
-          fontSize: 10,
-          letterSpacing: "0.1em",
-          textTransform: "uppercase",
-          color: i === 0 ? "var(--ui-text)" : "color-mix(in srgb, var(--ui-muted) 78%, var(--ui-text) 22%)",
-          opacity: i === 0 ? 1 : Math.max(0.22, 1 - i * 0.26),
-          textShadow: "0 2px 8px rgba(26,15,0,0.22)",
-          animation: i === 0 ? "feedIn 0.2s ease" : "none",
-          transition: "opacity 0.25s ease",
-          whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
-          maxWidth: "100%",
-        }}>{e.text}</div>
-      ))}
-    </div>
-  );
 }
 

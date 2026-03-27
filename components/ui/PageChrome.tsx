@@ -161,12 +161,16 @@ export function UnoWordmark({ compact = false }: { compact?: boolean }) {
 export function HomeUtilityBar({
   themeLabel,
   onTheme,
-  onSettings,
+  onOpenProfileSettings,
+  onOpenControlsSettings,
+  onOpenAudioSettings,
   onFriends,
 }: {
   themeLabel: string;
   onTheme: () => void;
-  onSettings: () => void;
+  onOpenProfileSettings: () => void;
+  onOpenControlsSettings: () => void;
+  onOpenAudioSettings: () => void;
   onFriends?: () => void;
 }) {
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -203,7 +207,7 @@ export function HomeUtilityBar({
             title="Settings"
             style={{
               background: 'var(--ui-surface)',
-              border: '1px solid var(--ui-line)',
+              border: 'none',
               color: 'var(--ui-muted)',
               padding: '6px 11px',
               cursor: 'pointer',
@@ -214,11 +218,9 @@ export function HomeUtilityBar({
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.color = 'var(--ui-text)';
-              e.currentTarget.style.borderColor = 'var(--ui-text)';
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.color = 'var(--ui-muted)';
-              e.currentTarget.style.borderColor = 'var(--ui-line)';
             }}
           >
             <Settings size={16} strokeWidth={2} />
@@ -240,7 +242,7 @@ export function HomeUtilityBar({
               {/* Profile */}
               <button
                 onClick={() => {
-                  onSettings();
+                  onOpenProfileSettings();
                   setSettingsOpen(false);
                 }}
                 style={{
@@ -274,7 +276,7 @@ export function HomeUtilityBar({
               {/* Controls */}
               <button
                 onClick={() => {
-                  onSettings();
+                  onOpenControlsSettings();
                   setSettingsOpen(false);
                 }}
                 style={{
@@ -308,7 +310,7 @@ export function HomeUtilityBar({
               {/* Audio */}
               <button
                 onClick={() => {
-                  onSettings();
+                  onOpenAudioSettings();
                   setSettingsOpen(false);
                 }}
                 style={{
@@ -381,7 +383,7 @@ export function HomeUtilityBar({
             title="Friends"
             style={{
               background: 'var(--ui-surface)',
-              border: '1px solid var(--ui-line)',
+              border: 'none',
               color: 'var(--ui-muted)',
               padding: '6px 11px',
               cursor: 'pointer',
@@ -392,11 +394,9 @@ export function HomeUtilityBar({
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.color = 'var(--ui-text)';
-              e.currentTarget.style.borderColor = 'var(--ui-text)';
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.color = 'var(--ui-muted)';
-              e.currentTarget.style.borderColor = 'var(--ui-line)';
             }}
           >
             <Users size={16} strokeWidth={2} />
@@ -410,11 +410,15 @@ export function HomeUtilityBar({
 export function SetupUtilityBar({
   themeLabel,
   onTheme,
-  onSettings,
+  onOpenProfileSettings,
+  onOpenControlsSettings,
+  onOpenAudioSettings,
 }: {
   themeLabel: string;
   onTheme: () => void;
-  onSettings: () => void;
+  onOpenProfileSettings: () => void;
+  onOpenControlsSettings: () => void;
+  onOpenAudioSettings: () => void;
 }) {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const settingsRef = useRef<HTMLDivElement>(null);
@@ -453,7 +457,7 @@ export function SetupUtilityBar({
             title="Settings"
             style={{
               background: 'var(--ui-surface)',
-              border: '1px solid var(--ui-line)',
+              border: 'none',
               color: 'var(--ui-muted)',
               padding: '6px 11px',
               cursor: 'pointer',
@@ -464,11 +468,9 @@ export function SetupUtilityBar({
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.color = 'var(--ui-text)';
-              e.currentTarget.style.borderColor = 'var(--ui-text)';
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.color = 'var(--ui-muted)';
-              e.currentTarget.style.borderColor = 'var(--ui-line)';
             }}
           >
             <Settings size={16} strokeWidth={2} />
@@ -490,7 +492,7 @@ export function SetupUtilityBar({
               {/* Profile */}
               <button
                 onClick={() => {
-                  onSettings();
+                  onOpenProfileSettings();
                   setSettingsOpen(false);
                 }}
                 style={{
@@ -524,7 +526,7 @@ export function SetupUtilityBar({
               {/* Controls */}
               <button
                 onClick={() => {
-                  onSettings();
+                  onOpenControlsSettings();
                   setSettingsOpen(false);
                 }}
                 style={{
@@ -558,7 +560,7 @@ export function SetupUtilityBar({
               {/* Audio */}
               <button
                 onClick={() => {
-                  onSettings();
+                  onOpenAudioSettings();
                   setSettingsOpen(false);
                 }}
                 style={{
@@ -669,26 +671,15 @@ export function SetupIntro({
   trailing?: ReactNode;
 }) {
   return (
-    <div style={{ display: 'grid', gap: 12 }}>
+    <div className="setup-intro" style={{ display: 'grid', gap: 12 }}>
       {onBack ? (
-        <div>
+        <div className="setup-intro-back" style={{ marginBottom: 10 }}>
           <UtilityButton onClick={onBack}>← Back</UtilityButton>
         </div>
       ) : null}
 
       <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 12 }}>
         <div style={{ display: 'grid', gap: 8 }}>
-          <p
-            style={{
-              margin: 0,
-              fontSize: 10,
-              letterSpacing: '0.22em',
-              textTransform: 'uppercase',
-              color: 'var(--ui-muted)',
-            }}
-          >
-            {eyebrow}
-          </p>
           <h2
             style={{
               margin: 0,

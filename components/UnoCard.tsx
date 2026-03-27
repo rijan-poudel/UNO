@@ -103,27 +103,75 @@ export default function UnoCard({
     return (
       <div style={{
         width: w, height: h, borderRadius: r,
-        background: '#1a0f00',
-        border: `${Math.max(1, Math.round(1.5 * s))}px solid rgba(255,248,240,0.15)`,
+        background: 'linear-gradient(160deg, #1a0f00 0%, #2a1806 100%)',
+        border: `${Math.max(1, Math.round(1.5 * s))}px solid rgba(255,248,240,0.2)`,
         flexShrink: 0, position: 'relative', overflow: 'hidden',
-        boxShadow: `${Math.round(1 * s)}px ${Math.round(2 * s)}px ${Math.round(6 * s)}px rgba(26,15,0,0.22)`,
+        boxShadow: `${Math.round(1 * s)}px ${Math.round(2 * s)}px ${Math.round(8 * s)}px rgba(26,15,0,0.26)`,
       }}>
         <div style={{
           position: 'absolute', inset: Math.round(4 * s),
-          border: '1px solid rgba(255,248,240,0.1)',
+          border: '1px solid rgba(255,248,240,0.16)',
           borderRadius: Math.max(1, r - 1),
-          background: 'repeating-linear-gradient(45deg, rgba(255,248,240,0.03) 0, rgba(255,248,240,0.03) 1px, transparent 1px, transparent 6px)',
+          background: 'radial-gradient(circle at 30% 20%, rgba(255,248,240,0.08), transparent 55%)',
         }} />
+        <div style={{
+          position: 'absolute',
+          inset: Math.round(7 * s),
+          borderRadius: Math.max(1, r - 3),
+          overflow: 'hidden',
+          opacity: 0.9,
+        }}>
+          <div style={{
+            position: 'absolute',
+            top: '-20%',
+            left: '-12%',
+            width: '48%',
+            height: '140%',
+            transform: 'rotate(-25deg)',
+            background: 'linear-gradient(180deg, #ef5350, #c0392b)',
+          }} />
+          <div style={{
+            position: 'absolute',
+            top: '-20%',
+            left: '24%',
+            width: '48%',
+            height: '140%',
+            transform: 'rotate(-25deg)',
+            background: 'linear-gradient(180deg, #fdd835, #d4a017)',
+          }} />
+          <div style={{
+            position: 'absolute',
+            top: '-20%',
+            left: '60%',
+            width: '48%',
+            height: '140%',
+            transform: 'rotate(-25deg)',
+            background: 'linear-gradient(180deg, #42a5f5, #1a4f8a)',
+          }} />
+        </div>
         <div style={{
           position: 'absolute', inset: 0,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>
-          <span style={{
-            fontFamily: "'Bebas Neue', cursive",
-            fontSize: Math.round(13 * s),
-            letterSpacing: '0.1em',
-            color: 'rgba(255,248,240,0.28)',
-          }}>UNO</span>
+          <div style={{
+            width: `${Math.round(54 * s)}px`,
+            height: `${Math.round(34 * s)}px`,
+            borderRadius: '999px',
+            background: 'rgba(26,15,0,0.78)',
+            border: `${Math.max(1, Math.round(2 * s))}px solid rgba(255,248,240,0.9)`,
+            transform: 'rotate(-18deg)',
+            display: 'grid',
+            placeItems: 'center',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.28)',
+          }}>
+            <span style={{
+              fontFamily: "'Bebas Neue', cursive",
+              fontSize: Math.round(15 * s),
+              letterSpacing: '0.12em',
+              color: '#fff8f0',
+              textShadow: '0 1px 2px rgba(0,0,0,0.3)',
+            }}>UNO</span>
+          </div>
         </div>
       </div>
     );

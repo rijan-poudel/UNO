@@ -1,7 +1,20 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import ProfileChip from './ProfileChip';
 const ONLINE_PLAYER_NAME_KEY = 'uno.online.playerName';
+const PLAYER_NAME_UPDATED_EVENT = 'uno:player-name-updated';
+const FALLBACK_PLAYER_NAME = 'Player 1';
+
+function sanitizePlayerName(value: unknown): string {
+  if (typeof value !== 'string') return FALLBACK_PLAYER_NAME;
+  const normalized = value.trim().slice(0, 18);
+  const lowered = normalized.toLowerCase();
+  if (!normalized || lowered === 'null' || lowered === 'undefined') {
+    return FALLBACK_PLAYER_NAME;
+  }
+  return normalized;
+}
 
 interface ProfileButtonProps {
   playerName?: string;
@@ -10,49 +23,70 @@ interface ProfileButtonProps {
 }
 
 export default function ProfileButton({
-  playerName: initialName = 'Player 1',
+  playerName: initialName = FALLBACK_PLAYER_NAME,
   onNameChange,
   onOpenProfileSettings,
 }: ProfileButtonProps) {
-  const [playerName, setPlayerName] = useState(() => {
-    if (initialName && initialName !== 'Player 1') return initialName;
+  const readStoredName = () => {
     try {
       const stored = window.localStorage.getItem(ONLINE_PLAYER_NAME_KEY);
-      return stored && stored.trim() ? stored.trim().slice(0, 18) : 'Player 1';
+      return sanitizePlayerName(stored);
     } catch {
-      return 'Player 1';
+      return FALLBACK_PLAYER_NAME;
     }
+  };
+
+  const [playerName, setPlayerName] = useState(() => {
+    const normalizedInitial = sanitizePlayerName(initialName);
+    if (normalizedInitial !== FALLBACK_PLAYER_NAME) return normalizedInitial;
+    return readStoredName();
   });
 
   const [isEditing, setIsEditing] = useState(false);
   const [lastSavedName, setLastSavedName] = useState(playerName);
-  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Auto-save with debounce
+  const persistPlayerName = (nextRaw: string) => {
+    const normalized = sanitizePlayerName(nextRaw);
+    try {
+      window.localStorage.setItem(ONLINE_PLAYER_NAME_KEY, normalized);
+      window.dispatchEvent(new CustomEvent(PLAYER_NAME_UPDATED_EVENT, { detail: { name: normalized } }));
+    } catch {
+      // Ignore storage errors
+    }
+    setPlayerName(normalized);
+    setLastSavedName(normalized);
+    onNameChange?.(normalized);
+  };
+
   useEffect(() => {
-    if (playerName === lastSavedName) return;
+    const nextInitial = sanitizePlayerName(initialName);
+    if (nextInitial !== FALLBACK_PLAYER_NAME) {
+      setPlayerName(nextInitial);
+      setLastSavedName(nextInitial);
+      return;
+    }
+    const stored = readStoredName();
+    setPlayerName(stored);
+    setLastSavedName(stored);
+  }, [initialName]);
 
-    if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
-
-    saveTimeoutRef.current = setTimeout(() => {
-      const trimmed = playerName.trim().slice(0, 18) || 'Player 1';
-      try {
-        window.localStorage.setItem(ONLINE_PLAYER_NAME_KEY, trimmed);
-      } catch {
-        // Ignore storage errors
-      }
-      setLastSavedName(trimmed);
-      onNameChange?.(trimmed);
-    }, 400);
-
-    return () => {
-      if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+  useEffect(() => {
+    const syncName = () => {
+      const stored = readStoredName();
+      setPlayerName(stored);
+      setLastSavedName(stored);
     };
-  }, [playerName, lastSavedName, onNameChange]);
 
-  const displayName = playerName.trim().slice(0, 18) || 'Player 1';
-  const initial = displayName.charAt(0).toUpperCase();
+    window.addEventListener(PLAYER_NAME_UPDATED_EVENT, syncName as EventListener);
+    window.addEventListener('storage', syncName);
+    return () => {
+      window.removeEventListener(PLAYER_NAME_UPDATED_EVENT, syncName as EventListener);
+      window.removeEventListener('storage', syncName);
+    };
+  }, []);
+
+  const displayName = sanitizePlayerName(playerName);
   const hasChanges = playerName !== lastSavedName;
 
   return (
@@ -73,44 +107,22 @@ export default function ProfileButton({
         if (!isEditing) e.currentTarget.style.background = 'transparent';
       }}
     >
-      {/* Avatar */}
-      <button
-        type="button"
-        style={{
-          width: 32,
-          height: 32,
-          borderRadius: '999px',
-          background: 'var(--ui-accent-blue)',
-          color: 'var(--ui-surface)',
-          display: 'grid',
-          placeItems: 'center',
-          fontFamily: "'Bebas Neue', cursive",
-          fontSize: 14,
-          fontWeight: 700,
-          border: '1px solid var(--ui-line)',
-          flexShrink: 0,
-        }}
-        onClick={() => {
-          if (onOpenProfileSettings) {
-            onOpenProfileSettings();
-            return;
-          }
-          setIsEditing(true);
-        }}
-      >
-        {initial}
-      </button>
-
       {/* Name Input or Display */}
       {isEditing ? (
         <input
           ref={inputRef}
           type="text"
           value={playerName}
-          onChange={(e) => setPlayerName(e.target.value)}
-          onBlur={() => setIsEditing(false)}
+          onChange={(e) => setPlayerName(e.target.value.slice(0, 18))}
+          onBlur={() => {
+            persistPlayerName(playerName);
+            setIsEditing(false);
+          }}
           onKeyDown={(e) => {
-            if (e.key === 'Enter') setIsEditing(false);
+            if (e.key === 'Enter') {
+              persistPlayerName(playerName);
+              setIsEditing(false);
+            }
             if (e.key === 'Escape') {
               setPlayerName(lastSavedName);
               setIsEditing(false);
@@ -120,33 +132,49 @@ export default function ProfileButton({
             fontFamily: "'Courier Prime', monospace",
             fontSize: 13,
             background: 'var(--ui-bg)',
-            border: '1px solid var(--ui-text)',
             color: 'var(--ui-text)',
             padding: '6px 8px',
             borderRadius: '3px',
             minWidth: 100,
             transition: 'border-color 0.15s',
+            outline: 'none',
+            boxShadow: 'none',
           }}
           maxLength={18}
           autoFocus
         />
       ) : (
-        <div
-          onClick={() => setIsEditing(true)}
+        <button
+          type="button"
+          title="Click for more information"
+          aria-label="Click for more information"
+          onClick={() => {
+            if (onOpenProfileSettings) {
+              onOpenProfileSettings();
+              return;
+            }
+            setIsEditing(true);
+          }}
           style={{
-            fontFamily: "'Bebas Neue', cursive",
-            fontSize: 14,
-            letterSpacing: '0.03em',
-            color: 'var(--ui-text)',
+            appearance: 'none',
+            border: 'none',
+            background: 'transparent',
+            padding: 0,
+            margin: 0,
+            color: 'inherit',
+            cursor: 'pointer',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
           }}
         >
-          {displayName}
+          <ProfileChip name={displayName} seed={displayName} />
           {hasChanges && (
             <span style={{ marginLeft: 6, fontSize: 10, color: 'var(--ui-accent-blue)', animation: 'pulse 0.8s infinite' }}>
               saving
             </span>
           )}
-        </div>
+        </button>
       )}
 
       <style>{`

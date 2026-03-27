@@ -31,40 +31,40 @@ export default function SetupShell({ subtitle, children, footer, controls }: Set
           color: 'var(--ui-text)',
           background: 'var(--ui-bg)',
           fontFamily: "'Courier Prime', monospace",
-          padding: 'clamp(14px, 2.4vh, 28px) clamp(12px, 2.6vw, 28px)',
-          display: 'flex',
-          justifyContent: 'center',
-        }}
-      >
-      <div
-        aria-label={subtitle}
-        style={{
-          width: 'min(1040px, 100%)',
-          height: '100%',
           display: 'grid',
-          gridTemplateRows: 'auto minmax(0, 1fr) auto',
-          gap: 'clamp(12px, 2.2vh, 30px)',
+          gridTemplateRows: 'auto minmax(0, 1fr)',
         }}
       >
-        <div>
-          {controls}
-        </div>
+        <div>{controls}</div>
 
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'start',
-            minHeight: 0,
-            overflowY: 'auto',
-            paddingRight: 2,
-          }}
-        >
-          <div style={{ width: 'min(620px, 100%)', display: 'grid', gap: 22 }}>{children}</div>
-        </div>
+        <div style={{ padding: 'clamp(14px, 2.4vh, 28px) clamp(12px, 2.6vw, 28px)' }}>
+          <div
+            aria-label={subtitle}
+            style={{
+              width: 'min(1040px, 100%)',
+              height: '100%',
+              marginInline: 'auto',
+              display: 'grid',
+              gridTemplateRows: 'minmax(0, 1fr) auto',
+              gap: 'clamp(12px, 2.2vh, 30px)',
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'start',
+                minHeight: 0,
+                overflowY: 'auto',
+                paddingRight: 2,
+              }}
+            >
+              <div style={{ width: 'min(620px, 100%)', display: 'grid', gap: 22 }}>{children}</div>
+            </div>
 
-        <div>{footer}</div>
-      </div>
+            <div>{footer}</div>
+          </div>
+        </div>
       </div>
     </>
   );

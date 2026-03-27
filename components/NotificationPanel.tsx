@@ -8,8 +8,10 @@ import {
   ChevronDown,
   ChevronUp,
   Gamepad2,
+  LogOut,
   Palette,
   Settings,
+  User,
   Volume2,
   VolumeX,
 } from 'lucide-react';
@@ -30,8 +32,17 @@ export interface Notification {
 interface NotificationPanelProps {
   themeLabel?: string;
   onSelectTheme?: (themeName: string) => void;
-  onSettings?: () => void;
+  onCycleTheme?: () => void;
+  onOpenControlsSettings?: () => void;
+  onOpenAudioSettings?: () => void;
   onOpenProfileSettings?: () => void;
+  showLogoLeft?: boolean;
+  compact?: boolean;
+  showNotificationsButton?: boolean;
+  onMenuClick?: () => void;
+  musicEnabled?: boolean;
+  onMusicToggle?: () => void;
+  musicContext?: 'lobby' | 'game';
   notifications?: Notification[];
   onNotificationDismiss?: (notificationId: string) => void;
   incomingInviteCount?: number;
@@ -40,8 +51,17 @@ interface NotificationPanelProps {
 export default function NotificationPanel({
   themeLabel = 'Dark',
   onSelectTheme,
-  onSettings,
+  onCycleTheme,
+  onOpenControlsSettings,
+  onOpenAudioSettings,
   onOpenProfileSettings,
+  showLogoLeft = false,
+  compact = false,
+  showNotificationsButton = true,
+  onMenuClick,
+  musicEnabled,
+  onMusicToggle,
+  musicContext = 'lobby',
   notifications = [],
   onNotificationDismiss,
   incomingInviteCount = 0,
@@ -50,7 +70,7 @@ export default function NotificationPanel({
   const [showThemeMenu, setShowThemeMenu] = useState(false);
   const [showThemeOptions, setShowThemeOptions] = useState(false);
   const [lobbyMusicEnabled, setLobbyMusicEnabled] = useState<boolean>(() =>
-    typeof window === 'undefined' ? true : isMusicEnabledForContext('lobby'),
+    typeof window === 'undefined' ? true : isMusicEnabledForContext(musicContext),
   );
   const notificationsRef = useRef<HTMLDivElement>(null);
   const themeRef = useRef<HTMLDivElement>(null);
@@ -84,54 +104,63 @@ export default function NotificationPanel({
 
   useEffect(() => {
     const sync = () => {
-      setLobbyMusicEnabled(isMusicEnabledForContext('lobby'));
+      setLobbyMusicEnabled(isMusicEnabledForContext(musicContext));
     };
     window.addEventListener('uno:audio-settings', sync);
     return () => window.removeEventListener('uno:audio-settings', sync);
-  }, []);
+  }, [musicContext]);
 
   const unreadCount = notifications.filter(n => !n.read).length;
   const totalNotifications = incomingInviteCount + unreadCount;
+  const effectiveMusicEnabled = typeof musicEnabled === 'boolean' ? musicEnabled : lobbyMusicEnabled;
+
+  const handleMusicToggle = () => {
+    if (onMusicToggle) {
+      onMusicToggle();
+      return;
+    }
+    const next = !effectiveMusicEnabled;
+    setMusicEnabledForContext(musicContext, next);
+    setLobbyMusicEnabled(next);
+  };
 
   return (
     <div
       style={{
         width: '100%',
-        padding: '12px 20px',
+        padding: compact ? '6px 12px' : '8px 16px',
         borderBottom: '1px solid var(--ui-line)',
         background: 'var(--ui-bg)',
-        display: 'grid',
-        gridTemplateColumns: 'auto 1fr auto auto auto',
+        display: 'flex',
         alignItems: 'center',
-        gap: 16,
+        gap: 10,
         boxShadow: '0 1px 0 rgba(0, 0, 0, 0.08)',
       }}
     >
       <style>{`
         .np-icon-btn {
-          width: 36px;
-          height: 36px;
-          border: 1px solid var(--ui-line);
+          width: ${compact ? '32px' : '34px'};
+          height: ${compact ? '32px' : '34px'};
+          border: none;
           background: transparent;
           color: var(--ui-text);
           cursor: pointer;
           display: grid;
           place-items: center;
           font-size: 18px;
-          transition: background-color 0.12s, border-color 0.12s, transform 0.08s;
+          transition: background-color 0.12s, transform 0.08s;
           position: relative;
         }
 
         .np-icon-btn svg {
-          width: 14px;
-          height: 14px;
+          width: 16px;
+          height: 16px;
           stroke-width: 2.5;
           shape-rendering: geometricPrecision;
         }
 
         .np-icon-btn:hover {
           background: color-mix(in oklab, var(--ui-text) 8%, transparent);
-          border-color: var(--ui-text);
           transform: translateY(-1px);
         }
 
@@ -341,86 +370,109 @@ export default function NotificationPanel({
       `}</style>
 
 
-      {/* Profile Button */}
-      <ProfileButton onOpenProfileSettings={onOpenProfileSettings} />
+      {showLogoLeft ? (
+        <h1
+          style={{
+            margin: 0,
+            fontFamily: "'Bebas Neue', cursive",
+            fontSize: compact ? 24 : 28,
+            letterSpacing: '0.02em',
+            lineHeight: 1,
+            userSelect: 'none',
+          }}
+        >
+          <span style={{ color: 'var(--ui-accent-red)' }}>U</span>
+          <span style={{ color: 'var(--ui-accent-yellow)' }}>N</span>
+          <span style={{ color: 'var(--ui-accent-green)' }}>O</span>
+        </h1>
+      ) : (
+        <ProfileButton onOpenProfileSettings={onOpenProfileSettings} />
+      )}
 
       {/* Spacer */}
       <div style={{ flex: 1 }} />
 
-      {/* Notification Icon */}
-      <div ref={notificationsRef} style={{ position: 'relative' }}>
-        <button
-          className="np-icon-btn"
-          onClick={() => setShowNotifications(!showNotifications)}
-          title="Notifications"
-        >
-          <Bell />
-          {totalNotifications > 0 && <span className="np-badge">{totalNotifications}</span>}
-        </button>
+      {showNotificationsButton ? (
+        <div ref={notificationsRef} style={{ position: 'relative' }}>
+          <button
+            className="np-icon-btn"
+            onClick={() => setShowNotifications(!showNotifications)}
+            title="Notifications"
+          >
+            <Bell />
+            {totalNotifications > 0 && <span className="np-badge">{totalNotifications}</span>}
+          </button>
 
-        {showNotifications && (
-          <div className="np-popup" style={{ minWidth: 280 }}>
-            <div className="np-popup-header">Notifications</div>
-            {incomingInviteCount > 0 && (
-              <div className="np-popup-item">
-                <div>
-                  <strong>{incomingInviteCount}</strong>&nbsp;
-                  {incomingInviteCount === 1 ? 'Game invite' : 'Game invites'} waiting
+          {showNotifications && (
+            <div className="np-popup" style={{ minWidth: 280 }}>
+              <div className="np-popup-header">Notifications</div>
+              {incomingInviteCount > 0 && (
+                <div className="np-popup-item">
+                  <div>
+                    <strong>{incomingInviteCount}</strong>&nbsp;
+                    {incomingInviteCount === 1 ? 'Game invite' : 'Game invites'} waiting
+                  </div>
                 </div>
-              </div>
-            )}
-            {notifications.length > 0 ? (
-              notifications.map((notif) => (
-                <div
-                  key={notif.id}
-                  className="np-notification-item"
-                  onClick={() => {
-                    onNotificationDismiss?.(notif.id);
-                  }}
-                >
-                  <div style={{ fontWeight: notif.read ? 400 : 700 }}>{notif.title}</div>
+              )}
+              {notifications.length > 0 ? (
+                notifications.map((notif) => (
                   <div
-                    style={{
-                      fontSize: '11px',
-                      color: 'var(--ui-muted)',
-                      marginTop: 2,
+                    key={notif.id}
+                    className="np-notification-item"
+                    onClick={() => {
+                      onNotificationDismiss?.(notif.id);
                     }}
                   >
-                    {notif.message}
+                    <div style={{ fontWeight: notif.read ? 400 : 700 }}>{notif.title}</div>
+                    <div
+                      style={{
+                        fontSize: '11px',
+                        color: 'var(--ui-muted)',
+                        marginTop: 2,
+                      }}
+                    >
+                      {notif.message}
+                    </div>
+                    <div className="np-notification-time">
+                      {new Date(notif.timestamp).toLocaleTimeString()}
+                    </div>
                   </div>
-                  <div className="np-notification-time">
-                    {new Date(notif.timestamp).toLocaleTimeString()}
-                  </div>
+                ))
+              ) : (
+                <div className="np-empty-state">
+                  {incomingInviteCount > 0 ? 'Check the lobby for details' : 'No notifications yet'}
                 </div>
-              ))
-            ) : (
-              <div className="np-empty-state">
-                {incomingInviteCount > 0 ? 'Check the lobby for details' : 'No notifications yet'}
-              </div>
-            )}
-          </div>
-        )}
-      </div>
+              )}
+            </div>
+          )}
+        </div>
+      ) : null}
 
       {/* Lobby Music Toggle */}
       <button
         className="np-icon-btn"
-        onClick={() => {
-          const next = !lobbyMusicEnabled;
-          setMusicEnabledForContext('lobby', next);
-          setLobbyMusicEnabled(next);
-        }}
-        title={lobbyMusicEnabled ? 'Turn lobby music off' : 'Turn lobby music on'}
+        onClick={handleMusicToggle}
+        title={effectiveMusicEnabled ? 'Turn music off' : 'Turn music on'}
         style={{
-          color: lobbyMusicEnabled ? 'var(--ui-text)' : 'var(--ui-accent-red)',
+          color: effectiveMusicEnabled ? 'var(--ui-text)' : 'var(--ui-accent-red)',
         }}
       >
-        {lobbyMusicEnabled ? (
+        {effectiveMusicEnabled ? (
           <Volume2 />
         ) : (
           <VolumeX />
         )}
       </button>
+
+      {onMenuClick ? (
+        <button
+          className="np-icon-btn"
+          onClick={onMenuClick}
+          title="Exit"
+        >
+          <LogOut />
+        </button>
+      ) : null}
 
       {/* Settings Icon */}
       <div ref={themeRef} style={{ position: 'relative' }}>
@@ -440,6 +492,20 @@ export default function NotificationPanel({
         {showThemeMenu && (
           <div className="np-popup" style={{ minWidth: 300 }}>
             <div className="np-popup-header" style={{ color: 'var(--ui-text)' }}>Settings</div>
+
+            <div
+              className="np-popup-item"
+              onClick={() => {
+                onOpenProfileSettings?.();
+                setShowThemeOptions(false);
+                setShowThemeMenu(false);
+              }}
+            >
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, color: 'var(--ui-text)' }}>
+                <User size={14} strokeWidth={2.5} />
+                Profile
+              </span>
+            </div>
 
             <div
               className="np-popup-item"
@@ -475,7 +541,11 @@ export default function NotificationPanel({
                       key={theme.id}
                       className={`np-theme-card ${theme.name === themeLabel ? 'active' : ''}`}
                       onClick={() => {
-                        onSelectTheme?.(theme.id);
+                        if (onSelectTheme) {
+                          onSelectTheme(theme.id);
+                        } else {
+                          onCycleTheme?.();
+                        }
                         setShowThemeOptions(false);
                         setShowThemeMenu(false);
                       }}
@@ -503,7 +573,7 @@ export default function NotificationPanel({
             <div
               className="np-popup-item"
               onClick={() => {
-                onSettings?.();
+                onOpenControlsSettings?.();
                 setShowThemeOptions(false);
                 setShowThemeMenu(false);
               }}
@@ -517,7 +587,7 @@ export default function NotificationPanel({
             <div
               className="np-popup-item"
               onClick={() => {
-                onSettings?.();
+                onOpenAudioSettings?.();
                 setShowThemeOptions(false);
                 setShowThemeMenu(false);
               }}

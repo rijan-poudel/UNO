@@ -19,12 +19,29 @@ interface GameSetupProps {
 
 const MAX_PLAYERS = 8;
 const LOCAL_PLAYER_NAMES_KEY = 'uno.local.playerNames';
+const ONLINE_PLAYER_NAME_KEY = 'uno.online.playerName';
 let uidCounter = 0;
 const nextUid = () => ++uidCounter;
 
+function getStoredProfileName(): string | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = window.localStorage.getItem(ONLINE_PLAYER_NAME_KEY);
+    if (!raw) return null;
+    const normalized = raw.trim().slice(0, 18);
+    if (!normalized) return null;
+    const lowered = normalized.toLowerCase();
+    if (lowered === 'null' || lowered === 'undefined') return null;
+    return normalized;
+  } catch {
+    return null;
+  }
+}
+
 function getInitialPlayers(): PlayerRow[] {
+  const storedProfileName = getStoredProfileName();
   const defaults: PlayerRow[] = [
-    { name: 'Player 1', isBot: false, uid: nextUid() },
+    { name: storedProfileName ?? 'Player 1', isBot: false, uid: nextUid() },
     { name: 'Player 2', isBot: true,  uid: nextUid() },
   ];
 
@@ -39,6 +56,9 @@ function getInitialPlayers(): PlayerRow[] {
       .filter((item): item is string => typeof item === 'string')
       .map(n => n.trim()).filter(n => n.length > 0).slice(0, MAX_PLAYERS);
     if (names.length < 2) return defaults;
+    if (storedProfileName) {
+      names[0] = storedProfileName;
+    }
     return names.map((name, i) => ({ name, isBot: i !== 0, uid: nextUid() }));
   } catch {
     return defaults;

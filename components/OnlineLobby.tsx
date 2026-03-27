@@ -6,6 +6,7 @@ import type { FriendInvite, FriendPresenceState, RoomSnapshot } from '../types/m
 import { toast } from 'sonner';
 import SetupShell from './SetupShell';
 import { CountBadge, PrimaryButton, SectionDivider, SegmentedToggle, SetupIntro, UtilityButton } from './ui/PageChrome';
+import { ChevronDown } from 'lucide-react';
 
 const ONLINE_PLAYER_NAME_KEY = 'uno.online.playerName';
 const ONLINE_ROOM_CODE_KEY = 'uno.online.roomCode';
@@ -13,6 +14,18 @@ const ONLINE_PANEL_KEY = 'uno.online.panel';
 const ONLINE_FRIENDS_KEY = 'uno.online.friends';
 const ONLINE_PREFILL_FRIEND_CODE_KEY = 'uno.online.prefill.friendCode';
 const MAX_FRIENDS = 16;
+const FRIEND_RAIL_LIMIT = 4;
+
+const AVATAR_PALETTE = [
+  { fg: '#102A43', bg: '#F0B429' },
+  { fg: '#2D132C', bg: '#F49D6E' },
+  { fg: '#12355B', bg: '#66C7F4' },
+  { fg: '#1B4332', bg: '#95D5B2' },
+  { fg: '#3D0C02', bg: '#FF9F1C' },
+  { fg: '#2B2D42', bg: '#CDB4DB' },
+  { fg: '#0B3954', bg: '#BFD7EA' },
+  { fg: '#3A0CA3', bg: '#FEC5BB' },
+];
 
 interface FriendEntry {
   friendCode: string;
@@ -82,6 +95,12 @@ function formatLastSeen(ts: number): string {
   const date = new Date(ts);
   if (Number.isNaN(date.getTime())) return 'recently';
   return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+}
+
+function firstAvatarLetter(friend: FriendEntry): string {
+  const source = friend.name.trim() || friend.friendCode;
+  const first = source.charAt(0).toUpperCase();
+  return /[A-Z0-9]/.test(first) ? first : '#';
 }
 
 interface OnlineLobbyProps {
@@ -253,6 +272,22 @@ export default function OnlineLobby({
     }),
     [friends, presenceMap],
   );
+
+  const railFriends = useMemo(() => sortedFriends.slice(0, FRIEND_RAIL_LIMIT), [sortedFriends]);
+  const railFriendsWithAvatar = useMemo(() => {
+    const usageByLetter: Record<string, number> = {};
+    return railFriends.map((friend) => {
+      const letter = firstAvatarLetter(friend);
+      const usage = usageByLetter[letter] ?? 0;
+      usageByLetter[letter] = usage + 1;
+      return {
+        friend,
+        letter,
+        avatarColor: AVATAR_PALETTE[usage % AVATAR_PALETTE.length],
+        presence: presenceMap[friend.friendCode] ?? 'offline',
+      };
+    });
+  }, [railFriends, presenceMap]);
 
   async function wrap(action: () => Promise<boolean>) {
     setBusy(true);
@@ -830,6 +865,292 @@ export default function OnlineLobby({
           )}
         </>
       )}
+
+      <style>{`
+        .lobby-friend-rail {
+          position: fixed;
+          right: 14px;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 64px;
+          border: 1px solid var(--ui-line);
+          background: color-mix(in oklab, var(--ui-surface) 90%, transparent);
+          backdrop-filter: blur(8px);
+          padding: 10px 8px;
+          display: grid;
+          gap: 8px;
+          z-index: 24;
+          overflow: hidden;
+          transition: width 0.28s cubic-bezier(0.2, 0.95, 0.2, 1);
+          box-shadow: 0 10px 26px rgba(0, 0, 0, 0.14);
+          transform-origin: right center;
+        }
+
+        .lobby-friend-rail:hover,
+        .lobby-friend-rail:focus-within {
+          width: min(320px, calc(100vw - 20px));
+          animation: lobby-rail-pop 0.22s ease-out;
+        }
+
+        .lobby-friend-collapsed {
+          display: grid;
+          justify-items: center;
+          gap: 7px;
+          margin-top: 2px;
+        }
+
+        .lobby-friend-expand {
+          display: none;
+          gap: 8px;
+          animation: lobby-fade-up 0.2s ease;
+        }
+
+        .lobby-friend-rail:hover .lobby-friend-expand,
+        .lobby-friend-rail:focus-within .lobby-friend-expand {
+          display: grid;
+        }
+
+        .lobby-friend-rail:hover .lobby-friend-collapsed,
+        .lobby-friend-rail:focus-within .lobby-friend-collapsed {
+          display: none;
+        }
+
+        .lobby-friend-row {
+          display: grid;
+          grid-template-columns: auto minmax(0, 1fr) auto;
+          align-items: center;
+          gap: 10px;
+          border: 1px solid var(--ui-line);
+          padding: 8px;
+          background: transparent;
+          transition: transform 0.12s ease, border-color 0.12s ease, opacity 0.12s ease;
+        }
+
+        .lobby-friend-row:hover {
+          transform: translateX(-2px);
+          border-color: color-mix(in oklab, var(--ui-text) 46%, var(--ui-line));
+        }
+
+        .lobby-friend-row.offline {
+          opacity: 0.52;
+        }
+
+        .lobby-friend-avatar {
+          width: 34px;
+          height: 34px;
+          border-radius: 999px;
+          display: grid;
+          place-items: center;
+          font-family: 'Bebas Neue', cursive;
+          font-size: 19px;
+          letter-spacing: 0.03em;
+          border: 1px solid rgba(0, 0, 0, 0.14);
+          flex: 0 0 auto;
+        }
+
+        .lobby-friend-status {
+          font-family: 'Courier Prime', monospace;
+          font-size: 9px;
+          font-weight: 700;
+          letter-spacing: 0.09em;
+          text-transform: uppercase;
+          white-space: nowrap;
+        }
+
+        .lobby-friend-status.playing {
+          color: var(--ui-accent-blue);
+        }
+
+        .lobby-friend-status.online {
+          color: var(--ui-accent-green);
+        }
+
+        .lobby-friend-status.offline {
+          color: var(--ui-muted);
+        }
+
+        .lobby-friend-invite-btn {
+          width: 28px;
+          height: 28px;
+          border: 1px solid var(--ui-line);
+          background: transparent;
+          color: var(--ui-text);
+          font-size: 16px;
+          line-height: 1;
+          cursor: pointer;
+          transition: transform 0.12s ease, opacity 0.12s ease;
+        }
+
+        .lobby-friend-invite-btn:hover {
+          transform: scale(1.04);
+        }
+
+        .lobby-friend-invite-btn:disabled {
+          cursor: default;
+          opacity: 0.45;
+        }
+
+        @keyframes lobby-rail-pop {
+          0% { transform: translateY(-50%) scale(0.97); }
+          70% { transform: translateY(-50%) scale(1.01); }
+          100% { transform: translateY(-50%) scale(1); }
+        }
+
+        @keyframes lobby-fade-up {
+          from { opacity: 0; transform: translateY(8px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 900px) {
+          .lobby-friend-rail {
+            position: static;
+            transform: none;
+            width: 100%;
+            animation: none;
+            margin-top: 8px;
+          }
+
+          .lobby-friend-collapsed {
+            display: none;
+          }
+
+          .lobby-friend-expand {
+            display: grid;
+          }
+        }
+      `}</style>
+
+      <aside className="lobby-friend-rail" aria-label="Top friends">
+        <div className="lobby-friend-collapsed" aria-hidden>
+          <ChevronDown size={18} />
+          {railFriendsWithAvatar.length === 0 && (
+            <span
+              style={{
+                fontFamily: "'Courier Prime', monospace",
+                fontSize: 9,
+                letterSpacing: '0.08em',
+                color: 'var(--ui-muted)',
+                textTransform: 'uppercase',
+              }}
+            >
+              None
+            </span>
+          )}
+          {railFriendsWithAvatar.map(({ friend, letter, avatarColor, presence }) => (
+            <span
+              key={friend.friendCode}
+              className="lobby-friend-avatar"
+              style={{
+                color: avatarColor.fg,
+                background: avatarColor.bg,
+                opacity: presence === 'offline' ? 0.48 : 1,
+              }}
+              title={friend.name}
+            >
+              {letter}
+            </span>
+          ))}
+        </div>
+
+        <div className="lobby-friend-expand">
+          <div style={{ display: 'grid', gap: 2, padding: '2px 4px 4px' }}>
+            <p
+              style={{
+                margin: 0,
+                fontFamily: "'Courier Prime', monospace",
+                fontSize: 9,
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase',
+                color: 'var(--ui-muted)',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {incomingInvites.length > 0
+                ? `${incomingInvites.length} invite${incomingInvites.length > 1 ? 's' : ''} waiting`
+                : 'No incoming invites'}
+            </p>
+            <h4
+              style={{
+                margin: 0,
+                fontFamily: "'Bebas Neue', cursive",
+                fontSize: 22,
+                letterSpacing: '0.08em',
+                color: 'var(--ui-text)',
+                lineHeight: 1,
+                whiteSpace: 'nowrap',
+              }}
+            >
+              Friends
+            </h4>
+          </div>
+
+          {railFriendsWithAvatar.length === 0 ? (
+            <p
+              style={{
+                margin: 0,
+                fontFamily: "'Courier Prime', monospace",
+                fontSize: 11,
+                color: 'var(--ui-muted)',
+                lineHeight: 1.5,
+              }}
+            >
+              No saved friends yet.
+            </p>
+          ) : (
+            railFriendsWithAvatar.map(({ friend, letter, avatarColor, presence }) => {
+              const canInvite = presence !== 'offline' && !busy && Boolean(displayName);
+              return (
+                <div
+                  key={friend.friendCode}
+                  className={`lobby-friend-row ${presence === 'offline' ? 'offline' : ''}`}
+                >
+                  <span
+                    className="lobby-friend-avatar"
+                    style={{
+                      color: avatarColor.fg,
+                      background: avatarColor.bg,
+                    }}
+                  >
+                    {letter}
+                  </span>
+
+                  <div style={{ minWidth: 0, display: 'grid', gap: 2 }}>
+                    <span
+                      style={{
+                        fontFamily: "'Courier Prime', monospace",
+                        fontSize: 12,
+                        fontWeight: 700,
+                        color: 'var(--ui-text)',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {friend.name}
+                    </span>
+                    <span className={`lobby-friend-status ${presence}`}>
+                      {presence === 'playing' ? 'Playing' : presence === 'online' ? 'Online' : 'Offline'}
+                    </span>
+                  </div>
+
+                  <button
+                    type="button"
+                    className="lobby-friend-invite-btn"
+                    disabled={!canInvite}
+                    onClick={() => {
+                      void wrap(() => sendInviteToFriend(friend.friendCode, friend.name));
+                    }}
+                    title={`Invite ${friend.name}`}
+                    aria-label={`Invite ${friend.name}`}
+                  >
+                    +
+                  </button>
+                </div>
+              );
+            })
+          )}
+        </div>
+      </aside>
     </SetupShell>
   );
 }

@@ -13,6 +13,7 @@ import {
   SectionDivider,
   UnoWordmark,
 } from "../ui/PageChrome";
+import { ChevronDown } from "lucide-react";
 
 const ONLINE_FRIENDS_KEY = "uno.online.friends";
 const MAX_FRIENDS = 4;
@@ -37,7 +38,8 @@ interface FriendEntry {
 interface HomeScreenProps {
   themeLabel: string;
   onSelectTheme?: (themeName: string) => void;
-  onSettings: () => void;
+  onOpenControlsSettings: () => void;
+  onOpenAudioSettings: () => void;
   onOpenProfileSettings?: () => void;
   onComputer: () => void;
   onFriends: () => void;
@@ -115,7 +117,8 @@ function loadFriends(): FriendEntry[] {
 export default function HomeScreen({
   themeLabel,
   onSelectTheme,
-  onSettings,
+  onOpenControlsSettings,
+  onOpenAudioSettings,
   onOpenProfileSettings,
   onComputer,
   onFriends,
@@ -217,7 +220,8 @@ export default function HomeScreen({
       <NotificationPanel
         themeLabel={themeLabel}
         onSelectTheme={onSelectTheme}
-        onSettings={onSettings}
+        onOpenControlsSettings={onOpenControlsSettings}
+        onOpenAudioSettings={onOpenAudioSettings}
         onOpenProfileSettings={onOpenProfileSettings}
         incomingInviteCount={incomingCount}
       />
@@ -494,6 +498,7 @@ export default function HomeScreen({
 
         <aside className="friend-rail" aria-label="Top friends">
           <div className="friend-collapsed-icons" aria-hidden>
+            <ChevronDown size={18} />
             {friendsWithAvatar.length === 0 && (
               <span
                 style={{

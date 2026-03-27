@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import type { GameRules } from "../types/rules";
 import { useUnoGame } from "../hooks/useUnoGame";
 import { useUnoOnlineGame } from "../hooks/useUnoOnlineGame";
@@ -9,8 +9,8 @@ import GameBoard from "../components/GameBoard";
 import GameSetup from "../components/GameSetup";
 import HomeScreen from "../components/home/HomeScreen";
 import OnlineLobby from "../components/OnlineLobby";
+import NotificationPanel from "../components/NotificationPanel";
 import SettingsModal from "../components/SettingsModal";
-import { SetupUtilityBar } from "../components/ui/PageChrome";
 import { toast } from "sonner";
 
 const SHARED_RULES_KEY = "uno.shared.rules";
@@ -118,15 +118,85 @@ function getInitialRules(): Partial<GameRules> {
 }
 
 function getInitialTheme(): ThemeName {
-  if (typeof window === "undefined") return "midnight";
-  try {
-    const raw = window.localStorage.getItem(PREFERRED_THEME_KEY);
-    return raw === "paper" || raw === "forest" || raw === "sunset"
-      ? raw
-      : "midnight";
-  } catch {
-    return "midnight";
-  }
+  return "midnight";
+}
+
+function WelcomeOverlay({ fadingOut }: { fadingOut: boolean }) {
+  return (
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        background: "#121212",
+        color: "#e0e0e0",
+        display: "grid",
+        placeItems: "center",
+        overflow: "hidden",
+        zIndex: 120,
+        opacity: fadingOut ? 0 : 1,
+        transform: fadingOut ? "scale(1.02)" : "scale(1)",
+        transition: "opacity 560ms cubic-bezier(0.22,1,0.36,1), transform 560ms cubic-bezier(0.22,1,0.36,1)",
+        pointerEvents: fadingOut ? "none" : "auto",
+      }}
+    >
+      <style>{`
+        @keyframes unoWelcomePulse {
+          0%, 100% { transform: scale(1); opacity: 0.92; }
+          50% { transform: scale(1.05); opacity: 1; }
+        }
+        @keyframes unoWelcomeSweep {
+          0% { transform: translateX(-140%); }
+          100% { transform: translateX(140%); }
+        }
+        @keyframes unoWelcomeFloat {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-4px); }
+        }
+      `}</style>
+      <div style={{ textAlign: "center", display: "grid", gap: 18, placeItems: "center", animation: "unoWelcomeFloat 2.2s ease-in-out infinite" }}>
+        <div
+          style={{
+            position: "relative",
+            fontFamily: "var(--font-monkeytype-mono), 'Roboto Mono', monospace",
+            fontStyle: "normal",
+            fontWeight: 700,
+            fontSize: "clamp(68px, 14vw, 126px)",
+            letterSpacing: "0.16em",
+            lineHeight: 1,
+            animation: "unoWelcomePulse 1.2s ease-in-out infinite",
+            textTransform: "uppercase",
+          }}
+        >
+          <span style={{ color: "#ef5350" }}>U</span>
+          <span style={{ color: "#fdd835" }}>N</span>
+          <span style={{ color: "#66bb6a" }}>O</span>
+          <span
+            style={{
+              position: "absolute",
+              left: 0,
+              right: 0,
+              bottom: -10,
+              height: 2,
+              background: "linear-gradient(90deg, transparent, #42a5f5, transparent)",
+              animation: "unoWelcomeSweep 1.4s ease-in-out infinite",
+            }}
+          />
+        </div>
+        <p
+          style={{
+            margin: 0,
+            fontFamily: "'Courier Prime', monospace",
+            fontSize: 12,
+            letterSpacing: "0.2em",
+            textTransform: "uppercase",
+            color: "rgba(224,224,224,0.7)",
+          }}
+        >
+          Welcome to the table
+        </p>
+      </div>
+    </div>
+  );
 }
 
 // ── Root ───────────────────────────────────────────────────────────────────────
@@ -139,16 +209,31 @@ export default function Home() {
   const [settingsTab, setSettingsTab] = useState<"profile" | "controls" | "audio">("controls");
   const [rules, setRules] = useState<Partial<GameRules>>(DEFAULT_RULES);
   const [mounted, setMounted] = useState(false);
+  const [welcomePhase, setWelcomePhase] = useState<"show" | "fade" | "done">("show");
   const { playMusic, setMusicContext } = useAudioManager();
 
   useEffect(() => {
-    const timer = setTimeout(() => {
+    const timer = window.setTimeout(() => {
       setTheme(getInitialTheme());
       setRules(getInitialRules());
       setMounted(true);
-    }, 0);
-    return () => clearTimeout(timer);
+    }, 220);
+    return () => window.clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+    const fadeTimer = window.setTimeout(() => {
+      setWelcomePhase("fade");
+    }, 120);
+    const doneTimer = window.setTimeout(() => {
+      setWelcomePhase("done");
+    }, 760);
+    return () => {
+      window.clearTimeout(fadeTimer);
+      window.clearTimeout(doneTimer);
+    };
+  }, [mounted]);
 
   const local = useUnoGame();
   const online = useUnoOnlineGame();
@@ -233,17 +318,22 @@ export default function Home() {
   );
 
   const topBar = (
-    <SetupUtilityBar
+    <NotificationPanel
       themeLabel={label}
-      onTheme={cycleTheme}
-      onSettings={() => openSettingsAt("controls")}
+      onSelectTheme={selectTheme}
+      onOpenProfileSettings={() => openSettingsAt("profile")}
+      onOpenControlsSettings={() => openSettingsAt("controls")}
+      onOpenAudioSettings={() => openSettingsAt("audio")}
+      incomingInviteCount={online.incomingInvites.length}
     />
   );
 
+  let content: ReactNode = null;
+
   // Active game
-  if (api.game) {
+  if (mounted && api.game) {
     const currentGame = api.game;
-    return (
+    content = (
       <>
         <GameBoard
           gameApi={api as ReturnType<typeof useUnoGame>}
@@ -263,22 +353,21 @@ export default function Home() {
             }
             void online.startOnlineGame(currentGame.rules);
           }}
-          onOpenSettings={() => openSettingsAt("controls")}
+          onOpenSettings={(tab) => openSettingsAt(tab ?? "controls")}
           onCycleTheme={cycleTheme}
           currentThemeLabel={label}
         />
         {settingsModal}
       </>
     );
-  }
-
-  if (view === "home") {
-    return (
+  } else if (mounted && view === "home") {
+    content = (
       <>
         <HomeScreen
           themeLabel={label}
           onSelectTheme={selectTheme}
-          onSettings={() => openSettingsAt("controls")}
+          onOpenControlsSettings={() => openSettingsAt("controls")}
+          onOpenAudioSettings={() => openSettingsAt("audio")}
           onOpenProfileSettings={() => openSettingsAt("profile")}
           onComputer={() => {
             setMode("computer");
@@ -325,10 +414,8 @@ export default function Home() {
         {settingsModal}
       </>
     );
-  }
-
-  if (view === "computer") {
-    return (
+  } else if (mounted && view === "computer") {
+    content = (
       <>
         <GameSetup
           controls={topBar}
@@ -341,37 +428,46 @@ export default function Home() {
         {settingsModal}
       </>
     );
+  } else if (mounted) {
+    content = (
+      <>
+        <OnlineLobby
+          controls={topBar}
+          onBack={() => setView("home")}
+          initialPanel={panel}
+          connected={online.connected}
+          room={online.room}
+          playerId={online.playerId}
+          friendCode={online.friendCode}
+          incomingInvites={online.incomingInvites}
+          outgoingInvites={online.outgoingInvites}
+          error={online.error}
+          onSyncPresence={online.syncPresence}
+          onCreateRoom={online.createRoom}
+          onJoinRoom={online.joinRoom}
+          onSendFriendInvite={online.sendFriendInvite}
+          onAcceptFriendInvite={online.acceptFriendInvite}
+          onDeclineFriendInvite={online.declineFriendInvite}
+          onLeaveRoom={online.leaveRoom}
+          onStartGame={() => {
+            setMode("online");
+            return online.startOnlineGame(rules);
+          }}
+          onAddBotSeat={online.addBotToRoom}
+          onKickPlayer={online.kickPlayer}
+          onCheckFriendOnline={online.checkFriendOnline}
+        />
+        {settingsModal}
+      </>
+    );
   }
 
   return (
     <>
-      <OnlineLobby
-        controls={topBar}
-        onBack={() => setView("home")}
-        initialPanel={panel}
-        connected={online.connected}
-        room={online.room}
-        playerId={online.playerId}
-        friendCode={online.friendCode}
-        incomingInvites={online.incomingInvites}
-        outgoingInvites={online.outgoingInvites}
-        error={online.error}
-        onSyncPresence={online.syncPresence}
-        onCreateRoom={online.createRoom}
-        onJoinRoom={online.joinRoom}
-        onSendFriendInvite={online.sendFriendInvite}
-        onAcceptFriendInvite={online.acceptFriendInvite}
-        onDeclineFriendInvite={online.declineFriendInvite}
-        onLeaveRoom={online.leaveRoom}
-        onStartGame={() => {
-          setMode("online");
-          return online.startOnlineGame(rules);
-        }}
-        onAddBotSeat={online.addBotToRoom}
-        onKickPlayer={online.kickPlayer}
-        onCheckFriendOnline={online.checkFriendOnline}
-      />
-      {settingsModal}
+      {content}
+      {(welcomePhase === "show" || welcomePhase === "fade") && (
+        <WelcomeOverlay fadingOut={welcomePhase === "fade"} />
+      )}
     </>
   );
 }

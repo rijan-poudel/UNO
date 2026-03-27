@@ -34,6 +34,7 @@ const safeStoredToUi = (v: number) =>
   typeof storedToUiVolume === "function" ? storedToUiVolume(v) : v;
 
 const ONLINE_PLAYER_NAME_KEY = "uno.online.playerName";
+const PLAYER_NAME_UPDATED_EVENT = "uno:player-name-updated";
 const READABLE_MUTED = "color-mix(in oklab, var(--ui-text) 72%, transparent)";
 const MONKEYTYPE_MONO = "var(--font-monkeytype-mono), 'Roboto Mono', monospace";
 
@@ -45,6 +46,15 @@ function getStoredProfileName(): string {
   } catch {
     return "Player 1";
   }
+}
+
+function sanitizeProfileName(value: string): string {
+  const normalized = value.trim().slice(0, 18);
+  const lowered = normalized.toLowerCase();
+  if (!normalized || lowered === "null" || lowered === "undefined") {
+    return "Player 1";
+  }
+  return normalized;
 }
 
 interface SettingsModalProps {
@@ -230,15 +240,21 @@ export default function SettingsModal({
     return () => window.clearTimeout(t);
   }, [open]);
 
-  useEffect(() => {
-    if (!open) return;
+  const persistProfileName = (rawValue: string) => {
+    const sanitized = sanitizeProfileName(rawValue);
+    setProfileName(sanitized);
     try {
-      const value = profileName.trim() || "Player 1";
-      window.localStorage.setItem(ONLINE_PLAYER_NAME_KEY, value);
+      window.localStorage.setItem(ONLINE_PLAYER_NAME_KEY, sanitized);
+      window.dispatchEvent(new CustomEvent(PLAYER_NAME_UPDATED_EVENT, { detail: { name: sanitized } }));
     } catch {
       // Ignore storage issues.
     }
-  }, [profileName, open]);
+  };
+
+  useEffect(() => {
+    if (!open) return;
+    setProfileName(getStoredProfileName());
+  }, [open]);
 
   if (!open) return null;
 
@@ -256,6 +272,48 @@ export default function SettingsModal({
       }}
       onClick={onClose}
     >
+      <style>{`
+        .settings-scroll {
+          scrollbar-width: thin;
+          scrollbar-color: color-mix(in oklab, var(--ui-text) 42%, transparent)
+            color-mix(in oklab, var(--ui-bg) 86%, transparent);
+        }
+
+        .settings-scroll::-webkit-scrollbar {
+          width: 10px;
+        }
+
+        .settings-scroll::-webkit-scrollbar-track {
+          background: color-mix(in oklab, var(--ui-bg) 90%, transparent);
+          border-left: 1px solid var(--ui-line);
+        }
+
+        .settings-scroll::-webkit-scrollbar-thumb {
+          background: linear-gradient(
+            180deg,
+            color-mix(in oklab, var(--ui-text) 58%, transparent),
+            color-mix(in oklab, var(--ui-text) 38%, transparent)
+          );
+          border: 2px solid color-mix(in oklab, var(--ui-bg) 90%, transparent);
+          border-radius: 999px;
+        }
+
+        .settings-scroll::-webkit-scrollbar-thumb:hover {
+          background: color-mix(in oklab, var(--ui-text) 66%, transparent);
+        }
+
+        .settings-profile-input {
+          outline: none;
+          box-shadow: none;
+        }
+
+        .settings-profile-input:focus {
+          outline: none;
+          box-shadow: none;
+          border-bottom-color: color-mix(in oklab, var(--ui-text) 72%, transparent);
+        }
+      `}</style>
+
       <div
         onClick={(e) => e.stopPropagation()}
         style={{
@@ -412,11 +470,13 @@ export default function SettingsModal({
           </aside>
 
           <section
+            className="settings-scroll"
             style={{
               border: "1px solid var(--ui-line)",
               padding: 18,
               display: "grid",
               gap: 14,
+              alignContent: "start",
               minHeight: 0,
               overflowY: "auto",
             }}
@@ -427,6 +487,7 @@ export default function SettingsModal({
             style={{
               display: "grid",
               gap: 12,
+              alignContent: "start",
             }}
           >
             <p
@@ -441,8 +502,10 @@ export default function SettingsModal({
               Player name
             </p>
             <input
+              className="settings-profile-input"
               value={profileName}
-              onChange={(e) => setProfileName(e.target.value.slice(0, 18))}
+              onChange={(e) => persistProfileName(e.target.value)}
+              onBlur={() => persistProfileName(profileName)}
               maxLength={18}
               placeholder="Player 1"
               style={{
@@ -450,11 +513,12 @@ export default function SettingsModal({
                 border: "none",
                 borderBottom: "1px solid var(--ui-line)",
                 fontFamily: MONKEYTYPE_MONO,
-                fontSize: 15,
+                fontSize: 13,
                 fontWeight: 700,
                 color: "var(--ui-text)",
-                padding: "4px 0",
+                padding: "2px 0",
                 width: "100%",
+                outline: "none",
               }}
             />
 
@@ -481,9 +545,9 @@ export default function SettingsModal({
               <div
                 style={{
                   border: "1px solid var(--ui-line)",
-                  padding: "10px 12px",
+                  padding: "8px 10px",
                   fontFamily: MONKEYTYPE_MONO,
-                  fontSize: 14,
+                  fontSize: 13,
                   fontWeight: 700,
                   letterSpacing: "0.12em",
                   color: "var(--ui-text)",
@@ -498,9 +562,9 @@ export default function SettingsModal({
                   border: "1px solid var(--ui-line)",
                   background: "transparent",
                   color: "var(--ui-text)",
-                  padding: "10px 12px",
+                  padding: "8px 10px",
                   cursor: "pointer",
-                  fontSize: 11,
+                  fontSize: 10,
                   letterSpacing: "0.08em",
                   textTransform: "uppercase",
                 }}
