@@ -114,7 +114,6 @@ export default function GameSetup({ onStart, controls, onBack }: GameSetupProps)
         )}
       >
         <SetupIntro
-          eyebrow="01 / Setup"
           title="Play with Computer"
           description="Choose local seats and bot players for this device"
           onBack={onBack}
