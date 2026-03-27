@@ -73,9 +73,9 @@ function describeAction(game: GameState): string {
     case 'pass':
       return `${name(a.playerId)} passed`;
     case 'declareUno':
-      return `🔴 ${name(a.playerId)} said UNO!`;
+      return `${name(a.playerId)} said UNO!`;
     case 'callOut':
-      return `😤 ${name(a.callerId)} caught ${name(a.targetId)} (+${a.penalty} cards)`;
+      return `${name(a.callerId)} caught ${name(a.targetId)} (+${a.penalty} cards)`;
     default:
       return 'Game started';
   }

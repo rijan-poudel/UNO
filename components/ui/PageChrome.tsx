@@ -1,6 +1,14 @@
 'use client';
 
 import { useState, useEffect, useRef, type CSSProperties, type MouseEvent, type ReactNode } from 'react';
+import {
+  Gamepad2,
+  Palette,
+  Settings,
+  User,
+  Users,
+  Volume2,
+} from 'lucide-react';
 
 const SECONDARY_BUTTON_STYLE: CSSProperties = {
   fontFamily: "'Courier Prime', monospace",
@@ -213,7 +221,7 @@ export function HomeUtilityBar({
               e.currentTarget.style.borderColor = 'var(--ui-line)';
             }}
           >
-            ⚙️
+            <Settings size={16} strokeWidth={2} />
           </button>
 
           {settingsOpen && (
@@ -260,7 +268,7 @@ export function HomeUtilityBar({
                   e.currentTarget.style.color = 'var(--ui-text)';
                 }}
               >
-                <span>👤</span> Profile
+                <span><User size={14} strokeWidth={2} /></span> Profile
               </button>
 
               {/* Controls */}
@@ -294,7 +302,7 @@ export function HomeUtilityBar({
                   e.currentTarget.style.color = 'var(--ui-text)';
                 }}
               >
-                <span>🎮</span> Controls
+                <span><Gamepad2 size={14} strokeWidth={2} /></span> Controls
               </button>
 
               {/* Audio */}
@@ -328,7 +336,7 @@ export function HomeUtilityBar({
                   e.currentTarget.style.color = 'var(--ui-text)';
                 }}
               >
-                <span>🔊</span> Audio
+                <span><Volume2 size={14} strokeWidth={2} /></span> Audio
               </button>
 
               {/* Theme */}
@@ -360,7 +368,7 @@ export function HomeUtilityBar({
                   e.currentTarget.style.color = 'var(--ui-text)';
                 }}
               >
-                <span>🎨</span> Theme: {themeLabel}
+                <span><Palette size={14} strokeWidth={2} /></span> Theme: {themeLabel}
               </button>
             </div>
           )}
@@ -391,7 +399,7 @@ export function HomeUtilityBar({
               e.currentTarget.style.borderColor = 'var(--ui-line)';
             }}
           >
-            👥
+            <Users size={16} strokeWidth={2} />
           </button>
         )}
       </div>
@@ -463,7 +471,7 @@ export function SetupUtilityBar({
               e.currentTarget.style.borderColor = 'var(--ui-line)';
             }}
           >
-            ⚙️
+            <Settings size={16} strokeWidth={2} />
           </button>
 
           {settingsOpen && (
@@ -510,7 +518,7 @@ export function SetupUtilityBar({
                   e.currentTarget.style.color = 'var(--ui-text)';
                 }}
               >
-                <span>👤</span> Profile
+                <span><User size={14} strokeWidth={2} /></span> Profile
               </button>
 
               {/* Controls */}
@@ -544,7 +552,7 @@ export function SetupUtilityBar({
                   e.currentTarget.style.color = 'var(--ui-text)';
                 }}
               >
-                <span>🎮</span> Controls
+                <span><Gamepad2 size={14} strokeWidth={2} /></span> Controls
               </button>
 
               {/* Audio */}
@@ -578,7 +586,7 @@ export function SetupUtilityBar({
                   e.currentTarget.style.color = 'var(--ui-text)';
                 }}
               >
-                <span>🔊</span> Audio
+                <span><Volume2 size={14} strokeWidth={2} /></span> Audio
               </button>
 
               {/* Theme */}
@@ -610,7 +618,7 @@ export function SetupUtilityBar({
                   e.currentTarget.style.color = 'var(--ui-text)';
                 }}
               >
-                <span>🎨</span> Theme: {themeLabel}
+                <span><Palette size={14} strokeWidth={2} /></span> Theme: {themeLabel}
               </button>
             </div>
           )}
@@ -650,13 +658,11 @@ export function CountBadge({
 }
 
 export function SetupIntro({
-  eyebrow,
   title,
   description,
   onBack,
   trailing,
 }: {
-  eyebrow: string;
   title: string;
   description: string;
   onBack?: () => void;

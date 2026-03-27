@@ -481,7 +481,6 @@ export default function OnlineLobby({
       }
     >
       <SetupIntro
-        eyebrow="01 / Setup"
         title="Play with Friends"
         description={room
           ? 'Manage seats, room code, and invites before the match starts'

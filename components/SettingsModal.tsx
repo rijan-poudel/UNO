@@ -11,11 +11,31 @@ import {
   uiToStoredVolume,
   storedToUiVolume,
 } from "../lib/audioSettings";
+import {
+  Blend,
+  Crown,
+  Equal,
+  Gamepad2,
+  Hand,
+  Layers,
+  ListChecks,
+  Palette,
+  ShieldPlus,
+  Shuffle,
+  SkipForward,
+  User,
+  Volume2,
+  AudioLines,
+  Mic,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 const safeStoredToUi = (v: number) =>
   typeof storedToUiVolume === "function" ? storedToUiVolume(v) : v;
 
 const ONLINE_PLAYER_NAME_KEY = "uno.online.playerName";
+const READABLE_MUTED = "color-mix(in oklab, var(--ui-text) 72%, transparent)";
+const MONKEYTYPE_MONO = "var(--font-monkeytype-mono), 'Roboto Mono', monospace";
 
 function getStoredProfileName(): string {
   if (typeof window === "undefined") return "Player 1";
@@ -29,6 +49,7 @@ function getStoredProfileName(): string {
 
 interface SettingsModalProps {
   open: boolean;
+  initialTab?: "profile" | "controls" | "audio";
   rules: Partial<GameRules>;
   friendCode?: string;
   onCopyFriendCode?: () => void;
@@ -112,6 +133,32 @@ const RULE_TOGGLES: RuleToggle[] = [
   },
 ];
 
+const RETRO_ICON_BADGE_STYLE = {
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  width: 14,
+  height: 14,
+  color: "var(--ui-text)",
+  flexShrink: 0,
+} as const;
+
+const CONTROL_RULE_ICONS: Partial<Record<keyof GameRules, LucideIcon>> = {
+  stackDraw2: Layers,
+  stackWild4: ShieldPlus,
+  allowWild4OnDraw2: Equal,
+  allowDiscardAll: SkipForward,
+  allowShuffleCard: Shuffle,
+  allowJumpIn: Hand,
+  drawUntilPlayable: ListChecks,
+  reverseActsAsSkipInTwoPlayer: SkipForward,
+  mustDeclareUno: Crown,
+  penalizeFalseCallOut: ShieldPlus,
+  allowStartingActionCard: Gamepad2,
+  allowDoublePlaySameNumber: Layers,
+  canFinishWithActionCard: Blend,
+};
+
 function Toggle({ on, onClick }: { on: boolean; onClick: () => void }) {
   return (
     <button
@@ -148,13 +195,14 @@ function Toggle({ on, onClick }: { on: boolean; onClick: () => void }) {
 
 export default function SettingsModal({
   open,
+  initialTab = "controls",
   rules,
   friendCode,
   onCopyFriendCode,
   onChange,
   onClose,
 }: SettingsModalProps) {
-  const [tab, setTab] = useState<"profile" | "controls" | "audio">("controls");
+  const [tab, setTab] = useState<"profile" | "controls" | "audio">(initialTab);
   const [profileName, setProfileName] = useState(getStoredProfileName);
   const [audio, setAudio] = useState<AudioSettings>(() => ({
     ...defaultAudioSettings,
@@ -211,14 +259,17 @@ export default function SettingsModal({
       <div
         onClick={(e) => e.stopPropagation()}
         style={{
-          width: "min(760px, 100%)",
-          maxHeight: "88dvh",
-          overflowY: "auto",
+          width: "min(860px, 100%)",
+          height: "min(760px, 90dvh)",
+          maxHeight: "90dvh",
+          overflow: "hidden",
           background: "var(--ui-surface)",
           border: "1px solid var(--ui-line)",
-          padding: 18,
+          padding: 22,
           display: "grid",
-          gap: 12,
+          gap: 16,
+          gridTemplateRows: "auto auto minmax(0, 1fr)",
+          fontFamily: MONKEYTYPE_MONO,
         }}
       >
         <div
@@ -232,7 +283,7 @@ export default function SettingsModal({
           <p
             style={{
               margin: 0,
-              fontFamily: "'Bebas Neue', cursive",
+              fontFamily: MONKEYTYPE_MONO,
               fontSize: 34,
               letterSpacing: "0.05em",
               color: "var(--ui-text)",
@@ -260,10 +311,11 @@ export default function SettingsModal({
         <p
           style={{
             margin: 0,
-            fontSize: 11,
-            color: "var(--ui-muted)",
-            letterSpacing: "0.08em",
+            fontSize: 12,
+            color: READABLE_MUTED,
+            letterSpacing: "0.06em",
             textTransform: "uppercase",
+            lineHeight: 1.5,
           }}
         >
           Grouped by task to keep setup clear
@@ -272,72 +324,109 @@ export default function SettingsModal({
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "1fr 1fr 1fr",
-            border: "1px solid var(--ui-line)",
+            gridTemplateColumns: "minmax(170px, 220px) minmax(0, 1fr)",
+            gap: 18,
+            alignItems: "stretch",
+            minHeight: 0,
           }}
         >
-          <button
-            type="button"
-            onClick={() => setTab("profile")}
+          <aside
             style={{
-              border: "none",
-              borderRight: "1px solid var(--ui-line)",
-              background: tab === "profile" ? "var(--ui-text)" : "transparent",
-              color: tab === "profile" ? "var(--ui-bg)" : "var(--ui-text)",
-              padding: "12px 8px",
-              fontSize: 11,
-              fontWeight: 700,
-              letterSpacing: "0.08em",
-              textTransform: "uppercase",
-              cursor: "pointer",
+              border: "1px solid var(--ui-line)",
+              background: "color-mix(in oklab, var(--ui-bg) 92%, transparent)",
+              display: "grid",
+              alignContent: "start",
             }}
           >
-            Profile
-          </button>
-          <button
-            type="button"
-            onClick={() => setTab("controls")}
+            <button
+              type="button"
+              onClick={() => setTab("profile")}
+              style={{
+                border: "none",
+                borderBottom: "1px solid var(--ui-line)",
+                background: tab === "profile" ? "var(--ui-text)" : "transparent",
+                color: tab === "profile" ? "var(--ui-bg)" : "var(--ui-text)",
+                padding: "14px 12px",
+                fontFamily: MONKEYTYPE_MONO,
+                fontSize: 12,
+                fontWeight: 700,
+                letterSpacing: "0.06em",
+                textTransform: "uppercase",
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "flex-start",
+                gap: 8,
+                cursor: "pointer",
+              }}
+            >
+              <User size={14} strokeWidth={2.5} />
+              Profile
+            </button>
+            <button
+              type="button"
+              onClick={() => setTab("controls")}
+              style={{
+                border: "none",
+                borderBottom: "1px solid var(--ui-line)",
+                background: tab === "controls" ? "var(--ui-text)" : "transparent",
+                color: tab === "controls" ? "var(--ui-bg)" : "var(--ui-text)",
+                padding: "14px 12px",
+                fontFamily: MONKEYTYPE_MONO,
+                fontSize: 12,
+                fontWeight: 700,
+                letterSpacing: "0.06em",
+                textTransform: "uppercase",
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "flex-start",
+                gap: 8,
+                cursor: "pointer",
+              }}
+            >
+              <Gamepad2 size={14} strokeWidth={2.5} />
+              Controls
+            </button>
+            <button
+              type="button"
+              onClick={() => setTab("audio")}
+              style={{
+                border: "none",
+                background: tab === "audio" ? "var(--ui-text)" : "transparent",
+                color: tab === "audio" ? "var(--ui-bg)" : "var(--ui-text)",
+                padding: "14px 12px",
+                fontFamily: MONKEYTYPE_MONO,
+                fontSize: 12,
+                fontWeight: 700,
+                letterSpacing: "0.06em",
+                textTransform: "uppercase",
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "flex-start",
+                gap: 8,
+                cursor: "pointer",
+              }}
+            >
+              <Volume2 size={14} strokeWidth={2.5} />
+              Audio
+            </button>
+          </aside>
+
+          <section
             style={{
-              border: "none",
-              borderRight: "1px solid var(--ui-line)",
-              background: tab === "controls" ? "var(--ui-text)" : "transparent",
-              color: tab === "controls" ? "var(--ui-bg)" : "var(--ui-text)",
-              padding: "12px 8px",
-              fontSize: 11,
-              fontWeight: 700,
-              letterSpacing: "0.08em",
-              textTransform: "uppercase",
-              cursor: "pointer",
+              border: "1px solid var(--ui-line)",
+              padding: 18,
+              display: "grid",
+              gap: 14,
+              minHeight: 0,
+              overflowY: "auto",
             }}
           >
-            Controls
-          </button>
-          <button
-            type="button"
-            onClick={() => setTab("audio")}
-            style={{
-              border: "none",
-              background: tab === "audio" ? "var(--ui-text)" : "transparent",
-              color: tab === "audio" ? "var(--ui-bg)" : "var(--ui-text)",
-              padding: "12px 8px",
-              fontSize: 11,
-              fontWeight: 700,
-              letterSpacing: "0.08em",
-              textTransform: "uppercase",
-              cursor: "pointer",
-            }}
-          >
-            Audio
-          </button>
-        </div>
 
         {tab === "profile" ? (
           <div
             style={{
-              border: "1px solid var(--ui-line)",
-              padding: 14,
               display: "grid",
-              gap: 10,
+              gap: 12,
             }}
           >
             <p
@@ -360,7 +449,7 @@ export default function SettingsModal({
                 background: "transparent",
                 border: "none",
                 borderBottom: "1px solid var(--ui-line)",
-                fontFamily: "'Courier Prime', monospace",
+                fontFamily: MONKEYTYPE_MONO,
                 fontSize: 15,
                 fontWeight: 700,
                 color: "var(--ui-text)",
@@ -393,7 +482,7 @@ export default function SettingsModal({
                 style={{
                   border: "1px solid var(--ui-line)",
                   padding: "10px 12px",
-                  fontFamily: "'Courier Prime', monospace",
+                  fontFamily: MONKEYTYPE_MONO,
                   fontSize: 14,
                   fontWeight: 700,
                   letterSpacing: "0.12em",
@@ -442,14 +531,21 @@ export default function SettingsModal({
                     fontSize: 13,
                     fontWeight: 700,
                     color: "var(--ui-text)",
+                    fontFamily: MONKEYTYPE_MONO,
+                    letterSpacing: "0.04em",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 8,
                   }}
                 >
+                  <AudioLines size={13} strokeWidth={2.5} />
                   Music volume
                 </p>
                 <p
                   style={{
                     margin: "3px 0 0",
                     fontSize: 11,
+                    fontFamily: MONKEYTYPE_MONO,
                     color: "var(--ui-muted)",
                     lineHeight: 1.45,
                   }}
@@ -525,14 +621,21 @@ export default function SettingsModal({
                     fontSize: 13,
                     fontWeight: 700,
                     color: "var(--ui-text)",
+                    fontFamily: MONKEYTYPE_MONO,
+                    letterSpacing: "0.04em",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 8,
                   }}
                 >
+                  <Volume2 size={13} strokeWidth={2.5} />
                   In-game voice & effects volume
                 </p>
                 <p
                   style={{
                     margin: "3px 0 0",
                     fontSize: 11,
+                    fontFamily: MONKEYTYPE_MONO,
                     color: "var(--ui-muted)",
                     lineHeight: 1.45,
                   }}
@@ -594,17 +697,23 @@ export default function SettingsModal({
               style={{
                 margin: 0,
                 fontSize: 11,
+                fontFamily: MONKEYTYPE_MONO,
                 color: "var(--ui-muted)",
                 letterSpacing: "0.08em",
                 textTransform: "uppercase",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 8,
               }}
             >
+              <AudioLines size={13} strokeWidth={2.5} />
               Table chimes
             </p>
             <p
               style={{
                 margin: "0 0 8px",
                 fontSize: 12,
+                fontFamily: MONKEYTYPE_MONO,
                 color: "var(--ui-muted)",
                 lineHeight: 1.45,
               }}
@@ -631,14 +740,21 @@ export default function SettingsModal({
                     fontSize: 13,
                     fontWeight: 700,
                     color: "var(--ui-text)",
+                    fontFamily: MONKEYTYPE_MONO,
+                    letterSpacing: "0.04em",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 8,
                   }}
                 >
+                  <AudioLines size={13} strokeWidth={2.5} />
                   Chimes during play
                 </p>
                 <p
                   style={{
                     margin: "3px 0 0",
                     fontSize: 11,
+                    fontFamily: MONKEYTYPE_MONO,
                     color: "var(--ui-muted)",
                     lineHeight: 1.45,
                   }}
@@ -659,23 +775,29 @@ export default function SettingsModal({
               style={{
                 margin: "14px 0 0",
                 fontSize: 11,
+                fontFamily: MONKEYTYPE_MONO,
                 color: "var(--ui-muted)",
                 letterSpacing: "0.08em",
                 textTransform: "uppercase",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 8,
               }}
             >
+              <Mic size={13} strokeWidth={2.5} />
               Voice announcer
             </p>
             <p
               style={{
                 margin: "0 0 8px",
                 fontSize: 12,
+                fontFamily: MONKEYTYPE_MONO,
                 color: "var(--ui-muted)",
                 lineHeight: 1.45,
               }}
             >
               Uses your files in{" "}
-              <span style={{ fontFamily: "'Courier Prime', monospace" }}>
+              <span style={{ fontFamily: MONKEYTYPE_MONO }}>
                 /public/audios/
               </span>{" "}
               (exact names are wired in code — you don&apos;t need to rename
@@ -699,14 +821,21 @@ export default function SettingsModal({
                     fontSize: 13,
                     fontWeight: 700,
                     color: "var(--ui-text)",
+                    fontFamily: MONKEYTYPE_MONO,
+                    letterSpacing: "0.04em",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 8,
                   }}
                 >
+                  <Mic size={13} strokeWidth={2.5} />
                   In-game voice
                 </p>
                 <p
                   style={{
                     margin: "3px 0 0",
                     fontSize: 11,
+                    fontFamily: MONKEYTYPE_MONO,
                     color: "var(--ui-muted)",
                     lineHeight: 1.45,
                   }}
@@ -729,12 +858,20 @@ export default function SettingsModal({
               style={{
                 margin: 0,
                 fontSize: 11,
+                fontFamily: MONKEYTYPE_MONO,
                 color: "var(--ui-muted)",
                 letterSpacing: "0.08em",
                 textTransform: "uppercase",
               }}
             >
-              Controls / House Rules (shared by local and online)
+              <span
+                style={{ display: "inline-flex", alignItems: "center", gap: 8 }}
+              >
+                <span style={RETRO_ICON_BADGE_STYLE}>
+                  <Gamepad2 size={12} strokeWidth={2.6} />
+                </span>
+                Controls / House Rules (shared by local and online)
+              </span>
             </p>
 
             <div
@@ -754,14 +891,23 @@ export default function SettingsModal({
                     fontSize: 13,
                     fontWeight: 700,
                     color: "var(--ui-text)",
+                    fontFamily: MONKEYTYPE_MONO,
+                    letterSpacing: "0.04em",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 8,
                   }}
                 >
+                  <span style={RETRO_ICON_BADGE_STYLE}>
+                    <Palette size={12} strokeWidth={2.6} />
+                  </span>
                   Starting hand size
                 </p>
                 <p
                   style={{
                     margin: "3px 0 0",
                     fontSize: 11,
+                    fontFamily: MONKEYTYPE_MONO,
                     color: "var(--ui-muted)",
                     lineHeight: 1.45,
                   }}
@@ -796,7 +942,7 @@ export default function SettingsModal({
                 </button>
                 <span
                   style={{
-                    fontFamily: "'Courier Prime', monospace",
+                    fontFamily: MONKEYTYPE_MONO,
                     fontSize: 15,
                     fontWeight: 700,
                     color: "var(--ui-text)",
@@ -838,6 +984,7 @@ export default function SettingsModal({
                 const isOn = !!(
                   rules[key as keyof typeof rules] ?? defaultRules[key]
                 );
+                const RuleIcon = CONTROL_RULE_ICONS[key] ?? ListChecks;
                 return (
                   <div
                     key={key}
@@ -860,14 +1007,23 @@ export default function SettingsModal({
                           fontSize: 13,
                           fontWeight: 700,
                           color: "var(--ui-text)",
+                          fontFamily: MONKEYTYPE_MONO,
+                          letterSpacing: "0.04em",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: 8,
                         }}
                       >
+                        <span style={RETRO_ICON_BADGE_STYLE}>
+                          <RuleIcon size={12} strokeWidth={2.6} />
+                        </span>
                         {label}
                       </p>
                       <p
                         style={{
                           margin: "3px 0 0",
                           fontSize: 11,
+                          fontFamily: MONKEYTYPE_MONO,
                           color: "var(--ui-muted)",
                           lineHeight: 1.45,
                         }}
@@ -885,7 +1041,10 @@ export default function SettingsModal({
             </div>
           </>
         )}
+          </section>
+        </div>
       </div>
     </div>
   );
 }
+

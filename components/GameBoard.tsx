@@ -13,6 +13,7 @@ import {
   isMusicEnabledForContext,
   setMusicEnabledForContext,
 } from "../lib/audioSettings";
+import { AlertTriangle } from "lucide-react";
 
 export type GameApi = ReturnType<typeof useUnoGame>;
 
@@ -133,7 +134,11 @@ function CallOutFlash({ name }: { name: string }) {
         textAlign: "center",
         animation: "callOutPop 1.1s cubic-bezier(0.22,1,0.36,1) forwards",
       }}>
-        😤 {name}<br />forgot UNO!
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 10 }}>
+          <AlertTriangle size={42} strokeWidth={2.6} />
+          {name}
+        </span>
+        <br />forgot UNO!
       </div>
     </div>
   );

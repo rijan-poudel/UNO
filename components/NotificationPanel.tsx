@@ -3,6 +3,17 @@
 import { useState, useEffect, useRef } from 'react';
 import ProfileButton from './ProfileButton';
 import {
+  Bell,
+  Check,
+  ChevronDown,
+  ChevronUp,
+  Gamepad2,
+  Palette,
+  Settings,
+  Volume2,
+  VolumeX,
+} from 'lucide-react';
+import {
   isMusicEnabledForContext,
   setMusicEnabledForContext,
 } from '../lib/audioSettings';
@@ -20,6 +31,7 @@ interface NotificationPanelProps {
   themeLabel?: string;
   onSelectTheme?: (themeName: string) => void;
   onSettings?: () => void;
+  onOpenProfileSettings?: () => void;
   notifications?: Notification[];
   onNotificationDismiss?: (notificationId: string) => void;
   incomingInviteCount?: number;
@@ -29,6 +41,7 @@ export default function NotificationPanel({
   themeLabel = 'Dark',
   onSelectTheme,
   onSettings,
+  onOpenProfileSettings,
   notifications = [],
   onNotificationDismiss,
   incomingInviteCount = 0,
@@ -86,12 +99,12 @@ export default function NotificationPanel({
         width: '100%',
         padding: '12px 20px',
         borderBottom: '1px solid var(--ui-line)',
-        background: 'var(--ui-surface)',
+        background: 'var(--ui-bg)',
         display: 'grid',
         gridTemplateColumns: 'auto 1fr auto auto auto',
         alignItems: 'center',
         gap: 16,
-        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+        boxShadow: '0 1px 0 rgba(0, 0, 0, 0.08)',
       }}
     >
       <style>{`
@@ -105,18 +118,41 @@ export default function NotificationPanel({
           display: grid;
           place-items: center;
           font-size: 18px;
-          transition: background-color 0.15s, border-color 0.15s, transform 0.1s;
+          transition: background-color 0.12s, border-color 0.12s, transform 0.08s;
           position: relative;
+        }
+
+        .np-icon-btn svg {
+          width: 14px;
+          height: 14px;
+          stroke-width: 2.5;
+          shape-rendering: geometricPrecision;
         }
 
         .np-icon-btn:hover {
           background: color-mix(in oklab, var(--ui-text) 8%, transparent);
           border-color: var(--ui-text);
-          transform: scale(1.05);
+          transform: translateY(-1px);
         }
 
         .np-icon-btn:active {
-          transform: scale(0.98);
+          transform: translateY(0);
+        }
+
+        .np-retro-glyph {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 14px;
+          height: 14px;
+          color: var(--ui-text);
+          flex-shrink: 0;
+        }
+
+        .np-retro-glyph svg {
+          width: 14px;
+          height: 14px;
+          stroke-width: 2.6;
         }
 
         .np-badge {
@@ -141,6 +177,7 @@ export default function NotificationPanel({
           right: 0;
           margin-top: 6px;
           background: var(--ui-surface);
+          color: var(--ui-text);
           border: 1px solid var(--ui-line);
           border-radius: 4px;
           box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
@@ -161,7 +198,8 @@ export default function NotificationPanel({
         }
 
         .np-popup-item {
-          padding: 12px 16px;
+          padding: 14px 18px;
+          color: var(--ui-text);
           border-bottom: 1px solid var(--ui-line);
           cursor: pointer;
           transition: background-color 0.12s;
@@ -179,13 +217,13 @@ export default function NotificationPanel({
         }
 
         .np-popup-header {
-          padding: 10px 16px;
+          padding: 12px 18px;
           border-bottom: 1px solid var(--ui-line);
-          font-size: 11px;
+          font-size: 12px;
           font-weight: 700;
-          letter-spacing: 0.08em;
+          letter-spacing: 0.06em;
           text-transform: uppercase;
-          color: var(--ui-muted);
+          color: color-mix(in oklab, var(--ui-text) 72%, transparent);
           font-family: 'Courier Prime', monospace;
         }
 
@@ -304,7 +342,7 @@ export default function NotificationPanel({
 
 
       {/* Profile Button */}
-      <ProfileButton />
+      <ProfileButton onOpenProfileSettings={onOpenProfileSettings} />
 
       {/* Spacer */}
       <div style={{ flex: 1 }} />
@@ -316,7 +354,7 @@ export default function NotificationPanel({
           onClick={() => setShowNotifications(!showNotifications)}
           title="Notifications"
         >
-          🔔
+          <Bell />
           {totalNotifications > 0 && <span className="np-badge">{totalNotifications}</span>}
         </button>
 
@@ -377,7 +415,11 @@ export default function NotificationPanel({
           color: lobbyMusicEnabled ? 'var(--ui-text)' : 'var(--ui-accent-red)',
         }}
       >
-        {lobbyMusicEnabled ? '🔊' : '🔇'}
+        {lobbyMusicEnabled ? (
+          <Volume2 />
+        ) : (
+          <VolumeX />
+        )}
       </button>
 
       {/* Settings Icon */}
@@ -392,12 +434,12 @@ export default function NotificationPanel({
           }}
           title="Settings"
         >
-          ⚙️
+          <Settings />
         </button>
 
         {showThemeMenu && (
-          <div className="np-popup" style={{ minWidth: 240 }}>
-            <div className="np-popup-header">Settings</div>
+          <div className="np-popup" style={{ minWidth: 300 }}>
+            <div className="np-popup-header" style={{ color: 'var(--ui-text)' }}>Settings</div>
 
             <div
               className="np-popup-item"
@@ -405,12 +447,23 @@ export default function NotificationPanel({
                 setShowThemeOptions(!showThemeOptions);
               }}
             >
-              <span>Theme</span>
-              <span style={{ color: 'var(--ui-muted)' }}>{showThemeOptions ? '▴' : '▾'}</span>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, color: 'var(--ui-text)' }}>
+                <span className="np-retro-glyph">
+                  <Palette />
+                </span>
+                Theme
+              </span>
+              <span style={{ color: 'var(--ui-muted)', display: 'inline-flex' }}>
+                {showThemeOptions ? (
+                  <ChevronUp size={14} strokeWidth={2.4} />
+                ) : (
+                  <ChevronDown size={14} strokeWidth={2.4} />
+                )}
+              </span>
             </div>
 
             {showThemeOptions && (
-              <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--ui-line)' }}>
+              <div style={{ padding: '14px 18px', borderBottom: '1px solid var(--ui-line)' }}>
                 <div className="np-theme-grid">
                   {[
                     { name: 'Light', id: 'paper', colors: ['#fafafa', '#ffffff'] },
@@ -438,7 +491,7 @@ export default function NotificationPanel({
                       </div>
                       <p className="np-theme-card-name">{theme.name}</p>
                       {theme.name === themeLabel && (
-                        <div className="np-theme-card-checkmark">✓</div>
+                        <div className="np-theme-card-checkmark"><Check size={12} strokeWidth={3.2} /></div>
                       )}
                     </div>
                   ))}
@@ -455,7 +508,24 @@ export default function NotificationPanel({
                 setShowThemeMenu(false);
               }}
             >
-              <span>Controls</span>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, color: 'var(--ui-text)' }}>
+                <Gamepad2 size={14} strokeWidth={2.5} />
+                Controls
+              </span>
+            </div>
+
+            <div
+              className="np-popup-item"
+              onClick={() => {
+                onSettings?.();
+                setShowThemeOptions(false);
+                setShowThemeMenu(false);
+              }}
+            >
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, color: 'var(--ui-text)' }}>
+                <Volume2 size={14} strokeWidth={2.5} />
+                Audio settings
+              </span>
             </div>
           </div>
         )}

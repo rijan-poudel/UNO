@@ -136,6 +136,7 @@ export default function Home() {
   const [panel, setPanel] = useState<"create" | "join">("create");
   const [theme, setTheme] = useState<ThemeName>("midnight");
   const [showS, setShowS] = useState(false);
+  const [settingsTab, setSettingsTab] = useState<"profile" | "controls" | "audio">("controls");
   const [rules, setRules] = useState<Partial<GameRules>>(DEFAULT_RULES);
   const [mounted, setMounted] = useState(false);
   const { playMusic, setMusicContext } = useAudioManager();
@@ -211,9 +212,16 @@ export default function Home() {
 
   const label = THEMES[theme].label;
 
+  const openSettingsAt = (tab: "profile" | "controls" | "audio") => {
+    setSettingsTab(tab);
+    setShowS(true);
+  };
+
   const settingsModal = (
     <SettingsModal
+      key={`settings-${settingsTab}-${showS ? "open" : "closed"}`}
       open={showS}
+      initialTab={settingsTab}
       rules={rules}
       friendCode={online.friendCode}
       onCopyFriendCode={() => {
@@ -228,7 +236,7 @@ export default function Home() {
     <SetupUtilityBar
       themeLabel={label}
       onTheme={cycleTheme}
-      onSettings={() => setShowS(true)}
+      onSettings={() => openSettingsAt("controls")}
     />
   );
 
@@ -255,7 +263,7 @@ export default function Home() {
             }
             void online.startOnlineGame(currentGame.rules);
           }}
-          onOpenSettings={() => setShowS(true)}
+          onOpenSettings={() => openSettingsAt("controls")}
           onCycleTheme={cycleTheme}
           currentThemeLabel={label}
         />
@@ -270,7 +278,8 @@ export default function Home() {
         <HomeScreen
           themeLabel={label}
           onSelectTheme={selectTheme}
-          onSettings={() => setShowS(true)}
+          onSettings={() => openSettingsAt("controls")}
+          onOpenProfileSettings={() => openSettingsAt("profile")}
           onComputer={() => {
             setMode("computer");
             setView("computer");

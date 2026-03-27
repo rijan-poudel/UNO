@@ -1,17 +1,18 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-
 const ONLINE_PLAYER_NAME_KEY = 'uno.online.playerName';
 
 interface ProfileButtonProps {
   playerName?: string;
   onNameChange?: (name: string) => void;
+  onOpenProfileSettings?: () => void;
 }
 
 export default function ProfileButton({
   playerName: initialName = 'Player 1',
   onNameChange,
+  onOpenProfileSettings,
 }: ProfileButtonProps) {
   const [playerName, setPlayerName] = useState(() => {
     if (initialName && initialName !== 'Player 1') return initialName;
@@ -73,7 +74,8 @@ export default function ProfileButton({
       }}
     >
       {/* Avatar */}
-      <div
+      <button
+        type="button"
         style={{
           width: 32,
           height: 32,
@@ -88,9 +90,16 @@ export default function ProfileButton({
           border: '1px solid var(--ui-line)',
           flexShrink: 0,
         }}
+        onClick={() => {
+          if (onOpenProfileSettings) {
+            onOpenProfileSettings();
+            return;
+          }
+          setIsEditing(true);
+        }}
       >
         {initial}
-      </div>
+      </button>
 
       {/* Name Input or Display */}
       {isEditing ? (

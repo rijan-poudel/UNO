@@ -38,6 +38,7 @@ interface HomeScreenProps {
   themeLabel: string;
   onSelectTheme?: (themeName: string) => void;
   onSettings: () => void;
+  onOpenProfileSettings?: () => void;
   onComputer: () => void;
   onFriends: () => void;
   onFriendQuickInvite: (friendCode: string) => Promise<boolean>;
@@ -115,6 +116,7 @@ export default function HomeScreen({
   themeLabel,
   onSelectTheme,
   onSettings,
+  onOpenProfileSettings,
   onComputer,
   onFriends,
   onFriendQuickInvite,
@@ -216,6 +218,7 @@ export default function HomeScreen({
         themeLabel={themeLabel}
         onSelectTheme={onSelectTheme}
         onSettings={onSettings}
+        onOpenProfileSettings={onOpenProfileSettings}
         incomingInviteCount={incomingCount}
       />
       <PageShell>

@@ -51,7 +51,7 @@ function printState(state: GameState): void {
   console.log(`Current turn: ${current.name}`);
   console.log('');
   for (const p of state.players) {
-    const uno = p.saidUno ? ' 🔴UNO' : '';
+    const uno = p.saidUno ? ' UNO' : '';
     const marker = p.id === current.id ? '▶' : ' ';
     const hand = p.hand.map(cardStr).join(' ') || '(no cards)';
     console.log(`  ${marker} ${p.name.padEnd(8)} (${p.hand.length} cards)${uno}`);
