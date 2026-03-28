@@ -25,6 +25,26 @@ import { getBotMove } from '../lib/botSupport';
 const BOT_ACTION_DELAY_MS = 1150;
 const AUTO_PASS_AFTER_DRAW_MS = 2200;
 
+function getActionPresentationDelay(game: GameState): number {
+  const action = game.lastAction;
+
+  if (action.type === 'init') return 900;
+  if (action.type === 'declareUno') return 1100;
+  if (action.type === 'callOut') return 1800;
+  if (action.type === 'draw') return Math.min(1700, 800 + (action.count * 120));
+  if (action.type === 'pass') return 700;
+
+  if (action.type === 'play') {
+    if (action.card.value === 'shuffle') return 2100;
+    if (action.card.value === 'discardAll') return 1700;
+    if (action.card.value === 'wild4' || action.card.value === 'draw2') return 1500;
+    if (action.card.value === 'reverse' || action.card.value === 'skip' || action.card.value === 'wild') return 1300;
+    return 950;
+  }
+
+  return 950;
+}
+
 // ── UI-layer state ────────────────────────────────────────────────────────────
 
 export interface UnoUIState {
@@ -278,6 +298,8 @@ export function useUnoGame() {
 
     dispatch({ type: 'BOT_THINKING', value: true });
 
+    const coordinatedDelay = Math.max(BOT_ACTION_DELAY_MS, getActionPresentationDelay(game));
+
     const timer = setTimeout(() => {
       try {
         let botState = game;
@@ -324,7 +346,7 @@ export function useUnoGame() {
         console.error('Bot error:', e);
         dispatch({ type: 'BOT_THINKING', value: false });
       }
-    }, BOT_ACTION_DELAY_MS);
+    }, coordinatedDelay);
 
     return () => clearTimeout(timer);
   // eslint-disable-next-line react-hooks/exhaustive-deps

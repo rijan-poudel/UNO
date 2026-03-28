@@ -656,6 +656,10 @@ export default function GameBoard({
         step += 1;
 
         window.setTimeout(() => {
+          if (stepIndex === 0) {
+            playTableChime("deal");
+          }
+          playCardMixing();
           queueAnimation({
             card: { id: `_anim-deal-${playerId}-${round}-${stepIndex}`, color: 'wild', value: 'wild' },
             faceDown: true,
@@ -669,8 +673,6 @@ export default function GameBoard({
             scale: 0.86,
             duration: DEAL_ANIMATION_DURATION_MS,
           });
-          // Play card mixing sound for each deal
-          playCardMixing();
         }, stepIndex * DEAL_ANIMATION_STAGGER_MS);
       });
     }
@@ -852,8 +854,6 @@ export default function GameBoard({
 
     if (dealAnimationKeyRef.current === animationKey) return;
     dealAnimationKeyRef.current = animationKey;
-    playTableChime("deal");
-    playShuffleMotionChime();
 
     const timer = window.setTimeout(() => {
       animateDealSequence(
@@ -924,8 +924,6 @@ export default function GameBoard({
 
           const counts = order.map((playerId) => game.players.find((player) => player.id === playerId)?.hand.length ?? 0);
           const timer = window.setTimeout(() => {
-            playTableChime("deal");
-            playShuffleMotionChime();
             animateDealSequence(order, counts, 'discard');
           }, 120);
           return () => window.clearTimeout(timer);
@@ -1160,6 +1158,13 @@ export default function GameBoard({
       return () => window.clearTimeout(clearTimer);
     }
 
+    if (turnTransitionLocked) {
+      turnTimerKeyRef.current = null;
+      turnTimerDeadlineRef.current = 0;
+      const clearTimer = window.setTimeout(() => setTurnCountdownSeconds(0), 0);
+      return () => window.clearTimeout(clearTimer);
+    }
+
     const turnKey = `${game.turnCount}:${game.currentPlayerIndex}`;
     let durationMs = 0;
     if (currentPlayer.isBot) {
@@ -1208,6 +1213,7 @@ export default function GameBoard({
     isLocalTurn,
     pendingWild,
     drawnThisTurn,
+    turnTransitionLocked,
   ]);
 
   useEffect(() => {
@@ -1392,6 +1398,9 @@ export default function GameBoard({
   const pileCardScale = tableCardScale;
   const pileCardColumnWidth = Math.round((82 * pileCardScale) + (22 * pileCardScale));
   const turnColumnWidth = Math.round((isCompactBoard ? 44 : 54) * pileCardScale);
+  const localHandAreaHeightPx = isCompactBoard
+    ? Math.round(122 * localHandCardScale) + (isNarrowMobile ? 20 : 28)
+    : Math.round(122 * localHandCardScale) + 36;
 
   const mustDrawNow = humanTurn && !turnTransitionLocked && !drawDisabled && playableCardIds.size === 0;
   const mustAutoDrawRequired = humanTurn && !turnTransitionLocked && game.pendingDraw > 0 && !hasPendingStackOption;
@@ -1448,6 +1457,13 @@ export default function GameBoard({
   const localHandSidePadding = isCompactBoard ? (isNarrowMobile ? 82 : 120) : 132;
   const ARC_SPREAD = 3.5;
   const ARC_LIFT   = 2.5;
+
+  useEffect(() => {
+    const overlayOpen = stackChoiceOpen || drawnChoiceOpen || !!pendingWild || showExitConfirm;
+    if (!overlayOpen && humanTurn) return;
+    setHoveredHandPosition(null);
+    setHoveredCardId(null);
+  }, [stackChoiceOpen, drawnChoiceOpen, pendingWild, showExitConfirm, humanTurn]);
 
   useEffect(() => {
     if (!showGameSettingsMenu) return;
@@ -1602,12 +1618,17 @@ export default function GameBoard({
       <div
         onPointerDownCapture={() => primeTableAudioFromUserGesture()}
         style={{
-        height: "100svh", overflow: "hidden",
+        position: "fixed",
+        inset: 0,
+        width: "100vw",
+        height: "100svh",
+        overflow: "clip",
         color: "var(--ui-text)", background: "var(--ui-bg)",
         fontFamily: "'Courier Prime', monospace",
         display: "grid",
         gridTemplateRows: "auto minmax(0, 1fr) auto",
-        position: "relative",
+        overscrollBehavior: "none",
+        contain: "layout paint",
       }}
       >
         <div
@@ -2082,9 +2103,9 @@ export default function GameBoard({
               className="uno-btn"
               style={{
                 position: "absolute",
-                left: "82%",
-                top: 0,
-                transform: "translate(-50%, -50%)",
+                left: isNarrowMobile ? "68%" : "72%",
+                top: isNarrowMobile ? 6 : 8,
+                transform: "translate(-50%, -30%)",
                 zIndex: 40,
                 fontFamily: "'Bebas Neue', cursive",
                 fontSize: isNarrowMobile ? 20 : isCompactBoard ? 24 : 28,
@@ -2266,19 +2287,20 @@ export default function GameBoard({
           )}
 
           {/* Card fan — scrollable, full height */}
-          <div style={{ overflow: "visible", width: "100%", position: "relative", zIndex: 13 }}>
+          <div style={{ overflow: "visible", width: "100%", position: "relative", zIndex: 13, height: `${localHandAreaHeightPx}px` }}>
             <div ref={localHandRef} style={{
+              position: "absolute",
+              left: "50%",
+              bottom: 0,
+              transform: "translateX(-50%)",
               display: "flex",
               alignItems: "flex-end",
-              justifyContent: "center",
-              minWidth: "max-content",
+              width: "max-content",
               paddingLeft:  localHandSidePadding,
               paddingRight: localHandSidePadding,
               paddingTop:   isCompactBoard ? (isNarrowMobile ? 8 : 12) : 16,
               paddingBottom: 0,
-              height: isCompactBoard
-                ? `${Math.round(122 * localHandCardScale) + (isNarrowMobile ? 20 : 28)}px`
-                : `${Math.round(122 * localHandCardScale) + 36}px`,
+              height: `${localHandAreaHeightPx}px`,
               overflow: "visible",
             }}
               onMouseMove={(event) => {
