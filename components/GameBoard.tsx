@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback, type CSSProperties, type ReactNode } from "react";
+import { memo, useEffect, useRef, useState, useCallback, type CSSProperties, type ReactNode } from "react";
 import type { Card, CardColor } from "../types/card";
 import type { GameState, Player } from "../types/game";
 import type { useUnoGame } from "../hooks/useUnoGame";
@@ -50,6 +50,15 @@ const DEAL_ANIMATION_STAGGER_MS = 55;
 const DEAL_ANIMATION_DURATION_MS = 320;
 const EASE_OUT = "cubic-bezier(0.23, 1, 0.32, 1)";
 const EASE_OUT_SOFT = "cubic-bezier(0.22, 1, 0.36, 1)";
+const CONFETTI_PIECES = Array.from({ length: 40 }, (_, i) => ({
+  id: i,
+  left: `${(i * 97) % 100}%`,
+  delay: `${(i % 9) * 0.11}s`,
+  duration: `${2.1 + ((i % 7) * 0.22)}s`,
+  color: ["#c0392b", "#d4a017", "#1e6b3a", "#1a4f8a", "#fff8f0"][i % 5],
+  size: 8 + (i % 5),
+  rotate: (i * 29) % 360,
+}));
 
 function sortHand(cards: Card[]): Card[] {
   return [...cards].sort((a, b) => {
@@ -181,17 +190,6 @@ function ActionFlash({ text, tone }: { text: string; tone: ActionFlashTone }) {
 }
 
 function VictoryConfetti() {
-  const palette = ["#c0392b", "#d4a017", "#1e6b3a", "#1a4f8a", "#fff8f0"];
-  const pieces = Array.from({ length: 40 }, (_, i) => ({
-    id: i,
-    left: `${(i * 97) % 100}%`,
-    delay: `${(i % 9) * 0.11}s`,
-    duration: `${2.1 + ((i % 7) * 0.22)}s`,
-    color: palette[i % palette.length],
-    size: 8 + (i % 5),
-    rotate: (i * 29) % 360,
-  }));
-
   return (
     <div style={{
       position: "fixed",
@@ -200,7 +198,7 @@ function VictoryConfetti() {
       pointerEvents: "none",
       overflow: "hidden",
     }}>
-      {pieces.map((piece) => (
+      {CONFETTI_PIECES.map((piece) => (
         <span
           key={piece.id}
           style={{
@@ -223,7 +221,7 @@ function VictoryConfetti() {
 }
 
 // ── Opponent strip ─────────────────────────────────────────────────────────────
-function OpponentStrip({
+const OpponentStrip = memo(function OpponentStrip({
   player, isCurrentTurn, canCallOut, onCallOut, cardScale, compact = false, angle = 0, turnProgress = 0,
 }: {
   player: Player; isCurrentTurn: boolean;
@@ -364,7 +362,17 @@ function OpponentStrip({
       <span style={{ minHeight: callOutHintHeight, visibility: "hidden" }} />
     </button>
   );
-}
+}, (prev, next) => (
+  prev.player.id === next.player.id
+  && prev.player.hand.length === next.player.hand.length
+  && prev.player.saidUno === next.player.saidUno
+  && prev.isCurrentTurn === next.isCurrentTurn
+  && prev.canCallOut === next.canCallOut
+  && prev.cardScale === next.cardScale
+  && prev.compact === next.compact
+  && prev.angle === next.angle
+  && prev.turnProgress === next.turnProgress
+));
 
 // ── Winner screen ──────────────────────────────────────────────────────────────
 function WinnerScreen({
@@ -2435,11 +2443,11 @@ export default function GameBoard({
             }}
               onMouseMove={(event) => {
                 if (event.target === event.currentTarget) {
-                  setHoveredHandPosition(null);
+                  setHoveredHandPosition((prev) => (prev === null ? prev : null));
                 }
               }}
               onMouseLeave={() => {
-                setHoveredHandPosition(null);
+                setHoveredHandPosition((prev) => (prev === null ? prev : null));
               }}
             >
               {sortedHand.map((card, i) => {

@@ -1,23 +1,57 @@
 "use client";
 
-import { useEffect, useState, useRef, type ReactNode } from "react";
+import { useCallback, useEffect, useState, useRef, type ReactNode } from "react";
+import dynamic from "next/dynamic";
 import type { GameRules } from "../types/rules";
 import { useUnoGame } from "../hooks/useUnoGame";
 import { useUnoOnlineGame } from "../hooks/useUnoOnlineGame";
 import { useAudioManager } from "../hooks/useAudioManager";
-import GameBoard from "../components/GameBoard";
 import GameSetup from "../components/GameSetup";
 import HomeScreen from "../components/home/HomeScreen";
-import OnlineLobby from "../components/OnlineLobby";
 import NotificationPanel from "../components/NotificationPanel";
-import SettingsModal from "../components/SettingsModal";
 import { MIN_SUPPORTED_MAX_PLAYERS } from "../lib/gameLimits";
 import { toast } from "sonner";
+
+function ChunkLoadingFallback({ label }: { label: string }) {
+  return (
+    <div style={{
+      position: "fixed",
+      inset: 0,
+      zIndex: 94,
+      display: "grid",
+      placeItems: "center",
+      pointerEvents: "none",
+      background: "color-mix(in srgb, var(--ui-bg) 78%, transparent)",
+    }}>
+      <div style={{
+        fontFamily: "'Courier Prime', monospace",
+        fontSize: 11,
+        letterSpacing: "0.14em",
+        textTransform: "uppercase",
+        color: "var(--ui-muted)",
+        border: "1px solid var(--ui-line)",
+        background: "var(--ui-surface)",
+        padding: "10px 14px",
+      }}>{label}</div>
+    </div>
+  );
+}
+
+const GameBoard = dynamic(() => import("../components/GameBoard"), {
+  loading: () => <ChunkLoadingFallback label="Loading table" />,
+});
+const OnlineLobby = dynamic(() => import("../components/OnlineLobby"), {
+  loading: () => <ChunkLoadingFallback label="Loading lobby" />,
+});
+const SettingsModal = dynamic(() => import("../components/SettingsModal"), {
+  loading: () => <ChunkLoadingFallback label="Loading settings" />,
+});
 
 const SHARED_RULES_KEY = "uno.shared.rules";
 const PREFERRED_THEME_KEY = "uno.preferred.theme";
 const ONLINE_PREFILL_FRIEND_CODE_KEY = "uno.online.prefill.friendCode";
 const ONLINE_PLAYER_NAME_KEY = "uno.online.playerName";
+const WELCOME_SEEN_KEY = "uno.welcome.seen";
 
 type ThemeName = "paper" | "midnight" | "forest" | "sunset";
 
@@ -128,6 +162,15 @@ function getInitialTheme(): ThemeName {
   return "midnight";
 }
 
+function shouldShowWelcomeOverlay(): boolean {
+  if (typeof window === "undefined") return true;
+  try {
+    return window.localStorage.getItem(WELCOME_SEEN_KEY) !== "1";
+  } catch {
+    return true;
+  }
+}
+
 function WelcomeOverlay({ onComplete }: { onComplete: () => void }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -184,7 +227,7 @@ export default function Home() {
   const [showS, setShowS] = useState(false);
   const [settingsTab, setSettingsTab] = useState<"profile" | "controls" | "audio">("controls");
   const [rules, setRules] = useState<Partial<GameRules>>(() => getInitialRules());
-  const [showWelcomeOverlay, setShowWelcomeOverlay] = useState(true);
+  const [showWelcomeOverlay, setShowWelcomeOverlay] = useState<boolean>(() => shouldShowWelcomeOverlay());
   const { playMusic, setMusicContext } = useAudioManager();
 
   const local = useUnoGame();
@@ -249,6 +292,15 @@ export default function Home() {
     setSettingsTab(tab);
     setShowS(true);
   };
+
+  const handleWelcomeOverlayComplete = useCallback(() => {
+    setShowWelcomeOverlay(false);
+    try {
+      window.localStorage.setItem(WELCOME_SEEN_KEY, "1");
+    } catch {
+      // Ignore storage errors.
+    }
+  }, []);
 
   const settingsModal = (
     <SettingsModal
@@ -441,7 +493,7 @@ export default function Home() {
     <>
       {content}
       {showWelcomeOverlay && (
-        <WelcomeOverlay onComplete={() => setShowWelcomeOverlay(false)} />
+        <WelcomeOverlay onComplete={handleWelcomeOverlayComplete} />
       )}
     </>
   );
