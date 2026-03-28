@@ -9,11 +9,13 @@ let globalMusic: HTMLAudioElement | null = null;
 let globalCardMixing: HTMLAudioElement | null = null;
 let globalCardThrowing: HTMLAudioElement | null = null;
 let activeMusicContext: MusicContext = "lobby";
+let unlockListenersBound = false;
 
 function ensureMusicElement(): HTMLAudioElement {
   if (!globalMusic) {
     globalMusic = new Audio("/audios/background_music.wav");
     globalMusic.loop = true;
+    globalMusic.preload = "auto";
   }
   return globalMusic;
 }
@@ -26,28 +28,47 @@ function getContextMusicVolume(): number {
 
 function applyMusicVolume(): void {
   if (!globalMusic) return;
-  const newVolume = getContextMusicVolume();
-  globalMusic.volume = newVolume;
+  globalMusic.volume = getContextMusicVolume();
 }
 
-function ensureMusicPlaying(): void {
+function tryPlayMusic(): void {
   const music = ensureMusicElement();
   applyMusicVolume();
-  // Resume if paused, but don't interrupt if already playing
-  if (music.paused) {
-    const playPromise = music.play();
-    if (playPromise !== undefined) {
-      playPromise.catch(() => {});
-    }
+
+  if (music.volume <= 0) return;
+  if (!music.paused) return;
+
+  const playPromise = music.play();
+  if (playPromise !== undefined) {
+    playPromise.catch(() => {});
   }
+}
+
+function bindMusicUnlockListeners(): void {
+  if (typeof window === "undefined") return;
+  if (unlockListenersBound) return;
+  unlockListenersBound = true;
+
+  const unlock = () => {
+    tryPlayMusic();
+    const music = globalMusic;
+    if (!music || music.paused) return;
+
+    window.removeEventListener("pointerdown", unlock);
+    window.removeEventListener("touchstart", unlock);
+    window.removeEventListener("keydown", unlock);
+  };
+
+  window.addEventListener("pointerdown", unlock, { passive: true });
+  window.addEventListener("touchstart", unlock, { passive: true });
+  window.addEventListener("keydown", unlock);
 }
 
 export function useAudioManager() {
   const setMusicContext = useCallback((context: MusicContext) => {
     activeMusicContext = context;
     applyMusicVolume();
-    // Ensure music continues playing in the new context
-    ensureMusicPlaying();
+    tryPlayMusic();
   }, []);
 
   // Play background music (looped)
@@ -55,10 +76,9 @@ export function useAudioManager() {
     if (context) {
       activeMusicContext = context;
     }
-    ensureMusicPlaying();
+    tryPlayMusic();
   }, []);
 
-  // Pause background music
   const pauseMusic = useCallback(() => {
     globalMusic?.pause();
   }, []);
@@ -87,8 +107,12 @@ export function useAudioManager() {
 
   // React to volume/context changes
   useEffect(() => {
+    bindMusicUnlockListeners();
+    tryPlayMusic();
+
     const handler = () => {
       applyMusicVolume();
+      tryPlayMusic();
       const settings = getAudioSettings();
       if (globalCardMixing) globalCardMixing.volume = settings.sfxVolume ?? 0.8;
       if (globalCardThrowing) globalCardThrowing.volume = (settings.sfxVolume ?? 0.8) * 0.5;

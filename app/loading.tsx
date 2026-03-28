@@ -1,11 +1,19 @@
 "use client";
 
 import { useEffect } from "react";
+import { useAudioManager } from "../hooks/useAudioManager";
 
 export default function Loading() {
+  const { setMusicContext, playMusic } = useAudioManager();
+
   useEffect(() => {
     void import("@dotlottie/player-component");
   }, []);
+
+  useEffect(() => {
+    setMusicContext("lobby");
+    playMusic("lobby");
+  }, [setMusicContext, playMusic]);
 
   return (
     <div

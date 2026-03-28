@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, type ReactNode } from 'react';
 import ProfileButton from './ProfileButton';
-import { Bell, LogOut, Volume2, VolumeX } from 'lucide-react';
+import { Bell, LogOut, Settings, Volume2, VolumeX } from 'lucide-react';
 import {
   isMusicEnabledForContext,
   setMusicEnabledForContext,
@@ -441,6 +441,27 @@ export default function NotificationPanel({
           <VolumeX />
         )}
       </button>
+
+      {/* Settings */}
+      {(onOpenControlsSettings || onOpenAudioSettings || onOpenProfileSettings) ? (
+        <button
+          className="np-icon-btn"
+          onClick={() => {
+            if (onOpenControlsSettings) {
+              onOpenControlsSettings();
+              return;
+            }
+            if (onOpenAudioSettings) {
+              onOpenAudioSettings();
+              return;
+            }
+            onOpenProfileSettings?.();
+          }}
+          title="Settings"
+        >
+          <Settings />
+        </button>
+      ) : null}
 
       {onMenuClick ? (
         <button

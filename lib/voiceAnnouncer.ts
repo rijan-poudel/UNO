@@ -144,121 +144,40 @@ export function playVoiceStem(
 // ── Semantic pools (stems ↔ your spoken lines) ───────────────────────────────
 
 const POOLS = {
-  gameStart: [
-    "shuffle_time",
-    "new_hand",
-    "switch_up",
-    "lets_play",
-    "game_on",
-    "uno_time",
-    "cards_out",
-    "lets_go",
-  ] as const,
-  skip: [
-    "skipped",
-    "sit_down",
-    "nope",
-    "bye_bye",
-    "not_you",
-    "all_skipped",
-  ] as const,
-  reverse: [
-    "reversed",
-    "other_way",
-    "flip_it",
-    "turn_around",
-    "switchback",
-  ] as const,
-  draw2Play: [
-    "draw_two",
-    "pick_up",
-    "two_cards",
-    "ouch",
-    "sorry_not_sorry",
-  ] as const,
-  wild4Play: [
-    "draw_four",
-    "plus_four",
-    "oh_no",
-    "big_trouble",
-    "take_that",
-    "yikes",
-  ] as const,
-  stack: [
-    "stack_it",
-    "plus_two_more",
-    "keep_going",
-    "whos_brave",
-    "stack_of_four",
-    "double_trouble",
-    "its_piling_up",
-    "no_escape",
-  ] as const,
-  wild: [
-    "wild_card",
-    "color_change",
-    "pick_one",
-    "your_call",
-    "wild_out",
-  ] as const,
-  shuffle: [
-    "who_got_what",
-    "bye_cards",
-    "shuffle_time",
-    "switch_decks",
-    "flipped",
-    "dark_side",
-    "light_side",
-    "flipped_back",
-    "back",
-  ] as const,
-  discardAll: [
-    "dump_them",
-    "all_gone",
-    "color_purge",
-    "out_they_go",
-    "table_cleared",
-    "everyone_out",
-  ] as const,
-  nicePlay: ["nice_one", "smooth", "clean_play"] as const,
-  unoDeclare: [
-    "uno",
-    "one_card",
-    "almost_out",
-    "so_close",
-    "watch_out",
-  ] as const,
-  calloutFalse: ["bad_call", "its_legal", "nope"] as const,
-  calloutCaller: ["gotcha"] as const,
-  calloutTarget: ["caught"] as const,
-  color: ["red", "blue", "yellow", "green"] as const,
-  drawVoluntary: ["drawing", "go_fish", "pick_one", "cross_fingers"] as const,
-  drawForcedSmall: ["ouch", "pick_up", "two_cards", "yikes"] as const,
-  drawForcedBig: [
-    "oh_no",
-    "big_trouble",
-    "buried",
-    "stacked_out",
-    "too_many_cards",
-    "brutal_stack",
-  ] as const,
-  winSelf: [
-    "you_won",
-    "winner",
-    "first_place",
-    "champion",
-    "unstoppable",
-    "too_easy",
-  ] as const,
-  loseSelf: [
-    "last_place",
-    "rough_one",
-    "try_again",
-    "next_time",
-    "shake_it_off",
-    "comeback_time",
-  ] as const,
+  skip: ["skip"] as const,
+  reverse: ["reverse"] as const,
+  draw2: ["draw_two"] as const,
+  discardAll: ["discard_all"] as const,
+  unoDeclare: ["uno"] as const,
+  plusFourByColor: {
+    red: "plus_four_red",
+    blue: "plus_four_blue",
+    yellow: "plus_four_yellow",
+    green: "plus_four_green",
+  } as const,
+  colorChangeByColor: {
+    red: "color_change_red",
+    blue: "color_change_blue",
+    yellow: "color_change_yellow",
+    green: "color_change_green",
+  } as const,
+  wildShuffleByColor: {
+    red: "wild_shuffle_red",
+    blue: "wild_shuffle_blue",
+    yellow: "wild_shuffle_yellow",
+    green: "wild_shuffle_green",
+  } as const,
 } as const;
+
+function normalizeActionColor(
+  color: string | null | undefined,
+): "red" | "blue" | "yellow" | "green" | null {
+  if (!color || color === "wild") return null;
+  if (color === "red" || color === "blue" || color === "yellow" || color === "green") {
+    return color;
+  }
+  return null;
+}
 
 /**
  * Call once per new `lastAction` (dedupe with the same key you use for SFX).
@@ -274,30 +193,24 @@ export function announceBoardFromTransition(
 
   switch (action.type) {
     case "init": {
-      const stem = pickStem(POOLS.gameStart, seed);
-      playVoiceStem(stem, {
-        category: "board",
-        audience: { type: "room" },
-        localPlayerId,
-        channel: "board:game_start",
-        minGapMs: 9000,
-      });
       break;
     }
 
     case "play": {
-      const { card, playerId, chosenColor, discardAllCount, shuffledHands } =
+      const { card, chosenColor, discardAllCount, shuffledHands } =
         action;
 
       if (shuffledHands) {
-        const stem = pickStem(POOLS.shuffle, seed);
-        playVoiceStem(stem, {
-          category: "board",
-          audience: { type: "room" },
-          localPlayerId,
-          channel: "board:shuffle",
-          minGapMs: 6500,
-        });
+        const mapped = normalizeActionColor(chosenColor);
+        if (mapped) {
+          playVoiceStem(POOLS.wildShuffleByColor[mapped], {
+            category: "board",
+            audience: { type: "room" },
+            localPlayerId,
+            channel: "board:shuffle",
+            minGapMs: 2200,
+          });
+        }
         return;
       }
 
@@ -337,127 +250,75 @@ export function announceBoardFromTransition(
       }
 
       if (card.value === "draw2") {
-        const stacked = (prev?.pendingDraw ?? 0) > 0;
-        const pool = stacked ? POOLS.stack : POOLS.draw2Play;
-        const stem = pickStem(pool, seed);
-        playVoiceStem(stem, {
+        playVoiceStem(pickStem(POOLS.draw2, seed), {
           category: "board",
           audience: { type: "room" },
           localPlayerId,
-          channel: stacked ? "board:stack" : "board:draw2",
-          minGapMs: stacked ? 2800 : 4000,
+          channel: "board:draw2",
+          minGapMs: 2200,
         });
         return;
       }
 
       if (card.value === "wild4") {
-        const stacked = (prev?.pendingDraw ?? 0) > 0;
-        const pool = stacked ? POOLS.stack : POOLS.wild4Play;
-        const stem = pickStem(pool, seed);
+        const mapped = normalizeActionColor(chosenColor);
+        const stem = mapped
+          ? POOLS.plusFourByColor[mapped]
+          : pickStem(Object.values(POOLS.plusFourByColor), seed);
         playVoiceStem(stem, {
           category: "board",
           audience: { type: "room" },
           localPlayerId,
-          channel: stacked ? "board:stack_wild" : "board:wild4",
-          minGapMs: stacked ? 2800 : 4500,
+          channel: "board:wild4",
+          minGapMs: 2200,
         });
-        if (chosenColor && chosenColor !== "wild") {
-          const colorStem = chosenColor as (typeof POOLS.color)[number];
-          if ((POOLS.color as readonly string[]).includes(colorStem)) {
-            playVoiceStem(colorStem, {
-              category: "board",
-              audience: { type: "room" },
-              localPlayerId,
-              channel: "board:color",
-              minGapMs: 1200,
-              volume: 0.85,
-            });
-          }
-        }
         return;
       }
 
       if (card.value === "wild") {
-        const stem = pickStem(POOLS.wild, seed);
-        playVoiceStem(stem, {
-          category: "board",
-          audience: { type: "room" },
-          localPlayerId,
-          channel: "board:wild",
-          minGapMs: 4000,
-        });
-        if (chosenColor && chosenColor !== "wild") {
-          const colorStem = chosenColor as (typeof POOLS.color)[number];
-          if ((POOLS.color as readonly string[]).includes(colorStem)) {
-            playVoiceStem(colorStem, {
-              category: "board",
-              audience: { type: "room" },
-              localPlayerId,
-              channel: "board:color",
-              minGapMs: 1200,
-              volume: 0.85,
-            });
-          }
+        const mapped = normalizeActionColor(chosenColor);
+        if (mapped) {
+          playVoiceStem(POOLS.colorChangeByColor[mapped], {
+            category: "board",
+            audience: { type: "room" },
+            localPlayerId,
+            channel: "board:wild",
+            minGapMs: 2200,
+          });
         }
         return;
       }
 
       if (card.value === "shuffle") {
-        const stem = pickStem(POOLS.shuffle, seed);
-        playVoiceStem(stem, {
-          category: "board",
-          audience: { type: "room" },
-          localPlayerId,
-          channel: "board:shuffle_card",
-          minGapMs: 6500,
-        });
+        const mapped = normalizeActionColor(chosenColor);
+        if (mapped) {
+          playVoiceStem(POOLS.wildShuffleByColor[mapped], {
+            category: "board",
+            audience: { type: "room" },
+            localPlayerId,
+            channel: "board:shuffle_card",
+            minGapMs: 2200,
+          });
+        }
         return;
       }
-
-      // Number / default — occasional praise, only actor hears to avoid spam.
-      playVoiceStem(pickStem(POOLS.nicePlay, seed), {
-        category: "board",
-        audience: { type: "players", ids: [playerId] },
-        localPlayerId,
-        channel: "board:nice_play",
-        minGapMs: 12000,
-        probability: 0.22,
-        volume: 0.78,
-      });
       break;
     }
 
     case "draw": {
-      const { playerId, count } = action;
+      const { count } = action;
       if (count <= 0) return;
 
-      const wasForced = (prev?.pendingDraw ?? 0) > 0;
-      if (wasForced || count >= 2) {
-        const pool = count >= 5 ? POOLS.drawForcedBig : POOLS.drawForcedSmall;
-        const stem = pickStem(pool, seed);
-        const audience =
-          count >= 4
-            ? ({ type: "room" } as const)
-            : ({ type: "players", ids: [playerId] } as const);
-        playVoiceStem(stem, {
+      if ((prev?.pendingDraw ?? 0) > 0 || count >= 2) {
+        playVoiceStem(pickStem(POOLS.draw2, seed), {
           category: "board",
-          audience,
+          audience: { type: "room" },
           localPlayerId,
           channel: "board:forced_draw",
-          minGapMs: 3200,
+          minGapMs: 2200,
         });
         return;
       }
-
-      playVoiceStem(pickStem(POOLS.drawVoluntary, seed), {
-        category: "board",
-        audience: { type: "players", ids: [playerId] },
-        localPlayerId,
-        channel: "board:voluntary_draw",
-        minGapMs: 5000,
-        probability: 0.24,
-        volume: 0.8,
-      });
       break;
     }
 
@@ -474,47 +335,6 @@ export function announceBoardFromTransition(
     }
 
     case "callOut": {
-      const { callerId, targetId, penalty } = action;
-      if (callerId === targetId) {
-        const stem = pickStem(POOLS.calloutFalse, seed);
-        playVoiceStem(stem, {
-          category: "board",
-          audience: { type: "players", ids: [callerId] },
-          localPlayerId,
-          channel: "board:false_call",
-          minGapMs: 5000,
-        });
-        return;
-      }
-
-      playVoiceStem(pickStem(POOLS.calloutCaller, seed + 1), {
-        category: "board",
-        audience: { type: "players", ids: [callerId] },
-        localPlayerId,
-        channel: "board:callout_caller",
-        minGapMs: 2000,
-        volume: 0.88,
-      });
-
-      playVoiceStem(pickStem(POOLS.calloutTarget, seed + 2), {
-        category: "board",
-        audience: { type: "players", ids: [targetId] },
-        localPlayerId,
-        channel: "board:callout_target",
-        minGapMs: 2000,
-        volume: 0.9,
-      });
-
-      if (penalty >= 4) {
-        playVoiceStem(pickStem(POOLS.drawForcedBig, seed + 3), {
-          category: "board",
-          audience: { type: "room" },
-          localPlayerId,
-          channel: "board:callout_big",
-          minGapMs: 6000,
-          probability: 0.45,
-        });
-      }
       break;
     }
 
@@ -527,26 +347,11 @@ export function announceBoardFromTransition(
 export function announceBoardWinner(
   winnerId: string,
   localPlayerId: string | null,
-  seed: number,
+  _seed: number,
 ): void {
-  if (!localPlayerId) return;
-  if (localPlayerId === winnerId) {
-    playVoiceStem(pickStem(POOLS.winSelf, seed), {
-      category: "board",
-      audience: { type: "players", ids: [winnerId] },
-      localPlayerId,
-      channel: "board:win",
-      minGapMs: 8000,
-    });
-  } else {
-    playVoiceStem(pickStem(POOLS.loseSelf, seed), {
-      category: "board",
-      audience: { type: "players", ids: [localPlayerId] },
-      localPlayerId,
-      channel: "board:lose",
-      minGapMs: 8000,
-    });
-  }
+  void winnerId;
+  void localPlayerId;
+  void _seed;
 }
 
 /** Lobby / socket / menus — respects "voice outside game" setting. */
@@ -575,10 +380,10 @@ export function announceOutside(
   tryNext();
 }
 
-// Fixed pools for UI (stems you listed for non-board contexts)
-const UI_CONNECT = ["connecting", "almost_ready", "starting_soon"] as const;
-const UI_DISCONNECT = ["disconnected", "waiting"] as const;
-const UI_ROOM = ["player_joined", "lets_go", "game_on"] as const;
+// Outside-game voice clips were removed from the asset set.
+const UI_CONNECT = [] as const;
+const UI_DISCONNECT = [] as const;
+const UI_ROOM = [] as const;
 
 export function voiceUiConnected(): void {
   announceOutside(

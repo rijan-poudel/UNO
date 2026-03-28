@@ -7,13 +7,7 @@ import type {
 } from "../../types/multiplayer";
 import NotificationPanel from "../NotificationPanel";
 import FriendInviteInput from "../FriendInviteInput";
-import {
-  ModeRow,
-  PageShell,
-  SectionDivider,
-  UnoWordmark,
-} from "../ui/PageChrome";
-import { ChevronDown } from "lucide-react";
+import { PageShell, SectionDivider, UnoWordmark } from "../ui/PageChrome";
 
 const ONLINE_FRIENDS_KEY = "uno.online.friends";
 const MAX_FRIENDS = 4;
@@ -225,445 +219,721 @@ export default function HomeScreen({
         onOpenProfileSettings={onOpenProfileSettings}
         incomingInviteCount={incomingCount}
       />
+
       <PageShell>
         <style>{`
-        .home-main-grid {
-          display: grid;
-          grid-template-columns: minmax(0, 1fr) minmax(260px, 340px);
-          gap: 24px;
-          align-items: start;
-        }
+          .home-wrap {
+            width: min(1120px, 100%);
+            margin: 0 auto;
+            display: grid;
+            gap: 20px;
+            padding-bottom: 16px;
+          }
 
-        .play-focus-card {
-          border: 1px solid var(--ui-line);
-          background:
-            radial-gradient(circle at 16% 18%, rgba(255,255,255,0.04), transparent 42%),
-            linear-gradient(140deg, rgba(255,255,255,0.02), transparent 54%);
-          padding: 18px 20px;
-          display: grid;
-          gap: 12px;
-        }
+          .hero-shell {
+            position: relative;
+            border: 2px solid var(--ui-line);
+            background:
+              linear-gradient(
+                180deg,
+                color-mix(in oklab, var(--ui-surface) 94%, white 6%),
+                color-mix(in oklab, var(--ui-surface) 98%, black 2%)
+              );
+            overflow: hidden;
+            box-shadow:
+              8px 8px 0 color-mix(in oklab, var(--ui-line) 60%, transparent),
+              0 0 0 1px color-mix(in oklab, var(--ui-line) 35%, transparent) inset;
+          }
 
-        .friend-rail {
-          position: fixed;
-          right: 14px;
-          top: 50%;
-          transform: translateY(-50%);
-          width: 64px;
-          border: 1px solid var(--ui-line);
-          background: color-mix(in oklab, var(--ui-surface) 90%, transparent);
-          backdrop-filter: blur(8px);
-          padding: 10px 8px;
-          display: grid;
-          gap: 8px;
-          z-index: 24;
-          overflow: hidden;
-          transition: width 0.28s cubic-bezier(0.2, 0.95, 0.2, 1);
-          box-shadow: 0 10px 26px rgba(0, 0, 0, 0.14);
-          transform-origin: right center;
-        }
+          .hero-shell::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background:
+              linear-gradient(
+                to right,
+                transparent 0,
+                transparent calc(100% - 1px),
+                color-mix(in oklab, var(--ui-line) 25%, transparent) calc(100% - 1px),
+                color-mix(in oklab, var(--ui-line) 25%, transparent) 100%
+              ),
+              linear-gradient(
+                to bottom,
+                transparent 0,
+                transparent calc(100% - 1px),
+                color-mix(in oklab, var(--ui-line) 18%, transparent) calc(100% - 1px),
+                color-mix(in oklab, var(--ui-line) 18%, transparent) 100%
+              );
+            background-size: 24px 24px;
+            opacity: 0.22;
+          }
 
-        .friend-rail:hover,
-        .friend-rail:focus-within {
-          width: min(320px, calc(100vw - 20px));
-          animation: rail-pop 0.22s ease-out;
-        }
+          .hero-grid {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+            gap: 20px;
+            padding: 22px;
+            align-items: stretch;
+          }
 
-        .friend-rail-head {
-          display: grid;
-          gap: 2px;
-          padding: 2px 4px 4px;
-        }
+          .hero-left {
+            display: grid;
+            gap: 14px;
+            align-content: start;
+          }
 
-        .friend-rail-title {
-          margin: 0;
-          font-family: 'Bebas Neue', cursive;
-          font-size: 22px;
-          letter-spacing: 0.08em;
-          color: var(--ui-text);
-          line-height: 1;
-          white-space: nowrap;
-        }
+          .hero-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            width: fit-content;
+            border: 1px solid var(--ui-line);
+            background: color-mix(in oklab, var(--ui-surface) 88%, white 12%);
+            padding: 5px 9px;
+            font-family: "Courier Prime", monospace;
+            font-size: 9px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--ui-muted);
+          }
 
-        .friend-rail-sub {
-          margin: 0;
-          font-family: 'Courier Prime', monospace;
-          font-size: 9px;
-          letter-spacing: 0.1em;
-          text-transform: uppercase;
-          color: var(--ui-muted);
-          white-space: nowrap;
-        }
+          .hero-kicker-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--ui-accent-green);
+            border-radius: 999px;
+          }
 
-        .friend-collapsed-icons {
-          display: grid;
-          justify-items: center;
-          gap: 7px;
-          margin-top: 2px;
-        }
+          .hero-copy {
+            display: grid;
+            gap: 10px;
+          }
 
-        .friend-row {
-          display: grid;
-          grid-template-columns: auto minmax(0, 1fr) auto;
-          align-items: center;
-          gap: 10px;
-          border: 1px solid var(--ui-line);
-          padding: 8px;
-          background: transparent;
-          transition: transform 0.12s ease, border-color 0.12s ease, opacity 0.12s ease;
-        }
+          .hero-title {
+            margin: 0;
+            font-family: "Bebas Neue", cursive;
+            font-size: clamp(38px, 7vw, 82px);
+            line-height: 0.92;
+            letter-spacing: 0.02em;
+            color: var(--ui-text);
+            text-transform: uppercase;
+          }
 
-        .friend-row:hover {
-          transform: translateX(-2px);
-          border-color: color-mix(in oklab, var(--ui-text) 46%, var(--ui-line));
-        }
+          .hero-subtitle {
+            margin: 0;
+            font-family: "Courier Prime", monospace;
+            font-size: clamp(11px, 1.5vw, 14px);
+            line-height: 1.5;
+            color: var(--ui-muted);
+            max-width: 46ch;
+          }
 
-        .friend-row.offline {
-          opacity: 0.52;
-        }
-
-        .friend-status {
-          font-family: 'Courier Prime', monospace;
-          font-size: 9px;
-          font-weight: 700;
-          letter-spacing: 0.09em;
-          text-transform: uppercase;
-          white-space: nowrap;
-        }
-
-        .friend-status.playing {
-          color: var(--ui-accent-blue);
-        }
-
-        .friend-status.online {
-          color: var(--ui-accent-green);
-        }
-
-        .friend-status.offline {
-          color: var(--ui-muted);
-        }
-
-        .friend-avatar {
-          width: 34px;
-          height: 34px;
-          border-radius: 999px;
-          display: grid;
-          place-items: center;
-          font-family: 'Bebas Neue', cursive;
-          font-size: 19px;
-          letter-spacing: 0.03em;
-          border: 1px solid rgba(0, 0, 0, 0.14);
-          flex: 0 0 auto;
-        }
-
-        .friend-invite-btn {
-          width: 28px;
-          height: 28px;
-          border: 1px solid var(--ui-line);
-          background: transparent;
-          color: var(--ui-text);
-          font-size: 16px;
-          line-height: 1;
-          cursor: pointer;
-          transition: transform 0.12s ease, opacity 0.12s ease;
-        }
-
-        .friend-invite-btn:hover {
-          transform: scale(1.04);
-        }
-
-        .friend-invite-btn:disabled {
-          cursor: default;
-          opacity: 0.45;
-        }
-
-        .friend-expand-content {
-          display: none;
-          gap: 8px;
-          animation: fade-up 0.2s ease;
-        }
-
-        .friend-rail:hover .friend-expand-content,
-        .friend-rail:focus-within .friend-expand-content {
-          display: grid;
-        }
-
-        .friend-rail:hover .friend-collapsed-icons,
-        .friend-rail:focus-within .friend-collapsed-icons {
-          display: none;
-        }
-
-        @keyframes rail-pop {
-          0% { transform: translateY(-50%) scale(0.97); }
-          70% { transform: translateY(-50%) scale(1.01); }
-          100% { transform: translateY(-50%) scale(1); }
-        }
-
-        @keyframes fade-up {
-          from { opacity: 0; transform: translateY(8px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-
-        @media (max-width: 900px) {
-          .home-main-grid {
-            grid-template-columns: 1fr;
+          .cta-row {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 12px;
           }
 
-          .friend-rail {
-            position: static;
-            transform: none;
-            width: 100%;
-            animation: none;
-            margin-top: 8px;
+          .arcade-btn {
+            position: relative;
+            border: 2px solid var(--ui-line);
+            background:
+              linear-gradient(
+                180deg,
+                color-mix(in oklab, var(--ui-surface) 86%, white 14%),
+                color-mix(in oklab, var(--ui-surface) 96%, black 4%)
+              );
+            color: var(--ui-text);
+            padding: 14px;
+            text-align: left;
+            cursor: pointer;
+            transition:
+              transform 0.14s ease,
+              box-shadow 0.14s ease,
+              border-color 0.14s ease;
+            box-shadow: 6px 6px 0 color-mix(in oklab, var(--ui-line) 55%, transparent);
           }
 
-          .friend-collapsed-icons {
-            display: none;
+          .arcade-btn:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 8px 8px 0 color-mix(in oklab, var(--ui-line) 60%, transparent);
+            border-color: color-mix(in oklab, var(--ui-text) 50%, var(--ui-line));
           }
 
-          .friend-expand-content {
+          .arcade-btn.primary {
+            background:
+              linear-gradient(
+                180deg,
+                color-mix(in oklab, var(--ui-accent-blue) 28%, var(--ui-surface)),
+                color-mix(in oklab, var(--ui-surface) 86%, black 14%)
+              );
+          }
+
+          .arcade-btn.secondary {
+            background:
+              linear-gradient(
+                180deg,
+                color-mix(in oklab, var(--ui-accent-green) 18%, var(--ui-surface)),
+                color-mix(in oklab, var(--ui-surface) 88%, black 12%)
+              );
+          }
+
+          .btn-topline {
+            display: block;
+            font-family: "Courier Prime", monospace;
+            font-size: 9px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--ui-muted);
+            margin-bottom: 4px;
+          }
+
+          .btn-title {
+            display: block;
+            font-family: "Bebas Neue", cursive;
+            font-size: 24px;
+            line-height: 0.96;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: var(--ui-text);
+          }
+
+          .btn-desc {
+            display: block;
+            margin-top: 6px;
+            font-family: "Courier Prime", monospace;
+            font-size: 10px;
+            line-height: 1.4;
+            color: var(--ui-muted);
+          }
+
+          .hero-right {
+            display: flex;
+            min-height: 100%;
+          }
+
+          .showcase-card {
+            flex: 1;
+            position: relative;
+            height: 100%;
+            min-height: 280px;
+            border: 2px solid var(--ui-line);
+            background:
+              radial-gradient(circle at 75% 18%, rgba(255,255,255,0.08), transparent 28%),
+              linear-gradient(
+                180deg,
+                color-mix(in oklab, var(--ui-surface) 92%, white 8%),
+                color-mix(in oklab, var(--ui-surface) 97%, black 3%)
+              );
+            overflow: hidden;
+            box-shadow: 6px 6px 0 color-mix(in oklab, var(--ui-line) 45%, transparent);
+          }
+
+          .pixel-stack {
+            position: absolute;
+            inset: 0;
             display: grid;
+            place-items: center;
+            padding: 22px;
           }
-        }
-      `}</style>
 
-      <section
-        style={{
-          width: "min(980px, 100%)",
-          margin: "0 auto",
-          display: "grid",
-          gap: 32,
-        }}
-      >
-        <div>
-          <UnoWordmark />
-          <p
-            style={{
-              margin: "12px 0 0",
-              fontFamily: "'Courier Prime', monospace",
-              fontSize: 11,
-              letterSpacing: "0.22em",
-              textTransform: "uppercase",
-              color: "var(--ui-muted)",
-            }}
-          >
-            Play Fast · Invite Faster
-          </p>
-        </div>
+          .pixel-stage {
+            position: relative;
+            width: min(100%, 300px);
+            aspect-ratio: 1 / 1;
+          }
 
-        <SectionDivider />
+          .pixel {
+            position: absolute;
+            border: 2px solid rgba(0,0,0,0.18);
+            box-shadow: 4px 4px 0 rgba(0,0,0,0.08);
+          }
 
-        <div>
-          <p
-            style={{
-              margin: 0,
-              fontFamily: "'Courier Prime', monospace",
-              fontSize: 10,
-              letterSpacing: "0.22em",
-              textTransform: "uppercase",
-              color: "var(--ui-muted)",
-            }}
-          >
-            01 / Start
-          </p>
-          <h2
-            style={{
-              margin: "8px 0 0",
-              fontFamily: "'Bebas Neue', cursive",
-              fontSize: 34,
-              letterSpacing: "0.04em",
-              lineHeight: 1,
-            }}
-          >
-            Start Playing Right Away
-          </h2>
-        </div>
+          .pixel.red { background: #c0392b; }
+          .pixel.yellow { background: #f4b400; }
+          .pixel.blue { background: #2f80ed; }
+          .pixel.green { background: #2e7d32; }
 
-        <div className="home-main-grid">
+          .pixel.p1 { width: 72px; height: 72px; top: 14%; left: 8%; }
+          .pixel.p2 { width: 72px; height: 72px; top: 14%; left: 32%; }
+          .pixel.p3 { width: 72px; height: 72px; top: 38%; left: 32%; }
+          .pixel.p4 { width: 72px; height: 72px; top: 8%; right: 10%; }
+          .pixel.p5 { width: 72px; height: 72px; top: 32%; right: 10%; }
+          .pixel.p6 { width: 72px; height: 72px; top: 56%; right: 10%; }
+          .pixel.p7 { width: 72px; height: 72px; bottom: 10%; left: 14%; }
+          .pixel.p8 { width: 72px; height: 72px; bottom: 10%; left: 38%; }
+
+          .mini-card {
+            position: absolute;
+            width: 106px;
+            height: 144px;
+            border: 2px solid rgba(0,0,0,0.16);
+            box-shadow: 8px 8px 0 rgba(0,0,0,0.08);
+          }
+
+          .mini-card.one {
+            top: 18%;
+            left: 28%;
+            transform: rotate(-12deg);
+            background-color: color-mix(in oklab, var(--ui-accent-blue) 25%, white 75%);
+          }
+
+          .mini-card.two {
+            bottom: 14%;
+            right: 18%;
+            transform: rotate(9deg);
+            background-color: color-mix(in oklab, var(--ui-accent-green) 18%, white 82%);
+          }
+
+          .mini-card-inner {
+            position: absolute;
+            inset: 10px;
+            border: 2px solid rgba(0,0,0,0.12);
+            display: grid;
+            place-items: center;
+            font-family: "Bebas Neue", cursive;
+            font-size: 48px;
+            color: rgba(0,0,0,0.55);
+          }
+
+          .friends-panel {
+            border: 2px solid var(--ui-line);
+            background:
+              linear-gradient(
+                180deg,
+                color-mix(in oklab, var(--ui-surface) 94%, white 6%),
+                color-mix(in oklab, var(--ui-surface) 98%, black 2%)
+              );
+            padding: 16px;
+            display: grid;
+            gap: 12px;
+            box-shadow: 6px 6px 0 color-mix(in oklab, var(--ui-line) 42%, transparent);
+          }
+
+          .friends-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: end;
+            gap: 10px;
+            flex-wrap: wrap;
+          }
+
+          .friends-kicker {
+            margin: 0;
+            font-family: "Courier Prime", monospace;
+            font-size: 9px;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--ui-muted);
+          }
+
+          .friends-title {
+            margin: 0;
+            font-family: "Bebas Neue", cursive;
+            font-size: 30px;
+            line-height: 1;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: var(--ui-text);
+          }
+
+          .invite-badge {
+            border: 1px solid var(--ui-line);
+            padding: 7px 9px;
+            font-family: "Courier Prime", monospace;
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--ui-text);
+            background: color-mix(in oklab, var(--ui-surface) 88%, white 12%);
+          }
+
+          .friends-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+          }
+
+          .friend-card {
+            border: 1px solid var(--ui-line);
+            background: color-mix(in oklab, var(--ui-surface) 92%, white 8%);
+            padding: 10px;
+            display: grid;
+            grid-template-columns: auto minmax(0, 1fr) auto;
+            gap: 10px;
+            align-items: center;
+            transition:
+              transform 0.12s ease,
+              border-color 0.12s ease,
+              opacity 0.12s ease;
+          }
+
+          .friend-card:hover {
+            transform: translateY(-2px);
+            border-color: color-mix(in oklab, var(--ui-text) 46%, var(--ui-line));
+          }
+
+          .friend-card.offline {
+            opacity: 0.56;
+          }
+
+          .friend-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 999px;
+            display: grid;
+            place-items: center;
+            font-family: "Bebas Neue", cursive;
+            font-size: 20px;
+            letter-spacing: 0.03em;
+            border: 1px solid rgba(0, 0, 0, 0.14);
+            flex: 0 0 auto;
+          }
+
+          .friend-meta {
+            min-width: 0;
+            display: grid;
+            gap: 2px;
+          }
+
+          .friend-name {
+            font-family: "Courier Prime", monospace;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--ui-text);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+
+          .friend-status {
+            font-family: "Courier Prime", monospace;
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 0.09em;
+            text-transform: uppercase;
+            white-space: nowrap;
+          }
+
+          .friend-status.playing {
+            color: var(--ui-accent-blue);
+          }
+
+          .friend-status.online {
+            color: var(--ui-accent-green);
+          }
+
+          .friend-status.offline {
+            color: var(--ui-muted);
+          }
+
+          .friend-invite-btn {
+            border: 1px solid var(--ui-line);
+            background: transparent;
+            color: var(--ui-text);
+            min-width: 34px;
+            height: 34px;
+            padding: 0 8px;
+            font-family: "Bebas Neue", cursive;
+            font-size: 21px;
+            line-height: 1;
+            cursor: pointer;
+            transition: transform 0.12s ease, opacity 0.12s ease;
+          }
+
+          .friend-invite-btn:hover {
+            transform: scale(1.04);
+          }
+
+          .friend-invite-btn:disabled {
+            cursor: default;
+            opacity: 0.45;
+          }
+
+          .friends-empty {
+            margin: 0;
+            border: 1px dashed var(--ui-line);
+            padding: 12px;
+            font-family: "Courier Prime", monospace;
+            font-size: 11px;
+            line-height: 1.45;
+            color: var(--ui-muted);
+            background: color-mix(in oklab, var(--ui-surface) 94%, white 6%);
+          }
+
+          .friends-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+          }
+
+          .lobby-btn {
+            border: 2px solid var(--ui-line);
+            background:
+              linear-gradient(
+                180deg,
+                color-mix(in oklab, var(--ui-surface) 86%, white 14%),
+                color-mix(in oklab, var(--ui-surface) 96%, black 4%)
+              );
+            color: var(--ui-text);
+            padding: 9px 12px;
+            font-family: "Courier Prime", monospace;
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            cursor: pointer;
+            box-shadow: 4px 4px 0 color-mix(in oklab, var(--ui-line) 35%, transparent);
+            transition: transform 0.12s ease, box-shadow 0.12s ease;
+          }
+
+          .lobby-btn:hover {
+            transform: translate(-1px, -1px);
+            box-shadow: 5px 5px 0 color-mix(in oklab, var(--ui-line) 38%, transparent);
+          }
+
+          .footer-strip {
+            border: 2px solid var(--ui-line);
+            background: color-mix(in oklab, var(--ui-surface) 94%, white 6%);
+            padding: 8px 12px;
+            font-family: "Courier Prime", monospace;
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--ui-muted);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px 14px;
+            justify-content: space-between;
+          }
+
+          .footer-left,
+          .footer-right {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px 12px;
+          }
+
+          @media (max-width: 980px) {
+            .hero-grid {
+              grid-template-columns: 1fr;
+            }
+
+            .showcase-card {
+              min-height: 240px;
+            }
+
+            .friends-grid {
+              grid-template-columns: 1fr;
+            }
+          }
+
+          @media (max-width: 720px) {
+            .home-wrap {
+              gap: 14px;
+            }
+
+            .hero-grid {
+              padding: 16px;
+              gap: 16px;
+            }
+
+            .cta-row {
+              grid-template-columns: 1fr;
+            }
+
+            .hero-title {
+              font-size: clamp(32px, 13vw, 52px);
+            }
+
+            .friends-panel {
+              padding: 12px;
+            }
+
+            .friends-title {
+              font-size: 24px;
+            }
+
+            .footer-strip {
+              justify-content: flex-start;
+            }
+          }
+        `}</style>
+
+        <section className="home-wrap">
           <div>
-            <ModeRow
-              label="With Computer"
-              desc="Play against bots on this device"
-              onClick={onComputer}
-            />
-            <ModeRow
-              label="With Friends"
-              desc="Create or join a room with friends"
-              onClick={onFriends}
-              last
-            />
-          </div>
-        </div>
-
-        <aside className="friend-rail" aria-label="Top friends">
-          <div className="friend-collapsed-icons" aria-hidden>
-            <ChevronDown size={18} />
-            {friendsWithAvatar.length === 0 && (
-              <span
-                style={{
-                  fontFamily: "'Courier Prime', monospace",
-                  fontSize: 9,
-                  letterSpacing: "0.08em",
-                  color: "var(--ui-muted)",
-                  textTransform: "uppercase",
-                }}
-              >
-                None
-              </span>
-            )}
-            {friendsWithAvatar.map(
-              ({ friend, letter, avatarColor, presence }) => (
-                <span
-                  key={friend.friendCode}
-                  className="friend-avatar"
-                  style={{
-                    color: avatarColor.fg,
-                    background: avatarColor.bg,
-                    opacity: presence === "offline" ? 0.48 : 1,
-                  }}
-                  title={friend.name}
-                >
-                  {letter}
-                </span>
-              ),
-            )}
+            <UnoWordmark />
           </div>
 
-          <div className="friend-expand-content">
-            <div className="friend-rail-head">
-              <p className="friend-rail-sub">
-                {incomingCount > 0
-                  ? `${incomingCount} invite${incomingCount > 1 ? "s" : ""} waiting`
-                  : "No incoming invites"}
-              </p>
-              <h4 className="friend-rail-title">Friends</h4>
-            </div>
-            {friendsWithAvatar.length === 0 ? (
-              <p
-                style={{
-                  margin: 0,
-                  fontFamily: "'Courier Prime', monospace",
-                  fontSize: 11,
-                  color: "var(--ui-muted)",
-                  lineHeight: 1.5,
-                }}
-              >
-                No saved friends yet.
-              </p>
-            ) : (
-              friendsWithAvatar.map(
-                ({ friend, letter, avatarColor, presence }) => {
-                  const canInvite =
-                    presence !== "offline" &&
-                    invitingCode !== friend.friendCode;
-                  return (
-                    <div
-                      key={friend.friendCode}
-                      className={`friend-row ${presence === "offline" ? "offline" : ""}`}
-                    >
-                      <span
-                        className="friend-avatar"
-                        style={{
-                          color: avatarColor.fg,
-                          background: avatarColor.bg,
-                        }}
-                      >
-                        {letter}
-                      </span>
+          <section className="hero-shell" aria-label="Home hero">
+            <div className="hero-grid">
+              <div className="hero-left">
+                <div className="hero-copy">
+                  <h1 className="hero-title">
+                    Pick a mode.
+                    <br />
+                    Start a match.
+                  </h1>
 
-                      <div style={{ minWidth: 0, display: "grid", gap: 2 }}>
-                        <span
-                          style={{
-                            fontFamily: "'Courier Prime', monospace",
-                            fontSize: 12,
-                            fontWeight: 700,
-                            color: "var(--ui-text)",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                            whiteSpace: "nowrap",
-                          }}
-                        >
-                          {friend.name}
-                        </span>
-                        <span className={`friend-status ${presence}`}>
-                          {presence === "playing"
-                            ? "Playing"
-                            : presence === "online"
-                              ? "Online"
-                              : "Offline"}
-                        </span>
+                  <p className="hero-subtitle">
+                    Fast UNO with quick invites and instant rounds.
+                  </p>
+                </div>
+
+                <div className="cta-row">
+                  <button
+                    type="button"
+                    className="arcade-btn primary"
+                    onClick={onComputer}
+                  >
+                    <span className="btn-topline">Solo</span>
+                    <span className="btn-title">Play vs CPU</span>
+                    <span className="btn-desc">Start a local game.</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    className="arcade-btn secondary"
+                    onClick={onFriends}
+                  >
+                    <span className="btn-topline">Online</span>
+                    <span className="btn-title">Play with Friends</span>
+                    <span className="btn-desc">Create or join a room.</span>
+                  </button>
+                </div>
+              </div>
+
+              <div className="hero-right">
+                <div className="showcase-card" aria-hidden="true">
+                  <div className="pixel-stack">
+                    <div className="pixel-stage">
+                      <div className="pixel red p1" />
+                      <div className="pixel yellow p2" />
+                      <div className="pixel blue p3" />
+                      <div className="pixel green p4" />
+                      <div className="pixel red p5" />
+                      <div className="pixel yellow p6" />
+                      <div className="pixel blue p7" />
+                      <div className="pixel green p8" />
+
+                      <div className="mini-card one">
+                        <div className="mini-card-inner">U</div>
                       </div>
 
-                      <button
-                        type="button"
-                        className="friend-invite-btn"
-                        disabled={!canInvite}
-                        onClick={() => {
-                          void inviteFriend(friend.friendCode);
-                        }}
-                        title={`Invite ${friend.name}`}
-                        aria-label={`Invite ${friend.name}`}
-                      >
-                        +
-                      </button>
+                      <div className="mini-card two">
+                        <div className="mini-card-inner">NO</div>
+                      </div>
                     </div>
-                  );
-                },
-              )
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <SectionDivider />
+
+          <section className="friends-panel" aria-label="Friends and quick invite">
+            <div className="friends-head">
+              <div>
+                <p className="friends-kicker">Friends</p>
+                <h2 className="friends-title">Quick Invite</h2>
+              </div>
+
+              <div className="invite-badge">
+                {incomingCount > 0
+                  ? `${incomingCount} waiting`
+                  : "No invites"}
+              </div>
+            </div>
+
+            {friendsWithAvatar.length === 0 ? (
+              <p className="friends-empty">
+                No saved friends yet. Enter a code to invite.
+              </p>
+            ) : (
+              <div className="friends-grid">
+                {friendsWithAvatar.map(
+                  ({ friend, letter, avatarColor, presence }) => {
+                    const canInvite =
+                      presence !== "offline" &&
+                      invitingCode !== friend.friendCode;
+
+                    return (
+                      <div
+                        key={friend.friendCode}
+                        className={`friend-card ${presence === "offline" ? "offline" : ""}`}
+                      >
+                        <span
+                          className="friend-avatar"
+                          style={{
+                            color: avatarColor.fg,
+                            background: avatarColor.bg,
+                          }}
+                        >
+                          {letter}
+                        </span>
+
+                        <div className="friend-meta">
+                          <span className="friend-name">{friend.name}</span>
+                          <span className={`friend-status ${presence}`}>
+                            {presence === "playing"
+                              ? "Playing"
+                              : presence === "online"
+                                ? "Online"
+                                : "Offline"}
+                          </span>
+                        </div>
+
+                        <button
+                          type="button"
+                          className="friend-invite-btn"
+                          disabled={!canInvite}
+                          onClick={() => {
+                            void inviteFriend(friend.friendCode);
+                          }}
+                          title={`Invite ${friend.name}`}
+                          aria-label={`Invite ${friend.name}`}
+                        >
+                          +
+                        </button>
+                      </div>
+                    );
+                  },
+                )}
+              </div>
             )}
 
-            <FriendInviteInput
-              value={friendCodeInput}
-              onChange={setFriendCodeInput}
-              onSend={() => {
-                void inviteFromInput();
-              }}
-              disabled={
-                normalizeCode(friendCodeInput).length < 4 ||
-                invitingCode === normalizeCode(friendCodeInput)
-              }
-              buttonLabel="Quick Invite"
-            />
+            <div className="friends-actions">
+              <FriendInviteInput
+                value={friendCodeInput}
+                onChange={setFriendCodeInput}
+                onSend={() => {
+                  void inviteFromInput();
+                }}
+                disabled={
+                  normalizeCode(friendCodeInput).length < 4 ||
+                  invitingCode === normalizeCode(friendCodeInput)
+                }
+                buttonLabel="Invite"
+              />
 
-            <button
-              type="button"
-              onClick={onFriends}
-              style={{
-                border: "1px solid var(--ui-line)",
-                background: "transparent",
-                color: "var(--ui-muted)",
-                padding: "8px 10px",
-                fontFamily: "'Courier Prime', monospace",
-                fontSize: 10,
-                fontWeight: 700,
-                letterSpacing: "0.08em",
-                textTransform: "uppercase",
-                cursor: "pointer",
-                justifySelf: "start",
-              }}
-            >
-              Open Lobby
-            </button>
-          </div>
-        </aside>
-
-        <SectionDivider />
-
-        <p
-          style={{
-            margin: 0,
-            fontFamily: "'Courier Prime', monospace",
-            fontSize: 10,
-            letterSpacing: "0.14em",
-            textTransform: "uppercase",
-            color: "var(--ui-muted)",
-          }}
-        >
-          Ad-free · No account required · Press settings for rules
-        </p>
-      </section>
-    </PageShell>
+              <button
+                type="button"
+                className="lobby-btn"
+                onClick={onFriends}
+              >
+                Open Lobby
+              </button>
+            </div>
+          </section>
+        </section>
+      </PageShell>
     </>
   );
 }
