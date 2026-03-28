@@ -1613,6 +1613,12 @@ export default function GameBoard({
 
   const handOverlap = Math.round(26 * localHandCardScale);
   const localHandSidePadding = isCompactBoard ? (isNarrowMobile ? 82 : 120) : 132;
+  const tableCenterTop = isCompactBoard
+    ? (isNarrowMobile ? "47%" : "46.5%")
+    : "46%";
+  const pendingDrawBadgeTop = isCompactBoard
+    ? (isNarrowMobile ? "calc(47% - 110px)" : "calc(46.5% - 124px)")
+    : "calc(46% - 132px)";
   const ARC_SPREAD = 3.5;
   const ARC_LIFT   = 2.5;
 
@@ -2088,7 +2094,7 @@ export default function GameBoard({
             <div style={{
               position: "absolute",
               left: "50%",
-              top: isCompactBoard ? (isNarrowMobile ? "calc(50% - 110px)" : "calc(50% - 124px)") : "calc(50% - 132px)",
+              top: pendingDrawBadgeTop,
               transform: "translateX(-50%)",
               pointerEvents: "none",
               zIndex: 6,
@@ -2106,7 +2112,7 @@ export default function GameBoard({
           <div style={{
             position: "absolute",
             left: "50%",
-            top: "50%",
+            top: tableCenterTop,
             transform: "translate(-50%, -50%)",
             display: "grid",
             gridTemplateColumns: `${pileCardColumnWidth}px ${turnColumnWidth}px ${pileCardColumnWidth}px`,
