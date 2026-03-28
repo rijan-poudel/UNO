@@ -14,7 +14,7 @@ export const STEM_TO_AUDIOS: Record<string, readonly string[]> = {
   // Base in-game action clips currently available in /public/audios
   skip: ['Skip'],
   reverse: ['Reverse'],
-  draw_two: ['Draw two!'],
+  plus_two: ['plustwo', 'Draw two!'],
   discard_all: ['Discard All'],
   uno: ['UNO!'],
 
@@ -28,6 +28,23 @@ export const STEM_TO_AUDIOS: Record<string, readonly string[]> = {
   plus_four_blue: ['Plus four Blue'],
   plus_four_yellow: ['Plus four Yellow'],
   plus_four_green: ['Plus four Green'],
+
+  // Incoming draw-count clips (prefer these for draw-pile resolutions)
+  draw_two: ['Draw two!'],
+  draw_four: ['Draw four'],
+  draw_six: ['Draw Six', 'Draw six'],
+  draw_eight: ['Draw eight'],
+  draw_ten: ['Draw ten'],
+  draw_twelve: ['Draw twelve'],
+  draw_fourteen: ['Draw fourteen'],
+  draw_sixteen: ['Draw sixteen'],
+  draw_eighteen: ['Draw eighteen'],
+  draw_twenty: ['Draw twenty'],
+  draw_twentytwo: ['Draw twentytwo'],
+  draw_twenty_four: ['Draw twentyFour', 'Draw twenty four'],
+
+  // Generic plus fallbacks still used when no draw-count clip exists.
+  plus_four_generic: ['Draw four', 'Plus four'],
 
   wild_shuffle_red: ['Wild shuffle red'],
   wild_shuffle_blue: ['Wild shuffle Blue'],

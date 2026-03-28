@@ -2,7 +2,9 @@
 
 import { useState, useEffect, useRef, type ReactNode } from 'react';
 import ProfileButton from './ProfileButton';
-import { Bell, Check, ChevronLeft, ChevronRight, LogOut, Settings, Volume2, VolumeX } from 'lucide-react';
+import { Bell, Check, ChevronRight, LogOut, Settings, Volume2, VolumeX } from 'lucide-react';
+import type { FriendInvite } from '../types/multiplayer';
+import { toast } from 'sonner';
 import {
   isMusicEnabledForContext,
   setMusicEnabledForContext,
@@ -36,6 +38,9 @@ interface NotificationPanelProps {
   notifications?: Notification[];
   onNotificationDismiss?: (notificationId: string) => void;
   incomingInviteCount?: number;
+  incomingInvites?: FriendInvite[];
+  onAcceptFriendInvite?: (inviteId: string) => Promise<boolean>;
+  onDeclineFriendInvite?: (inviteId: string) => Promise<boolean>;
 }
 
 const THEME_OPTIONS = [
@@ -66,10 +71,14 @@ export default function NotificationPanel({
   notifications = [],
   onNotificationDismiss,
   incomingInviteCount = 0,
+  incomingInvites = [],
+  onAcceptFriendInvite,
+  onDeclineFriendInvite,
 }: NotificationPanelProps): ReactNode {
   const [showNotifications, setShowNotifications] = useState<boolean>(false);
   const [showThemeMenu, setShowThemeMenu] = useState<boolean>(false);
   const [showThemeSubmenu, setShowThemeSubmenu] = useState<boolean>(false);
+  const [inviteActioningId, setInviteActioningId] = useState<string | null>(null);
   const [lobbyMusicEnabled, setLobbyMusicEnabled] = useState<boolean>(() =>
     typeof window === 'undefined' ? true : isMusicEnabledForContext(musicContext),
   );
@@ -539,13 +548,89 @@ export default function NotificationPanel({
             <div className="np-popup" style={{ minWidth: 280 }}>
               <div className="np-popup-header">Notifications</div>
               {incomingInviteCount > 0 && (
-                <div className="np-popup-item">
+                <div className="np-popup-item" style={{ cursor: 'default' }}>
                   <div>
                     <strong>{incomingInviteCount}</strong>&nbsp;
                     {incomingInviteCount === 1 ? 'Game invite' : 'Game invites'} waiting
                   </div>
                 </div>
               )}
+
+              {incomingInvites.slice(0, 4).map((invite) => {
+                const busy = inviteActioningId === invite.inviteId;
+                return (
+                  <div key={invite.inviteId} className="np-notification-item" style={{ display: 'grid', gap: 8 }}>
+                    <div style={{ fontWeight: 700 }}>{invite.fromName}</div>
+                    <div
+                      style={{
+                        fontSize: '11px',
+                        color: 'var(--ui-muted)',
+                        marginTop: -2,
+                      }}
+                    >
+                      {invite.fromFriendCode} · room {invite.roomId}
+                    </div>
+                    <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+                      <button
+                        type="button"
+                        disabled={busy || !onDeclineFriendInvite}
+                        onClick={() => {
+                          if (!onDeclineFriendInvite) return;
+                          setInviteActioningId(invite.inviteId);
+                          void onDeclineFriendInvite(invite.inviteId)
+                            .then((ok) => {
+                              if (ok) toast.message('Invite declined.');
+                            })
+                            .finally(() => setInviteActioningId(null));
+                        }}
+                        style={{
+                          padding: '6px 10px',
+                          border: '1px solid var(--ui-line)',
+                          background: 'transparent',
+                          color: 'var(--ui-muted)',
+                          fontSize: 10,
+                          letterSpacing: '0.08em',
+                          textTransform: 'uppercase',
+                          cursor: busy || !onDeclineFriendInvite ? 'default' : 'pointer',
+                          opacity: busy || !onDeclineFriendInvite ? 0.5 : 1,
+                        }}
+                      >
+                        Decline
+                      </button>
+                      <button
+                        type="button"
+                        disabled={busy || !onAcceptFriendInvite}
+                        onClick={() => {
+                          if (!onAcceptFriendInvite) return;
+                          setInviteActioningId(invite.inviteId);
+                          void onAcceptFriendInvite(invite.inviteId)
+                            .then((ok) => {
+                              if (ok) {
+                                toast.success('Invite accepted.');
+                                setShowNotifications(false);
+                              }
+                            })
+                            .finally(() => setInviteActioningId(null));
+                        }}
+                        style={{
+                          padding: '6px 10px',
+                          border: 'none',
+                          background: 'var(--ui-text)',
+                          color: 'var(--ui-surface)',
+                          fontSize: 10,
+                          letterSpacing: '0.1em',
+                          textTransform: 'uppercase',
+                          cursor: busy || !onAcceptFriendInvite ? 'default' : 'pointer',
+                          opacity: busy || !onAcceptFriendInvite ? 0.5 : 1,
+                        }}
+                      >
+                        Accept
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+
               {notifications.length > 0 ? (
                 notifications.map((notif) => (
                   <div

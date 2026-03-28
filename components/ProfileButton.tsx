@@ -36,11 +36,7 @@ export default function ProfileButton({
     }
   };
 
-  const [playerName, setPlayerName] = useState(() => {
-    const normalizedInitial = sanitizePlayerName(initialName);
-    if (normalizedInitial !== FALLBACK_PLAYER_NAME) return normalizedInitial;
-    return readStoredName();
-  });
+  const [playerName, setPlayerName] = useState(() => sanitizePlayerName(initialName));
 
   const [isEditing, setIsEditing] = useState(false);
   const [lastSavedName, setLastSavedName] = useState(playerName);
@@ -61,14 +57,12 @@ export default function ProfileButton({
 
   useEffect(() => {
     const nextInitial = sanitizePlayerName(initialName);
-    if (nextInitial !== FALLBACK_PLAYER_NAME) {
-      setPlayerName(nextInitial);
-      setLastSavedName(nextInitial);
-      return;
-    }
-    const stored = readStoredName();
-    setPlayerName(stored);
-    setLastSavedName(stored);
+    const nextValue = nextInitial !== FALLBACK_PLAYER_NAME ? nextInitial : readStoredName();
+    const timer = window.setTimeout(() => {
+      setPlayerName(nextValue);
+      setLastSavedName(nextValue);
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, [initialName]);
 
   useEffect(() => {

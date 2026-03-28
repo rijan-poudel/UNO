@@ -42,6 +42,8 @@ interface HomeScreenProps {
         friendCodes: string[],
     ) => Promise<Record<string, FriendPresenceState>>;
     incomingInvites: FriendInvite[];
+    onAcceptFriendInvite?: (inviteId: string) => Promise<boolean>;
+    onDeclineFriendInvite?: (inviteId: string) => Promise<boolean>;
 }
 
 function cleanFriendName(
@@ -119,6 +121,8 @@ export default function HomeScreen({
     onFriendQuickInvite,
     onCheckFriendOnline,
     incomingInvites,
+    onAcceptFriendInvite,
+    onDeclineFriendInvite,
 }: HomeScreenProps) {
     const [friends] = useState<FriendEntry[]>(() => loadFriends());
     const [friendCodeInput, setFriendCodeInput] = useState("");
@@ -217,6 +221,9 @@ export default function HomeScreen({
                 onOpenControlsSettings={onOpenControlsSettings}
                 onOpenAudioSettings={onOpenAudioSettings}
                 onOpenProfileSettings={onOpenProfileSettings}
+              incomingInvites={incomingInvites}
+              onAcceptFriendInvite={onAcceptFriendInvite}
+              onDeclineFriendInvite={onDeclineFriendInvite}
                 incomingInviteCount={incomingCount}
             />
 

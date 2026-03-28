@@ -7,6 +7,9 @@ interface ColorPickerProps {
   onCancel: () => void;
 }
 
+const EASE_OUT = 'cubic-bezier(0.23, 1, 0.32, 1)';
+const EASE_OUT_SOFT = 'cubic-bezier(0.22, 1, 0.36, 1)';
+
 const COLORS: Array<{ color: CardColor; bg: string; text: string; border: string; label: string }> = [
   { color: 'red',    bg: 'var(--ui-accent-red)',    text: '#fff8f0',       border: 'color-mix(in srgb, var(--ui-accent-red) 72%, #000 28%)', label: 'Red'    },
   { color: 'yellow', bg: 'var(--ui-accent-yellow)', text: 'var(--ui-text)', border: 'color-mix(in srgb, var(--ui-accent-yellow) 72%, #000 28%)', label: 'Yellow' },
@@ -23,16 +26,33 @@ export default function ColorPicker({ onSelect, onCancel }: ColorPickerProps) {
           to   { opacity: 1; }
         }
         @keyframes cpSlideUp {
-          from { opacity: 0; transform: translateY(16px); }
+          from { opacity: 0; transform: translateY(14px) scale(0.96); }
           to   { opacity: 1; transform: translateY(0); }
         }
         .cp-btn {
-          transition: opacity 0.12s ease;
+          transition: transform 0.16s ${EASE_OUT}, opacity 0.14s ${EASE_OUT_SOFT}, filter 0.16s ${EASE_OUT_SOFT};
           cursor: pointer;
         }
-        .cp-btn:hover { opacity: 0.82; }
-        .cp-btn:active { opacity: 0.6; }
-        .cp-cancel:hover { color: var(--ui-text) !important; }
+        .cp-btn:hover {
+          opacity: 0.92;
+          transform: translateY(-1px);
+          filter: saturate(1.06) brightness(1.03);
+        }
+        .cp-btn:active {
+          opacity: 0.82;
+          transform: scale(0.97);
+          filter: saturate(0.98);
+        }
+        .cp-cancel {
+          transition: color 0.14s ${EASE_OUT_SOFT}, transform 0.12s ${EASE_OUT};
+        }
+        .cp-cancel:hover {
+          color: var(--ui-text) !important;
+          transform: translateY(-1px);
+        }
+        .cp-cancel:active {
+          transform: scale(0.97);
+        }
       `}</style>
 
       {/* Backdrop */}
@@ -47,7 +67,7 @@ export default function ColorPicker({ onSelect, onCancel }: ColorPickerProps) {
           alignItems: 'center',
           justifyContent: 'center',
           padding: 24,
-          animation: 'cpFadeIn 0.18s ease',
+          animation: `cpFadeIn 0.18s ${EASE_OUT_SOFT}`,
         }}
       >
         <div
@@ -61,7 +81,7 @@ export default function ColorPicker({ onSelect, onCancel }: ColorPickerProps) {
             flexDirection: 'column',
             alignItems: 'center',
             gap: 28,
-            animation: 'cpSlideUp 0.2s ease',
+            animation: `cpSlideUp 0.22s ${EASE_OUT}`,
           }}
         >
 
@@ -133,7 +153,6 @@ export default function ColorPicker({ onSelect, onCancel }: ColorPickerProps) {
                 color: 'var(--ui-muted)',
                 cursor: 'pointer',
                 padding: '4px 0',
-                transition: 'color 0.12s',
               }}
             >Cancel</button>
           </div>

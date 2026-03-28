@@ -7,7 +7,7 @@ import type { useUnoGame } from "../hooks/useUnoGame";
 import UnoCard from "./UnoCard";
 import ColorPicker from "./ColorPicker";
 import ProfileChip from "./ProfileChip";
-import { announceBoardFromTransition, announceBoardWinner } from "../lib/voiceAnnouncer";
+import { announceBoardFromTransition, announceBoardWinner, getBoardVoiceRemainingMs } from "../lib/voiceAnnouncer";
 import { playShuffleMotionChime, playTableChime, primeTableAudioFromUserGesture } from "../lib/tableChimes";
 import { useAudioManager } from "../hooks/useAudioManager";
 import { isMusicEnabledForContext, setMusicEnabledForContext } from "../lib/audioSettings";
@@ -41,13 +41,15 @@ const VALUE_ORDER: Record<string, number> = {
   skip: 10, reverse: 11, draw2: 12, discardAll: 13, wild: 14, wild4: 15, shuffle: 16,
 };
 
-const BOT_THINK_DELAY_MS = 10000;
+const BOT_THINK_DELAY_MS = 1500;
 const HUMAN_IDLE_TIMEOUT_MS = 12000;
 const HUMAN_IDLE_AFTER_DRAW_TIMEOUT_MS = 12000;
 const HUMAN_IDLE_WILD_PICK_TIMEOUT_MS = 12000;
-const ACTION_FLASH_HOLD_MS = 980;
+const ACTION_FLASH_HOLD_MS = 520;
 const DEAL_ANIMATION_STAGGER_MS = 55;
 const DEAL_ANIMATION_DURATION_MS = 320;
+const EASE_OUT = "cubic-bezier(0.23, 1, 0.32, 1)";
+const EASE_OUT_SOFT = "cubic-bezier(0.22, 1, 0.36, 1)";
 
 function sortHand(cards: Card[]): Card[] {
   return [...cards].sort((a, b) => {
@@ -74,7 +76,7 @@ function ActionTray({ children }: { children: ReactNode }) {
       display: "grid",
       gap: 10,
       animation: "none",
-      transition: "opacity 0.2s ease, transform 0.2s cubic-bezier(0.23, 1, 0.32, 1)",
+      transition: `opacity 0.18s ${EASE_OUT_SOFT}, transform 0.2s ${EASE_OUT}`,
     }}>
       {children}
     </div>
@@ -122,7 +124,7 @@ function AnimatedCards({ animations }: { animations: TravelAnimation[] }) {
             top: animation.started ? animation.to.y : animation.from.y,
             transform: `translate(-50%, -50%) rotate(${animation.started ? animation.rotationTo : animation.rotationFrom}deg) scale(${animation.scale})`,
             transformOrigin: "center center",
-            transition: `left ${animation.duration}ms cubic-bezier(0.23, 1, 0.32, 1), top ${animation.duration}ms cubic-bezier(0.23, 1, 0.32, 1), transform ${animation.duration}ms cubic-bezier(0.23, 1, 0.32, 1), opacity ${animation.duration}ms ease`,
+            transition: `left ${animation.duration}ms ${EASE_OUT}, top ${animation.duration}ms ${EASE_OUT}, transform ${animation.duration}ms ${EASE_OUT}, opacity ${animation.duration}ms ${EASE_OUT_SOFT}`,
             opacity: animation.started ? 0.92 : 1,
           }}
         >
@@ -240,7 +242,7 @@ function OpponentStrip({
   const fanWidth = Math.max(28, (82 * effectiveFanScale) + Math.max(0, fans - 1) * overlap);
   const fanHeight = 122 * effectiveFanScale + 8;
   const fanMid = (fans - 1) / 2;
-  const turnBoost = 1;
+  const turnBoost = isCurrentTurn ? 1.08 : 1;
   const callOutHintHeight = compact ? 10 : 12;
   const cornerNameClearance = Math.abs(angle) >= 30 ? (compact ? 12 : 16) : 0;
   const isSideSeat = Math.abs(angle) >= 80;
@@ -264,7 +266,7 @@ function OpponentStrip({
       justifyItems: "center",
       rowGap: 3,
       opacity: canCallOut ? 1 : isCurrentTurn ? 1 : 0.38,
-      transition: "opacity 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease, transform 0.25s ease",
+      transition: `opacity 0.22s ${EASE_OUT_SOFT}, background-color 0.22s ${EASE_OUT_SOFT}, box-shadow 0.22s ${EASE_OUT_SOFT}, transform 0.24s ${EASE_OUT}`,
       position: "relative",
       borderRadius: "8px",
       boxShadow: "none",
@@ -296,7 +298,7 @@ function OpponentStrip({
             transform: `rotate(${(i - fanMid) * -7}deg) scale(${turnBoost})`,
             transformOrigin: "bottom center",
             zIndex: isCurrentTurn ? i + 30 : i,
-            transition: "transform 0.2s ease, opacity 0.2s ease",
+            transition: `transform 0.18s ${EASE_OUT}, opacity 0.16s ${EASE_OUT_SOFT}`,
           }}>
             <GameCard
               card={{ id: `_opp-${player.id}-${i}`, color: "wild", value: "wild" }}
@@ -429,23 +431,19 @@ function WinnerScreen({
       )}
 
       <div style={{ display: "flex", gap: 10 }}>
-        <button onClick={onReset} style={{
+        <button className="winner-secondary-btn" onClick={onReset} style={{
           fontFamily: "'Courier Prime', monospace", fontSize: 11, fontWeight: 700,
           letterSpacing: "0.1em", textTransform: "uppercase",
           background: "transparent", border: "1px solid var(--ui-line)",
           color: "var(--ui-muted)", padding: "12px 20px", cursor: "pointer",
-          transition: "color 0.12s",
+          transition: `color 0.14s ${EASE_OUT_SOFT}, transform 0.12s ${EASE_OUT}`,
         }}
-          onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.color = "var(--ui-text)")}
-          onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.color = "var(--ui-muted)")}
         >New players</button>
-        <button onClick={onDealAgain} style={{
+        <button className="winner-primary-btn" onClick={onDealAgain} style={{
           fontFamily: "'Bebas Neue', cursive", fontSize: 22, letterSpacing: "0.14em",
           background: "var(--ui-text)", color: "var(--ui-bg)",
-          border: "none", padding: "12px 36px", cursor: "pointer", transition: "opacity 0.12s",
+          border: "none", padding: "12px 36px", cursor: "pointer", transition: `opacity 0.14s ${EASE_OUT_SOFT}, transform 0.12s ${EASE_OUT}`,
         }}
-          onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.opacity = "0.7")}
-          onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.opacity = "1")}
         >Deal again</button>
       </div>
     </div>
@@ -457,7 +455,7 @@ export default function GameBoard({
   gameApi, onReset, onDealAgain, onOpenSettings, onCycleTheme, currentThemeLabel,
 }: GameBoardProps) {
   // Audio manager for SFX and shared background music control
-  const { playCardMixing, playCardThrowing } = useAudioManager();
+  const { playCardMixing, stopCardMixing, playCardThrowing } = useAudioManager();
 
   const {
     game, localPlayerIndex, pendingWild, drawnThisTurn, botThinking,
@@ -491,7 +489,6 @@ export default function GameBoard({
   const [highlightedDrawnCardId, setHighlightedDrawnCardId] = useState<string | null>(null);
   const [drawDecisionCardId, setDrawDecisionCardId] = useState<string | null>(null);
   const [hoveredHandPosition, setHoveredHandPosition] = useState<number | null>(null);
-  const [hoveredCardId, setHoveredCardId] = useState<string | null>(null);
   const [animations, setAnimations] = useState<TravelAnimation[]>([]);
   const [turnCountdownSeconds, setTurnCountdownSeconds] = useState(0);
   const turnTransitionLocked = actionFlash !== null;
@@ -659,7 +656,10 @@ export default function GameBoard({
           if (stepIndex === 0) {
             playTableChime("deal");
           }
-          playCardMixing();
+          const isShuffleDeal = source === "discard";
+          if (isShuffleDeal || stepIndex % 3 === 0) {
+            playCardMixing(isShuffleDeal ? 170 : 130);
+          }
           queueAnimation({
             card: { id: `_anim-deal-${playerId}-${round}-${stepIndex}`, color: 'wild', value: 'wild' },
             faceDown: true,
@@ -676,7 +676,61 @@ export default function GameBoard({
         }, stepIndex * DEAL_ANIMATION_STAGGER_MS);
       });
     }
-  }, [getElementCenter, localPlayer?.id, queueAnimation, playCardMixing]);
+
+    const totalSteps = Math.max(0, step);
+    if (totalSteps > 0) {
+      const stopDelay = (totalSteps * DEAL_ANIMATION_STAGGER_MS) + DEAL_ANIMATION_DURATION_MS + 40;
+      window.setTimeout(() => {
+        stopCardMixing();
+      }, stopDelay);
+    }
+  }, [getElementCenter, localPlayer?.id, queueAnimation, playCardMixing, stopCardMixing]);
+
+  const animateCollectLocalHandForShuffle = useCallback((cards: Card[]): number => {
+    const from = getElementCenter(localHandRef.current);
+    const to = getElementCenter(discardPileRef.current) ?? getElementCenter(drawPileRef.current);
+
+    if (!from || !to || cards.length === 0) return 0;
+
+    const visibleCount = Math.min(cards.length, 9);
+    const staggerMs = 44;
+    const travelMs = 280;
+
+    for (let index = 0; index < visibleCount; index += 1) {
+      const card = cards[cards.length - 1 - index] ?? cards[cards.length - 1];
+      const fan = (index - ((visibleCount - 1) / 2)) * 11;
+
+      window.setTimeout(() => {
+        if (index === 0) {
+          playTableChime("shuffle");
+        }
+        playCardMixing(160);
+        queueAnimation({
+          card,
+          faceDown: false,
+          from: {
+            x: from.x + fan,
+            y: from.y - (Math.abs(fan) * 0.14),
+          },
+          to: {
+            x: to.x + (fan * 0.38),
+            y: to.y - ((index % 3) * 2),
+          },
+          rotationFrom: -10 + (index * 4),
+          rotationTo: -5 + (index * 3),
+          scale: 0.86,
+          duration: travelMs,
+        });
+      }, index * staggerMs);
+    }
+
+    const totalDuration = ((visibleCount - 1) * staggerMs) + travelMs;
+    window.setTimeout(() => {
+      stopCardMixing();
+    }, totalDuration + 48);
+
+    return totalDuration;
+  }, [getElementCenter, queueAnimation, playCardMixing, stopCardMixing]);
 
   const handleSelectCard = useCallback((card: Card, element: HTMLDivElement | null) => {
     if (element) {
@@ -740,9 +794,11 @@ export default function GameBoard({
         window.clearTimeout(unoBadgeResetTimerRef.current);
         unoBadgeResetTimerRef.current = null;
       }
-      setShowUnoDeclaredBadge(false);
+      const hideTimer = window.setTimeout(() => {
+        setShowUnoDeclaredBadge(false);
+      }, 0);
       prevLocalHandCountRef.current = currentHandCount;
-      return;
+      return () => window.clearTimeout(hideTimer);
     }
 
     if (previousHandCount !== null && currentHandCount < previousHandCount) {
@@ -766,7 +822,10 @@ export default function GameBoard({
       window.clearTimeout(unoBadgeResetTimerRef.current);
       unoBadgeResetTimerRef.current = null;
     }
-    setShowUnoDeclaredBadge(false);
+    const hideTimer = window.setTimeout(() => {
+      setShowUnoDeclaredBadge(false);
+    }, 0);
+    return () => window.clearTimeout(hideTimer);
   }, [showUnoDeclaredBadge, game?.currentPlayerIndex, localPlayerIndex, game]);
 
   // Record wins as they happen
@@ -879,8 +938,11 @@ export default function GameBoard({
     const action = game.lastAction;
     if (action.type === "draw") {
       playTableChime("draw");
-      animateDrawToPlayer(action.playerId, action.count);
-      return;
+      const drawTransferDelay = Math.max(40, getBoardVoiceRemainingMs() + 40);
+      const timer = window.setTimeout(() => {
+        animateDrawToPlayer(action.playerId, action.count);
+      }, drawTransferDelay);
+      return () => window.clearTimeout(timer);
     }
 
     if (action.type === "callOut") {
@@ -888,9 +950,10 @@ export default function GameBoard({
       const callOutFlashDelay = action.callerId === action.targetId
         ? ACTION_FLASH_HOLD_MS + 40
         : (ACTION_FLASH_HOLD_MS * 2) + 80;
+      const drawTransferDelay = Math.max(callOutFlashDelay, getBoardVoiceRemainingMs() + 40);
       const timer = window.setTimeout(() => {
         animateDrawToPlayer(action.targetId, action.penalty);
-      }, callOutFlashDelay);
+      }, drawTransferDelay);
       return () => window.clearTimeout(timer);
     }
 
@@ -917,6 +980,12 @@ export default function GameBoard({
       if (action.shuffledHands && previous) {
         const actorIndex = previous.players.findIndex((player) => player.id === action.playerId);
         if (actorIndex >= 0) {
+          const previousLocalHand = previous.players.find((player) => player.id === localPlayer?.id)?.hand ?? [];
+          const collectCards = action.playerId === localPlayer?.id
+            ? previousLocalHand.filter((card) => card.id !== action.card.id)
+            : previousLocalHand;
+          const collectDuration = animateCollectLocalHandForShuffle(collectCards);
+
           const order = Array.from({ length: game.players.length }, (_, index) => {
             const seat = (actorIndex + previous.direction + (index * previous.direction) + game.players.length * 4) % game.players.length;
             return game.players[seat]?.id;
@@ -925,12 +994,12 @@ export default function GameBoard({
           const counts = order.map((playerId) => game.players.find((player) => player.id === playerId)?.hand.length ?? 0);
           const timer = window.setTimeout(() => {
             animateDealSequence(order, counts, 'discard');
-          }, 120);
+          }, 120 + collectDuration);
           return () => window.clearTimeout(timer);
         }
       }
     }
-  }, [game, localPlayer?.id, animateDealSequence, animateDiscardAllToDiscard, animateDrawToPlayer, animatePlayToDiscard]);
+  }, [game, localPlayer?.id, animateCollectLocalHandForShuffle, animateDealSequence, animateDiscardAllToDiscard, animateDrawToPlayer, animatePlayToDiscard]);
 
   useEffect(() => {
     if (!game || !localPlayer) return;
@@ -962,10 +1031,14 @@ export default function GameBoard({
       }
 
       if (action.card.value === "draw2") {
+        const total = Math.max(2, game.pendingDraw || 0);
+        queueActionFlash(`+${total}`, "yellow");
         return;
       }
 
       if (action.card.value === "wild4") {
+        const total = Math.max(4, game.pendingDraw || 0);
+        queueActionFlash(`+${total}`, "red");
         return;
       }
 
@@ -979,15 +1052,32 @@ export default function GameBoard({
       }
 
       if (action.card.value === "shuffle") {
-        queueActionFlash(chosenLabel ? `Shuffle • ${chosenLabel}` : "Shuffle", chosenLabel ? chosenTone : "blue");
+        queueActionFlash("Shuffle", "blue");
       }
       return;
     }
 
     if (action.type === "declareUno") {
       playTableChime("uno");
+      let showTimer: number | null = null;
+      if (action.playerId === localPlayer.id) {
+        if (unoBadgeResetTimerRef.current !== null) {
+          window.clearTimeout(unoBadgeResetTimerRef.current);
+        }
+        showTimer = window.setTimeout(() => {
+          setShowUnoDeclaredBadge(true);
+        }, 0);
+        unoBadgeResetTimerRef.current = window.setTimeout(() => {
+          setShowUnoDeclaredBadge(false);
+          unoBadgeResetTimerRef.current = null;
+        }, 1200);
+      }
       queueActionFlash("UNO", "red");
-      return;
+      return () => {
+        if (showTimer !== null) {
+          window.clearTimeout(showTimer);
+        }
+      };
     }
 
     if (action.type === "callOut") {
@@ -1097,8 +1187,8 @@ export default function GameBoard({
       autoActionExecuteTimerRef.current = window.setTimeout(() => {
         autoActionExecuteTimerRef.current = null;
         drawCard();
-      }, 120);
-    }, 650);
+      }, 40);
+    }, 160);
     return () => {
       window.clearTimeout(timer);
     };
@@ -1230,9 +1320,12 @@ export default function GameBoard({
     }
 
     if (autoTurnHandledRef.current === turnKey) return;
-    autoTurnHandledRef.current = turnKey;
 
     const timer = window.setTimeout(() => {
+      if (autoTurnHandledRef.current === turnKey) return;
+      autoTurnHandledRef.current = turnKey;
+
+      setDrawDecisionCardId(null);
       if (pendingWild) {
         confirmWildColor(pickAutoWildColor(localPlayer.hand));
         return;
@@ -1272,6 +1365,92 @@ export default function GameBoard({
     drawCard,
     pass,
   ]);
+
+  useEffect(() => {
+    const isHumanTurnSafe = Boolean(
+      game
+      && localPlayer
+      && currentPlayer
+      && isLocalTurn
+      && !localPlayer.isBot
+      && !game.winnerId,
+    );
+
+    const stackOpen = Boolean(game && isHumanTurnSafe && game.pendingDraw > 0 && hasPendingStackOption);
+
+    const revealed = drawnCardId && localPlayer
+      ? localPlayer.hand.find((card) => card.id === drawnCardId) ?? null
+      : null;
+    const drawnOpen = Boolean(
+      isHumanTurnSafe
+      && drawnThisTurn
+      && revealed
+      && playableCardIds.has(revealed.id)
+      && drawDecisionCardId === revealed.id,
+    );
+
+    const overlayOpen = stackOpen || drawnOpen || !!pendingWild || showExitConfirm;
+    if (!overlayOpen && isHumanTurnSafe) return;
+    const resetTimer = window.setTimeout(() => {
+      setHoveredHandPosition(null);
+    }, 0);
+    return () => window.clearTimeout(resetTimer);
+  }, [
+    game,
+    localPlayer,
+    currentPlayer,
+    isLocalTurn,
+    hasPendingStackOption,
+    drawnCardId,
+    drawnThisTurn,
+    playableCardIds,
+    drawDecisionCardId,
+    pendingWild,
+    showExitConfirm,
+  ]);
+
+  useEffect(() => {
+    if (!showGameSettingsMenu) return;
+    const handleClickOutside = (event: MouseEvent) => {
+      if (gameSettingsRef.current && !gameSettingsRef.current.contains(event.target as Node)) {
+        setShowGameSettingsMenu(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showGameSettingsMenu]);
+
+  useEffect(() => {
+    const syncMusicState = () => {
+      setMusicEnabled(isMusicEnabledForContext("game"));
+    };
+    window.addEventListener("uno:audio-settings", syncMusicState);
+    return () => window.removeEventListener("uno:audio-settings", syncMusicState);
+  }, []);
+
+  useEffect(() => {
+    const html = document.documentElement;
+    const body = document.body;
+    const prevHtmlOverflow = html.style.overflow;
+    const prevBodyOverflow = body.style.overflow;
+
+    // Keep viewport metrics stable while playing to avoid modal-triggered screen shifts.
+    html.style.overflow = "hidden";
+    body.style.overflow = "hidden";
+
+    return () => {
+      html.style.overflow = prevHtmlOverflow;
+      body.style.overflow = prevBodyOverflow;
+    };
+  }, []);
+
+  const handleToggleMusic = useCallback(() => {
+    const next = !musicEnabled;
+    // Keep both contexts aligned so music continues across home/game transitions.
+    setMusicEnabledForContext("lobby", next);
+    setMusicEnabledForContext("game", next);
+    setMusicEnabled(next);
+  }, [musicEnabled]);
 
   if (!game || !localPlayer || !currentPlayer) return null;
 
@@ -1394,7 +1573,7 @@ export default function GameBoard({
   const localHandCardScale = boardScale < 1
     ? Math.max(0.50, Math.min(scaledByHeight, scaledByWidth, 1.2))
     : Math.max(0.50, Math.min(scaledByHeight, scaledByWidth, 1.5));
-  const localTurnBoost = 1;
+  const localTurnBoost = isLocalTurn ? 1.08 : 1;
   const pileCardScale = tableCardScale;
   const pileCardColumnWidth = Math.round((82 * pileCardScale) + (22 * pileCardScale));
   const turnColumnWidth = Math.round((isCompactBoard ? 44 : 54) * pileCardScale);
@@ -1418,8 +1597,6 @@ export default function GameBoard({
   const drawnChoiceOpen = humanTurn && !turnTransitionLocked && drawnThisTurn && !!revealedDrawnCard && drawDecisionCardId === revealedDrawnCard.id;
   const directionLabel = game.direction === 1 ? "Clockwise" : "Counter-clockwise";
   const directionSymbol = game.direction === 1 ? "⟳" : "⟲";
-  const showCountdown = turnCountdownSeconds > 0;
-  const timerUrgent = turnCountdownSeconds > 0 && turnCountdownSeconds <= 6;
   const currentTurnTimerMs = currentPlayer.isBot
     ? BOT_THINK_DELAY_MS
     : isLocalTurn
@@ -1434,79 +1611,10 @@ export default function GameBoard({
     ? Math.max(0, Math.min(1, (currentTurnTimerSeconds - turnCountdownSeconds) / currentTurnTimerSeconds))
     : 0;
 
-  const hint = !humanTurn
-    ? `Waiting for ${currentPlayer.name}`
-    : game.pendingDraw > 0
-      ? playableCardIds.size > 0 ? "Add to the stack, or take the cards" : `No counter — taking +${game.pendingDraw}`
-      : drawnThisTurn
-        ? drawnPlayableCard ? "Choose to play the drawn card, or pass" : "No playable draw — passing in a moment"
-        : playableCardIds.size > 0 ? "Tap a highlighted card to play · Space to draw · U for UNO"
-        : "No playable cards — draw from pile";
-
-  const hoveredCard = hoveredCardId
-    ? sortedHand.find((card) => card.id === hoveredCardId) ?? null
-    : null;
-
-  const hoveredCardHint = hoveredCard
-    ? `${hoveredCard.color === "wild" ? "" : `${hoveredCard.color} `}${hoveredCard.value}`.toUpperCase().replace("WILD4", "WILD +4")
-    : null;
-
-  const infoLine = hoveredCardHint ? `CARD: ${hoveredCardHint}` : hint;
-
   const handOverlap = Math.round(26 * localHandCardScale);
   const localHandSidePadding = isCompactBoard ? (isNarrowMobile ? 82 : 120) : 132;
   const ARC_SPREAD = 3.5;
   const ARC_LIFT   = 2.5;
-
-  useEffect(() => {
-    const overlayOpen = stackChoiceOpen || drawnChoiceOpen || !!pendingWild || showExitConfirm;
-    if (!overlayOpen && humanTurn) return;
-    setHoveredHandPosition(null);
-    setHoveredCardId(null);
-  }, [stackChoiceOpen, drawnChoiceOpen, pendingWild, showExitConfirm, humanTurn]);
-
-  useEffect(() => {
-    if (!showGameSettingsMenu) return;
-    const handleClickOutside = (event: MouseEvent) => {
-      if (gameSettingsRef.current && !gameSettingsRef.current.contains(event.target as Node)) {
-        setShowGameSettingsMenu(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [showGameSettingsMenu]);
-
-  useEffect(() => {
-    const syncMusicState = () => {
-      setMusicEnabled(isMusicEnabledForContext("game"));
-    };
-    window.addEventListener("uno:audio-settings", syncMusicState);
-    return () => window.removeEventListener("uno:audio-settings", syncMusicState);
-  }, []);
-
-  useEffect(() => {
-    const html = document.documentElement;
-    const body = document.body;
-    const prevHtmlOverflow = html.style.overflow;
-    const prevBodyOverflow = body.style.overflow;
-
-    // Keep viewport metrics stable while playing to avoid modal-triggered screen shifts.
-    html.style.overflow = "hidden";
-    body.style.overflow = "hidden";
-
-    return () => {
-      html.style.overflow = prevHtmlOverflow;
-      body.style.overflow = prevBodyOverflow;
-    };
-  }, []);
-
-  const handleToggleMusic = useCallback(() => {
-    const next = !musicEnabled;
-    // Keep both contexts aligned so music continues across home/game transitions.
-    setMusicEnabledForContext("lobby", next);
-    setMusicEnabledForContext("game", next);
-    setMusicEnabled(next);
-  }, [musicEnabled]);
 
   return (
     <>
@@ -1596,6 +1704,22 @@ export default function GameBoard({
           transform: translateY(-2px);
         }
         .uno-btn:active {
+          transform: scale(0.97);
+        }
+
+        .winner-secondary-btn:hover {
+          color: var(--ui-text) !important;
+          transform: translateY(-1px);
+        }
+        .winner-secondary-btn:active {
+          transform: scale(0.97);
+        }
+
+        .winner-primary-btn:hover {
+          opacity: 0.76 !important;
+          transform: translateY(-1px);
+        }
+        .winner-primary-btn:active {
           transform: scale(0.97);
         }
 
@@ -2306,12 +2430,10 @@ export default function GameBoard({
               onMouseMove={(event) => {
                 if (event.target === event.currentTarget) {
                   setHoveredHandPosition(null);
-                  setHoveredCardId(null);
                 }
               }}
               onMouseLeave={() => {
                 setHoveredHandPosition(null);
-                setHoveredCardId(null);
               }}
             >
               {sortedHand.map((card, i) => {
@@ -2361,7 +2483,6 @@ export default function GameBoard({
                     onClick={playable ? (event) => handleSelectCard(card, event.currentTarget) : undefined}
                     onMouseEnter={() => {
                       setHoveredHandPosition(i);
-                      setHoveredCardId(card.id);
                     }}
                     onMouseMove={(event) => {
                       const rect = event.currentTarget.getBoundingClientRect();
@@ -2451,7 +2572,15 @@ export default function GameBoard({
         </div>
       )}
 
-      {pendingWild && <ColorPicker onSelect={confirmWildColor} onCancel={cancelWild} />}
+      {pendingWild && (
+        <ColorPicker
+          onSelect={(color) => {
+            autoDeclareUnoIfNeeded();
+            confirmWildColor(color);
+          }}
+          onCancel={cancelWild}
+        />
+      )}
 
       {!pendingWild && wildPickerPlayerName && (
         <div style={{

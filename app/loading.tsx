@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
-import { useAudioManager } from "../hooks/useAudioManager";
+import { useEffect, useLayoutEffect } from "react";
+import { primeMusicForFastStart, useAudioManager } from "../hooks/useAudioManager";
 
 export default function Loading() {
   const { setMusicContext, playMusic } = useAudioManager();
@@ -10,7 +10,8 @@ export default function Loading() {
     void import("@dotlottie/player-component");
   }, []);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
+    primeMusicForFastStart("lobby");
     setMusicContext("lobby");
     playMusic("lobby");
   }, [setMusicContext, playMusic]);
@@ -29,7 +30,7 @@ export default function Loading() {
       <dotlottie-player
         src="/loadingPage/Welcome.lottie"
         background="transparent"
-        speed="1"
+        speed="2.5"
         style={{ width: "min(460px, 76vw)", height: "min(460px, 76vw)" }}
         loop
         autoplay

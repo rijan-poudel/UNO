@@ -6,7 +6,7 @@ import type { FriendInvite, FriendPresenceState, RoomSnapshot } from '../types/m
 import { toast } from 'sonner';
 import SetupShell from './SetupShell';
 import { CountBadge, PrimaryButton, SectionDivider, SegmentedToggle, SetupIntro, UtilityButton } from './ui/PageChrome';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, UserPlus } from 'lucide-react';
 
 const ONLINE_PLAYER_NAME_KEY = 'uno.online.playerName';
 const ONLINE_ROOM_CODE_KEY = 'uno.online.roomCode';
@@ -157,6 +157,7 @@ export default function OnlineLobby({
   const [friends, setFriends] = useState<FriendEntry[]>([]);
   const [presenceMap, setPresenceMap] = useState<Record<string, FriendPresenceState>>({});
   const [busy, setBusy] = useState(false);
+  const [isFriendRailExpanded, setIsFriendRailExpanded] = useState(false);
 
   const displayName = playerName.trim() || 'Player 1';
 
@@ -775,6 +776,24 @@ export default function OnlineLobby({
                   padding: '13px 0',
                 }}
               >
+                {(() => {
+                  const playerFriendCode = normalizeCode(player.friendCode ?? '');
+                  const isSelf = player.playerId === playerId;
+                  const isKnownFriend = !!playerFriendCode && friends.some((entry) => entry.friendCode === playerFriendCode);
+                  const hasPendingInvite = !!playerFriendCode && outgoingInvites.some((invite) => normalizeCode(invite.targetFriendCode) === playerFriendCode);
+                  const canAddFriend = (
+                    !player.isBot
+                    && !isSelf
+                    && !!playerFriendCode
+                    && playerFriendCode !== normalizeCode(friendCode)
+                    && !isKnownFriend
+                    && !hasPendingInvite
+                    && !busy
+                    && Boolean(displayName)
+                  );
+
+                  return (
+                    <>
                 <span style={{
                   fontFamily: "'Courier Prime', monospace",
                   fontSize: 10,
@@ -810,6 +829,29 @@ export default function OnlineLobby({
                   }}>
                     {player.isBot ? 'Bot' : player.connected ? 'Online' : 'Offline'}
                   </span>
+
+                  {canAddFriend ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        void wrap(() => sendInviteToFriend(playerFriendCode, player.name));
+                      }}
+                      title={`Send friend request to ${player.name}`}
+                      aria-label={`Send friend request to ${player.name}`}
+                      style={{
+                        width: 26,
+                        height: 26,
+                        border: '1px solid var(--ui-line)',
+                        background: 'transparent',
+                        color: 'var(--ui-text)',
+                        display: 'grid',
+                        placeItems: 'center',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <UserPlus size={14} />
+                    </button>
+                  ) : null}
                 </div>
 
                 {isHost && player.playerId !== playerId ? (
@@ -830,6 +872,9 @@ export default function OnlineLobby({
                     }}
                   >×</button>
                 ) : <div style={{ width: 24 }} />}
+                    </>
+                  );
+                })()}
               </div>
             ))}
 
@@ -881,15 +926,24 @@ export default function OnlineLobby({
           gap: 8px;
           z-index: 24;
           overflow: hidden;
-          transition: width 0.28s cubic-bezier(0.2, 0.95, 0.2, 1);
+          transition: width 0.16s ease;
           box-shadow: 0 10px 26px rgba(0, 0, 0, 0.14);
           transform-origin: right center;
         }
 
-        .lobby-friend-rail:hover,
-        .lobby-friend-rail:focus-within {
+        .lobby-friend-rail.expanded {
           width: min(320px, calc(100vw - 20px));
-          animation: lobby-rail-pop 0.22s ease-out;
+        }
+
+        .lobby-friend-toggle {
+          width: 100%;
+          border: 1px solid var(--ui-line);
+          background: transparent;
+          color: var(--ui-text);
+          min-height: 30px;
+          display: grid;
+          place-items: center;
+          cursor: pointer;
         }
 
         .lobby-friend-collapsed {
@@ -899,20 +953,17 @@ export default function OnlineLobby({
           margin-top: 2px;
         }
 
+        .lobby-friend-rail.expanded .lobby-friend-collapsed {
+          display: none;
+        }
+
         .lobby-friend-expand {
           display: none;
           gap: 8px;
-          animation: lobby-fade-up 0.2s ease;
         }
 
-        .lobby-friend-rail:hover .lobby-friend-expand,
-        .lobby-friend-rail:focus-within .lobby-friend-expand {
+        .lobby-friend-rail.expanded .lobby-friend-expand {
           display: grid;
-        }
-
-        .lobby-friend-rail:hover .lobby-friend-collapsed,
-        .lobby-friend-rail:focus-within .lobby-friend-collapsed {
-          display: none;
         }
 
         .lobby-friend-row {
@@ -923,12 +974,7 @@ export default function OnlineLobby({
           border: 1px solid var(--ui-line);
           padding: 8px;
           background: transparent;
-          transition: transform 0.12s ease, border-color 0.12s ease, opacity 0.12s ease;
-        }
-
-        .lobby-friend-row:hover {
-          transform: translateX(-2px);
-          border-color: color-mix(in oklab, var(--ui-text) 46%, var(--ui-line));
+          transition: opacity 0.12s ease;
         }
 
         .lobby-friend-row.offline {
@@ -978,11 +1024,7 @@ export default function OnlineLobby({
           font-size: 16px;
           line-height: 1;
           cursor: pointer;
-          transition: transform 0.12s ease, opacity 0.12s ease;
-        }
-
-        .lobby-friend-invite-btn:hover {
-          transform: scale(1.04);
+          transition: opacity 0.12s ease;
         }
 
         .lobby-friend-invite-btn:disabled {
@@ -990,39 +1032,36 @@ export default function OnlineLobby({
           opacity: 0.45;
         }
 
-        @keyframes lobby-rail-pop {
-          0% { transform: translateY(-50%) scale(0.97); }
-          70% { transform: translateY(-50%) scale(1.01); }
-          100% { transform: translateY(-50%) scale(1); }
-        }
-
-        @keyframes lobby-fade-up {
-          from { opacity: 0; transform: translateY(8px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-
         @media (max-width: 900px) {
           .lobby-friend-rail {
             position: static;
             transform: none;
             width: 100%;
-            animation: none;
             margin-top: 8px;
           }
 
-          .lobby-friend-collapsed {
-            display: none;
-          }
-
-          .lobby-friend-expand {
-            display: grid;
+          .lobby-friend-rail.expanded {
+            width: 100%;
           }
         }
       `}</style>
 
-      <aside className="lobby-friend-rail" aria-label="Top friends">
+      <aside className={`lobby-friend-rail${isFriendRailExpanded ? ' expanded' : ''}`} aria-label="Top friends">
+        <button
+          type="button"
+          className="lobby-friend-toggle"
+          onClick={() => setIsFriendRailExpanded((prev) => !prev)}
+          aria-expanded={isFriendRailExpanded}
+          aria-label={isFriendRailExpanded ? 'Collapse friends panel' : 'Expand friends panel'}
+          title={isFriendRailExpanded ? 'Collapse' : 'Expand'}
+        >
+          <ChevronDown
+            size={18}
+            style={{ transform: isFriendRailExpanded ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.12s ease' }}
+          />
+        </button>
+
         <div className="lobby-friend-collapsed" aria-hidden>
-          <ChevronDown size={18} />
           {railFriendsWithAvatar.length === 0 && (
             <span
               style={{

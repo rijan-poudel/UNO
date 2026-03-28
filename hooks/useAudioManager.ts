@@ -8,6 +8,8 @@ import {
 let globalMusic: HTMLAudioElement | null = null;
 let globalCardMixing: HTMLAudioElement | null = null;
 let globalCardThrowing: HTMLAudioElement | null = null;
+let globalCardMixingStopTimer: number | null = null;
+let lastCardMixingAt = 0;
 let activeMusicContext: MusicContext = "lobby";
 let unlockListenersBound = false;
 
@@ -18,6 +20,22 @@ function ensureMusicElement(): HTMLAudioElement {
     globalMusic.preload = "auto";
   }
   return globalMusic;
+}
+
+export function primeMusicForFastStart(context: MusicContext = "lobby"): void {
+  if (typeof window === "undefined") return;
+  activeMusicContext = context;
+  const music = ensureMusicElement();
+  music.preload = "auto";
+  try {
+    music.load();
+  } catch {
+    // Ignore media preload failures.
+  }
+}
+
+if (typeof window !== "undefined") {
+  primeMusicForFastStart("lobby");
 }
 
 function getContextMusicVolume(): number {
@@ -84,20 +102,47 @@ export function useAudioManager() {
   }, []);
 
   // Play card mixing sound
-  const playCardMixing = useCallback(() => {
+  const playCardMixing = useCallback((durationMs = 180) => {
     if (!globalCardMixing) {
       globalCardMixing = new Audio("/audios/card_mixing.mp3");
+      globalCardMixing.preload = "auto";
     }
+
+    const now = Date.now();
+    if (now - lastCardMixingAt < 70) return;
+    lastCardMixingAt = now;
+
     const settings = getAudioSettings();
     globalCardMixing.volume = settings.sfxVolume ?? 0.8;
     globalCardMixing.currentTime = 0;
     globalCardMixing.play().catch(() => {});
+
+    if (globalCardMixingStopTimer !== null) {
+      window.clearTimeout(globalCardMixingStopTimer);
+    }
+    globalCardMixingStopTimer = window.setTimeout(() => {
+      if (!globalCardMixing) return;
+      globalCardMixing.pause();
+      globalCardMixing.currentTime = 0;
+      globalCardMixingStopTimer = null;
+    }, Math.max(80, durationMs));
+  }, []);
+
+  const stopCardMixing = useCallback(() => {
+    if (globalCardMixingStopTimer !== null) {
+      window.clearTimeout(globalCardMixingStopTimer);
+      globalCardMixingStopTimer = null;
+    }
+    if (!globalCardMixing) return;
+    globalCardMixing.pause();
+    globalCardMixing.currentTime = 0;
   }, []);
 
   // Play card throwing sound (lower volume)
   const playCardThrowing = useCallback(() => {
     if (!globalCardThrowing) {
       globalCardThrowing = new Audio("/audios/card_throwing.mp3");
+      globalCardThrowing.preload = "auto";
     }
     const settings = getAudioSettings();
     globalCardThrowing.volume = (settings.sfxVolume ?? 0.8) * 0.5;
@@ -126,6 +171,7 @@ export function useAudioManager() {
     pauseMusic,
     setMusicContext,
     playCardMixing,
+    stopCardMixing,
     playCardThrowing,
   };
 }

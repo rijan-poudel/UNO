@@ -116,12 +116,16 @@ function toSnapshot(room: ServerRoom): RoomSnapshot {
   return {
     roomId: room.roomId,
     hostPlayerId: room.hostPlayerId,
-    players: room.players.map((p) => ({
+    players: room.players.map((p) => {
+      const presence = p.socketId ? presenceBySocket.get(p.socketId) : undefined;
+      return {
       playerId: p.playerId,
       name: p.name,
       connected: p.connected,
       isBot: p.isBot,
-    })),
+      friendCode: presence?.friendCode,
+      };
+    }),
     started: room.started,
     game: room.game,
     pendingColorChoice: room.pendingColorChoice,

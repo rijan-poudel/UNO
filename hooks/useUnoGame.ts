@@ -22,9 +22,11 @@ import {
 import { canPlayCard, getPlayableCards } from '../lib/gameRules';
 import { getBotMove } from '../lib/botSupport';
 import { resolvePlayerName } from '../lib/playerNames';
+import { getBoardVoiceRemainingMs } from '../lib/voiceAnnouncer';
 
-const BOT_ACTION_DELAY_MS = 1150;
-const AUTO_PASS_AFTER_DRAW_MS = 2200;
+const BOT_ACTION_DELAY_MS = 1500;
+const AUTO_PASS_AFTER_DRAW_MS = 1000;
+const POST_ACTION_HANDOFF_DELAY_MS = 1000;
 
 function reportHookError(context: string, error: unknown): void {
   if (process.env.NODE_ENV !== 'production') {
@@ -35,21 +37,21 @@ function reportHookError(context: string, error: unknown): void {
 function getActionPresentationDelay(game: GameState): number {
   const action = game.lastAction;
 
-  if (action.type === 'init') return 900;
-  if (action.type === 'declareUno') return 1100;
-  if (action.type === 'callOut') return 1800;
-  if (action.type === 'draw') return Math.min(1700, 800 + (action.count * 120));
-  if (action.type === 'pass') return 700;
+  if (action.type === 'init') return 260;
+  if (action.type === 'declareUno') return 300;
+  if (action.type === 'callOut') return 420;
+  if (action.type === 'draw') return Math.min(950, 360 + (action.count * 110));
+  if (action.type === 'pass') return 200;
 
   if (action.type === 'play') {
-    if (action.card.value === 'shuffle') return 2100;
-    if (action.card.value === 'discardAll') return 1700;
-    if (action.card.value === 'wild4' || action.card.value === 'draw2') return 1500;
-    if (action.card.value === 'reverse' || action.card.value === 'skip' || action.card.value === 'wild') return 1300;
-    return 950;
+    if (action.card.value === 'shuffle') return 460;
+    if (action.card.value === 'discardAll') return 400;
+    if (action.card.value === 'wild4' || action.card.value === 'draw2') return 360;
+    if (action.card.value === 'reverse' || action.card.value === 'skip' || action.card.value === 'wild') return 340;
+    return 240;
   }
 
-  return 950;
+  return 240;
 }
 
 // ── UI-layer state ────────────────────────────────────────────────────────────
@@ -304,7 +306,11 @@ export function useUnoGame() {
 
     dispatch({ type: 'BOT_THINKING', value: true });
 
-    const coordinatedDelay = Math.max(BOT_ACTION_DELAY_MS, getActionPresentationDelay(game));
+    const coordinatedDelay = Math.max(
+      BOT_ACTION_DELAY_MS,
+      getActionPresentationDelay(game) + POST_ACTION_HANDOFF_DELAY_MS,
+      getBoardVoiceRemainingMs() + POST_ACTION_HANDOFF_DELAY_MS,
+    );
 
     const timer = setTimeout(() => {
       try {
@@ -394,6 +400,11 @@ export function useUnoGame() {
     const playable = getPlayableCards(player.hand, game, localPlayerIndex);
     if (playable.length > 0) return;
 
+    const coordinatedAutoPassDelay = Math.max(
+      AUTO_PASS_AFTER_DRAW_MS,
+      getBoardVoiceRemainingMs() + POST_ACTION_HANDOFF_DELAY_MS,
+    );
+
     const timer = window.setTimeout(() => {
       try {
         const next = passTurn(game, localPlayerIndex);
@@ -401,7 +412,7 @@ export function useUnoGame() {
       } catch (e) {
         reportHookError('auto passTurn error', e);
       }
-    }, AUTO_PASS_AFTER_DRAW_MS);
+    }, coordinatedAutoPassDelay);
 
     return () => window.clearTimeout(timer);
   }, [game, localPlayerIndex, drawnThisTurn]);

@@ -167,7 +167,7 @@ function WelcomeOverlay({ onComplete }: { onComplete: () => void }) {
       <dotlottie-player
         src="/loadingPage/Welcome.lottie"
         background="transparent"
-        speed="1"
+        speed="2.5"
         style={{ width: "min(460px, 76vw)", height: "min(460px, 76vw)" }}
         autoplay
       />
@@ -180,55 +180,33 @@ export default function Home() {
   const [mode, setMode] = useState<"online" | "computer">("computer");
   const [view, setView] = useState<"home" | "computer" | "friends">("home");
   const [panel, setPanel] = useState<"create" | "join">("create");
-  const [theme, setTheme] = useState<ThemeName>("midnight");
+  const [theme, setTheme] = useState<ThemeName>(() => getInitialTheme());
   const [showS, setShowS] = useState(false);
   const [settingsTab, setSettingsTab] = useState<"profile" | "controls" | "audio">("controls");
-  const [rules, setRules] = useState<Partial<GameRules>>(DEFAULT_RULES);
-  const [mounted, setMounted] = useState(false);
+  const [rules, setRules] = useState<Partial<GameRules>>(() => getInitialRules());
   const [showWelcomeOverlay, setShowWelcomeOverlay] = useState(true);
   const { playMusic, setMusicContext } = useAudioManager();
-
-  useEffect(() => {
-    setTheme(getInitialTheme());
-    setRules(getInitialRules());
-    setMounted(true);
-  }, []);
 
   const local = useUnoGame();
   const online = useUnoOnlineGame();
   const api = mode === "computer" ? local : online;
 
-  // Track whether game is active with a ref to avoid effect re-triggers during gameplay
-  const prevGameActiveRef = useRef<boolean | null>(null);
-  const [gameContext, setGameContext] = useState<"lobby" | "game">("lobby");
+  const gameContext: "lobby" | "game" = api.game ? "game" : "lobby";
 
   useEffect(() => {
-    const isGameActive = api.game !== null;
-    // Only update context if the active state actually changed
-    if (prevGameActiveRef.current !== isGameActive) {
-      prevGameActiveRef.current = isGameActive;
-      setGameContext(isGameActive ? "game" : "lobby");
-    }
-  }, [api.game]);
+    try {
+      window.localStorage.setItem(SHARED_RULES_KEY, JSON.stringify(rules));
+    } catch {}
+  }, [rules]);
 
   useEffect(() => {
-    if (mounted) {
-      try {
-        window.localStorage.setItem(SHARED_RULES_KEY, JSON.stringify(rules));
-      } catch {}
-    }
-  }, [rules, mounted]);
-
-  useEffect(() => {
-    if (mounted) {
-      try {
-        window.localStorage.setItem(PREFERRED_THEME_KEY, theme);
-      } catch {}
-    }
+    try {
+      window.localStorage.setItem(PREFERRED_THEME_KEY, theme);
+    } catch {}
     const root = document.documentElement;
     for (const [k, v] of Object.entries(THEMES[theme].vars))
       root.style.setProperty(k, v);
-  }, [theme, mounted]);
+  }, [theme]);
 
   useEffect(() => {
     setMusicContext(gameContext);
@@ -294,6 +272,20 @@ export default function Home() {
       onOpenProfileSettings={() => openSettingsAt("profile")}
       onOpenControlsSettings={() => openSettingsAt("controls")}
       onOpenAudioSettings={() => openSettingsAt("audio")}
+      incomingInvites={online.incomingInvites}
+      onAcceptFriendInvite={async (inviteId) => {
+        let playerName = "Player 1";
+        try {
+          const stored = window.localStorage.getItem(ONLINE_PLAYER_NAME_KEY);
+          if (stored && stored.trim()) {
+            playerName = stored.trim().slice(0, 18);
+          }
+        } catch {
+          // Ignore storage errors.
+        }
+        return online.acceptFriendInvite(inviteId, playerName);
+      }}
+      onDeclineFriendInvite={(inviteId) => online.declineFriendInvite(inviteId)}
       incomingInviteCount={online.incomingInvites.length}
     />
   );
@@ -301,7 +293,7 @@ export default function Home() {
   let content: ReactNode = null;
 
   // Active game
-  if (mounted && api.game) {
+  if (api.game) {
     const currentGame = api.game;
     content = (
       <>
@@ -330,7 +322,7 @@ export default function Home() {
         {settingsModal}
       </>
     );
-  } else if (mounted && view === "home") {
+  } else if (view === "home") {
     content = (
       <>
         <HomeScreen
@@ -349,6 +341,19 @@ export default function Home() {
             setView("friends");
           }}
           incomingInvites={online.incomingInvites}
+          onAcceptFriendInvite={async (inviteId) => {
+            let playerName = "Player 1";
+            try {
+              const stored = window.localStorage.getItem(ONLINE_PLAYER_NAME_KEY);
+              if (stored && stored.trim()) {
+                playerName = stored.trim().slice(0, 18);
+              }
+            } catch {
+              // Ignore storage errors.
+            }
+            return online.acceptFriendInvite(inviteId, playerName);
+          }}
+          onDeclineFriendInvite={(inviteId) => online.declineFriendInvite(inviteId)}
           onCheckFriendOnline={online.checkFriendOnline}
           onFriendQuickInvite={async (friendCode) => {
             let playerName = "Player 1";
@@ -384,7 +389,7 @@ export default function Home() {
         {settingsModal}
       </>
     );
-  } else if (mounted && view === "computer") {
+  } else if (view === "computer") {
     content = (
       <>
         <GameSetup
@@ -398,7 +403,7 @@ export default function Home() {
         {settingsModal}
       </>
     );
-  } else if (mounted) {
+  } else {
     content = (
       <>
         <OnlineLobby

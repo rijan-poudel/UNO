@@ -12,11 +12,14 @@ import type {
   MultiplayerAction,
   RoomSnapshot,
 } from '../types/multiplayer';
+import { toast } from 'sonner';
 import { getPlayableCards } from '../lib/gameRules';
 import { resolvePlayerName } from '../lib/playerNames';
+import { getBoardVoiceRemainingMs } from '../lib/voiceAnnouncer';
 import { voiceUiConnected, voiceUiDisconnected, voiceUiRoomJoined } from '../lib/voiceAnnouncer';
 
-const AUTO_PASS_AFTER_DRAW_MS = 2200;
+const AUTO_PASS_AFTER_DRAW_MS = 1000;
+const POST_ACTION_HANDOFF_DELAY_MS = 1000;
 const ONLINE_DEVICE_ID_KEY = 'uno.online.deviceId';
 const ONLINE_FRIEND_CODE_KEY = 'uno.online.friendCode';
 const ONLINE_RECENT_ROOMS_KEY = 'uno.online.recentRooms';
@@ -365,6 +368,9 @@ export function useUnoOnlineGame() {
           .sort((a, b) => b.createdAt - a.createdAt)
           .slice(0, 10),
       }));
+      toast.message(`Invite from ${invite.fromName}`, {
+        description: `Room ${invite.roomId} · ${invite.fromFriendCode}`,
+      });
     });
 
     socket.on('friend:invite:removed', (payload?: { inviteId?: string }) => {
@@ -726,9 +732,14 @@ export function useUnoOnlineGame() {
     if ((game.pendingDraw ?? 0) > 0) return;
     if (playableCardIds.size > 0) return;
 
+    const coordinatedAutoPassDelay = Math.max(
+      AUTO_PASS_AFTER_DRAW_MS,
+      getBoardVoiceRemainingMs() + POST_ACTION_HANDOFF_DELAY_MS,
+    );
+
     const timer = window.setTimeout(() => {
       void sendAction({ type: 'pass' });
-    }, AUTO_PASS_AFTER_DRAW_MS);
+    }, coordinatedAutoPassDelay);
 
     return () => window.clearTimeout(timer);
   }, [

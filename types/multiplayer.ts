@@ -7,6 +7,7 @@ export interface RoomPlayer {
   name: string;
   connected: boolean;
   isBot: boolean;
+  friendCode?: string;
 }
 
 export interface RoomSnapshot {

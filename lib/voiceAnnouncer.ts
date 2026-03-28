@@ -42,6 +42,9 @@ function pickStem(pool: readonly string[], seed: number): string {
 
 const lastChannelAt = new Map<string, number>();
 const audioCache: Record<string, HTMLAudioElement> = {};
+let activeBoardVoice: HTMLAudioElement | null = null;
+let pendingBoardVoice: { paths: string[]; volume: number } | null = null;
+let boardVoiceBusyUntil = 0;
 
 function audienceAllows(
   audience: VoiceAudience,
@@ -100,6 +103,102 @@ function tryPlayPath(path: string, volume: number, onFail: () => void): void {
   }
 }
 
+function playBoardVoicePath(paths: string[], volume: number): void {
+  if (typeof window === "undefined" || typeof Audio === "undefined") return;
+
+  const validPaths = paths.filter((p) => Boolean(p));
+  if (!validPaths.length) return;
+
+  const tryAt = (index: number) => {
+    if (index >= validPaths.length) {
+      if (activeBoardVoice) {
+        activeBoardVoice = null;
+      }
+      boardVoiceBusyUntil = Date.now();
+      return;
+    }
+
+    const path = validPaths[index]!;
+
+    let audio = audioCache[path];
+    if (!audio) {
+      audio = new Audio(path);
+      audio.preload = "auto";
+      audioCache[path] = audio;
+    }
+
+    // Keep a single in-game voice lane; latest request wins as pending.
+    if (activeBoardVoice && !activeBoardVoice.paused && !activeBoardVoice.ended) {
+      pendingBoardVoice = { paths: validPaths, volume };
+      return;
+    }
+
+    activeBoardVoice = audio;
+    pendingBoardVoice = null;
+
+    audio.volume = Math.min(1, Math.max(0, volume));
+    audio.currentTime = 0;
+
+    const syncBusyFromPlayback = () => {
+      if (Number.isFinite(audio.duration) && audio.duration > 0) {
+        const remainingMs = Math.max(0, (audio.duration - audio.currentTime) * 1000);
+        boardVoiceBusyUntil = Date.now() + remainingMs;
+      }
+    };
+
+    audio.onloadedmetadata = syncBusyFromPlayback;
+    audio.onplaying = syncBusyFromPlayback;
+    audio.onended = () => {
+      if (activeBoardVoice === audio) {
+        activeBoardVoice = null;
+      }
+      boardVoiceBusyUntil = Date.now();
+
+      if (pendingBoardVoice) {
+        const next = pendingBoardVoice;
+        pendingBoardVoice = null;
+        playBoardVoicePath(next.paths, next.volume);
+      }
+    };
+    audio.onerror = () => {
+      if (activeBoardVoice === audio) {
+        activeBoardVoice = null;
+      }
+      boardVoiceBusyUntil = Date.now();
+      tryAt(index + 1);
+    };
+
+    const result = audio.play();
+    if (result && typeof result.then === "function") {
+      void result.catch(() => {
+        if (activeBoardVoice === audio) {
+          activeBoardVoice = null;
+        }
+        boardVoiceBusyUntil = Date.now();
+        tryAt(index + 1);
+      });
+    }
+  };
+
+  tryAt(0);
+}
+
+export function getBoardVoiceRemainingMs(): number {
+  if (activeBoardVoice && !activeBoardVoice.paused && Number.isFinite(activeBoardVoice.duration)) {
+    return Math.max(0, (activeBoardVoice.duration - activeBoardVoice.currentTime) * 1000);
+  }
+  return Math.max(0, boardVoiceBusyUntil - Date.now());
+}
+
+export function stopBoardVoiceover(): void {
+  pendingBoardVoice = null;
+  boardVoiceBusyUntil = Date.now();
+  if (!activeBoardVoice) return;
+  activeBoardVoice.pause();
+  activeBoardVoice.currentTime = 0;
+  activeBoardVoice = null;
+}
+
 /**
  * Play a single voice stem (first readable extension wins).
  */
@@ -129,16 +228,15 @@ export function playVoiceStem(
 
   const volume = opts.volume ?? 0.92;
   const candidates = audioUrlsForStem(stem);
-  let index = 0;
+  if (!candidates.length) return;
 
-  const tryNext = () => {
-    if (index >= candidates.length) return;
-    const path = candidates[index]!;
-    index += 1;
-    tryPlayPath(path, volume, tryNext);
-  };
+  if (opts.category === "board") {
+    playBoardVoicePath(candidates, volume);
+    return;
+  }
 
-  tryNext();
+  const path = candidates[0]!;
+  tryPlayPath(path, volume, () => {});
 }
 
 // ── Semantic pools (stems ↔ your spoken lines) ───────────────────────────────
@@ -146,7 +244,7 @@ export function playVoiceStem(
 const POOLS = {
   skip: ["skip"] as const,
   reverse: ["reverse"] as const,
-  draw2: ["draw_two"] as const,
+  draw2: ["plus_two"] as const,
   discardAll: ["discard_all"] as const,
   unoDeclare: ["uno"] as const,
   plusFourByColor: {
@@ -154,6 +252,36 @@ const POOLS = {
     blue: "plus_four_blue",
     yellow: "plus_four_yellow",
     green: "plus_four_green",
+  } as const,
+  plusByCount: {
+    2: 'plus_two',
+    4: 'plus_four_generic',
+    6: 'plus_six',
+    8: 'plus_eight',
+    10: 'plus_ten',
+    12: 'plus_twelve',
+    14: 'plus_fourteen',
+    16: 'plus_sixteen',
+    18: 'plus_eighteen',
+    20: 'plus_twenty',
+    22: 'plus_twentytwo',
+    24: 'plus_twenty_four',
+    28: 'plus_twenty_eight',
+    32: 'plus_thirty_two',
+  } as const,
+  drawByCount: {
+    2: 'draw_two',
+    4: 'draw_four',
+    6: 'draw_six',
+    8: 'draw_eight',
+    10: 'draw_ten',
+    12: 'draw_twelve',
+    14: 'draw_fourteen',
+    16: 'draw_sixteen',
+    18: 'draw_eighteen',
+    20: 'draw_twenty',
+    22: 'draw_twentytwo',
+    24: 'draw_twenty_four',
   } as const,
   colorChangeByColor: {
     red: "color_change_red",
@@ -168,6 +296,27 @@ const POOLS = {
     green: "wild_shuffle_green",
   } as const,
 } as const;
+
+function stemForPlusCount(count: number): string | null {
+  return POOLS.plusByCount[count as keyof typeof POOLS.plusByCount] ?? null;
+}
+
+function stemForDrawCount(count: number): string | null {
+  return POOLS.drawByCount[count as keyof typeof POOLS.drawByCount] ?? null;
+}
+
+function resolveForcedDrawStem(count: number): string | null {
+  const drawStem = stemForDrawCount(count);
+  if (drawStem && audioUrlsForStem(drawStem).length > 0) {
+    return drawStem;
+  }
+
+  // Fallback policy requested: otherwise use plus two / plus four.
+  if (count <= 2) {
+    return stemForPlusCount(2);
+  }
+  return stemForPlusCount(4);
+}
 
 function normalizeActionColor(
   color: string | null | undefined,
@@ -188,6 +337,11 @@ export function announceBoardFromTransition(
   localPlayerId: string | null,
   actionKey: string,
 ): void {
+  if (next.winnerId) {
+    stopBoardVoiceover();
+    return;
+  }
+
   const action = next.lastAction;
   const seed = hashSeed([actionKey, next.turnCount, action.type]);
 
@@ -264,7 +418,7 @@ export function announceBoardFromTransition(
         const mapped = normalizeActionColor(chosenColor);
         const stem = mapped
           ? POOLS.plusFourByColor[mapped]
-          : pickStem(Object.values(POOLS.plusFourByColor), seed);
+          : (stemForPlusCount(4) ?? pickStem(Object.values(POOLS.plusFourByColor), seed));
         playVoiceStem(stem, {
           category: "board",
           audience: { type: "room" },
@@ -309,16 +463,23 @@ export function announceBoardFromTransition(
       const { count } = action;
       if (count <= 0) return;
 
-      if ((prev?.pendingDraw ?? 0) > 0 || count >= 2) {
-        playVoiceStem(pickStem(POOLS.draw2, seed), {
-          category: "board",
-          audience: { type: "room" },
-          localPlayerId,
-          channel: "board:forced_draw",
-          minGapMs: 2200,
-        });
+      const pendingBeforeDraw = prev?.pendingDraw ?? 0;
+      const forcedCount = Math.max(pendingBeforeDraw, count);
+
+      if (forcedCount >= 2) {
+        const forcedStem = resolveForcedDrawStem(forcedCount);
+        if (forcedStem) {
+          playVoiceStem(forcedStem, {
+            category: "board",
+            audience: { type: "room" },
+            localPlayerId,
+            channel: `board:forced_draw_${forcedCount}`,
+            minGapMs: 1000,
+          });
+        }
         return;
       }
+
       break;
     }
 
@@ -335,6 +496,14 @@ export function announceBoardFromTransition(
     }
 
     case "callOut": {
+      const stem = pickStem(POOLS.unoDeclare, seed);
+      playVoiceStem(stem, {
+        category: "board",
+        audience: { type: "room" },
+        localPlayerId,
+        channel: "board:uno_callout",
+        minGapMs: 1200,
+      });
       break;
     }
 
@@ -352,6 +521,7 @@ export function announceBoardWinner(
   void winnerId;
   void localPlayerId;
   void _seed;
+  stopBoardVoiceover();
 }
 
 /** Lobby / socket / menus — respects "voice outside game" setting. */

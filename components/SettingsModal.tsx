@@ -37,6 +37,8 @@ const ONLINE_PLAYER_NAME_KEY = "uno.online.playerName";
 const PLAYER_NAME_UPDATED_EVENT = "uno:player-name-updated";
 const READABLE_MUTED = "color-mix(in oklab, var(--ui-text) 72%, transparent)";
 const MONKEYTYPE_MONO = "var(--font-monkeytype-mono), 'Roboto Mono', monospace";
+const EASE_OUT = "cubic-bezier(0.23, 1, 0.32, 1)";
+const EASE_OUT_SOFT = "cubic-bezier(0.22, 1, 0.36, 1)";
 
 function getStoredProfileName(): string {
   if (typeof window === "undefined") return "Player 1";
@@ -172,6 +174,7 @@ const CONTROL_RULE_ICONS: Partial<Record<keyof GameRules, LucideIcon>> = {
 function Toggle({ on, onClick }: { on: boolean; onClick: () => void }) {
   return (
     <button
+      className="settings-toggle"
       type="button"
       onClick={onClick}
       aria-checked={on}
@@ -183,11 +186,12 @@ function Toggle({ on, onClick }: { on: boolean; onClick: () => void }) {
         background: on ? "var(--ui-text)" : "transparent",
         position: "relative",
         cursor: "pointer",
-        transition: "background 0.15s, border-color 0.15s",
+        transition: `background 0.16s ${EASE_OUT_SOFT}, border-color 0.16s ${EASE_OUT_SOFT}, transform 0.12s ${EASE_OUT}`,
         flexShrink: 0,
       }}
     >
       <span
+        className="settings-toggle-thumb"
         style={{
           position: "absolute",
           top: 3,
@@ -195,8 +199,7 @@ function Toggle({ on, onClick }: { on: boolean; onClick: () => void }) {
           width: 14,
           height: 14,
           background: on ? "var(--ui-bg)" : "var(--ui-muted)",
-          transition:
-            "left 0.15s cubic-bezier(0.22,1,0.36,1), background 0.15s",
+          transition: `left 0.16s ${EASE_OUT}, background 0.16s ${EASE_OUT_SOFT}`,
         }}
       />
     </button>
@@ -251,15 +254,11 @@ export default function SettingsModal({
     }
   };
 
-  useEffect(() => {
-    if (!open) return;
-    setProfileName(getStoredProfileName());
-  }, [open]);
-
   if (!open) return null;
 
   return (
     <div
+      className="settings-modal-backdrop"
       style={{
         position: "fixed",
         inset: 0,
@@ -273,6 +272,24 @@ export default function SettingsModal({
       onClick={onClose}
     >
       <style>{`
+        @keyframes settingsFade {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+
+        @keyframes settingsPop {
+          from { opacity: 0; transform: translateY(14px) scale(0.98); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .settings-modal-backdrop {
+          animation: settingsFade 0.2s ${EASE_OUT_SOFT};
+        }
+
+        .settings-modal-panel {
+          animation: settingsPop 0.22s ${EASE_OUT};
+        }
+
         .settings-scroll {
           scrollbar-width: thin;
           scrollbar-color: color-mix(in oklab, var(--ui-text) 42%, transparent)
@@ -312,9 +329,38 @@ export default function SettingsModal({
           box-shadow: none;
           border-bottom-color: color-mix(in oklab, var(--ui-text) 72%, transparent);
         }
+
+        .settings-btn {
+          transition: transform 0.12s ${EASE_OUT}, color 0.14s ${EASE_OUT_SOFT}, background-color 0.14s ${EASE_OUT_SOFT}, border-color 0.14s ${EASE_OUT_SOFT}, opacity 0.14s ${EASE_OUT_SOFT};
+        }
+
+        .settings-btn:hover {
+          transform: translateY(-1px);
+        }
+
+        .settings-btn:active {
+          transform: scale(0.97);
+        }
+
+        .settings-tab-btn {
+          transition: transform 0.12s ${EASE_OUT}, color 0.14s ${EASE_OUT_SOFT}, background-color 0.14s ${EASE_OUT_SOFT};
+        }
+
+        .settings-tab-btn:hover {
+          transform: translateY(-1px);
+        }
+
+        .settings-tab-btn:active {
+          transform: scale(0.98);
+        }
+
+        .settings-toggle:active {
+          transform: scale(0.97);
+        }
       `}</style>
 
       <div
+        className="settings-modal-panel"
         onClick={(e) => e.stopPropagation()}
         style={{
           width: "min(860px, 100%)",
@@ -350,6 +396,7 @@ export default function SettingsModal({
             Settings
           </p>
           <button
+            className="settings-btn"
             onClick={onClose}
             style={{
               border: "1px solid var(--ui-line)",
@@ -397,6 +444,7 @@ export default function SettingsModal({
             }}
           >
             <button
+              className="settings-tab-btn"
               type="button"
               onClick={() => setTab("profile")}
               style={{
@@ -421,6 +469,7 @@ export default function SettingsModal({
               Profile
             </button>
             <button
+              className="settings-tab-btn"
               type="button"
               onClick={() => setTab("controls")}
               style={{
@@ -445,6 +494,7 @@ export default function SettingsModal({
               Controls
             </button>
             <button
+              className="settings-tab-btn"
               type="button"
               onClick={() => setTab("audio")}
               style={{
@@ -556,6 +606,7 @@ export default function SettingsModal({
                 {friendCode || "Syncing..."}
               </div>
               <button
+                className="settings-btn"
                 type="button"
                 onClick={onCopyFriendCode}
                 style={{
@@ -619,6 +670,7 @@ export default function SettingsModal({
               </div>
               <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
                 <button
+                  className="settings-btn"
                   type="button"
                   onClick={() => adjustMusicVolume(-0.1)}
                   style={{
@@ -648,6 +700,7 @@ export default function SettingsModal({
                   {Math.round(musicUi * 10)}
                 </div>
                 <button
+                  className="settings-btn"
                   type="button"
                   onClick={() => adjustMusicVolume(0.1)}
                   style={{
@@ -709,6 +762,7 @@ export default function SettingsModal({
               </div>
               <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
                 <button
+                  className="settings-btn"
                   type="button"
                   onClick={() => adjustSfxVolume(-0.1)}
                   style={{
@@ -738,6 +792,7 @@ export default function SettingsModal({
                   {Math.round(sfxUi * 10)}
                 </div>
                 <button
+                  className="settings-btn"
                   type="button"
                   onClick={() => adjustSfxVolume(0.1)}
                   style={{
@@ -981,6 +1036,7 @@ export default function SettingsModal({
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <button
+                  className="settings-btn"
                   type="button"
                   onClick={() => {
                     const cur =
@@ -1017,6 +1073,7 @@ export default function SettingsModal({
                   {rules.startingHandSize ?? defaultRules.startingHandSize}
                 </span>
                 <button
+                  className="settings-btn"
                   type="button"
                   onClick={() => {
                     const cur =

@@ -32,6 +32,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <link
+          rel="preload"
+          as="audio"
+          href="/audios/background_music.wav"
+          type="audio/wav"
+        />
         <script
           dangerouslySetInnerHTML={{
             __html: `

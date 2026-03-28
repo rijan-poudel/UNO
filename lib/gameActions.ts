@@ -93,15 +93,38 @@ function shuffleHandsStartingFrom(
   state: GameState,
   startIndex: number,
 ): GameState {
-  const pooled = shuffleDeck(state.players.flatMap((player) => player.hand));
-  const dealtHands: Card[][] = state.players.map(() => []);
-  let seat = startIndex;
+  const originalHandsSignature = state.players.map((player) => (
+    player.hand.map((card) => card.id).sort().join('|')
+  ));
+
+  let dealtHands: Card[][] = state.players.map(() => []);
+
+  const dealFromPooled = (pooled: Card[]): Card[][] => {
+    const nextHands: Card[][] = state.players.map(() => []);
+    let seat = startIndex;
+    for (const card of pooled) {
+      nextHands[seat].push(card);
+      seat = (seat + state.direction + state.players.length) % state.players.length;
+    }
+    return nextHands;
+  };
+
+  const handsChanged = (candidateHands: Card[][]): boolean => (
+    candidateHands.some((hand, index) => (
+      hand.map((card) => card.id).sort().join('|') !== originalHandsSignature[index]
+    ))
+  );
 
   // True shuffle-hands behavior: pool every hand and deal one-by-one in turn order
   // starting from the next player after the shuffle card is played.
-  for (const card of pooled) {
-    dealtHands[seat].push(card);
-    seat = (seat + state.direction + state.players.length) % state.players.length;
+  // Retry a few times if RNG happens to produce effectively unchanged hands.
+  const MAX_SHUFFLE_RETRIES = 5;
+  for (let attempt = 0; attempt <= MAX_SHUFFLE_RETRIES; attempt += 1) {
+    const pooled = shuffleDeck(state.players.flatMap((player) => player.hand));
+    dealtHands = dealFromPooled(pooled);
+    if (handsChanged(dealtHands)) {
+      break;
+    }
   }
 
   return {
