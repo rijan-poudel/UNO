@@ -42,9 +42,9 @@ const VALUE_ORDER: Record<string, number> = {
 };
 
 const BOT_THINK_DELAY_MS = 10000;
-const HUMAN_IDLE_TIMEOUT_MS = 10000;
-const HUMAN_IDLE_AFTER_DRAW_TIMEOUT_MS = 10000;
-const HUMAN_IDLE_WILD_PICK_TIMEOUT_MS = 10000;
+const HUMAN_IDLE_TIMEOUT_MS = 12000;
+const HUMAN_IDLE_AFTER_DRAW_TIMEOUT_MS = 12000;
+const HUMAN_IDLE_WILD_PICK_TIMEOUT_MS = 12000;
 const ACTION_FLASH_HOLD_MS = 980;
 const DEAL_ANIMATION_STAGGER_MS = 55;
 const DEAL_ANIMATION_DURATION_MS = 320;
@@ -222,11 +222,13 @@ function VictoryConfetti() {
 
 // ── Opponent strip ─────────────────────────────────────────────────────────────
 function OpponentStrip({
-  player, isCurrentTurn, canCallOut, onCallOut, cardScale, compact = false,
+  player, isCurrentTurn, canCallOut, onCallOut, cardScale, compact = false, angle = 0, turnProgress = 0,
 }: {
   player: Player; isCurrentTurn: boolean;
   canCallOut: boolean; onCallOut: () => void; cardScale: number;
   compact?: boolean;
+  angle?: number;
+  turnProgress?: number;
 }) {
   const n = player.hand.length;
   const opponentCardScale = cardScale;
@@ -238,32 +240,37 @@ function OpponentStrip({
   const fanWidth = Math.max(28, (82 * effectiveFanScale) + Math.max(0, fans - 1) * overlap);
   const fanHeight = 122 * effectiveFanScale + 8;
   const fanMid = (fans - 1) / 2;
-  const turnBoost = isCurrentTurn ? 1.08 : 1;
+  const turnBoost = 1;
   const callOutHintHeight = compact ? 10 : 12;
+  const cornerNameClearance = Math.abs(angle) >= 30 ? (compact ? 12 : 16) : 0;
+  const isSideSeat = Math.abs(angle) >= 80;
+  const profileSideOffset = compact ? 8 : 10;
 
   return (
     <button
       type="button"
       onClick={canCallOut ? onCallOut : undefined}
       style={{
-      background: canCallOut ? "color-mix(in srgb, var(--ui-accent-red) 8%, transparent)" : "transparent",
+      background: "transparent",
       border: "none",
-      padding: "0 6px 4px",
+      padding: compact ? "0 4px 2px" : "0 6px 4px",
       cursor: canCallOut ? "pointer" : "default",
       textAlign: "center",
       display: "grid",
-      gridTemplateRows: `${Math.round(fanHeight)}px auto ${callOutHintHeight}px`,
+      gridTemplateRows: isSideSeat
+        ? `${Math.round(fanHeight + cornerNameClearance)}px ${callOutHintHeight}px`
+        : `${Math.round(fanHeight + cornerNameClearance)}px auto ${callOutHintHeight}px`,
       alignItems: "start",
       justifyItems: "center",
-      rowGap: 4,
+      rowGap: 3,
       opacity: canCallOut ? 1 : isCurrentTurn ? 1 : 0.38,
-      transition: "opacity 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease",
+      transition: "opacity 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease, transform 0.25s ease",
       position: "relative",
       borderRadius: "8px",
-      boxShadow: canCallOut 
-        ? "0 0 20px rgba(192, 57, 43, 0.4), 0 0 40px rgba(192, 57, 43, 0.2), inset 0 0 16px rgba(192, 57, 43, 0.12)"
-        : "none",
-      animation: canCallOut ? "callOutAttention 0.7s ease-in-out infinite alternate" : "none",
+      boxShadow: "none",
+      animation: "none",
+      transform: `rotate(${angle}deg)`,
+      transformOrigin: "center center",
     }}>
 
       {/* Fanned face-down cards */}
@@ -273,6 +280,11 @@ function OpponentStrip({
         width: fanWidth,
         marginTop: 0,
         flexShrink: 0,
+        borderRadius: 10,
+        boxShadow: canCallOut
+          ? "0 0 0 1px color-mix(in srgb, var(--ui-accent-red) 75%, transparent), 0 0 20px rgba(192,57,43,0.42), inset 0 0 18px rgba(192,57,43,0.2)"
+          : "none",
+        animation: canCallOut ? "mustDrawPulse 1s ease-in-out infinite" : "none",
       }}>
         {fans === 0 ? (
           <span style={{ fontFamily: "'Courier Prime', monospace", fontSize: 9, color: "var(--ui-muted)" }}>empty</span>
@@ -296,7 +308,27 @@ function OpponentStrip({
       </div>
 
       {/* Name row */}
-      <div style={{ display: "flex", alignItems: "center", gap: 6, minHeight: compact ? 18 : 20 }}>
+      <div style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 6,
+        minHeight: compact ? 18 : 20,
+        marginTop: cornerNameClearance > 0 ? 2 : 0,
+        transform: `rotate(${-angle}deg)`,
+        transformOrigin: "center center",
+        ...(isSideSeat
+          ? {
+              position: "absolute" as const,
+              top: "50%",
+              left: angle < 0 ? `calc(100% + ${profileSideOffset}px)` : `-${profileSideOffset}px`,
+              transform: angle < 0
+                ? `translate(0, -50%) rotate(${-angle}deg)`
+                : `translate(-100%, -50%) rotate(${-angle}deg)`,
+              marginTop: 0,
+              zIndex: 5,
+            }
+          : {}),
+      }}>
         {isCurrentTurn && (
           <span style={{
             width: 5, height: 5, borderRadius: "50%",
@@ -304,14 +336,19 @@ function OpponentStrip({
             animation: "dot 1.1s ease-in-out infinite", flexShrink: 0,
           }} />
         )}
-        <ProfileChip
-          name={player.name}
-          seed={player.id}
-          compact
-          textColor={canCallOut ? "var(--ui-accent-red)" : "var(--ui-text)"}
-          maxNameWidth={compact ? 88 : 116}
-          ringColor={player.saidUno && n === 1 ? "var(--ui-accent-red)" : undefined}
-        />
+
+        <div style={{ position: "relative" }}>
+          <ProfileChip
+            name={player.name}
+            seed={player.id}
+            compact
+            textColor={canCallOut ? "var(--ui-accent-red)" : "var(--ui-text)"}
+            maxNameWidth={compact ? 96 : 126}
+            ringColor={player.saidUno && n === 1 ? "var(--ui-accent-red)" : undefined}
+            progressRing={isCurrentTurn ? turnProgress : undefined}
+          />
+        </div>
+
         {player.saidUno && n === 1 && (
           <span style={{
             fontFamily: "'Courier Prime', monospace",
@@ -322,16 +359,7 @@ function OpponentStrip({
         )}
       </div>
 
-      <span style={{
-        fontFamily: "'Courier Prime', monospace",
-        fontSize: compact ? 7 : 8,
-        fontWeight: 700,
-        letterSpacing: "0.14em",
-        textTransform: "uppercase",
-        color: "var(--ui-accent-red)",
-        minHeight: callOutHintHeight,
-        visibility: canCallOut ? "visible" : "hidden",
-      }}>Click to call UNO</span>
+      <span style={{ minHeight: callOutHintHeight, visibility: "hidden" }} />
     </button>
   );
 }
@@ -477,6 +505,7 @@ export default function GameBoard({
   const unoBadgeResetTimerRef = useRef<number | null>(null);
   const turnTimerKeyRef = useRef<string | null>(null);
   const turnTimerDeadlineRef = useRef<number>(0);
+  const autoTurnHandledRef = useRef<string | null>(null);
   const prevLocalHandIdsRef = useRef<string[]>([]);
   const prevLocalHandCountRef = useRef<number | null>(null);
   const pendingPlayRectRef = useRef<{ cardId: string; x: number; y: number } | null>(null);
@@ -709,6 +738,7 @@ export default function GameBoard({
         window.clearTimeout(unoBadgeResetTimerRef.current);
         unoBadgeResetTimerRef.current = null;
       }
+      setShowUnoDeclaredBadge(false);
       prevLocalHandCountRef.current = currentHandCount;
       return;
     }
@@ -725,6 +755,17 @@ export default function GameBoard({
 
     prevLocalHandCountRef.current = currentHandCount;
   }, [localPlayer]);
+
+  useEffect(() => {
+    if (!showUnoDeclaredBadge || !game) return;
+    if (game.currentPlayerIndex === localPlayerIndex) return;
+
+    if (unoBadgeResetTimerRef.current !== null) {
+      window.clearTimeout(unoBadgeResetTimerRef.current);
+      unoBadgeResetTimerRef.current = null;
+    }
+    setShowUnoDeclaredBadge(false);
+  }, [showUnoDeclaredBadge, game?.currentPlayerIndex, localPlayerIndex, game]);
 
   // Record wins as they happen
   useEffect(() => {
@@ -990,6 +1031,27 @@ export default function GameBoard({
     }
   }, [game, localPlayer, declareUno]);
 
+  const pickAutoWildColor = useCallback((hand: Card[]): CardColor => {
+    const colors: Array<Exclude<CardColor, "wild">> = ["red", "yellow", "green", "blue"];
+    const counts: Record<Exclude<CardColor, "wild">, number> = { red: 0, yellow: 0, green: 0, blue: 0 };
+
+    for (const card of hand) {
+      if (card.color === "red" || card.color === "yellow" || card.color === "green" || card.color === "blue") {
+        counts[card.color] += 1;
+      }
+    }
+
+    let best: CardColor = "red";
+    let bestCount = -1;
+    for (const color of colors) {
+      if (counts[color] > bestCount) {
+        best = color;
+        bestCount = counts[color];
+      }
+    }
+    return best;
+  }, []);
+
   const handleCallOut = useCallback((callerIdx: number, targetIdx: number) => {
     callOut(callerIdx, targetIdx);
   }, [callOut]);
@@ -1148,6 +1210,63 @@ export default function GameBoard({
     drawnThisTurn,
   ]);
 
+  useEffect(() => {
+    if (!game || !localPlayer || !currentPlayer) return;
+    if (!isLocalTurn || localPlayer.isBot || game.winnerId) return;
+    if (turnTransitionLocked) return;
+
+    const turnKey = `${game.turnCount}:${game.currentPlayerIndex}`;
+    if (turnCountdownSeconds > 0) {
+      if (autoTurnHandledRef.current !== turnKey) {
+        autoTurnHandledRef.current = null;
+      }
+      return;
+    }
+
+    if (autoTurnHandledRef.current === turnKey) return;
+    autoTurnHandledRef.current = turnKey;
+
+    const timer = window.setTimeout(() => {
+      if (pendingWild) {
+        confirmWildColor(pickAutoWildColor(localPlayer.hand));
+        return;
+      }
+
+      const playableCards = localPlayer.hand.filter((card) => playableCardIds.has(card.id));
+      if (playableCards.length > 0) {
+        const chosen = playableCards.find((card) => card.color !== "wild") ?? playableCards[0];
+        autoDeclareUnoIfNeeded();
+        selectCard(chosen);
+        return;
+      }
+
+      if (game.pendingDraw > 0 || !drawnThisTurn) {
+        drawCard();
+        return;
+      }
+
+      pass();
+    }, 140);
+
+    return () => window.clearTimeout(timer);
+  }, [
+    game,
+    localPlayer,
+    currentPlayer,
+    isLocalTurn,
+    turnTransitionLocked,
+    turnCountdownSeconds,
+    pendingWild,
+    drawnThisTurn,
+    playableCardIds,
+    autoDeclareUnoIfNeeded,
+    pickAutoWildColor,
+    confirmWildColor,
+    selectCard,
+    drawCard,
+    pass,
+  ]);
+
   if (!game || !localPlayer || !currentPlayer) return null;
 
   const topDiscard = game.discardPile[game.discardPile.length - 1];
@@ -1156,7 +1275,79 @@ export default function GameBoard({
   const drawDisabled = botThinking || turnTransitionLocked || !!game.winnerId || (drawnThisTurn && game.pendingDraw === 0) || !humanTurn;
   const sortedHand = sortHand(localPlayer.hand);
   const handCount = sortedHand.length;
-  const opponents = game.players.filter((_, i) => i !== localPlayerIndex);
+  const opponentSeatOrder = Array.from({ length: Math.max(0, game.players.length - 1) }, (_, step) => {
+    const playerIndex = (localPlayerIndex + 1 + step) % game.players.length;
+    return {
+      playerIndex,
+      player: game.players[playerIndex],
+    };
+  });
+
+  interface SeatLayout {
+    top: string;
+    left: string;
+    angle: number;
+    translateX?: string;
+    translateY?: string;
+  }
+
+  const getOpponentSeatLayouts = (count: number): SeatLayout[] => {
+    const TOP_CENTER_Y = "10%";
+    const TOP_CORNER_Y = "16%";
+    const SIDE_CENTER_Y = "50%";
+    const TOP_LEFT_X = "24%";
+    const TOP_RIGHT_X = "76%";
+    const SIDE_LEFT_X = "0%";
+    const SIDE_RIGHT_X = "100%";
+    const SIDE_LEFT_TRANSLATE_X = "0%";
+    const SIDE_RIGHT_TRANSLATE_X = "-100%";
+
+    const layouts: Record<number, SeatLayout[]> = {
+      1: [
+        // 2 players total: top-center on vertical axis
+        { top: TOP_CENTER_Y, left: "50%", angle: 0, translateX: "-50%", translateY: "-50%" },
+      ],
+      2: [
+        // 3 players total, clockwise from local(bottom): left-adjacent -> right-adjacent
+        { top: TOP_CORNER_Y, left: TOP_LEFT_X, angle: -45, translateX: "-50%", translateY: "-50%" },
+        { top: TOP_CORNER_Y, left: TOP_RIGHT_X, angle: 45, translateX: "-50%", translateY: "-50%" },
+      ],
+      3: [
+        // 4 players total, clockwise from local(bottom): left -> top -> right
+        { top: SIDE_CENTER_Y, left: SIDE_LEFT_X, angle: -90, translateX: SIDE_LEFT_TRANSLATE_X, translateY: "-50%" },
+        { top: TOP_CENTER_Y, left: "50%", angle: 0, translateX: "-50%", translateY: "-50%" },
+        { top: SIDE_CENTER_Y, left: SIDE_RIGHT_X, angle: 90, translateX: SIDE_RIGHT_TRANSLATE_X, translateY: "-50%" },
+      ],
+      4: [
+        // 5 players total, clockwise from local(bottom): left -> top-left -> top-right -> right
+        { top: SIDE_CENTER_Y, left: SIDE_LEFT_X, angle: -90, translateX: SIDE_LEFT_TRANSLATE_X, translateY: "-50%" },
+        { top: TOP_CORNER_Y, left: TOP_LEFT_X, angle: -45, translateX: "-50%", translateY: "-50%" },
+        { top: TOP_CORNER_Y, left: TOP_RIGHT_X, angle: 45, translateX: "-50%", translateY: "-50%" },
+        { top: SIDE_CENTER_Y, left: SIDE_RIGHT_X, angle: 90, translateX: SIDE_RIGHT_TRANSLATE_X, translateY: "-50%" },
+      ],
+      5: [
+        // 6 players total, clockwise from local(bottom): left -> top-left -> top -> top-right -> right
+        { top: SIDE_CENTER_Y, left: SIDE_LEFT_X, angle: -90, translateX: SIDE_LEFT_TRANSLATE_X, translateY: "-50%" },
+        { top: TOP_CORNER_Y, left: TOP_LEFT_X, angle: -45, translateX: "-50%", translateY: "-50%" },
+        { top: TOP_CENTER_Y, left: "50%", angle: 0, translateX: "-50%", translateY: "-50%" },
+        { top: TOP_CORNER_Y, left: TOP_RIGHT_X, angle: 45, translateX: "-50%", translateY: "-50%" },
+        { top: SIDE_CENTER_Y, left: SIDE_RIGHT_X, angle: 90, translateX: SIDE_RIGHT_TRANSLATE_X, translateY: "-50%" },
+      ],
+      6: [
+        // Fallback clockwise order from local(bottom): left -> top-left -> top -> top-right -> right -> bottom
+        { top: SIDE_CENTER_Y, left: SIDE_LEFT_X, angle: -90, translateX: SIDE_LEFT_TRANSLATE_X, translateY: "-50%" },
+        { top: TOP_CORNER_Y, left: TOP_LEFT_X, angle: -45, translateX: "-50%", translateY: "-50%" },
+        { top: TOP_CENTER_Y, left: "50%", angle: 0, translateX: "-50%", translateY: "-50%" },
+        { top: TOP_CORNER_Y, left: TOP_RIGHT_X, angle: 45, translateX: "-50%", translateY: "-50%" },
+        { top: SIDE_CENTER_Y, left: SIDE_RIGHT_X, angle: 90, translateX: SIDE_RIGHT_TRANSLATE_X, translateY: "-50%" },
+        { top: "88%", left: "50%", angle: 0, translateX: "-50%", translateY: "-50%" },
+      ],
+    };
+
+    return layouts[Math.min(count, 6)] ?? layouts[6];
+  };
+
+  const opponentSeatLayouts = getOpponentSeatLayouts(opponentSeatOrder.length);
 
   const discardDisplayCard: Card | null = topDiscard
     ? topDiscard.color === "wild" && game.activeColor && game.activeColor !== "wild"
@@ -1190,12 +1381,17 @@ export default function GameBoard({
   const availableHandWidth = Math.max(220, viewportW - (isCompactBoard ? 34 : 52) - reservedRightPx);
   const requiredHandWidthAtScale1 = 82 + Math.max(0, handCount - 1) * 26;
   const scaledByWidth = availableHandWidth / Math.max(1, requiredHandWidthAtScale1);
-  const gameCardScale = boardScale < 1
-    ? Math.max(0.50, Math.min(scaledByHeight, scaledByWidth, 1.2))   // compact viewport: increased cap to 1.2
-    : Math.max(0.50, Math.min(scaledByHeight, scaledByWidth, 1.5));  // full viewport: increased cap to 1.5
-  const localHandCardScale = gameCardScale;
-  const localTurnBoost = isLocalTurn && !game.winnerId ? 1.08 : 1;
-  const pileCardScale = gameCardScale;
+  // Keep center table and opponent sizes stable; only hand fan reacts to hand count/width.
+  const tableCardScale = boardScale < 1
+    ? Math.max(0.50, Math.min(scaledByHeight, 1.2))
+    : Math.max(0.50, Math.min(scaledByHeight, 1.5));
+  const localHandCardScale = boardScale < 1
+    ? Math.max(0.50, Math.min(scaledByHeight, scaledByWidth, 1.2))
+    : Math.max(0.50, Math.min(scaledByHeight, scaledByWidth, 1.5));
+  const localTurnBoost = 1;
+  const pileCardScale = tableCardScale;
+  const pileCardColumnWidth = Math.round((82 * pileCardScale) + (22 * pileCardScale));
+  const turnColumnWidth = Math.round((isCompactBoard ? 44 : 54) * pileCardScale);
 
   const mustDrawNow = humanTurn && !turnTransitionLocked && !drawDisabled && playableCardIds.size === 0;
   const mustAutoDrawRequired = humanTurn && !turnTransitionLocked && game.pendingDraw > 0 && !hasPendingStackOption;
@@ -1215,6 +1411,19 @@ export default function GameBoard({
   const directionSymbol = game.direction === 1 ? "⟳" : "⟲";
   const showCountdown = turnCountdownSeconds > 0;
   const timerUrgent = turnCountdownSeconds > 0 && turnCountdownSeconds <= 6;
+  const currentTurnTimerMs = currentPlayer.isBot
+    ? BOT_THINK_DELAY_MS
+    : isLocalTurn
+      ? pendingWild
+        ? HUMAN_IDLE_WILD_PICK_TIMEOUT_MS
+        : drawnThisTurn
+          ? HUMAN_IDLE_AFTER_DRAW_TIMEOUT_MS
+          : HUMAN_IDLE_TIMEOUT_MS
+      : 0;
+  const currentTurnTimerSeconds = Math.max(1, Math.ceil(currentTurnTimerMs / 1000));
+  const currentTurnProgress = currentTurnTimerMs > 0
+    ? Math.max(0, Math.min(1, (currentTurnTimerSeconds - turnCountdownSeconds) / currentTurnTimerSeconds))
+    : 0;
 
   const hint = !humanTurn
     ? `Waiting for ${currentPlayer.name}`
@@ -1257,6 +1466,22 @@ export default function GameBoard({
     };
     window.addEventListener("uno:audio-settings", syncMusicState);
     return () => window.removeEventListener("uno:audio-settings", syncMusicState);
+  }, []);
+
+  useEffect(() => {
+    const html = document.documentElement;
+    const body = document.body;
+    const prevHtmlOverflow = html.style.overflow;
+    const prevBodyOverflow = body.style.overflow;
+
+    // Keep viewport metrics stable while playing to avoid modal-triggered screen shifts.
+    html.style.overflow = "hidden";
+    body.style.overflow = "hidden";
+
+    return () => {
+      html.style.overflow = prevHtmlOverflow;
+      body.style.overflow = prevBodyOverflow;
+    };
   }, []);
 
   const handleToggleMusic = useCallback(() => {
@@ -1318,6 +1543,10 @@ export default function GameBoard({
           from { transform: translateY(0) scale(1); }
           to   { transform: translateY(-4px) scale(1.04); }
         }
+        @keyframes turnRingFlow {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
         /* Call out flash centre screen */
         @keyframes callOutPop {
           0%  { opacity:0; transform:scale(0.75); }
@@ -1373,11 +1602,12 @@ export default function GameBoard({
       <div
         onPointerDownCapture={() => primeTableAudioFromUserGesture()}
         style={{
-        height: "100dvh", overflow: "hidden",
+        height: "100svh", overflow: "hidden",
         color: "var(--ui-text)", background: "var(--ui-bg)",
         fontFamily: "'Courier Prime', monospace",
         display: "grid",
         gridTemplateRows: "auto minmax(0, 1fr) auto",
+        position: "relative",
       }}
       >
         <div
@@ -1395,6 +1625,7 @@ export default function GameBoard({
           <div
             style={{
               pointerEvents: "none",
+              position: "relative",
               display: "flex",
               alignItems: "center",
               transform: "scale(1.2)",
@@ -1408,7 +1639,33 @@ export default function GameBoard({
               maxNameWidth={isNarrowMobile ? 110 : 144}
               ringColor={localPlayer.saidUno && localPlayer.hand.length === 1 ? "var(--ui-accent-red)" : undefined}
               ringWidth={2.5}
+              progressRing={isLocalTurn ? currentTurnProgress : undefined}
             />
+
+            <span
+              style={{
+                position: "absolute",
+                right: `calc(100% + ${isNarrowMobile ? 6 : 8}px)`,
+                top: "50%",
+                transform: "translateY(-50%)",
+                fontFamily: "'Bebas Neue', cursive",
+                fontSize: isNarrowMobile ? 14 : 16,
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+                background: "var(--ui-accent-red)",
+                color: "#fff",
+                border: "1px solid color-mix(in srgb, var(--ui-accent-red) 78%, #fff 22%)",
+                padding: isNarrowMobile ? "2px 8px" : "3px 10px",
+                lineHeight: 1,
+                animation: showUnoDeclaredBadge ? "blink 0.85s step-end infinite" : "none",
+                boxShadow: "0 0 10px rgba(192,57,43,0.45)",
+                opacity: showUnoDeclaredBadge ? 1 : 0,
+                transition: "opacity 0.14s ease",
+                pointerEvents: "none",
+              }}
+            >
+              UNO
+            </span>
           </div>
 
           <button
@@ -1618,28 +1875,57 @@ export default function GameBoard({
           ) : null}
         </div>
 
-        {/* ── Opponents — paddingTop clears floating header ── */}
-        <section style={{
-          paddingTop: isCompactBoard ? 12 : 18,
-          paddingBottom: isCompactBoard ? 16 : 24,
-          paddingInline: isNarrowMobile ? 6 : 12,
-          display: "flex", flexWrap: "wrap",
-          gap: isCompactBoard ? (isNarrowMobile ? "3px 8px" : "4px 14px") : "8px 20px",
-          justifyContent: "center", alignItems: "flex-start",
-          flexShrink: 0,
-        }}>
-          {opponents.map(player => {
-            const idx = game.players.findIndex(p => p.id === player.id);
-            const canCallOut = humanTurn && player.hand.length === 1 && !player.saidUno && game.rules.mustDeclareUno;
+        {/* ── Opponent Seat Overlay ── */}
+        <section
+          style={{
+            position: "absolute",
+            inset: 0,
+            zIndex: 2,
+            pointerEvents: "none",
+          }}
+        >
+          {opponentSeatOrder.map(({ player, playerIndex }, index) => {
+            const seat = opponentSeatLayouts[index] ?? {
+              top: "20%",
+              left: "50%",
+              angle: 0,
+              translateX: "-50%",
+              translateY: "-50%",
+            };
+            const canCallOut =
+              game.rules.mustDeclareUno &&
+              !game.winnerId &&
+              player.hand.length === 1 &&
+              !player.saidUno;
+
+            const isCurrentTurn = game.currentPlayerIndex === playerIndex;
+
             return (
-              <div key={player.id} ref={(node) => { playerZoneRefs.current[player.id] = node; }}>
+              <div
+                key={player.id}
+                ref={(node) => {
+                  playerZoneRefs.current[player.id] = node;
+                }}
+                style={{
+                  position: "absolute",
+                  top: seat.top,
+                  left: seat.left,
+                  transform: `translate(${seat.translateX ?? "-50%"}, ${seat.translateY ?? "-50%"})`,
+                  transformOrigin: "center center",
+                  zIndex: isCurrentTurn ? 12 : 4,
+                  // Avoid intercepting clicks on draw/play controls when more seats are visible.
+                  pointerEvents: canCallOut ? "auto" : "none",
+                }}
+              >
                 <OpponentStrip
                   player={player}
-                  isCurrentTurn={idx === game.currentPlayerIndex}
+                  isCurrentTurn={isCurrentTurn}
                   canCallOut={canCallOut}
-                  onCallOut={() => handleCallOut(localPlayerIndex, idx)}
-                  cardScale={gameCardScale}
-                  compact={isNarrowMobile}
+                  onCallOut={() => handleCallOut(localPlayerIndex, playerIndex)}
+                  cardScale={tableCardScale}
+                  compact={isCompactBoard}
+                  angle={seat.angle}
+                  turnProgress={isCurrentTurn ? currentTurnProgress : 0}
                 />
               </div>
             );
@@ -1648,41 +1934,46 @@ export default function GameBoard({
 
         {/* ── Table ── */}
         <main style={{
-          flex: 1, minHeight: 0,
-          display: "flex", flexDirection: "column",
-          alignItems: "center", justifyContent: "center",
-          gap: isCompactBoard ? 12 : 20,
-          padding: isCompactBoard ? (isNarrowMobile ? "8px 4px" : "10px 8px") : "12px 16px",
-          overflow: "hidden",
-          transform: isCompactBoard ? (isNarrowMobile ? "translateY(-1px)" : "translateY(-4px)") : "translateY(-10px)",
-          position: "relative",
+          position: "absolute",
+          inset: 0,
+          pointerEvents: "none",
         }}>
 
-          <div style={{
-            minHeight: 20,
-            width: "100%",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            paddingLeft: isCompactBoard ? 4 : 8,
-            paddingRight: isCompactBoard ? 6 : 10,
-          }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              {game.pendingDraw > 0 && humanTurn ? (
-                <span style={{
-                  fontFamily: "'Courier Prime', monospace", fontSize: 11,
-                  color: "var(--ui-accent-red)", letterSpacing: "0.1em", textTransform: "uppercase",
-                  border: "1px solid var(--ui-accent-red)", padding: "3px 12px",
-                  animation: "blink 2s step-end infinite",
-                }}>{hasPendingStackOption ? `+${game.pendingDraw} incoming` : `taking +${game.pendingDraw}`}</span>
-              ) : null}
+          {game.pendingDraw > 0 && humanTurn ? (
+            <div style={{
+              position: "absolute",
+              left: "50%",
+              top: isCompactBoard ? (isNarrowMobile ? "calc(50% - 110px)" : "calc(50% - 124px)") : "calc(50% - 132px)",
+              transform: "translateX(-50%)",
+              pointerEvents: "none",
+              zIndex: 6,
+            }}>
+              <span style={{
+                fontFamily: "'Courier Prime', monospace", fontSize: 11,
+                color: "var(--ui-accent-red)", letterSpacing: "0.1em", textTransform: "uppercase",
+                border: "1px solid var(--ui-accent-red)", padding: "3px 12px",
+                animation: "blink 2s step-end infinite",
+                background: "color-mix(in srgb, var(--ui-bg) 82%, transparent)",
+              }}>{hasPendingStackOption ? `+${game.pendingDraw} incoming` : `taking +${game.pendingDraw}`}</span>
             </div>
-          </div>
+          ) : null}
 
-          <div style={{ display: "flex", alignItems: "flex-end", gap: isCompactBoard ? (isNarrowMobile ? 8 : 14) : 32 }}>
+          <div style={{
+            position: "absolute",
+            left: "50%",
+            top: "50%",
+            transform: "translate(-50%, -50%)",
+            display: "grid",
+            gridTemplateColumns: `${pileCardColumnWidth}px ${turnColumnWidth}px ${pileCardColumnWidth}px`,
+            alignItems: "end",
+            justifyItems: "center",
+            columnGap: isCompactBoard ? (isNarrowMobile ? 8 : 14) : 32,
+            pointerEvents: "auto",
+            zIndex: 5,
+          }}>
 
             {/* Draw pile */}
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
+            <div style={{ width: pileCardColumnWidth, display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
               <span style={{
                 fontFamily: "'Courier Prime', monospace", fontSize: 9,
                 letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--ui-muted)",
@@ -1711,7 +2002,7 @@ export default function GameBoard({
             </div>
 
             {/* Direction indicator (aligned with piles) */}
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
+            <div style={{ width: turnColumnWidth, display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
               <span style={{
                 fontFamily: "'Courier Prime', monospace", fontSize: 9,
                 letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--ui-muted)",
@@ -1731,7 +2022,7 @@ export default function GameBoard({
             </div>
 
             {/* Discard pile */}
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
+            <div style={{ width: pileCardColumnWidth, display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
               <span style={{
                 fontFamily: "'Courier Prime', monospace", fontSize: 9,
                 letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--ui-muted)",
@@ -1749,11 +2040,12 @@ export default function GameBoard({
                     const isTop = idx === arr.length - 1;
                     const displayCard = isTop && discardDisplayCard ? discardDisplayCard : card;
                     const offset = arr.length - 1 - idx;
+                    const horizontalShift = isTop ? 0 : (offset % 2 === 0 ? -1 : 1) * (2 + offset * 2);
                     return (
                       <div key={card.id} style={{
                         position: "absolute", inset: 0,
                         display: "flex", justifyContent: "center", alignItems: "center",
-                        transform: `translate(${offset * -4}px, ${offset * -2}px) rotate(${isTop ? -2 : -6 + idx * 3}deg)`,
+                        transform: `translate(${horizontalShift}px, ${offset * -2}px) rotate(${isTop ? -2 : -6 + idx * 3}deg)`,
                         opacity: isTop ? 1 : 0.78,
                         zIndex: idx + 1,
                         animation: isTop ? "discardLand 0.24s cubic-bezier(0.22,1,0.36,1)" : "none",
@@ -1773,8 +2065,10 @@ export default function GameBoard({
 
         {/* ── Player panel ── */}
         <div style={{
-          flexShrink: 0,
-          position: "relative",
+          position: "absolute",
+          left: 0,
+          right: 0,
+          bottom: 0,
           overflow: "visible",
           zIndex: 12,
           paddingTop: isCompactBoard ? 12 : 16,

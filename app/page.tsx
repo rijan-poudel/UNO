@@ -17,6 +17,7 @@ const SHARED_RULES_KEY = "uno.shared.rules";
 const PREFERRED_THEME_KEY = "uno.preferred.theme";
 const ONLINE_PREFILL_FRIEND_CODE_KEY = "uno.online.prefill.friendCode";
 const ONLINE_PLAYER_NAME_KEY = "uno.online.playerName";
+const MIN_SUPPORTED_MAX_PLAYERS = 6;
 
 type ThemeName = "paper" | "midnight" | "forest" | "sunset";
 
@@ -93,7 +94,7 @@ const DEFAULT_RULES: Partial<GameRules> = {
   allowDiscardAll: false,
   allowShuffleCard: false,
   allowDoublePlaySameNumber: false,
-  maxPlayers: 4,
+  maxPlayers: MIN_SUPPORTED_MAX_PLAYERS,
 };
 
 function getInitialRules(): Partial<GameRules> {
@@ -104,9 +105,15 @@ function getInitialRules(): Partial<GameRules> {
     const parsed = JSON.parse(raw) as Partial<GameRules> & {
       shuffleHandsOnZero?: boolean;
     };
+    const normalizedMaxPlayers = Math.max(
+      MIN_SUPPORTED_MAX_PLAYERS,
+      parsed.maxPlayers ?? DEFAULT_RULES.maxPlayers ?? MIN_SUPPORTED_MAX_PLAYERS,
+    );
+
     return {
       ...DEFAULT_RULES,
       ...parsed,
+      maxPlayers: normalizedMaxPlayers,
       allowShuffleCard:
         parsed.allowShuffleCard ??
         parsed.shuffleHandsOnZero ??
@@ -122,13 +129,18 @@ function getInitialTheme(): ThemeName {
 }
 
 function WelcomeOverlay({ fadingOut }: { fadingOut: boolean }) {
+  useEffect(() => {
+    void import("@dotlottie/player-component");
+  }, []);
+
   return (
     <div
       style={{
         position: "fixed",
         inset: 0,
-        background: "#121212",
-        color: "#e0e0e0",
+        background:
+          "radial-gradient(120% 95% at 50% 10%, color-mix(in srgb, var(--ui-accent-blue) 16%, transparent), transparent 58%), linear-gradient(180deg, var(--ui-bg), color-mix(in srgb, var(--ui-bg) 80%, #000 20%))",
+        color: "var(--ui-text)",
         display: "grid",
         placeItems: "center",
         overflow: "hidden",
@@ -140,61 +152,160 @@ function WelcomeOverlay({ fadingOut }: { fadingOut: boolean }) {
       }}
     >
       <style>{`
-        @keyframes unoWelcomePulse {
-          0%, 100% { transform: scale(1); opacity: 0.92; }
-          50% { transform: scale(1.05); opacity: 1; }
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Courier+Prime:wght@400;700&display=swap');
+
         @keyframes unoWelcomeSweep {
-          0% { transform: translateX(-140%); }
-          100% { transform: translateX(140%); }
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(100%); }
         }
+
+        @keyframes unoWelcomeBlink {
+          0%, 100% { opacity: 0.2; }
+          50% { opacity: 1; }
+        }
+
         @keyframes unoWelcomeFloat {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-4px); }
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-6px); }
         }
       `}</style>
-      <div style={{ textAlign: "center", display: "grid", gap: 18, placeItems: "center", animation: "unoWelcomeFloat 2.2s ease-in-out infinite" }}>
+
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background:
+            "repeating-linear-gradient(0deg, transparent, transparent 10px, color-mix(in srgb, var(--ui-line) 42%, transparent) 10px, color-mix(in srgb, var(--ui-line) 42%, transparent) 11px)",
+          opacity: 0.2,
+          pointerEvents: "none",
+        }}
+      />
+
+      <section
+        style={{
+          width: "min(760px, calc(100vw - 28px))",
+          border: "1px solid color-mix(in srgb, var(--ui-line) 75%, transparent)",
+          background: "color-mix(in srgb, var(--ui-surface) 90%, var(--ui-bg) 10%)",
+          boxShadow: "0 24px 48px rgba(0,0,0,0.34)",
+          padding: "clamp(16px, 3vw, 26px)",
+          display: "grid",
+          gap: "clamp(10px, 2vw, 18px)",
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
         <div
           style={{
             position: "relative",
-            fontFamily: "var(--font-monkeytype-mono), 'Roboto Mono', monospace",
-            fontStyle: "normal",
-            fontWeight: 700,
-            fontSize: "clamp(68px, 14vw, 126px)",
-            letterSpacing: "0.16em",
-            lineHeight: 1,
-            animation: "unoWelcomePulse 1.2s ease-in-out infinite",
-            textTransform: "uppercase",
+            left: 0,
+            right: 0,
+            top: 0,
+            height: 2,
+            background:
+              "linear-gradient(90deg, transparent, var(--ui-accent-red), var(--ui-accent-yellow), var(--ui-accent-blue), transparent)",
+            opacity: 0.85,
           }}
-        >
-          <span style={{ color: "#ef5350" }}>U</span>
-          <span style={{ color: "#fdd835" }}>N</span>
-          <span style={{ color: "#66bb6a" }}>O</span>
+        />
+
+        <header style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 16 }}>
+          <h1
+            style={{
+              margin: 0,
+              fontFamily: "'Bebas Neue', cursive",
+              fontSize: "clamp(30px, 5.2vw, 54px)",
+              letterSpacing: "0.06em",
+              lineHeight: 0.9,
+              textTransform: "uppercase",
+            }}
+          >
+            UNO Arena
+          </h1>
           <span
             style={{
-              position: "absolute",
-              left: 0,
-              right: 0,
-              bottom: -10,
-              height: 2,
-              background: "linear-gradient(90deg, transparent, #42a5f5, transparent)",
-              animation: "unoWelcomeSweep 1.4s ease-in-out infinite",
+              fontFamily: "'Courier Prime', monospace",
+              fontSize: 10,
+              letterSpacing: "0.2em",
+              textTransform: "uppercase",
+              color: "var(--ui-muted)",
+              whiteSpace: "nowrap",
             }}
-          />
-        </div>
-        <p
+          >
+            boot sequence
+          </span>
+        </header>
+
+        <div
           style={{
-            margin: 0,
-            fontFamily: "'Courier Prime', monospace",
-            fontSize: 12,
-            letterSpacing: "0.2em",
-            textTransform: "uppercase",
-            color: "rgba(224,224,224,0.7)",
+            display: "grid",
+            placeItems: "center",
+            animation: "unoWelcomeFloat 2.2s ease-in-out infinite",
           }}
         >
-          Welcome to the table
-        </p>
-      </div>
+          <dotlottie-player
+            src="/loadingPage/Welcome.lottie"
+            background="transparent"
+            speed="1"
+            style={{ width: "min(460px, 76vw)", height: "min(460px, 76vw)" }}
+            loop
+            autoplay
+          />
+        </div>
+
+        <div style={{ display: "grid", gap: 8 }}>
+          <div
+            style={{
+              height: 10,
+              border: "1px solid var(--ui-line)",
+              position: "relative",
+              overflow: "hidden",
+              background: "color-mix(in srgb, var(--ui-bg) 78%, transparent)",
+            }}
+          >
+            <span
+              style={{
+                position: "absolute",
+                inset: 0,
+                background:
+                  "linear-gradient(90deg, transparent, color-mix(in srgb, var(--ui-accent-yellow) 88%, #fff 12%), transparent)",
+                animation: "unoWelcomeSweep 1.6s linear infinite",
+              }}
+            />
+          </div>
+
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              gap: 12,
+            }}
+          >
+            <span
+              style={{
+                fontFamily: "'Courier Prime', monospace",
+                fontSize: 11,
+                letterSpacing: "0.14em",
+                textTransform: "uppercase",
+                color: "var(--ui-muted)",
+              }}
+            >
+              Loading game
+            </span>
+            <span
+              style={{
+                fontFamily: "'Courier Prime', monospace",
+                fontSize: 11,
+                letterSpacing: "0.22em",
+                textTransform: "uppercase",
+              }}
+            >
+              <span style={{ animation: "unoWelcomeBlink 1s 0s infinite" }}>.</span>
+              <span style={{ animation: "unoWelcomeBlink 1s 0.2s infinite" }}>.</span>
+              <span style={{ animation: "unoWelcomeBlink 1s 0.4s infinite" }}>.</span>
+            </span>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

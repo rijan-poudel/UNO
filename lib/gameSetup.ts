@@ -71,7 +71,12 @@ export function initializeGame(
   botFlags?: boolean[],
 ): GameState {
   // ── 1. Merge rules ───────────────────────────────────────────────────────
-  const mergedRules: GameRules = { ...defaultRules, ...rules };
+  const mergedRules: GameRules = {
+    ...defaultRules,
+    ...rules,
+    // Guard against stale persisted configs forcing old 4-player caps.
+    maxPlayers: Math.max(6, rules?.maxPlayers ?? defaultRules.maxPlayers),
+  };
 
   // ── 2. Validate player count ─────────────────────────────────────────────
   if (playerNames.length < 2) {

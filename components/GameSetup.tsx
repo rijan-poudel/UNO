@@ -17,7 +17,7 @@ interface GameSetupProps {
   onBack?: () => void;
 }
 
-const MAX_PLAYERS = 8;
+const MAX_PLAYERS = 6;
 const LOCAL_PLAYER_NAMES_KEY = 'uno.local.playerNames';
 const ONLINE_PLAYER_NAME_KEY = 'uno.online.playerName';
 let uidCounter = 0;
