@@ -13,6 +13,7 @@ import type {
   RoomSnapshot,
 } from '../types/multiplayer';
 import { getPlayableCards } from '../lib/gameRules';
+import { resolvePlayerName } from '../lib/playerNames';
 import { voiceUiConnected, voiceUiDisconnected, voiceUiRoomJoined } from '../lib/voiceAnnouncer';
 
 const AUTO_PASS_AFTER_DRAW_MS = 2200;
@@ -229,7 +230,6 @@ interface FeedState {
 
 function describeAction(game: GameState): string {
   const action = game.lastAction;
-  const name = (id: string) => game.players.find((p) => p.id === id)?.name ?? id;
 
   switch (action.type) {
     case 'play': {
@@ -240,18 +240,18 @@ function describeAction(game: GameState): string {
       if (action.shuffledHands) {
         extras.push('shuffled all hands');
       }
-      return `${name(action.playerId)} played ${action.card.color} ${action.card.value}${
+      return `${resolvePlayerName(game.players, action.playerId)} played ${action.card.color} ${action.card.value}${
         action.chosenColor ? ` -> chose ${action.chosenColor}` : ''
       }${extras.length ? ` (${extras.join(', ')})` : ''}`;
     }
     case 'draw':
-      return `${name(action.playerId)} drew ${action.count} card${action.count !== 1 ? 's' : ''}`;
+      return `${resolvePlayerName(game.players, action.playerId)} drew ${action.count} card${action.count !== 1 ? 's' : ''}`;
     case 'pass':
-      return `${name(action.playerId)} passed`;
+      return `${resolvePlayerName(game.players, action.playerId)} passed`;
     case 'declareUno':
-      return `${name(action.playerId)} said UNO`;
+      return `${resolvePlayerName(game.players, action.playerId)} said UNO`;
     case 'callOut':
-      return `${name(action.callerId)} called out ${name(action.targetId)}`;
+      return `${resolvePlayerName(game.players, action.callerId)} called out ${resolvePlayerName(game.players, action.targetId)}`;
     default:
       return 'Game started';
   }

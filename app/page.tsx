@@ -11,13 +11,13 @@ import HomeScreen from "../components/home/HomeScreen";
 import OnlineLobby from "../components/OnlineLobby";
 import NotificationPanel from "../components/NotificationPanel";
 import SettingsModal from "../components/SettingsModal";
+import { MIN_SUPPORTED_MAX_PLAYERS } from "../lib/gameLimits";
 import { toast } from "sonner";
 
 const SHARED_RULES_KEY = "uno.shared.rules";
 const PREFERRED_THEME_KEY = "uno.preferred.theme";
 const ONLINE_PREFILL_FRIEND_CODE_KEY = "uno.online.prefill.friendCode";
 const ONLINE_PLAYER_NAME_KEY = "uno.online.playerName";
-const MIN_SUPPORTED_MAX_PLAYERS = 6;
 
 type ThemeName = "paper" | "midnight" | "forest" | "sunset";
 

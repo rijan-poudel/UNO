@@ -21,9 +21,16 @@ import {
 } from '../lib/gameActions';
 import { canPlayCard, getPlayableCards } from '../lib/gameRules';
 import { getBotMove } from '../lib/botSupport';
+import { resolvePlayerName } from '../lib/playerNames';
 
 const BOT_ACTION_DELAY_MS = 1150;
 const AUTO_PASS_AFTER_DRAW_MS = 2200;
+
+function reportHookError(context: string, error: unknown): void {
+  if (process.env.NODE_ENV !== 'production') {
+    console.error(`[useUnoGame] ${context}`, error);
+  }
+}
 
 function getActionPresentationDelay(game: GameState): number {
   const action = game.lastAction;
@@ -73,7 +80,6 @@ type UIAction =
 
 function describeAction(game: GameState): string {
   const a = game.lastAction;
-  const name = (id: string) => game.players.find((p) => p.id === id)?.name ?? id;
 
   switch (a.type) {
     case 'play': {
@@ -84,18 +90,18 @@ function describeAction(game: GameState): string {
       if (a.shuffledHands) {
         extras.push('shuffled all hands');
       }
-      return `${name(a.playerId)} played ${a.card.color} ${a.card.value}${
+      return `${resolvePlayerName(game.players, a.playerId)} played ${a.card.color} ${a.card.value}${
         a.chosenColor ? ` -> chose ${a.chosenColor}` : ''
       }${extras.length ? ` (${extras.join(', ')})` : ''}`;
     }
     case 'draw':
-      return `${name(a.playerId)} drew ${a.count} card${a.count !== 1 ? 's' : ''}`;
+      return `${resolvePlayerName(game.players, a.playerId)} drew ${a.count} card${a.count !== 1 ? 's' : ''}`;
     case 'pass':
-      return `${name(a.playerId)} passed`;
+      return `${resolvePlayerName(game.players, a.playerId)} passed`;
     case 'declareUno':
-      return `${name(a.playerId)} said UNO!`;
+      return `${resolvePlayerName(game.players, a.playerId)} said UNO!`;
     case 'callOut':
-      return `${name(a.callerId)} caught ${name(a.targetId)} (+${a.penalty} cards)`;
+      return `${resolvePlayerName(game.players, a.callerId)} caught ${resolvePlayerName(game.players, a.targetId)} (+${a.penalty} cards)`;
     default:
       return 'Game started';
   }
@@ -201,7 +207,7 @@ export function useUnoGame() {
           const next = enginePlayCard(game, game.currentPlayerIndex, card.id);
           dispatch({ type: 'PLAY', game: next });
         } catch (e) {
-          console.error('playCard error:', e);
+          reportHookError('playCard error', e);
         }
       }
     },
@@ -217,7 +223,7 @@ export function useUnoGame() {
         const next = enginePlayCard(game, game.currentPlayerIndex, pendingWild.id, color);
         dispatch({ type: 'PLAY', game: next });
       } catch (e) {
-        console.error('confirmWildColor error:', e);
+        reportHookError('confirmWildColor error', e);
       }
     },
     [game, pendingWild],
@@ -237,7 +243,7 @@ export function useUnoGame() {
         const next = drawRequiredCards(game, idx);
         dispatch({ type: 'PLAY', game: next });
       } catch (e) {
-        console.error('drawRequiredCards error:', e);
+        reportHookError('drawRequiredCards error', e);
       }
     } else {
       // Voluntary draw. The board decides whether to offer play/pass or
@@ -246,7 +252,7 @@ export function useUnoGame() {
         const afterDraw = drawOneCard(game, idx);
         dispatch({ type: 'DRAW_ONE', game: afterDraw });
       } catch (e) {
-        console.error('drawOneCard error:', e);
+        reportHookError('drawOneCard error', e);
       }
     }
   }, [game]);
@@ -259,7 +265,7 @@ export function useUnoGame() {
       const next = passTurn(game, game.currentPlayerIndex);
       dispatch({ type: 'PLAY', game: next });
     } catch (e) {
-      console.error('passTurn error:', e);
+      reportHookError('passTurn error', e);
     }
   }, [game]);
 
@@ -343,7 +349,7 @@ export function useUnoGame() {
 
         dispatch({ type: 'PLAY', game: next });
       } catch (e) {
-        console.error('Bot error:', e);
+        reportHookError('bot action error', e);
         dispatch({ type: 'BOT_THINKING', value: false });
       }
     }, coordinatedDelay);
@@ -393,7 +399,7 @@ export function useUnoGame() {
         const next = passTurn(game, localPlayerIndex);
         dispatch({ type: 'PLAY', game: next });
       } catch (e) {
-        console.error('auto passTurn error:', e);
+        reportHookError('auto passTurn error', e);
       }
     }, AUTO_PASS_AFTER_DRAW_MS);
 

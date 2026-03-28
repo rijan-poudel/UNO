@@ -8,6 +8,7 @@ import type { GameRules } from '../types/rules';
 import type { Card, CardColor } from '../types/card';
 import { defaultRules } from '../types/rules';
 import { isActionCard, isWildCard, STANDARD_COLORS } from '../types/card';
+import { MIN_SUPPORTED_MAX_PLAYERS } from './gameLimits';
 import { createStandardUnoDeck, shuffleDeck, dealCards } from './deck';
 
 // ── Internal helpers ──────────────────────────────────────────────────────────
@@ -75,7 +76,7 @@ export function initializeGame(
     ...defaultRules,
     ...rules,
     // Guard against stale persisted configs forcing old 4-player caps.
-    maxPlayers: Math.max(6, rules?.maxPlayers ?? defaultRules.maxPlayers),
+    maxPlayers: Math.max(MIN_SUPPORTED_MAX_PLAYERS, rules?.maxPlayers ?? defaultRules.maxPlayers),
   };
 
   // ── 2. Validate player count ─────────────────────────────────────────────
