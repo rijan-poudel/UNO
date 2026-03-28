@@ -1,25 +1,14 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, type ReactNode } from 'react';
 import ProfileButton from './ProfileButton';
-import {
-  Bell,
-  Check,
-  ChevronDown,
-  ChevronUp,
-  Gamepad2,
-  LogOut,
-  Palette,
-  Settings,
-  User,
-  Volume2,
-  VolumeX,
-} from 'lucide-react';
+import { Bell, LogOut, Volume2, VolumeX } from 'lucide-react';
 import {
   isMusicEnabledForContext,
   setMusicEnabledForContext,
 } from '../lib/audioSettings';
 
+/** Notification object with metadata for display in the notification panel */
 export interface Notification {
   id: string;
   type: 'invite' | 'message' | 'status';
@@ -29,6 +18,7 @@ export interface Notification {
   read: boolean;
 }
 
+/** Props for the NotificationPanel component */
 interface NotificationPanelProps {
   themeLabel?: string;
   onSelectTheme?: (themeName: string) => void;
@@ -48,6 +38,10 @@ interface NotificationPanelProps {
   incomingInviteCount?: number;
 }
 
+/**
+ * NotificationPanel - Header component with notifications, music toggle, and settings
+ * Displays notifications, manages music context settings, and provides quick access to settings menus
+ */
 export default function NotificationPanel({
   themeLabel = 'Dark',
   onSelectTheme,
@@ -65,45 +59,29 @@ export default function NotificationPanel({
   notifications = [],
   onNotificationDismiss,
   incomingInviteCount = 0,
-}: NotificationPanelProps) {
-  const [showNotifications, setShowNotifications] = useState(false);
-  const [showThemeMenu, setShowThemeMenu] = useState(false);
-  const [showThemeOptions, setShowThemeOptions] = useState(false);
+}: NotificationPanelProps): ReactNode {
+  const [showNotifications, setShowNotifications] = useState<boolean>(false);
+  const [showThemeMenu, setShowThemeMenu] = useState<boolean>(false);
   const [lobbyMusicEnabled, setLobbyMusicEnabled] = useState<boolean>(() =>
     typeof window === 'undefined' ? true : isMusicEnabledForContext(musicContext),
   );
   const notificationsRef = useRef<HTMLDivElement>(null);
-  const themeRef = useRef<HTMLDivElement>(null);
 
   // Close notification panel when clicking outside
   useEffect(() => {
-    function handleClickOutside(e: Event) {
+    const handleClickOutside = (e: Event): void => {
       if (notificationsRef.current && !notificationsRef.current.contains(e.target as Node)) {
         setShowNotifications(false);
       }
-    }
+    };
     if (showNotifications) {
       document.addEventListener('mousedown', handleClickOutside);
       return () => document.removeEventListener('mousedown', handleClickOutside);
     }
   }, [showNotifications]);
 
-  // Close theme menu when clicking outside
   useEffect(() => {
-    function handleClickOutside(e: Event) {
-      if (themeRef.current && !themeRef.current.contains(e.target as Node)) {
-        setShowThemeMenu(false);
-        setShowThemeOptions(false);
-      }
-    }
-    if (showThemeMenu) {
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => document.removeEventListener('mousedown', handleClickOutside);
-    }
-  }, [showThemeMenu]);
-
-  useEffect(() => {
-    const sync = () => {
+    const sync = (): void => {
       setLobbyMusicEnabled(isMusicEnabledForContext(musicContext));
     };
     window.addEventListener('uno:audio-settings', sync);
@@ -114,13 +92,15 @@ export default function NotificationPanel({
   const totalNotifications = incomingInviteCount + unreadCount;
   const effectiveMusicEnabled = typeof musicEnabled === 'boolean' ? musicEnabled : lobbyMusicEnabled;
 
-  const handleMusicToggle = () => {
+  const handleMusicToggle = (): void => {
     if (onMusicToggle) {
       onMusicToggle();
       return;
     }
     const next = !effectiveMusicEnabled;
-    setMusicEnabledForContext(musicContext, next);
+    // Keep lobby and game music states aligned so playback doesn't stop on view transitions.
+    setMusicEnabledForContext('lobby', next);
+    setMusicEnabledForContext('game', next);
     setLobbyMusicEnabled(next);
   };
 
@@ -419,9 +399,7 @@ export default function NotificationPanel({
                   <div
                     key={notif.id}
                     className="np-notification-item"
-                    onClick={() => {
-                      onNotificationDismiss?.(notif.id);
-                    }}
+                    onClick={() => onNotificationDismiss?.(notif.id)}
                   >
                     <div style={{ fontWeight: notif.read ? 400 : 700 }}>{notif.title}</div>
                     <div
@@ -473,133 +451,6 @@ export default function NotificationPanel({
           <LogOut />
         </button>
       ) : null}
-
-      {/* Settings Icon */}
-      <div ref={themeRef} style={{ position: 'relative' }}>
-        <button
-          className="np-icon-btn"
-          onClick={() => {
-            setShowThemeMenu(!showThemeMenu);
-            if (showThemeMenu) {
-              setShowThemeOptions(false);
-            }
-          }}
-          title="Settings"
-        >
-          <Settings />
-        </button>
-
-        {showThemeMenu && (
-          <div className="np-popup" style={{ minWidth: 300 }}>
-            <div className="np-popup-header" style={{ color: 'var(--ui-text)' }}>Settings</div>
-
-            <div
-              className="np-popup-item"
-              onClick={() => {
-                onOpenProfileSettings?.();
-                setShowThemeOptions(false);
-                setShowThemeMenu(false);
-              }}
-            >
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, color: 'var(--ui-text)' }}>
-                <User size={14} strokeWidth={2.5} />
-                Profile
-              </span>
-            </div>
-
-            <div
-              className="np-popup-item"
-              onClick={() => {
-                setShowThemeOptions(!showThemeOptions);
-              }}
-            >
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, color: 'var(--ui-text)' }}>
-                <span className="np-retro-glyph">
-                  <Palette />
-                </span>
-                Theme
-              </span>
-              <span style={{ color: 'var(--ui-muted)', display: 'inline-flex' }}>
-                {showThemeOptions ? (
-                  <ChevronUp size={14} strokeWidth={2.4} />
-                ) : (
-                  <ChevronDown size={14} strokeWidth={2.4} />
-                )}
-              </span>
-            </div>
-
-            {showThemeOptions && (
-              <div style={{ padding: '14px 18px', borderBottom: '1px solid var(--ui-line)' }}>
-                <div className="np-theme-grid">
-                  {[
-                    { name: 'Light', id: 'paper', colors: ['#fafafa', '#ffffff'] },
-                    { name: 'Dark', id: 'midnight', colors: ['#121212', '#1e1e1e'] },
-                    { name: 'Teal', id: 'forest', colors: ['#e0f2f1', '#ffffff'] },
-                    { name: 'Purple', id: 'sunset', colors: ['#1a0033', '#2d0057'] },
-                  ].map((theme) => (
-                    <div
-                      key={theme.id}
-                      className={`np-theme-card ${theme.name === themeLabel ? 'active' : ''}`}
-                      onClick={() => {
-                        if (onSelectTheme) {
-                          onSelectTheme(theme.id);
-                        } else {
-                          onCycleTheme?.();
-                        }
-                        setShowThemeOptions(false);
-                        setShowThemeMenu(false);
-                      }}
-                    >
-                      <div className="np-theme-card-preview">
-                        {theme.colors.map((color, idx) => (
-                          <div
-                            key={idx}
-                            className="np-theme-card-color"
-                            style={{ background: color }}
-                          />
-                        ))}
-                      </div>
-                      <p className="np-theme-card-name">{theme.name}</p>
-                      {theme.name === themeLabel && (
-                        <div className="np-theme-card-checkmark"><Check size={12} strokeWidth={3.2} /></div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Controls Option */}
-            <div
-              className="np-popup-item"
-              onClick={() => {
-                onOpenControlsSettings?.();
-                setShowThemeOptions(false);
-                setShowThemeMenu(false);
-              }}
-            >
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, color: 'var(--ui-text)' }}>
-                <Gamepad2 size={14} strokeWidth={2.5} />
-                Controls
-              </span>
-            </div>
-
-            <div
-              className="np-popup-item"
-              onClick={() => {
-                onOpenAudioSettings?.();
-                setShowThemeOptions(false);
-                setShowThemeMenu(false);
-              }}
-            >
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, color: 'var(--ui-text)' }}>
-                <Volume2 size={14} strokeWidth={2.5} />
-                Audio settings
-              </span>
-            </div>
-          </div>
-        )}
-      </div>
     </div>
   );
 }

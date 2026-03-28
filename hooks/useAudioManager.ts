@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import {
   getAudioSettings,
   isMusicEnabledForContext,
@@ -26,32 +26,45 @@ function getContextMusicVolume(): number {
 
 function applyMusicVolume(): void {
   if (!globalMusic) return;
-  globalMusic.volume = getContextMusicVolume();
+  const newVolume = getContextMusicVolume();
+  globalMusic.volume = newVolume;
+}
+
+function ensureMusicPlaying(): void {
+  const music = ensureMusicElement();
+  applyMusicVolume();
+  // Resume if paused, but don't interrupt if already playing
+  if (music.paused) {
+    const playPromise = music.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(() => {});
+    }
+  }
 }
 
 export function useAudioManager() {
-  const setMusicContext = (context: MusicContext) => {
+  const setMusicContext = useCallback((context: MusicContext) => {
     activeMusicContext = context;
     applyMusicVolume();
-  };
+    // Ensure music continues playing in the new context
+    ensureMusicPlaying();
+  }, []);
 
   // Play background music (looped)
-  const playMusic = (context?: MusicContext) => {
+  const playMusic = useCallback((context?: MusicContext) => {
     if (context) {
       activeMusicContext = context;
     }
-    const music = ensureMusicElement();
-    applyMusicVolume();
-    music.play().catch(() => {});
-  };
+    ensureMusicPlaying();
+  }, []);
 
   // Pause background music
-  const pauseMusic = () => {
+  const pauseMusic = useCallback(() => {
     globalMusic?.pause();
-  };
+  }, []);
 
   // Play card mixing sound
-  const playCardMixing = () => {
+  const playCardMixing = useCallback(() => {
     if (!globalCardMixing) {
       globalCardMixing = new Audio("/audios/card_mixing.mp3");
     }
@@ -59,10 +72,10 @@ export function useAudioManager() {
     globalCardMixing.volume = settings.sfxVolume ?? 0.8;
     globalCardMixing.currentTime = 0;
     globalCardMixing.play().catch(() => {});
-  };
+  }, []);
 
   // Play card throwing sound (lower volume)
-  const playCardThrowing = () => {
+  const playCardThrowing = useCallback(() => {
     if (!globalCardThrowing) {
       globalCardThrowing = new Audio("/audios/card_throwing.mp3");
     }
@@ -70,7 +83,7 @@ export function useAudioManager() {
     globalCardThrowing.volume = (settings.sfxVolume ?? 0.8) * 0.5;
     globalCardThrowing.currentTime = 0;
     globalCardThrowing.play().catch(() => {});
-  };
+  }, []);
 
   // React to volume/context changes
   useEffect(() => {

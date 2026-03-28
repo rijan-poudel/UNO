@@ -10,7 +10,8 @@ import ProfileChip from "./ProfileChip";
 import { announceBoardFromTransition, announceBoardWinner } from "../lib/voiceAnnouncer";
 import { playShuffleMotionChime, playTableChime, primeTableAudioFromUserGesture } from "../lib/tableChimes";
 import { useAudioManager } from "../hooks/useAudioManager";
-import { AudioLines, Gamepad2, LogOut, Settings, User } from "lucide-react";
+import { isMusicEnabledForContext, setMusicEnabledForContext } from "../lib/audioSettings";
+import { AudioLines, Gamepad2, LogOut, Settings, User, Volume2, VolumeX } from "lucide-react";
 
 export type GameApi = ReturnType<typeof useUnoGame>;
 
@@ -73,6 +74,7 @@ function ActionTray({ children }: { children: ReactNode }) {
       display: "grid",
       gap: 10,
       animation: "none",
+      transition: "opacity 0.2s ease, transform 0.2s cubic-bezier(0.23, 1, 0.32, 1)",
     }}>
       {children}
     </div>
@@ -120,7 +122,7 @@ function AnimatedCards({ animations }: { animations: TravelAnimation[] }) {
             top: animation.started ? animation.to.y : animation.from.y,
             transform: `translate(-50%, -50%) rotate(${animation.started ? animation.rotationTo : animation.rotationFrom}deg) scale(${animation.scale})`,
             transformOrigin: "center center",
-            transition: `left ${animation.duration}ms cubic-bezier(0.22,1,0.36,1), top ${animation.duration}ms cubic-bezier(0.22,1,0.36,1), transform ${animation.duration}ms cubic-bezier(0.22,1,0.36,1), opacity ${animation.duration}ms ease`,
+            transition: `left ${animation.duration}ms cubic-bezier(0.23, 1, 0.32, 1), top ${animation.duration}ms cubic-bezier(0.23, 1, 0.32, 1), transform ${animation.duration}ms cubic-bezier(0.23, 1, 0.32, 1), opacity ${animation.duration}ms ease`,
             opacity: animation.started ? 0.92 : 1,
           }}
         >
@@ -170,7 +172,7 @@ function ActionFlash({ text, tone }: { text: string; tone: ActionFlashTone }) {
         textTransform: "uppercase",
         color: colorByTone[tone],
         textShadow: "0 10px 26px rgba(0,0,0,0.30), 0 0 24px color-mix(in srgb, var(--ui-surface) 45%, var(--ui-bg) 55%)",
-        animation: "actionFlashPop 1s cubic-bezier(0.22,1,0.36,1) forwards",
+        animation: "actionFlashPop 1s cubic-bezier(0.23, 1, 0.32, 1) forwards",
       }}>{text}</div>
     </div>
   );
@@ -237,21 +239,30 @@ function OpponentStrip({
   const fanHeight = 122 * effectiveFanScale + 8;
   const fanMid = (fans - 1) / 2;
   const turnBoost = isCurrentTurn ? 1.08 : 1;
+  const callOutHintHeight = compact ? 10 : 12;
 
   return (
     <button
       type="button"
       onClick={canCallOut ? onCallOut : undefined}
       style={{
-      background: "transparent",
-      border: canCallOut ? "1px solid var(--ui-accent-red)" : "1px solid transparent",
-      padding: canCallOut ? "0 6px 4px" : "0 6px 4px",
+      background: canCallOut ? "color-mix(in srgb, var(--ui-accent-red) 8%, transparent)" : "transparent",
+      border: "none",
+      padding: "0 6px 4px",
       cursor: canCallOut ? "pointer" : "default",
       textAlign: "center",
-      display: "flex", flexDirection: "column", alignItems: "center", gap: 4,
+      display: "grid",
+      gridTemplateRows: `${Math.round(fanHeight)}px auto ${callOutHintHeight}px`,
+      alignItems: "start",
+      justifyItems: "center",
+      rowGap: 4,
       opacity: canCallOut ? 1 : isCurrentTurn ? 1 : 0.38,
-      transition: "opacity 0.3s ease",
+      transition: "opacity 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease",
       position: "relative",
+      borderRadius: "8px",
+      boxShadow: canCallOut 
+        ? "0 0 20px rgba(192, 57, 43, 0.4), 0 0 40px rgba(192, 57, 43, 0.2), inset 0 0 16px rgba(192, 57, 43, 0.12)"
+        : "none",
       animation: canCallOut ? "callOutAttention 0.7s ease-in-out infinite alternate" : "none",
     }}>
 
@@ -285,7 +296,7 @@ function OpponentStrip({
       </div>
 
       {/* Name row */}
-      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 6, minHeight: compact ? 18 : 20 }}>
         {isCurrentTurn && (
           <span style={{
             width: 5, height: 5, borderRadius: "50%",
@@ -311,16 +322,16 @@ function OpponentStrip({
         )}
       </div>
 
-      {canCallOut && (
-        <span style={{
-          fontFamily: "'Courier Prime', monospace",
-          fontSize: compact ? 7 : 8,
-          fontWeight: 700,
-          letterSpacing: "0.14em",
-          textTransform: "uppercase",
-          color: "var(--ui-accent-red)",
-        }}>Click to call UNO</span>
-      )}
+      <span style={{
+        fontFamily: "'Courier Prime', monospace",
+        fontSize: compact ? 7 : 8,
+        fontWeight: 700,
+        letterSpacing: "0.14em",
+        textTransform: "uppercase",
+        color: "var(--ui-accent-red)",
+        minHeight: callOutHintHeight,
+        visibility: canCallOut ? "visible" : "hidden",
+      }}>Click to call UNO</span>
     </button>
   );
 }
@@ -441,6 +452,10 @@ export default function GameBoard({
   const [showUnoFlash, setShowUnoFlash] = useState(false);
   const [showUnoDeclaredBadge, setShowUnoDeclaredBadge] = useState(false);
   const [actionFlash, setActionFlash] = useState<ActionFlashState | null>(null);
+  const [musicEnabled, setMusicEnabled] = useState<boolean>(() => {
+    if (typeof window === "undefined") return true;
+    return isMusicEnabledForContext("game");
+  });
   const [isNarrowMobile, setIsNarrowMobile] = useState(false);
   const [isCompactBoard, setIsCompactBoard] = useState(false);
   const [boardScale, setBoardScale] = useState(1);
@@ -1169,15 +1184,15 @@ export default function GameBoard({
 
   const viewportH = typeof window !== "undefined" ? window.innerHeight : 700;
   const viewportW = typeof window !== "undefined" ? window.innerWidth : 1200;
-  const cardBudgetPx = viewportH - 120 - 220 - 36 - 20;
-  const scaledByHeight = Math.max(0.65, Math.min(1.3, (cardBudgetPx - 40) / 122));
+  const cardBudgetPx = viewportH - 100 - 180 - 36 - 20;
+  const scaledByHeight = Math.max(0.75, Math.min(1.5, (cardBudgetPx - 40) / 122));
   const reservedRightPx = 0;
   const availableHandWidth = Math.max(220, viewportW - (isCompactBoard ? 34 : 52) - reservedRightPx);
   const requiredHandWidthAtScale1 = 82 + Math.max(0, handCount - 1) * 26;
   const scaledByWidth = availableHandWidth / Math.max(1, requiredHandWidthAtScale1);
   const gameCardScale = boardScale < 1
-    ? Math.max(0.42, Math.min(scaledByHeight, scaledByWidth, 1.0))   // compact viewport: cap at 1.0
-    : Math.max(0.42, Math.min(scaledByHeight, scaledByWidth, 1.3));  // full viewport: allow up to 1.3
+    ? Math.max(0.50, Math.min(scaledByHeight, scaledByWidth, 1.2))   // compact viewport: increased cap to 1.2
+    : Math.max(0.50, Math.min(scaledByHeight, scaledByWidth, 1.5));  // full viewport: increased cap to 1.5
   const localHandCardScale = gameCardScale;
   const localTurnBoost = isLocalTurn && !game.winnerId ? 1.08 : 1;
   const pileCardScale = gameCardScale;
@@ -1236,16 +1251,37 @@ export default function GameBoard({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [showGameSettingsMenu]);
 
+  useEffect(() => {
+    const syncMusicState = () => {
+      setMusicEnabled(isMusicEnabledForContext("game"));
+    };
+    window.addEventListener("uno:audio-settings", syncMusicState);
+    return () => window.removeEventListener("uno:audio-settings", syncMusicState);
+  }, []);
+
+  const handleToggleMusic = useCallback(() => {
+    const next = !musicEnabled;
+    // Keep both contexts aligned so music continues across home/game transitions.
+    setMusicEnabledForContext("lobby", next);
+    setMusicEnabledForContext("game", next);
+    setMusicEnabled(next);
+  }, [musicEnabled]);
+
   return (
     <>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Courier+Prime:wght@400;700&display=swap');
         *, *::before, *::after { box-sizing: border-box; }
 
+        /* Emil's custom easing curves for responsive UI */
+        --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+        --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+        --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+
         @keyframes blink   { 0%,100%{opacity:1} 50%{opacity:0.15} }
         @keyframes dot     { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.3;transform:scale(0.6)} }
         @keyframes fadeUp  { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
-        @keyframes modalIn { from{opacity:0;transform:translateY(12px) scale(0.98)} to{opacity:1;transform:none} }
+        @keyframes modalIn { from{opacity:0;transform:translateY(12px) scale(0.95);} to{opacity:1;transform:translateY(0) scale(1);} }
         @keyframes timerPulse {
           0%,100% { filter: drop-shadow(0 0 0 rgba(192,57,43,0.00)); }
           50% { filter: drop-shadow(0 0 12px rgba(192,57,43,0.62)); }
@@ -1261,19 +1297,19 @@ export default function GameBoard({
           50%      { filter: drop-shadow(0 0 14px rgba(192,57,43,0.75)); }
         }
         @keyframes unoFlashPop {
-          0%  { opacity:0; transform:translate(-50%,-50%) scale(0.65); }
-          20% { opacity:1; transform:translate(-50%,-50%) scale(1.06); }
+          0%  { opacity:0; transform:translate(-50%,-50%) scale(0.8); }
+          20% { opacity:1; transform:translate(-50%,-50%) scale(1.08); }
           75% { opacity:1; transform:translate(-50%,-50%) scale(1);    }
-          100%{ opacity:0; transform:translate(-50%,-50%) scale(1.1);  }
+          100%{ opacity:0; transform:translate(-50%,-50%) scale(1.12);  }
         }
         @keyframes actionFlashPop {
-          0%  { opacity:0; transform:scale(0.68); }
-          18% { opacity:1; transform:scale(1.04); }
+          0%  { opacity:0; transform:scale(0.75); }
+          18% { opacity:1; transform:scale(1.06); }
           74% { opacity:1; transform:scale(1); }
-          100%{ opacity:0; transform:scale(1.08); }
+          100%{ opacity:0; transform:scale(1.1); }
         }
         @keyframes discardLand {
-          0%  { transform:translateY(-16px) rotate(-10deg) scale(0.94); opacity:0.4; }
+          0%  { transform:translateY(-16px) rotate(-10deg) scale(0.92); opacity:0.4; }
           65% { transform:translateY(2px) rotate(-1deg) scale(1.02); opacity:1; }
           100%{ transform:translateY(0) rotate(-2deg) scale(1); opacity:1; }
         }
@@ -1284,10 +1320,10 @@ export default function GameBoard({
         }
         /* Call out flash centre screen */
         @keyframes callOutPop {
-          0%  { opacity:0; transform:scale(0.7); }
-          18% { opacity:1; transform:scale(1.05); }
+          0%  { opacity:0; transform:scale(0.75); }
+          18% { opacity:1; transform:scale(1.06); }
           75% { opacity:1; transform:scale(1); }
-          100%{ opacity:0; transform:scale(1.08); }
+          100%{ opacity:0; transform:scale(1.1); }
         }
         @keyframes confettiFall {
           0% { transform: translateY(-16vh) rotate(0deg); opacity: 0; }
@@ -1295,13 +1331,40 @@ export default function GameBoard({
           100% { transform: translateY(118vh) rotate(760deg); opacity: 0.9; }
         }
 
-        .hand-card { transition: transform 0.18s cubic-bezier(0.22,1,0.36,1), filter 0.18s ease !important; }
+        .hand-card { transition: transform 0.18s var(--ease-out-soft), filter 0.18s ease !important; }
 
-        .draw-pile-btn { transition: filter 0.2s ease, opacity 0.2s ease, transform 0.15s ease; }
-        .draw-pile-btn:hover:not(:disabled) { transform: translateY(-4px); }
+        .draw-pile-btn { 
+          transition: filter 0.2s ease, opacity 0.2s ease, transform 0.15s var(--ease-out);
+        }
+        .draw-pile-btn:active:not(:disabled) { 
+          transform: scale(0.97);
+        }
+        .draw-pile-btn:hover:not(:disabled) { 
+          transform: translateY(-4px);
+        }
 
-        .uno-btn { transition: opacity 0.12s; }
-        .uno-btn:hover { opacity: 0.82 !important; }
+        .uno-btn { 
+          transition: opacity 0.12s, transform 0.12s var(--ease-out) !important;
+        }
+        .uno-btn:hover { 
+          opacity: 0.82 !important;
+          transform: translateY(-2px);
+        }
+        .uno-btn:active {
+          transform: scale(0.97);
+        }
+
+        button {
+          transition: transform 0.1s var(--ease-out), opacity 0.1s ease, color 0.12s ease;
+        }
+        button:active:not(:disabled) {
+          transform: scale(0.97);
+        }
+
+        /* Responsive opponent strip on hover */
+        [role="button"]:has(> div > [class*="fan"]):hover {
+          filter: brightness(1.05);
+        }
       `}</style>
 
       <AnimatedCards animations={animations} />
@@ -1313,7 +1376,8 @@ export default function GameBoard({
         height: "100dvh", overflow: "hidden",
         color: "var(--ui-text)", background: "var(--ui-bg)",
         fontFamily: "'Courier Prime', monospace",
-        display: "flex", flexDirection: "column",
+        display: "grid",
+        gridTemplateRows: "auto minmax(0, 1fr) auto",
       }}
       >
         <div
@@ -1349,18 +1413,39 @@ export default function GameBoard({
 
           <button
             type="button"
+            onClick={handleToggleMusic}
+            title={musicEnabled ? "Mute music" : "Unmute music"}
+            style={{
+              width: isNarrowMobile ? 40 : 44,
+              height: isNarrowMobile ? 40 : 44,
+              border: "none",
+              background: "transparent",
+              color: musicEnabled ? "var(--ui-text)" : "var(--ui-accent-red)",
+              display: "grid",
+              placeItems: "center",
+              cursor: "pointer",
+              boxShadow: "none",
+              transition: "transform 0.12s cubic-bezier(0.23, 1, 0.32, 1), background-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease",
+            }}
+          >
+            {musicEnabled ? <Volume2 size={18} strokeWidth={2.4} /> : <VolumeX size={18} strokeWidth={2.4} />}
+          </button>
+
+          <button
+            type="button"
             onClick={() => setShowGameSettingsMenu((prev) => !prev)}
             title="Settings"
             style={{
               width: isNarrowMobile ? 40 : 44,
               height: isNarrowMobile ? 40 : 44,
               border: "none",
-              background: "var(--ui-surface)",
+              background: "transparent",
               color: "var(--ui-text)",
               display: "grid",
               placeItems: "center",
               cursor: "pointer",
-              boxShadow: "0 6px 14px rgba(0,0,0,0.18)",
+              boxShadow: "none",
+              transition: "transform 0.12s cubic-bezier(0.23, 1, 0.32, 1), background-color 0.15s ease, box-shadow 0.15s ease",
             }}
           >
             <Settings size={18} strokeWidth={2.4} />
@@ -1415,6 +1500,8 @@ export default function GameBoard({
                   display: "inline-flex",
                   alignItems: "center",
                   gap: 8,
+                  transition: "color 0.12s ease, background-color 0.12s ease",
+                  width: "100%",
                 }}
               >
                 <User size={14} strokeWidth={2.5} />
@@ -1441,6 +1528,8 @@ export default function GameBoard({
                   display: "inline-flex",
                   alignItems: "center",
                   gap: 8,
+                  transition: "color 0.12s ease, background-color 0.12s ease",
+                  width: "100%",
                 }}
               >
                 <Gamepad2 size={14} strokeWidth={2.5} />
@@ -1467,6 +1556,8 @@ export default function GameBoard({
                   display: "inline-flex",
                   alignItems: "center",
                   gap: 8,
+                  transition: "color 0.12s ease, background-color 0.12s ease",
+                  width: "100%",
                 }}
               >
                 <AudioLines size={14} strokeWidth={2.5} />
@@ -1490,6 +1581,8 @@ export default function GameBoard({
                   letterSpacing: "0.08em",
                   textTransform: "uppercase",
                   cursor: "pointer",
+                  transition: "color 0.12s ease, background-color 0.12s ease",
+                  width: "100%",
                 }}
               >
                 Theme: {currentThemeLabel}
@@ -1514,6 +1607,8 @@ export default function GameBoard({
                   display: "inline-flex",
                   alignItems: "center",
                   gap: 8,
+                  transition: "color 0.12s ease, background-color 0.12s ease, transform 0.1s cubic-bezier(0.23, 1, 0.32, 1)",
+                  width: "100%",
                 }}
               >
                 <LogOut size={14} strokeWidth={2.5} />
@@ -1526,7 +1621,7 @@ export default function GameBoard({
         {/* ── Opponents — paddingTop clears floating header ── */}
         <section style={{
           paddingTop: isCompactBoard ? 12 : 18,
-          paddingBottom: isCompactBoard ? 4 : 8,
+          paddingBottom: isCompactBoard ? 16 : 24,
           paddingInline: isNarrowMobile ? 6 : 12,
           display: "flex", flexWrap: "wrap",
           gap: isCompactBoard ? (isNarrowMobile ? "3px 8px" : "4px 14px") : "8px 20px",
@@ -1556,8 +1651,8 @@ export default function GameBoard({
           flex: 1, minHeight: 0,
           display: "flex", flexDirection: "column",
           alignItems: "center", justifyContent: "center",
-          gap: isCompactBoard ? 6 : 12,
-          padding: isCompactBoard ? (isNarrowMobile ? "0 4px" : "0 8px") : "0 16px",
+          gap: isCompactBoard ? 12 : 20,
+          padding: isCompactBoard ? (isNarrowMobile ? "8px 4px" : "10px 8px") : "12px 16px",
           overflow: "hidden",
           transform: isCompactBoard ? (isNarrowMobile ? "translateY(-1px)" : "translateY(-4px)") : "translateY(-10px)",
           position: "relative",
@@ -1604,6 +1699,7 @@ export default function GameBoard({
                   animation: mustDrawNow || mustAutoDrawRequired ? "mustDrawPulse 1.0s ease-in-out infinite" : "none",
                   filter: !mustDrawNow && !mustAutoDrawRequired && game.pendingDraw > 0 && humanTurn
                     ? "drop-shadow(0 0 7px rgba(192,57,43,0.55))" : "none",
+                  transition: "transform 0.15s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.2s ease, filter 0.2s ease",
                 }}
               >
                 <GameCard card={{ id: "_draw", color: "wild", value: "wild" }} faceDown scale={pileCardScale} />
@@ -1681,6 +1777,8 @@ export default function GameBoard({
           position: "relative",
           overflow: "visible",
           zIndex: 12,
+          paddingTop: isCompactBoard ? 12 : 16,
+          paddingBottom: isCompactBoard ? 12 : 16,
         }}>
 
           {unoButtonVisible && (
@@ -1706,6 +1804,7 @@ export default function GameBoard({
                 animation: "none",
                 lineHeight: 1,
                 boxShadow: "0 6px 14px rgba(26,15,0,0.28)",
+                transition: "transform 0.12s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.12s ease",
               }}
               title="Say UNO"
             >UNO</button>
@@ -1765,6 +1864,7 @@ export default function GameBoard({
                     border: "none",
                     padding: "12px 14px",
                     cursor: "pointer",
+                    transition: "transform 0.1s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.1s ease",
                   }}
                 >Add {preferredStackLabel}</button>
                 <button
@@ -1784,6 +1884,7 @@ export default function GameBoard({
                     color: "var(--ui-muted)",
                     padding: "12px 14px",
                     cursor: "pointer",
+                    transition: "color 0.12s ease, border-color 0.12s ease, transform 0.1s cubic-bezier(0.23, 1, 0.32, 1)",
                   }}
                 >Take +{game.pendingDraw}</button>
               </div>
@@ -1842,6 +1943,7 @@ export default function GameBoard({
                       border: "none",
                       padding: "12px 14px",
                       cursor: "pointer",
+                      transition: "transform 0.1s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.1s ease",
                     }}
                   >Play card</button>
                 )}
@@ -1862,6 +1964,7 @@ export default function GameBoard({
                     color: "var(--ui-muted)",
                     padding: "12px 14px",
                     cursor: "pointer",
+                    transition: "color 0.12s ease, border-color 0.12s ease, transform 0.1s cubic-bezier(0.23, 1, 0.32, 1)",
                   }}
                 >{drawnPlayableCard ? "Pass" : "Pass now"}</button>
               </div>
@@ -1930,14 +2033,14 @@ export default function GameBoard({
                       position: "relative",
                       transform: baseTransform,
                       transformOrigin: "bottom center",
-                      transition: "transform 0.18s cubic-bezier(0.22,1,0.36,1)",
+                      transition: "transform 0.18s cubic-bezier(0.23, 1, 0.32, 1), filter 0.18s ease",
                       cursor: playable ? "pointer" : "default",
                       outline: isSelected ? "2px solid var(--ui-text)" : "none",
                       outlineOffset: 3,
                       filter: isFreshDraw
                         ? "drop-shadow(0 0 16px rgba(192,57,43,0.45))"
                         : playable ? "drop-shadow(0 2px 4px rgba(26,15,0,0.14))" : "none",
-                      animation: isFreshDraw ? "drewCardGlow 0.6s cubic-bezier(0.22,1,0.36,1)" : "none",
+                      animation: isFreshDraw ? "drewCardGlow 0.6s cubic-bezier(0.23, 1, 0.32, 1)" : "none",
                     } as CSSProperties & Record<string, string | number>}
                     onClick={playable ? (event) => handleSelectCard(card, event.currentTarget) : undefined}
                     onMouseEnter={() => {
@@ -2017,13 +2120,15 @@ export default function GameBoard({
                 border: "1px solid var(--ui-line)", background: "transparent",
                 color: "var(--ui-muted)", padding: "10px 14px", cursor: "pointer",
                 fontSize: 11, letterSpacing: "0.08em", textTransform: "uppercase",
-                fontFamily: "'Courier Prime', monospace", transition: "color 0.12s",
+                fontFamily: "'Courier Prime', monospace", 
+                transition: "color 0.12s ease, transform 0.1s cubic-bezier(0.23, 1, 0.32, 1)",
               }}>Stay</button>
               <button onClick={confirmExitGame} style={{
                 border: "none", background: "var(--ui-accent-red)", color: "#fff",
                 padding: "10px 16px", cursor: "pointer",
                 fontSize: 18, letterSpacing: "0.1em", textTransform: "uppercase",
                 fontFamily: "'Bebas Neue', cursive",
+                transition: "transform 0.1s cubic-bezier(0.23, 1, 0.32, 1)",
               }}>Exit</button>
             </div>
           </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useState, useRef, type ReactNode } from "react";
 import type { GameRules } from "../types/rules";
 import { useUnoGame } from "../hooks/useUnoGame";
 import { useUnoOnlineGame } from "../hooks/useUnoOnlineGame";
@@ -239,6 +239,19 @@ export default function Home() {
   const online = useUnoOnlineGame();
   const api = mode === "computer" ? local : online;
 
+  // Track whether game is active with a ref to avoid effect re-triggers during gameplay
+  const prevGameActiveRef = useRef<boolean | null>(null);
+  const [gameContext, setGameContext] = useState<"lobby" | "game">("lobby");
+
+  useEffect(() => {
+    const isGameActive = api.game !== null;
+    // Only update context if the active state actually changed
+    if (prevGameActiveRef.current !== isGameActive) {
+      prevGameActiveRef.current = isGameActive;
+      setGameContext(isGameActive ? "game" : "lobby");
+    }
+  }, [api.game]);
+
   useEffect(() => {
     if (mounted) {
       try {
@@ -259,20 +272,18 @@ export default function Home() {
   }, [theme, mounted]);
 
   useEffect(() => {
-    const activeContext = api.game ? "game" : "lobby";
-    setMusicContext(activeContext);
-    playMusic(activeContext);
-  }, [api.game, playMusic, setMusicContext]);
+    setMusicContext(gameContext);
+    playMusic(gameContext);
+  }, [gameContext, setMusicContext, playMusic]);
 
   useEffect(() => {
     const startMusic = () => {
-      const activeContext = api.game ? "game" : "lobby";
-      setMusicContext(activeContext);
-      playMusic(activeContext);
+      setMusicContext(gameContext);
+      playMusic(gameContext);
     };
     window.addEventListener("pointerdown", startMusic, { once: true });
     return () => window.removeEventListener("pointerdown", startMusic);
-  }, [api.game, playMusic, setMusicContext]);
+  }, [gameContext, setMusicContext, playMusic]);
 
   const cycleTheme = () => {
     const order: ThemeName[] = ["paper", "midnight", "forest", "sunset"];
