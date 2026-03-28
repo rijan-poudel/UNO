@@ -2,8 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import type {
-  FriendInvite,
-  FriendPresenceState,
+    FriendInvite,
+    FriendPresenceState,
 } from "../../types/multiplayer";
 import NotificationPanel from "../NotificationPanel";
 import FriendInviteInput from "../FriendInviteInput";
@@ -13,215 +13,215 @@ const ONLINE_FRIENDS_KEY = "uno.online.friends";
 const MAX_FRIENDS = 4;
 
 const AVATAR_PALETTE = [
-  { fg: "#102A43", bg: "#F0B429" },
-  { fg: "#2D132C", bg: "#F49D6E" },
-  { fg: "#12355B", bg: "#66C7F4" },
-  { fg: "#1B4332", bg: "#95D5B2" },
-  { fg: "#3D0C02", bg: "#FF9F1C" },
-  { fg: "#2B2D42", bg: "#CDB4DB" },
-  { fg: "#0B3954", bg: "#BFD7EA" },
-  { fg: "#3A0CA3", bg: "#FEC5BB" },
+    { fg: "#102A43", bg: "#F0B429" },
+    { fg: "#2D132C", bg: "#F49D6E" },
+    { fg: "#12355B", bg: "#66C7F4" },
+    { fg: "#1B4332", bg: "#95D5B2" },
+    { fg: "#3D0C02", bg: "#FF9F1C" },
+    { fg: "#2B2D42", bg: "#CDB4DB" },
+    { fg: "#0B3954", bg: "#BFD7EA" },
+    { fg: "#3A0CA3", bg: "#FEC5BB" },
 ];
 
 interface FriendEntry {
-  friendCode: string;
-  name: string;
-  lastSeenAt: number;
+    friendCode: string;
+    name: string;
+    lastSeenAt: number;
 }
 
 interface HomeScreenProps {
-  themeLabel: string;
-  onSelectTheme?: (themeName: string) => void;
-  onOpenControlsSettings: () => void;
-  onOpenAudioSettings: () => void;
-  onOpenProfileSettings?: () => void;
-  onComputer: () => void;
-  onFriends: () => void;
-  onFriendQuickInvite: (friendCode: string) => Promise<boolean>;
-  onCheckFriendOnline: (
-    friendCodes: string[],
-  ) => Promise<Record<string, FriendPresenceState>>;
-  incomingInvites: FriendInvite[];
+    themeLabel: string;
+    onSelectTheme?: (themeName: string) => void;
+    onOpenControlsSettings: () => void;
+    onOpenAudioSettings: () => void;
+    onOpenProfileSettings?: () => void;
+    onComputer: () => void;
+    onFriends: () => void;
+    onFriendQuickInvite: (friendCode: string) => Promise<boolean>;
+    onCheckFriendOnline: (
+        friendCodes: string[],
+    ) => Promise<Record<string, FriendPresenceState>>;
+    incomingInvites: FriendInvite[];
 }
 
 function cleanFriendName(
-  rawName: string | undefined,
-  fallbackCode: string,
+    rawName: string | undefined,
+    fallbackCode: string,
 ): string {
-  const trimmed = (rawName ?? "").trim().slice(0, 20);
-  const normalized = trimmed.toLowerCase();
-  const blocked = new Set(["friend", "friends", "player", "unknown", "guest"]);
-  if (!trimmed || blocked.has(normalized)) return fallbackCode;
-  return trimmed;
+    const trimmed = (rawName ?? "").trim().slice(0, 20);
+    const normalized = trimmed.toLowerCase();
+    const blocked = new Set(["friend", "friends", "player", "unknown", "guest"]);
+    if (!trimmed || blocked.has(normalized)) return fallbackCode;
+    return trimmed;
 }
 
 function normalizeCode(value: string): string {
-  return value
-    .trim()
-    .toUpperCase()
-    .replace(/[^A-Z0-9]/g, "")
-    .slice(0, 8);
+    return value
+        .trim()
+        .toUpperCase()
+        .replace(/[^A-Z0-9]/g, "")
+        .slice(0, 8);
 }
 
 function firstAvatarLetter(friend: FriendEntry): string {
-  const source = friend.name.trim() || friend.friendCode;
-  const first = source.charAt(0).toUpperCase();
-  return /[A-Z0-9]/.test(first) ? first : "#";
+    const source = friend.name.trim() || friend.friendCode;
+    const first = source.charAt(0).toUpperCase();
+    return /[A-Z0-9]/.test(first) ? first : "#";
 }
 
 function presenceRank(state: FriendPresenceState | undefined): number {
-  if (state === "playing") return 2;
-  if (state === "online") return 1;
-  return 0;
+    if (state === "playing") return 2;
+    if (state === "online") return 1;
+    return 0;
 }
 
 function loadFriends(): FriendEntry[] {
-  if (typeof window === "undefined") return [];
+    if (typeof window === "undefined") return [];
 
-  try {
-    const raw = window.localStorage.getItem(ONLINE_FRIENDS_KEY);
-    if (!raw) return [];
+    try {
+        const raw = window.localStorage.getItem(ONLINE_FRIENDS_KEY);
+        if (!raw) return [];
 
-    const parsed = JSON.parse(raw) as unknown;
-    if (!Array.isArray(parsed)) return [];
+        const parsed = JSON.parse(raw) as unknown;
+        if (!Array.isArray(parsed)) return [];
 
-    return parsed
-      .filter((item): item is FriendEntry => {
-        if (typeof item !== "object" || item === null) return false;
-        const candidate = item as Partial<FriendEntry>;
-        return (
-          typeof candidate.friendCode === "string" &&
-          typeof candidate.name === "string" &&
-          typeof candidate.lastSeenAt === "number"
-        );
-      })
-      .map((item) => ({
-        friendCode: normalizeCode(item.friendCode),
-        name: cleanFriendName(item.name, normalizeCode(item.friendCode)),
-        lastSeenAt: item.lastSeenAt,
-      }))
-      .filter((item) => Boolean(item.friendCode))
-      .sort((a, b) => b.lastSeenAt - a.lastSeenAt)
-      .slice(0, MAX_FRIENDS);
-  } catch {
-    return [];
-  }
+        return parsed
+            .filter((item): item is FriendEntry => {
+                if (typeof item !== "object" || item === null) return false;
+                const candidate = item as Partial<FriendEntry>;
+                return (
+                    typeof candidate.friendCode === "string" &&
+                    typeof candidate.name === "string" &&
+                    typeof candidate.lastSeenAt === "number"
+                );
+            })
+            .map((item) => ({
+                friendCode: normalizeCode(item.friendCode),
+                name: cleanFriendName(item.name, normalizeCode(item.friendCode)),
+                lastSeenAt: item.lastSeenAt,
+            }))
+            .filter((item) => Boolean(item.friendCode))
+            .sort((a, b) => b.lastSeenAt - a.lastSeenAt)
+            .slice(0, MAX_FRIENDS);
+    } catch {
+        return [];
+    }
 }
 
 export default function HomeScreen({
-  themeLabel,
-  onSelectTheme,
-  onOpenControlsSettings,
-  onOpenAudioSettings,
-  onOpenProfileSettings,
-  onComputer,
-  onFriends,
-  onFriendQuickInvite,
-  onCheckFriendOnline,
-  incomingInvites,
+    themeLabel,
+    onSelectTheme,
+    onOpenControlsSettings,
+    onOpenAudioSettings,
+    onOpenProfileSettings,
+    onComputer,
+    onFriends,
+    onFriendQuickInvite,
+    onCheckFriendOnline,
+    incomingInvites,
 }: HomeScreenProps) {
-  const [friends] = useState<FriendEntry[]>(() => loadFriends());
-  const [friendCodeInput, setFriendCodeInput] = useState("");
-  const [presenceMap, setPresenceMap] = useState<
-    Record<string, FriendPresenceState>
-  >({});
-  const [invitingCode, setInvitingCode] = useState<string | null>(null);
+    const [friends] = useState<FriendEntry[]>(() => loadFriends());
+    const [friendCodeInput, setFriendCodeInput] = useState("");
+    const [presenceMap, setPresenceMap] = useState<
+        Record<string, FriendPresenceState>
+    >({});
+    const [invitingCode, setInvitingCode] = useState<string | null>(null);
 
-  const inviteFromInput = async () => {
-    const code = normalizeCode(friendCodeInput);
-    if (code.length < 4) return;
-    setInvitingCode(code);
-    try {
-      const invited = await onFriendQuickInvite(code);
-      if (invited) setFriendCodeInput("");
-    } finally {
-      setInvitingCode(null);
-    }
-  };
-
-  const shownFriends = useMemo(
-    () =>
-      [...friends]
-        .sort((a, b) => {
-          const aPresence = presenceRank(presenceMap[a.friendCode]);
-          const bPresence = presenceRank(presenceMap[b.friendCode]);
-          if (aPresence !== bPresence) return bPresence - aPresence;
-          return b.lastSeenAt - a.lastSeenAt;
-        })
-        .slice(0, MAX_FRIENDS),
-    [friends, presenceMap],
-  );
-
-  const friendsWithAvatar = useMemo(() => {
-    const usageByLetter: Record<string, number> = {};
-    return shownFriends.map((friend) => {
-      const letter = firstAvatarLetter(friend);
-      const usage = usageByLetter[letter] ?? 0;
-      usageByLetter[letter] = usage + 1;
-      const avatarColor = AVATAR_PALETTE[usage % AVATAR_PALETTE.length];
-      return {
-        friend,
-        letter,
-        avatarColor,
-        presence: presenceMap[friend.friendCode] ?? "offline",
-      };
-    });
-  }, [shownFriends, presenceMap]);
-
-  useEffect(() => {
-    if (!friends.length) {
-      setPresenceMap({});
-      return;
-    }
-
-    let disposed = false;
-    const refreshStatuses = async () => {
-      const statuses = await onCheckFriendOnline(
-        friends.map((friend) => friend.friendCode),
-      );
-      if (!disposed) setPresenceMap(statuses);
+    const inviteFromInput = async () => {
+        const code = normalizeCode(friendCodeInput);
+        if (code.length < 4) return;
+        setInvitingCode(code);
+        try {
+            const invited = await onFriendQuickInvite(code);
+            if (invited) setFriendCodeInput("");
+        } finally {
+            setInvitingCode(null);
+        }
     };
 
-    void refreshStatuses();
-    const timer = window.setInterval(() => {
-      void refreshStatuses();
-    }, 12000);
+    const shownFriends = useMemo(
+        () =>
+            [...friends]
+                .sort((a, b) => {
+                    const aPresence = presenceRank(presenceMap[a.friendCode]);
+                    const bPresence = presenceRank(presenceMap[b.friendCode]);
+                    if (aPresence !== bPresence) return bPresence - aPresence;
+                    return b.lastSeenAt - a.lastSeenAt;
+                })
+                .slice(0, MAX_FRIENDS),
+        [friends, presenceMap],
+    );
 
-    return () => {
-      disposed = true;
-      window.clearInterval(timer);
+    const friendsWithAvatar = useMemo(() => {
+        const usageByLetter: Record<string, number> = {};
+        return shownFriends.map((friend) => {
+            const letter = firstAvatarLetter(friend);
+            const usage = usageByLetter[letter] ?? 0;
+            usageByLetter[letter] = usage + 1;
+            const avatarColor = AVATAR_PALETTE[usage % AVATAR_PALETTE.length];
+            return {
+                friend,
+                letter,
+                avatarColor,
+                presence: presenceMap[friend.friendCode] ?? "offline",
+            };
+        });
+    }, [shownFriends, presenceMap]);
+
+    useEffect(() => {
+        if (!friends.length) {
+            setPresenceMap({});
+            return;
+        }
+
+        let disposed = false;
+        const refreshStatuses = async () => {
+            const statuses = await onCheckFriendOnline(
+                friends.map((friend) => friend.friendCode),
+            );
+            if (!disposed) setPresenceMap(statuses);
+        };
+
+        void refreshStatuses();
+        const timer = window.setInterval(() => {
+            void refreshStatuses();
+        }, 12000);
+
+        return () => {
+            disposed = true;
+            window.clearInterval(timer);
+        };
+    }, [friends, onCheckFriendOnline]);
+
+    const inviteFriend = async (friendCode: string) => {
+        const normalized = normalizeCode(friendCode);
+        if (!normalized || (presenceMap[normalized] ?? "offline") === "offline") {
+            return;
+        }
+
+        setInvitingCode(normalized);
+        try {
+            await onFriendQuickInvite(normalized);
+        } finally {
+            setInvitingCode(null);
+        }
     };
-  }, [friends, onCheckFriendOnline]);
 
-  const inviteFriend = async (friendCode: string) => {
-    const normalized = normalizeCode(friendCode);
-    if (!normalized || (presenceMap[normalized] ?? "offline") === "offline") {
-      return;
-    }
+    const incomingCount = incomingInvites.length;
 
-    setInvitingCode(normalized);
-    try {
-      await onFriendQuickInvite(normalized);
-    } finally {
-      setInvitingCode(null);
-    }
-  };
+    return (
+        <>
+            <NotificationPanel
+                themeLabel={themeLabel}
+                onSelectTheme={onSelectTheme}
+                onOpenControlsSettings={onOpenControlsSettings}
+                onOpenAudioSettings={onOpenAudioSettings}
+                onOpenProfileSettings={onOpenProfileSettings}
+                incomingInviteCount={incomingCount}
+            />
 
-  const incomingCount = incomingInvites.length;
-
-  return (
-    <>
-      <NotificationPanel
-        themeLabel={themeLabel}
-        onSelectTheme={onSelectTheme}
-        onOpenControlsSettings={onOpenControlsSettings}
-        onOpenAudioSettings={onOpenAudioSettings}
-        onOpenProfileSettings={onOpenProfileSettings}
-        incomingInviteCount={incomingCount}
-      />
-
-      <PageShell>
-        <style>{`
+            <PageShell>
+                <style>{`
           .home-wrap {
             width: min(1120px, 100%);
             margin: 0 auto;
@@ -500,203 +500,233 @@ export default function HomeScreen({
           }
 
           .friends-panel {
-            border: 2px solid var(--ui-line);
-            background:
-              linear-gradient(
-                180deg,
-                color-mix(in oklab, var(--ui-surface) 94%, white 6%),
-                color-mix(in oklab, var(--ui-surface) 98%, black 2%)
-              );
-            padding: 16px;
-            display: grid;
-            gap: 12px;
-            box-shadow: 6px 6px 0 color-mix(in oklab, var(--ui-line) 42%, transparent);
-          }
+  border: 2px solid var(--ui-line);
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--ui-surface) 92%, white 8%),
+      color-mix(in oklab, var(--ui-surface) 97%, black 3%)
+    );
+  padding: 14px;
+  display: grid;
+  gap: 12px;
+  box-shadow: 6px 6px 0 color-mix(in oklab, var(--ui-line) 34%, transparent);
+}
 
-          .friends-head {
-            display: flex;
-            justify-content: space-between;
-            align-items: end;
-            gap: 10px;
-            flex-wrap: wrap;
-          }
+.friends-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
 
-          .friends-kicker {
-            margin: 0;
-            font-family: "Courier Prime", monospace;
-            font-size: 9px;
-            letter-spacing: 0.14em;
-            text-transform: uppercase;
-            color: var(--ui-muted);
-          }
+.friends-kicker {
+  margin: 0;
+  font-family: 'Courier Prime', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ui-muted);
+}
 
-          .friends-title {
-            margin: 0;
-            font-family: "Bebas Neue", cursive;
-            font-size: 30px;
-            line-height: 1;
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
-            color: var(--ui-text);
-          }
+.friends-title {
+  margin: 2px 0 0;
+  font-family: 'Bebas Neue', cursive;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ui-text);
+}
 
-          .invite-badge {
-            border: 1px solid var(--ui-line);
-            padding: 7px 9px;
-            font-family: "Courier Prime", monospace;
-            font-size: 9px;
-            font-weight: 700;
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
-            color: var(--ui-text);
-            background: color-mix(in oklab, var(--ui-surface) 88%, white 12%);
-          }
+.invite-badge {
+  border: 1px solid var(--ui-line);
+  background: color-mix(in oklab, var(--ui-surface) 88%, white 12%);
+  padding: 6px 10px;
+  font-family: 'Courier Prime', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ui-muted);
+  white-space: nowrap;
+}
 
-          .friends-grid {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 10px;
-          }
+.friends-empty {
+  margin: 0;
+  border: 1px dashed var(--ui-line);
+  background: color-mix(in oklab, var(--ui-surface) 94%, white 6%);
+  padding: 12px;
+  font-family: 'Courier Prime', monospace;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--ui-muted);
+}
 
-          .friend-card {
-            border: 1px solid var(--ui-line);
-            background: color-mix(in oklab, var(--ui-surface) 92%, white 8%);
-            padding: 10px;
-            display: grid;
-            grid-template-columns: auto minmax(0, 1fr) auto;
-            gap: 10px;
-            align-items: center;
-            transition:
-              transform 0.12s ease,
-              border-color 0.12s ease,
-              opacity 0.12s ease;
-          }
+.friends-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
 
-          .friend-card:hover {
-            transform: translateY(-2px);
-            border-color: color-mix(in oklab, var(--ui-text) 46%, var(--ui-line));
-          }
+.friend-card {
+  border: 1px solid var(--ui-line);
+  background: color-mix(in oklab, var(--ui-surface) 94%, white 6%);
+  padding: 8px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  min-height: 56px;
+  transition:
+    transform 0.12s ease,
+    border-color 0.12s ease,
+    opacity 0.12s ease;
+}
 
-          .friend-card.offline {
-            opacity: 0.56;
-          }
+.friend-card:hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in oklab, var(--ui-text) 40%, var(--ui-line));
+}
 
-          .friend-avatar {
-            width: 38px;
-            height: 38px;
-            border-radius: 999px;
-            display: grid;
-            place-items: center;
-            font-family: "Bebas Neue", cursive;
-            font-size: 20px;
-            letter-spacing: 0.03em;
-            border: 1px solid rgba(0, 0, 0, 0.14);
-            flex: 0 0 auto;
-          }
+.friend-card.offline {
+  opacity: 0.56;
+}
 
-          .friend-meta {
-            min-width: 0;
-            display: grid;
-            gap: 2px;
-          }
+.friend-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font-family: 'Bebas Neue', cursive;
+  font-size: 18px;
+  line-height: 1;
+  border: 1px solid rgba(0, 0, 0, 0.14);
+  flex: 0 0 auto;
+}
 
-          .friend-name {
-            font-family: "Courier Prime", monospace;
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--ui-text);
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-          }
+.friend-meta {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
 
-          .friend-status {
-            font-family: "Courier Prime", monospace;
-            font-size: 9px;
-            font-weight: 700;
-            letter-spacing: 0.09em;
-            text-transform: uppercase;
-            white-space: nowrap;
-          }
+.friend-name {
+  font-family: 'Courier Prime', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ui-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
-          .friend-status.playing {
-            color: var(--ui-accent-blue);
-          }
+.friend-status {
+  font-family: 'Courier Prime', monospace;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1;
+}
 
-          .friend-status.online {
-            color: var(--ui-accent-green);
-          }
+.friend-status.playing {
+  color: var(--ui-accent-blue);
+}
 
-          .friend-status.offline {
-            color: var(--ui-muted);
-          }
+.friend-status.online {
+  color: var(--ui-accent-green);
+}
 
-          .friend-invite-btn {
-            border: 1px solid var(--ui-line);
-            background: transparent;
-            color: var(--ui-text);
-            min-width: 34px;
-            height: 34px;
-            padding: 0 8px;
-            font-family: "Bebas Neue", cursive;
-            font-size: 21px;
-            line-height: 1;
-            cursor: pointer;
-            transition: transform 0.12s ease, opacity 0.12s ease;
-          }
+.friend-status.offline {
+  color: var(--ui-muted);
+}
 
-          .friend-invite-btn:hover {
-            transform: scale(1.04);
-          }
+.friend-invite-btn {
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--ui-line);
+  background: transparent;
+  color: var(--ui-text);
+  font-family: 'Bebas Neue', cursive;
+  font-size: 18px;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: transform 0.12s ease, opacity 0.12s ease;
+}
 
-          .friend-invite-btn:disabled {
-            cursor: default;
-            opacity: 0.45;
-          }
+.friend-invite-btn:hover {
+  transform: scale(1.04);
+}
 
-          .friends-empty {
-            margin: 0;
-            border: 1px dashed var(--ui-line);
-            padding: 12px;
-            font-family: "Courier Prime", monospace;
-            font-size: 11px;
-            line-height: 1.45;
-            color: var(--ui-muted);
-            background: color-mix(in oklab, var(--ui-surface) 94%, white 6%);
-          }
+.friend-invite-btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
 
-          .friends-actions {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            align-items: center;
-          }
+.friends-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: stretch;
+}
 
-          .lobby-btn {
-            border: 2px solid var(--ui-line);
-            background:
-              linear-gradient(
-                180deg,
-                color-mix(in oklab, var(--ui-surface) 86%, white 14%),
-                color-mix(in oklab, var(--ui-surface) 96%, black 4%)
-              );
-            color: var(--ui-text);
-            padding: 9px 12px;
-            font-family: "Courier Prime", monospace;
-            font-size: 9px;
-            font-weight: 700;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            cursor: pointer;
-            box-shadow: 4px 4px 0 color-mix(in oklab, var(--ui-line) 35%, transparent);
-            transition: transform 0.12s ease, box-shadow 0.12s ease;
-          }
+.lobby-btn {
+  border: 2px solid var(--ui-line);
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--ui-surface) 86%, white 14%),
+      color-mix(in oklab, var(--ui-surface) 96%, black 4%)
+    );
+  color: var(--ui-text);
+  padding: 0 14px;
+  min-height: 44px;
+  font-family: 'Courier Prime', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 4px 4px 0 color-mix(in oklab, var(--ui-line) 28%, transparent);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
 
-          .lobby-btn:hover {
-            transform: translate(-1px, -1px);
-            box-shadow: 5px 5px 0 color-mix(in oklab, var(--ui-line) 38%, transparent);
-          }
+.lobby-btn:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 5px 5px 0 color-mix(in oklab, var(--ui-line) 34%, transparent);
+}
 
+@media (max-width: 980px) {
+  .friends-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .friends-panel {
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .friends-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .friends-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .lobby-btn {
+    min-height: 42px;
+  }
           .footer-strip {
             border: 2px solid var(--ui-line);
             background: color-mix(in oklab, var(--ui-surface) 94%, white 6%);
@@ -766,174 +796,171 @@ export default function HomeScreen({
           }
         `}</style>
 
-        <section className="home-wrap">
-          <div>
-            <UnoWordmark />
-          </div>
-
-          <section className="hero-shell" aria-label="Home hero">
-            <div className="hero-grid">
-              <div className="hero-left">
-                <div className="hero-copy">
-                  <h1 className="hero-title">
-                    Pick a mode.
-                    <br />
-                    Start a match.
-                  </h1>
-
-                  <p className="hero-subtitle">
-                    Fast UNO with quick invites and instant rounds.
-                  </p>
-                </div>
-
-                <div className="cta-row">
-                  <button
-                    type="button"
-                    className="arcade-btn primary"
-                    onClick={onComputer}
-                  >
-                    <span className="btn-topline">Solo</span>
-                    <span className="btn-title">Play vs CPU</span>
-                    <span className="btn-desc">Start a local game.</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    className="arcade-btn secondary"
-                    onClick={onFriends}
-                  >
-                    <span className="btn-topline">Online</span>
-                    <span className="btn-title">Play with Friends</span>
-                    <span className="btn-desc">Create or join a room.</span>
-                  </button>
-                </div>
-              </div>
-
-              <div className="hero-right">
-                <div className="showcase-card" aria-hidden="true">
-                  <div className="pixel-stack">
-                    <div className="pixel-stage">
-                      <div className="pixel red p1" />
-                      <div className="pixel yellow p2" />
-                      <div className="pixel blue p3" />
-                      <div className="pixel green p4" />
-                      <div className="pixel red p5" />
-                      <div className="pixel yellow p6" />
-                      <div className="pixel blue p7" />
-                      <div className="pixel green p8" />
-
-                      <div className="mini-card one">
-                        <div className="mini-card-inner">U</div>
-                      </div>
-
-                      <div className="mini-card two">
-                        <div className="mini-card-inner">NO</div>
-                      </div>
+                <section className="home-wrap">
+                    <div>
+                        <UnoWordmark />
                     </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
 
-          <SectionDivider />
+                    <section className="hero-shell" aria-label="Home hero">
+                        <div className="hero-grid">
+                            <div className="hero-left">
+                                <div className="hero-copy">
+                                    <h1 className="hero-title">
+                                        Pick a mode.
+                                        <br />
+                                        Start a match.
+                                    </h1>
 
-          <section className="friends-panel" aria-label="Friends and quick invite">
-            <div className="friends-head">
-              <div>
-                <p className="friends-kicker">Friends</p>
-                <h2 className="friends-title">Quick Invite</h2>
-              </div>
+                                    <p className="hero-subtitle">
+                                        Fast UNO with quick invites and instant rounds.
+                                    </p>
+                                </div>
 
-              <div className="invite-badge">
-                {incomingCount > 0
-                  ? `${incomingCount} waiting`
-                  : "No invites"}
-              </div>
-            </div>
+                                <div className="cta-row">
+                                    <button
+                                        type="button"
+                                        className="arcade-btn primary"
+                                        onClick={onComputer}
+                                    >
+                                        <span className="btn-topline">Solo</span>
+                                        <span className="btn-title">Play vs CPU</span>
+                                        <span className="btn-desc">Start a local game.</span>
+                                    </button>
 
-            {friendsWithAvatar.length === 0 ? (
-              <p className="friends-empty">
-                No saved friends yet. Enter a code to invite.
-              </p>
-            ) : (
-              <div className="friends-grid">
-                {friendsWithAvatar.map(
-                  ({ friend, letter, avatarColor, presence }) => {
-                    const canInvite =
-                      presence !== "offline" &&
-                      invitingCode !== friend.friendCode;
+                                    <button
+                                        type="button"
+                                        className="arcade-btn secondary"
+                                        onClick={onFriends}
+                                    >
+                                        <span className="btn-topline">Online</span>
+                                        <span className="btn-title">Play with Friends</span>
+                                        <span className="btn-desc">Create or join a room.</span>
+                                    </button>
+                                </div>
+                            </div>
 
-                    return (
-                      <div
-                        key={friend.friendCode}
-                        className={`friend-card ${presence === "offline" ? "offline" : ""}`}
-                      >
-                        <span
-                          className="friend-avatar"
-                          style={{
-                            color: avatarColor.fg,
-                            background: avatarColor.bg,
-                          }}
-                        >
-                          {letter}
-                        </span>
+                            <div className="hero-right">
+                                <div className="showcase-card" aria-hidden="true">
+                                    <div className="pixel-stack">
+                                        <div className="pixel-stage">
+                                            <div className="pixel red p1" />
+                                            <div className="pixel yellow p2" />
+                                            <div className="pixel blue p3" />
+                                            <div className="pixel green p4" />
+                                            <div className="pixel red p5" />
+                                            <div className="pixel yellow p6" />
+                                            <div className="pixel blue p7" />
+                                            <div className="pixel green p8" />
 
-                        <div className="friend-meta">
-                          <span className="friend-name">{friend.name}</span>
-                          <span className={`friend-status ${presence}`}>
-                            {presence === "playing"
-                              ? "Playing"
-                              : presence === "online"
-                                ? "Online"
-                                : "Offline"}
-                          </span>
+                                            <div className="mini-card one">
+                                                <div className="mini-card-inner">U</div>
+                                            </div>
+
+                                            <div className="mini-card two">
+                                                <div className="mini-card-inner">NO</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <SectionDivider />
+
+                    <section
+                        className="friends-panel"
+                        aria-label="Friends and quick invite"
+                    >
+                        <div className="friends-head">
+                            <div className="friends-title-wrap">
+                                <p className="friends-kicker">Friends</p>
+                                <h2 className="friends-title">Quick Invite</h2>
+                            </div>
+
+                            <div className="invite-badge">
+                                {incomingCount > 0 ? `${incomingCount} waiting` : "No invites"}
+                            </div>
                         </div>
 
-                        <button
-                          type="button"
-                          className="friend-invite-btn"
-                          disabled={!canInvite}
-                          onClick={() => {
-                            void inviteFriend(friend.friendCode);
-                          }}
-                          title={`Invite ${friend.name}`}
-                          aria-label={`Invite ${friend.name}`}
-                        >
-                          +
-                        </button>
-                      </div>
-                    );
-                  },
-                )}
-              </div>
-            )}
+                        {friendsWithAvatar.length === 0 ? (
+                            <p className="friends-empty">
+                                No saved friends yet. Enter a code to invite.
+                            </p>
+                        ) : (
+                            <div className="friends-grid">
+                                {friendsWithAvatar.map(
+                                    ({ friend, letter, avatarColor, presence }) => {
+                                        const canInvite =
+                                            presence !== "offline" &&
+                                            invitingCode !== friend.friendCode;
 
-            <div className="friends-actions">
-              <FriendInviteInput
-                value={friendCodeInput}
-                onChange={setFriendCodeInput}
-                onSend={() => {
-                  void inviteFromInput();
-                }}
-                disabled={
-                  normalizeCode(friendCodeInput).length < 4 ||
-                  invitingCode === normalizeCode(friendCodeInput)
-                }
-                buttonLabel="Invite"
-              />
+                                        return (
+                                            <div
+                                                key={friend.friendCode}
+                                                className={`friend-card ${presence === "offline" ? "offline" : ""}`}
+                                            >
+                                                <span
+                                                    className="friend-avatar"
+                                                    style={{
+                                                        color: avatarColor.fg,
+                                                        background: avatarColor.bg,
+                                                    }}
+                                                >
+                                                    {letter}
+                                                </span>
 
-              <button
-                type="button"
-                className="lobby-btn"
-                onClick={onFriends}
-              >
-                Open Lobby
-              </button>
-            </div>
-          </section>
-        </section>
-      </PageShell>
-    </>
-  );
+                                                <div className="friend-meta">
+                                                    <span className="friend-name">{friend.name}</span>
+                                                    <span className={`friend-status ${presence}`}>
+                                                        {presence === "playing"
+                                                            ? "Playing"
+                                                            : presence === "online"
+                                                                ? "Online"
+                                                                : "Offline"}
+                                                    </span>
+                                                </div>
+
+                                                <button
+                                                    type="button"
+                                                    className="friend-invite-btn"
+                                                    disabled={!canInvite}
+                                                    onClick={() => {
+                                                        void inviteFriend(friend.friendCode);
+                                                    }}
+                                                    title={`Invite ${friend.name}`}
+                                                    aria-label={`Invite ${friend.name}`}
+                                                >
+                                                    +
+                                                </button>
+                                            </div>
+                                        );
+                                    },
+                                )}
+                            </div>
+                        )}
+
+                        <div className="friends-actions">
+                            <FriendInviteInput
+                                value={friendCodeInput}
+                                onChange={setFriendCodeInput}
+                                onSend={() => {
+                                    void inviteFromInput();
+                                }}
+                                disabled={
+                                    normalizeCode(friendCodeInput).length < 4 ||
+                                    invitingCode === normalizeCode(friendCodeInput)
+                                }
+                                buttonLabel="Invite"
+                            />
+
+                            <button type="button" className="lobby-btn" onClick={onFriends}>
+                                Open Lobby
+                            </button>
+                        </div>
+                    </section>
+                </section>
+            </PageShell>
+        </>
+    );
 }
