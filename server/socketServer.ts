@@ -31,6 +31,7 @@ import type {
   RoomSnapshot,
   SendFriendInvitePayload,
   StartRoomPayload,
+  ReadyPayload,
 } from '../types/multiplayer';
 
 const PORT = Number(process.env.PORT ?? process.env.UNO_SOCKET_PORT ?? 3001);
@@ -121,6 +122,7 @@ function toSnapshot(room: ServerRoom): RoomSnapshot {
       connected: p.connected,
       isBot: p.isBot,
       friendCode: presence?.friendCode,
+      ready: p.ready,
       };
     }),
     started: room.started,
@@ -139,7 +141,7 @@ function createRoomForPlayer(socketId: string, playerName: string, deviceId: str
   const room: ServerRoom = {
     roomId,
     hostPlayerId: playerId,
-    players: [{ playerId, socketId, name: playerName, connected: true, deviceId, isBot: false }],
+    players: [{ playerId, socketId, name: playerName, connected: true, deviceId, isBot: false, ready: false }],
     started: false,
     game: null,
     pendingColorChoice: null,
@@ -159,6 +161,7 @@ function joinRoomAsPlayer(room: ServerRoom, socketId: string, playerName: string
 
     existingPlayerForDevice.socketId = socketId;
     existingPlayerForDevice.connected = true;
+    existingPlayerForDevice.ready = false;
     existingPlayerForDevice.name = playerName;
     playerBySocket.set(socketId, { roomId: room.roomId, playerId: existingPlayerForDevice.playerId });
     return existingPlayerForDevice.playerId;
@@ -169,7 +172,7 @@ function joinRoomAsPlayer(room: ServerRoom, socketId: string, playerName: string
   }
 
   const playerId = makeNextPlayerId(room.players);
-  room.players.push({ playerId, socketId, name: playerName, connected: true, deviceId, isBot: false });
+  room.players.push({ playerId, socketId, name: playerName, connected: true, deviceId, isBot: false, ready: false });
   playerBySocket.set(socketId, { roomId: room.roomId, playerId });
   return playerId;
 }
@@ -188,6 +191,7 @@ function addBotSeat(room: ServerRoom): void {
     name: nextBotName(room),
     connected: false,
     isBot: true,
+    ready: true,
   });
 }
 
@@ -271,6 +275,7 @@ function leaveRoomForSocket(socketId: string, ioServer: Server): void {
   if (room.started) {
     player.connected = false;
     player.socketId = '';
+    player.ready = true;
 
     if (room.hostPlayerId === player.playerId) {
       const nextHost = room.players.find((p) => p.playerId !== player.playerId && p.connected)
@@ -879,6 +884,11 @@ io.on('connection', (socket) => {
         room.players.map((p) => p.isBot),
       );
       removeInvitesForRoom(room.roomId, io);
+      
+      // Reset ready status for all players
+      for (const p of room.players) {
+        p.ready = false;
+      }
 
       runOfflineBotTurns(room);
 
@@ -996,6 +1006,39 @@ io.on('connection', (socket) => {
       socket.leave(roomId);
       leaveRoomForSocket(socket.id, io);
       reply?.({ ok: true, data: { left: true } });
+    } catch (error) {
+      reply?.(ackError((error as Error).message));
+    }
+  });
+
+  socket.on('room:ready', (payload: ReadyPayload, reply?: (ack: Ack<{ room: RoomSnapshot }>) => void) => {
+    try {
+      const roomId = payload.roomId?.trim().toUpperCase();
+      if (!roomId) {
+        reply?.(ackError('Room code is required.'));
+        return;
+      }
+
+      const room = rooms.get(roomId);
+      if (!room) {
+        reply?.(ackError('Room not found.'));
+        return;
+      }
+
+      const player = room.players.find((p) => p.socketId === socket.id);
+      if (!player) {
+        reply?.(ackError('You are not in this room.'));
+        return;
+      }
+
+      // Toggle ready status (but bots are always ready)
+      if (!player.isBot) {
+        player.ready = !player.ready;
+      }
+
+      const snapshot = toSnapshot(room);
+      io.to(room.roomId).emit('room:update', snapshot);
+      reply?.({ ok: true, data: { room: snapshot } });
     } catch (error) {
       reply?.(ackError((error as Error).message));
     }

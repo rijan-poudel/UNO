@@ -548,6 +548,25 @@ export function useUnoOnlineGame() {
     return true;
   }, [callAck, state.room]);
 
+  const toggleReady = useCallback(async () => {
+    if (!state.room) return false;
+    const ack = await callAck<{ room: RoomSnapshot }>('room:ready', {
+      roomId: state.room.roomId,
+    });
+    if (!ack.ok) {
+      setState((prev) => ({ ...prev, error: ack.error }));
+      return false;
+    }
+
+    setState((prev) => ({
+      ...prev,
+      room: ack.data.room,
+      game: ack.data.room.game,
+      error: null,
+    }));
+    return true;
+  }, [callAck, state.room]);
+
   const sendFriendInvite = useCallback(async (targetFriendCode: string, playerName: string) => {
     const ack = await callAck<{ room: RoomSnapshot; playerId: string; invite: FriendInvite }>('friend:invite', {
       targetFriendCode,
@@ -823,6 +842,7 @@ export function useUnoOnlineGame() {
     startOnlineGame,
     kickPlayer,
     addBotToRoom,
+    toggleReady,
     sendFriendInvite,
     acceptFriendInvite,
     declineFriendInvite,

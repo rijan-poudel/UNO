@@ -58,7 +58,10 @@ function audienceAllows(
 function channelOk(channel: string, minGapMs: number): boolean {
   const now = Date.now();
   const last = lastChannelAt.get(channel) ?? 0;
-  if (now - last < minGapMs) return false;
+  if (now - last < minGapMs) {
+    lastChannelAt.set(channel, now);
+    return false;
+  }
   lastChannelAt.set(channel, now);
   return true;
 }
@@ -386,7 +389,7 @@ export function announceBoardFromTransition(
           audience: { type: "room" },
           localPlayerId,
           channel: "board:skip",
-          minGapMs: 3500,
+          minGapMs: 2000,
         });
         return;
       }
@@ -398,7 +401,7 @@ export function announceBoardFromTransition(
           audience: { type: "room" },
           localPlayerId,
           channel: "board:reverse",
-          minGapMs: 3500,
+          minGapMs: 2000,
         });
         return;
       }

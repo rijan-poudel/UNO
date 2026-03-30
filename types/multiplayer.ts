@@ -8,6 +8,7 @@ export interface RoomPlayer {
   connected: boolean;
   isBot: boolean;
   friendCode?: string;
+  ready: boolean;
 }
 
 export interface RoomSnapshot {
@@ -73,6 +74,10 @@ export interface AddBotPayload {
 }
 
 export interface LeaveRoomPayload {
+  roomId: string;
+}
+
+export interface ReadyPayload {
   roomId: string;
 }
 

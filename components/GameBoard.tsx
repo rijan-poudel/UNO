@@ -4,6 +4,7 @@ import { memo, useEffect, useRef, useState, useCallback, type CSSProperties, typ
 import type { Card, CardColor } from "../types/card";
 import type { GameState, Player } from "../types/game";
 import type { useUnoGame } from "../hooks/useUnoGame";
+import type { RoomPlayer, RoomSnapshot } from "../types/multiplayer";
 import UnoCard from "./UnoCard";
 import ColorPicker from "./ColorPicker";
 import ProfileChip from "./ProfileChip";
@@ -222,13 +223,15 @@ function VictoryConfetti() {
 
 // ── Opponent strip ─────────────────────────────────────────────────────────────
 const OpponentStrip = memo(function OpponentStrip({
-  player, isCurrentTurn, canCallOut, onCallOut, cardScale, compact = false, angle = 0, turnProgress = 0,
+  player, isCurrentTurn, canCallOut, onCallOut, cardScale, compact = false, angle = 0, turnProgress = 0, isOffline = false, isReady = false,
 }: {
   player: Player; isCurrentTurn: boolean;
   canCallOut: boolean; onCallOut: () => void; cardScale: number;
   compact?: boolean;
   angle?: number;
   turnProgress?: number;
+  isOffline?: boolean;
+  isReady?: boolean;
 }) {
   const n = player.hand.length;
   const opponentCardScale = cardScale;
@@ -357,6 +360,21 @@ const OpponentStrip = memo(function OpponentStrip({
             animation: isCurrentTurn ? "blink 0.9s step-end infinite" : "none",
           }}>UNO</span>
         )}
+        {isOffline && (
+          <span style={{
+            fontFamily: "'Courier Prime', monospace",
+            fontSize: compact ? 6 : 7, fontWeight: 700, letterSpacing: "0.12em",
+            background: "var(--ui-muted)", color: "#fff", padding: "1px 4px",
+            opacity: 0.7,
+          }}>OFFLINE</span>
+        )}
+        {!isOffline && isReady && (
+          <span style={{
+            fontFamily: "'Courier Prime', monospace",
+            fontSize: compact ? 6 : 7, fontWeight: 700, letterSpacing: "0.12em",
+            background: "var(--ui-accent-green)", color: "#fff", padding: "1px 4px",
+          }}>READY</span>
+        )}
       </div>
 
       <span style={{ minHeight: callOutHintHeight, visibility: "hidden" }} />
@@ -372,13 +390,17 @@ const OpponentStrip = memo(function OpponentStrip({
   && prev.compact === next.compact
   && prev.angle === next.angle
   && prev.turnProgress === next.turnProgress
+  && prev.isOffline === next.isOffline
+  && prev.isReady === next.isReady
 ));
 
 // ── Winner screen ──────────────────────────────────────────────────────────────
 function WinnerScreen({
   winner, onReset, onDealAgain, scores, players,
+  showReadyToggle, onToggleReady, isReady,
 }: {
   winner: Player; onReset: () => void; onDealAgain: () => void; scores: Record<string, number>; players: string[];
+  showReadyToggle?: boolean; onToggleReady?: () => void; isReady?: boolean;
 }) {
   const leaders = players
     .map((name) => [name, scores[name] ?? 0] as const)
@@ -447,6 +469,18 @@ function WinnerScreen({
           transition: `color 0.14s ${EASE_OUT_SOFT}, transform 0.12s ${EASE_OUT}`,
         }}
         >New players</button>
+        {showReadyToggle && onToggleReady && (
+          <button className="winner-secondary-btn" onClick={onToggleReady} style={{
+            fontFamily: "'Courier Prime', monospace", fontSize: 11, fontWeight: 700,
+            letterSpacing: "0.1em", textTransform: "uppercase",
+            background: isReady ? "var(--ui-accent-green)" : "transparent",
+            border: "1px solid var(--ui-line)",
+            color: isReady ? "#fff" : "var(--ui-muted)",
+            padding: "12px 20px", cursor: "pointer",
+            transition: `color 0.14s ${EASE_OUT_SOFT}, transform 0.12s ${EASE_OUT}`,
+          }}
+          >{isReady ? "Ready" : "Ready?"}</button>
+        )}
         <button className="winner-primary-btn" onClick={onDealAgain} style={{
           fontFamily: "'Bebas Neue', cursive", fontSize: 22, letterSpacing: "0.14em",
           background: "var(--ui-text)", color: "var(--ui-bg)",
@@ -481,6 +515,22 @@ export default function GameBoard({
       ? ((gameApi as { wildPickerPlayerName?: string | null }).wildPickerPlayerName ?? null)
       : null;
 
+  // Check if we're in online mode and get room info
+  const isOnlineModePlayer = "room" in gameApi;
+  const roomPlayerInfo: RoomSnapshot | null = isOnlineModePlayer ? (gameApi as { room: RoomSnapshot | null }).room : null;
+  
+  const getPlayerConnectedStatus = (playerId: string): boolean => {
+    if (!roomPlayerInfo) return true; // single player or no room info
+    const roomPlayer = roomPlayerInfo.players.find((p: RoomPlayer) => p.playerId === playerId);
+    return roomPlayer?.connected ?? true;
+  };
+  
+  const getPlayerReadyStatus = (playerId: string): boolean => {
+    if (!roomPlayerInfo) return false;
+    const roomPlayer = roomPlayerInfo.players.find((p: RoomPlayer) => p.playerId === playerId);
+    return roomPlayer?.ready ?? false;
+  };
+
   const [showExitConfirm, setShowExitConfirm] = useState(false);
   const [showGameSettingsMenu, setShowGameSettingsMenu] = useState(false);
   const [showUnoFlash, setShowUnoFlash] = useState(false);
@@ -499,7 +549,6 @@ export default function GameBoard({
   const [highlightedDrawnCardId, setHighlightedDrawnCardId] = useState<string | null>(null);
   const [hiddenIncomingCardIds, setHiddenIncomingCardIds] = useState<Set<string>>(new Set());
   const [drawDecisionCardId, setDrawDecisionCardId] = useState<string | null>(null);
-  const [hoveredHandPosition, setHoveredHandPosition] = useState<number | null>(null);
   const [animations, setAnimations] = useState<TravelAnimation[]>([]);
   const [turnCountdownSeconds, setTurnCountdownSeconds] = useState(0);
   const turnTransitionLocked = actionFlash !== null;
@@ -518,8 +567,6 @@ export default function GameBoard({
   const prevLocalHandCountRef = useRef<number | null>(null);
   const pendingPlayRectRef = useRef<{ cardId: string; x: number; y: number } | null>(null);
   const animationCounterRef = useRef(0);
-  const hoverAnimationFrameRef = useRef<number | null>(null);
-  const hoverTargetRef = useRef<number | null>(null);
   const dealAnimationKeyRef = useRef<string | null>(null);
   const drawPileRef = useRef<HTMLButtonElement | null>(null);
   const discardPileRef = useRef<HTMLDivElement | null>(null);
@@ -549,28 +596,6 @@ export default function GameBoard({
     }, animation.duration + 120);
   }, []);
 
-  const queueHoverPosition = useCallback((next: number | null) => {
-    hoverTargetRef.current = next;
-    if (hoverAnimationFrameRef.current !== null) return;
-
-    hoverAnimationFrameRef.current = window.requestAnimationFrame(() => {
-      hoverAnimationFrameRef.current = null;
-      setHoveredHandPosition((prev) => {
-        const target = hoverTargetRef.current;
-        if (target === prev) return prev;
-        if (target === null) return null;
-        if (prev === null) return target;
-
-        const delta = target - prev;
-        const absDelta = Math.abs(delta);
-
-        // Deadzone + capped step keeps quick mouse sweeps from feeling jittery.
-        if (absDelta < 0.22) return prev;
-        const step = Math.sign(delta) * Math.min(0.34, absDelta * 0.32);
-        return prev + step;
-      });
-    });
-  }, []);
 
   const animateDrawToPlayer = useCallback((playerId: string, count: number) => {
     const from = getElementCenter(drawPileRef.current);
@@ -832,9 +857,6 @@ export default function GameBoard({
       if (unoBadgeResetTimerRef.current !== null) {
         window.clearTimeout(unoBadgeResetTimerRef.current);
       }
-      if (hoverAnimationFrameRef.current !== null) {
-        window.cancelAnimationFrame(hoverAnimationFrameRef.current);
-      }
     };
   }, []);
 
@@ -1090,7 +1112,9 @@ export default function GameBoard({
             ? previousLocalHand.filter((card) => card.id !== action.card.id)
             : previousLocalHand;
           const voiceDelay = getDrawTransferDelayMs();
-          setShuffleLocalHandOverride(previousLocalHand);
+          window.setTimeout(() => {
+            setShuffleLocalHandOverride(previousLocalHand);
+          }, 0);
 
           const order = Array.from({ length: game.players.length }, (_, index) => {
             const seat = (actorIndex + previous.direction + (index * previous.direction) + game.players.length * 4) % game.players.length;
@@ -1464,6 +1488,7 @@ export default function GameBoard({
       setDrawDecisionCardId(null);
       if (pendingWild) {
         confirmWildColor(pickAutoWildColor(localPlayer.hand));
+        setAutoPilotActive(false);
         return;
       }
 
@@ -1472,15 +1497,18 @@ export default function GameBoard({
         const chosen = playableCards.find((card) => card.color !== "wild") ?? playableCards[0];
         autoDeclareUnoIfNeeded();
         selectCard(chosen);
+        setAutoPilotActive(false);
         return;
       }
 
       if (game.pendingDraw > 0 || !drawnThisTurn) {
         drawCard();
+        setAutoPilotActive(false);
         return;
       }
 
       pass();
+      setAutoPilotActive(false);
     }, 140);
 
     return () => window.clearTimeout(timer);
@@ -1501,52 +1529,6 @@ export default function GameBoard({
     selectCard,
     drawCard,
     pass,
-  ]);
-
-  useEffect(() => {
-    const isHumanTurnSafe = Boolean(
-      game
-      && localPlayer
-      && currentPlayer
-      && isLocalTurn
-      && !localPlayer.isBot
-      && !game.winnerId,
-    );
-
-    const stackOpen = Boolean(game && isHumanTurnSafe && game.pendingDraw > 0 && hasPendingStackOption);
-
-    const revealed = drawnCardId && localPlayer
-      ? localPlayer.hand.find((card) => card.id === drawnCardId) ?? null
-      : null;
-    const drawnOpen = Boolean(
-      isHumanTurnSafe
-      && !autoPilotActive
-      && drawnThisTurn
-      && revealed
-      && playableCardIds.has(revealed.id)
-      && drawDecisionCardId === revealed.id,
-    );
-
-    const overlayOpen = stackOpen || drawnOpen || !!pendingWild || showExitConfirm;
-    if (!overlayOpen && isHumanTurnSafe) return;
-    const resetTimer = window.setTimeout(() => {
-      queueHoverPosition(null);
-    }, 0);
-    return () => window.clearTimeout(resetTimer);
-  }, [
-    game,
-    localPlayer,
-    currentPlayer,
-    isLocalTurn,
-    hasPendingStackOption,
-    drawnCardId,
-    drawnThisTurn,
-    playableCardIds,
-    drawDecisionCardId,
-    autoPilotActive,
-    pendingWild,
-    showExitConfirm,
-    queueHoverPosition,
   ]);
 
   useEffect(() => {
@@ -1596,6 +1578,15 @@ export default function GameBoard({
 
   const topDiscard = game.discardPile[game.discardPile.length - 1];
   const winner = game.winnerId ? game.players.find(p => p.id === game.winnerId) : null;
+  
+  // Ready toggle for multiplayer after game ends
+  const isOnlineModeGame = 'room' in gameApi;
+  const roomGame = isOnlineModeGame ? (gameApi as { room?: RoomSnapshot }).room ?? null : null;
+  const showReadyToggle = isOnlineModeGame && !!winner;
+  const onToggleReady = 'toggleReady' in gameApi ? (gameApi as { toggleReady?: () => Promise<boolean> }).toggleReady : undefined;
+  const localRoomPlayer = roomGame?.players.find((p: RoomPlayer) => p.playerId === localPlayer?.id);
+  const isReady = localRoomPlayer?.ready ?? false;
+  
   const humanTurn = isLocalTurn && !localPlayer.isBot && !game.winnerId;
   const drawDisabled = botThinking || turnTransitionLocked || !!game.winnerId || (drawnThisTurn && game.pendingDraw === 0) || !humanTurn;
   const effectiveLocalHand = shuffleLocalHandOverride ?? localPlayer.hand;
@@ -1832,7 +1823,16 @@ export default function GameBoard({
           100% { transform: translateY(118vh) rotate(760deg); opacity: 0.9; }
         }
 
-        .hand-card { transition: transform 0.18s var(--ease-out-soft), filter 0.18s ease !important; }
+        .hand-card { transition: translate 0.15s cubic-bezier(0.23, 1, 0.32, 1), scale 0.15s cubic-bezier(0.23, 1, 0.32, 1), filter 0.15s ease !important; }
+        @media (hover: hover) and (pointer: fine) {
+          .hand-card:hover {
+            translate: 0 -14px;
+            scale: 1.06;
+            z-index: 999 !important;
+            filter: drop-shadow(0 8px 16px rgba(26,15,0,0.28)) brightness(1.04) !important;
+            transition: translate 0.32s cubic-bezier(0.34, 1.56, 0.64, 1), scale 0.32s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.18s ease !important;
+          }
+        }
 
         .draw-pile-btn { 
           transition: filter 0.2s ease, opacity 0.2s ease, transform 0.15s var(--ease-out);
@@ -2192,6 +2192,8 @@ export default function GameBoard({
               !player.saidUno;
 
             const isCurrentTurn = game.currentPlayerIndex === playerIndex;
+            const isOffline = !getPlayerConnectedStatus(player.id);
+            const isReady = getPlayerReadyStatus(player.id);
 
             return (
               <div
@@ -2219,6 +2221,8 @@ export default function GameBoard({
                   compact={isCompactBoard}
                   angle={seat.angle}
                   turnProgress={isCurrentTurn ? currentTurnProgress : 0}
+                  isOffline={isOffline}
+                  isReady={isReady}
                 />
               </div>
             );
@@ -2376,8 +2380,8 @@ export default function GameBoard({
               style={{
                 position: "absolute",
                 left: isNarrowMobile ? "68%" : "72%",
-                top: isNarrowMobile ? 6 : 8,
-                transform: "translate(-50%, -30%)",
+                top: -4,
+                transform: "translate(-50%, -100%)",
                 zIndex: 40,
                 fontFamily: "'Bebas Neue', cursive",
                 fontSize: isNarrowMobile ? 20 : isCompactBoard ? 24 : 28,
@@ -2397,32 +2401,7 @@ export default function GameBoard({
             >UNO</button>
           )}
 
-          {humanTurn && drawnThisTurn && game.pendingDraw === 0 && !showExitConfirm && (
-            <button
-              type="button"
-              onClick={() => { if (turnTransitionLocked) return; pass(); }}
-              className="uno-btn"
-              style={{
-                position: "absolute",
-                left: isNarrowMobile ? "88%" : "90%",
-                top: isNarrowMobile ? 6 : 8,
-                transform: "translate(-50%, -30%)",
-                zIndex: 40,
-                fontFamily: "'Bebas Neue', cursive",
-                fontSize: isNarrowMobile ? 18 : isCompactBoard ? 22 : 26,
-                letterSpacing: "0.1em",
-                background: "transparent",
-                color: "var(--ui-text)",
-                border: "1px solid var(--ui-line)",
-                padding: isNarrowMobile ? "4px 14px 3px" : isCompactBoard ? "5px 16px 4px" : "7px 20px 6px",
-                cursor: "pointer",
-                lineHeight: 1,
-                boxShadow: "0 4px 10px rgba(26,15,0,0.18)",
-                transition: "transform 0.12s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.12s ease, color 0.12s ease, border-color 0.12s ease",
-              }}
-              title="Pass your turn"
-            >PASS</button>
-          )}
+
 
           {stackChoiceOpen && (
             <ActionTray>
@@ -2633,40 +2612,6 @@ export default function GameBoard({
               height: `${localHandAreaHeightPx}px`,
               overflow: "visible",
             }}
-              onMouseMove={(event) => {
-                if (visibleHand.length <= 1) {
-                  queueHoverPosition(0);
-                  return;
-                }
-
-                const rect = event.currentTarget.getBoundingClientRect();
-                const x = Math.max(0, Math.min(rect.width, event.clientX - rect.left));
-                const y = Math.max(0, Math.min(rect.height, event.clientY - rect.top));
-                const fanSpan = Math.max(1, (visibleHand.length - 1) * handOverlap);
-                const fanStart = Math.max(0, (rect.width - fanSpan) / 2);
-                const fanEnd = fanStart + fanSpan;
-
-                // Limit hover activation to the real card fan area so nearby empty space
-                // does not trigger magnetic motion.
-                const activationPaddingX = Math.max(10, handOverlap * 0.35);
-                const cardHeightPx = 122 * localHandCardScale;
-                const activationTopY = Math.max(0, rect.height - cardHeightPx - 20);
-                const activationBottomY = rect.height;
-                const insideX = x >= (fanStart - activationPaddingX) && x <= (fanEnd + activationPaddingX);
-                const insideY = y >= activationTopY && y <= activationBottomY;
-
-                if (!insideX || !insideY) {
-                  queueHoverPosition(null);
-                  return;
-                }
-
-                const finePosition = Math.max(0, Math.min(visibleHand.length - 1, (x - fanStart) / Math.max(1, handOverlap)));
-                const quantizedPosition = Math.round(finePosition * 4) / 4;
-                queueHoverPosition(quantizedPosition);
-              }}
-              onMouseLeave={() => {
-                queueHoverPosition(null);
-              }}
             >
               {visibleHand.map((card, i) => {
                 const playable = humanTurn && !botThinking && !turnTransitionLocked && playableCardIds.has(card.id);
@@ -2676,17 +2621,8 @@ export default function GameBoard({
                 const offset = i - mid;
                 const rotateDeg = offset * ARC_SPREAD;
                 const liftPx = Math.abs(offset) * ARC_LIFT;
-                const hoverDistance = hoveredHandPosition === null ? 99 : Math.abs(i - hoveredHandPosition);
-                const gaussian = hoveredHandPosition === null
-                  ? 0
-                  : Math.exp(-((hoverDistance * hoverDistance) / (2 * 1.35 * 1.35)));
-                const dockScale = 1 + (0.08 * gaussian);
-                const dockLift = 5 * gaussian;
-                const horizontalPush = hoveredHandPosition === null
-                  ? 0
-                  : Math.sign(i - hoveredHandPosition) * (1.5 * gaussian);
                 const baseLift = isSelected ? liftPx - 14 : liftPx;
-                const baseTransform = `translateX(${horizontalPush}px) rotate(${rotateDeg}deg) translateY(${baseLift - dockLift}px) scale(${dockScale * localTurnBoost})`;
+                const baseTransform = `rotate(${rotateDeg}deg) translateY(${baseLift}px) scale(${localTurnBoost})`;
 
                 return (
                   <div
@@ -2697,13 +2633,10 @@ export default function GameBoard({
                       "--card-rot": `${rotateDeg}deg`,
                       "--card-lift": `${isSelected ? liftPx - 14 : liftPx}px`,
                       marginLeft: i === 0 ? 0 : -handOverlap,
-                      zIndex: hoveredHandPosition === null
-                        ? (playable ? i + 1 : i)
-                        : i + Math.round(gaussian * 180),
+                      zIndex: playable ? i + 1 : i,
                       position: "relative",
                       transform: baseTransform,
                       transformOrigin: "bottom center",
-                      transition: "transform 0.26s cubic-bezier(0.22, 1, 0.36, 1), filter 0.2s ease",
                       willChange: "transform",
                       cursor: playable ? "pointer" : "default",
                       outline: isSelected ? "2px solid var(--ui-text)" : "none",
@@ -2714,9 +2647,6 @@ export default function GameBoard({
                       animation: isFreshDraw ? "drewCardGlow 0.6s cubic-bezier(0.23, 1, 0.32, 1)" : "none",
                     } as CSSProperties & Record<string, string | number>}
                     onClick={playable ? (event) => handleSelectCard(card, event.currentTarget) : undefined}
-                    onMouseEnter={() => {
-                      queueHoverPosition(i);
-                    }}
                   >
                     {isFreshDraw && (
                       <span style={{
@@ -2732,6 +2662,7 @@ export default function GameBoard({
                         color: "var(--ui-accent-red)",
                         whiteSpace: "nowrap",
                         zIndex: 3,
+                        pointerEvents: "none",
                       }}>DREW</span>
                     )}
                     <GameCard
@@ -2872,6 +2803,9 @@ export default function GameBoard({
             players={game.players.map((player) => player.name)}
             onReset={() => { resetGame(); onReset(); }}
             onDealAgain={onDealAgain}
+            showReadyToggle={showReadyToggle}
+            onToggleReady={onToggleReady}
+            isReady={isReady}
           />
         </>
       )}

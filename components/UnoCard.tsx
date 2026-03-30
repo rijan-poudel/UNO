@@ -195,28 +195,12 @@ export default function UnoCard({
           : isPlayable
             ? `inset 0 0 0 ${Math.round(2 * s)}px rgba(255,248,240,0.35), ${Math.round(2 * s)}px ${Math.round(4 * s)}px ${Math.round(10 * s)}px rgba(26,15,0,0.25)`
             : `${Math.round(1 * s)}px ${Math.round(3 * s)}px ${Math.round(8 * s)}px rgba(26,15,0,0.18)`,
-        transform: isSelected ? `translateY(${Math.round(-10 * s)}px)` : 'translateY(0)',
-        transition: 'transform 0.15s cubic-bezier(0.22,1,0.36,1), box-shadow 0.15s ease',
+        transition: 'box-shadow 0.15s ease',
         cursor: interactive ? 'pointer' : 'default',
         userSelect: 'none',
         position: 'relative',
         flexShrink: 0,
         overflow: 'hidden',
-      }}
-      onMouseEnter={e => {
-        if (!interactive) return;
-        (e.currentTarget as HTMLDivElement).style.transform = `translateY(${Math.round(-14 * s)}px)`;
-        (e.currentTarget as HTMLDivElement).style.boxShadow =
-          `inset 0 0 0 ${Math.round(2 * s)}px rgba(255,248,240,0.55), ${Math.round(2 * s)}px ${Math.round(8 * s)}px ${Math.round(18 * s)}px rgba(26,15,0,0.32)`;
-      }}
-      onMouseLeave={e => {
-        (e.currentTarget as HTMLDivElement).style.transform =
-          isSelected ? `translateY(${Math.round(-10 * s)}px)` : 'translateY(0)';
-        (e.currentTarget as HTMLDivElement).style.boxShadow = isSelected
-          ? `0 0 0 ${Math.round(3 * s)}px #1a0f00, 0 0 0 ${Math.round(5 * s)}px #fff8f0, ${Math.round(2 * s)}px ${Math.round(4 * s)}px ${Math.round(10 * s)}px rgba(26,15,0,0.3)`
-          : isPlayable
-            ? `inset 0 0 0 ${Math.round(2 * s)}px rgba(255,248,240,0.35), ${Math.round(2 * s)}px ${Math.round(4 * s)}px ${Math.round(10 * s)}px rgba(26,15,0,0.25)`
-            : `${Math.round(1 * s)}px ${Math.round(3 * s)}px ${Math.round(8 * s)}px rgba(26,15,0,0.18)`;
       }}
     >
       {/* Inner border — like a real printed card */}
