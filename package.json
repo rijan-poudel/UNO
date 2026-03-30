@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "agent": "tsx agent/agent.ts",
     "dev": "concurrently \"npm run dev:web\" \"npm run dev:socket\"",
     "dev:web": "next dev --webpack",
     "dev:socket": "tsx server/socketServer.ts",

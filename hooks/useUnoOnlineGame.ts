@@ -278,7 +278,6 @@ export function useUnoOnlineGame() {
     connected: false,
   });
 
-  const previousTurnRef = useRef<number | null>(null);
   const announcedRoomIdRef = useRef<string | null>(null);
 
   useEffect(() => {
@@ -310,16 +309,10 @@ export function useUnoOnlineGame() {
           nextLog = [actionLine, ...prev.log.filter((entry) => entry !== actionLine)].slice(0, 30);
         }
 
-        let drawnThisTurn = prev.drawnThisTurn;
-        if (room.game) {
-          const turn = room.game.turnCount;
-          if (previousTurnRef.current !== null && previousTurnRef.current !== turn) {
-            drawnThisTurn = false;
-          }
-
-          const localIndex = prev.playerId
-            ? room.game.players.findIndex((p) => p.id === prev.playerId)
-            : -1;
+        // Derive drawnThisTurn purely from server state to avoid desync
+        let drawnThisTurn = false;
+        if (room.game && prev.playerId) {
+          const localIndex = room.game.players.findIndex((p) => p.id === prev.playerId);
           if (
             localIndex >= 0 &&
             room.game.lastAction.type === 'draw' &&
@@ -329,12 +322,6 @@ export function useUnoOnlineGame() {
           ) {
             drawnThisTurn = true;
           }
-
-          if (room.game.lastAction.type === 'play' || room.game.lastAction.type === 'pass') {
-            drawnThisTurn = false;
-          }
-
-          previousTurnRef.current = turn;
         }
 
         return {

@@ -46,6 +46,7 @@ export function canPlayCard(
 
   const { activeColor, pendingDraw, pendingDrawType, rules, discardPile } = state;
   const topDiscard = discardPile[discardPile.length - 1];
+  if (!topDiscard) return false;
 
   if (card.value === 'discardAll' && !rules.allowDiscardAll) return false;
   if (card.value === 'shuffle' && !rules.allowShuffleCard) return false;

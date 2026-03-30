@@ -16,6 +16,8 @@ import { canJumpInPlay, canPlayCard } from './gameRules';
 import { advanceTurn } from './turns';
 import { shuffleDeck } from './deck';
 
+const MAX_DRAW_UNTIL_PLAYABLE = 20;
+
 // ── Internal utilities ────────────────────────────────────────────────────────
 
 /** Remove one card by id from a hand array. Returns the card and the new hand. */
@@ -153,6 +155,13 @@ function resolveCardEffect(
   const { rules, players } = state;
   const playerCount = players.length;
 
+  const requireChosenColor = (): CardColor => {
+    if (!chosenColor || chosenColor === 'wild') {
+      throw new Error('A valid non-wild color must be chosen for wild cards.');
+    }
+    return chosenColor;
+  };
+
   switch (card.value) {
 
     // ── Skip ────────────────────────────────────────────────────────────────
@@ -196,7 +205,7 @@ function resolveCardEffect(
         ...state,
         pendingDraw: newPending,
         pendingDrawType: 'wild4',
-        activeColor: chosenColor!, // chosenColor is validated before this runs
+        activeColor: requireChosenColor(),
       });
     }
 
@@ -205,15 +214,24 @@ function resolveCardEffect(
       // No draw penalty — just change the active color and pass the turn.
       return advanceTurn({
         ...state,
-        activeColor: chosenColor!,
+        activeColor: requireChosenColor(),
       });
     }
 
     case 'shuffle': {
-      return advanceTurn({
+      let result = advanceTurn({
         ...state,
-        activeColor: chosenColor!,
+        activeColor: requireChosenColor(),
       });
+      const nextSeat = (playedByIndex + state.direction + state.players.length) % state.players.length;
+      result = shuffleHandsStartingFrom(result, nextSeat);
+      const prevAction = result.lastAction;
+      return {
+        ...result,
+        lastAction: prevAction.type === 'play'
+          ? { ...prevAction, shuffledHands: true }
+          : prevAction,
+      };
     }
 
     // ── Number cards ────────────────────────────────────────────────────────
@@ -271,7 +289,7 @@ export function playCard(
 
   // Determine new active color (resolveCardEffect may override this for wild4).
   const newActiveColor: CardColor =
-    isWildCard(card) ? chosenColor! : card.color;
+    isWildCard(card) ? (chosenColor ?? card.color) : card.color;
 
   // When a player plays down to 1 card, reset their UNO declaration flag so
   // they need to declare UNO again (they didn't on this turn yet).
@@ -338,18 +356,6 @@ export function playCard(
     return { ...newState, winnerId: player.id };
   }
 
-  if (effectiveState.rules.allowShuffleCard && card.value === 'shuffle') {
-    const nextSeat = (playerIndex + effectiveState.direction + effectiveState.players.length) % effectiveState.players.length;
-    newState = shuffleHandsStartingFrom(newState, nextSeat);
-    newState = {
-      ...newState,
-      lastAction: {
-        ...(newState.lastAction.type === 'play' ? newState.lastAction : lastAction),
-        shuffledHands: true,
-      },
-    };
-  }
-
   // ── Apply card effects and advance turn ──────────────────────────────────
   newState = resolveCardEffect(newState, card, playerIndex, chosenColor);
 
@@ -394,7 +400,9 @@ export function drawOneCard(
   drawOnce();
 
   if (state.rules.drawUntilPlayable) {
-    while (drawn.length > 0) {
+    let draws = 0;
+    while (drawn.length > 0 && draws < MAX_DRAW_UNTIL_PLAYABLE) {
+      draws++;
       const latestCard = drawn[drawn.length - 1];
       if (canPlayCard(latestCard, afterDraw, playerIndex)) {
         break;
@@ -562,7 +570,7 @@ export function callOutUno(
       lastAction: {
         type: 'callOut',
         callerId: caller.id,
-        targetId: caller.id,
+        targetId: target.id,
         penalty,
       },
     };

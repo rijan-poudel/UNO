@@ -9,7 +9,7 @@ import type { Card, CardColor } from '../types/card';
 import { defaultRules } from '../types/rules';
 import { isActionCard, isWildCard, STANDARD_COLORS } from '../types/card';
 import { MIN_SUPPORTED_MAX_PLAYERS } from './gameLimits';
-import { createStandardUnoDeck, shuffleDeck, dealCards } from './deck';
+import { createStandardUnoDeck, shuffleDeck, dealCards, resetCardIdCounter } from './deck';
 
 // ── Internal helpers ──────────────────────────────────────────────────────────
 
@@ -71,6 +71,9 @@ export function initializeGame(
   rules?: Partial<GameRules>,
   botFlags?: boolean[],
 ): GameState {
+  // ── 0. Reset card ID counter for a clean game ──────────────────────────
+  resetCardIdCounter();
+
   // ── 1. Merge rules ───────────────────────────────────────────────────────
   const mergedRules: GameRules = {
     ...defaultRules,

@@ -1,6 +1,14 @@
 # UNO Multiplayer
 
-UNO game built with Next.js (frontend) and Socket.IO (multiplayer server).
+UNO card game built with Next.js 16 (App Router) frontend and Socket.IO real-time multiplayer server.
+
+## Features
+
+- **Local multiplayer**: Play against computer bots with configurable AI
+- **Online multiplayer**: Create/join rooms with friends using invite codes
+- **Customizable rules**: Stacking, double-play, jump-in, and more
+- **Responsive UI**: Mobile-friendly with smooth animations
+- **Voice announcer**: Optional voice feedback for game actions
 
 ## Requirements
 
@@ -46,6 +54,38 @@ Example:
 NEXT_PUBLIC_SOCKET_URL=https://your-socket-service.example.com
 UNO_CORS_ORIGINS=https://your-app.vercel.app,https://your-domain.com
 ```
+
+## Project Structure
+
+```
+app/           # Next.js App Router pages and layouts
+components/    # React components (PascalCase .tsx files)
+  ui/          # shadcn/ui base components
+hooks/         # Custom React hooks
+lib/           # Pure game logic, utilities
+server/        # Socket.IO multiplayer server
+types/         # TypeScript type definitions
+```
+
+## Key Game Logic
+
+The game engine in `lib/` uses immutable state transitions:
+
+- `gameSetup.ts` - Initializes a new game with players, deck, and rules
+- `gameActions.ts` - All player actions (play, draw, pass, call out UNO)
+- `gameRules.ts` - Playability checks and valid move detection
+- `turns.ts` - Turn order and direction management
+- `deck.ts` - Deck creation, shuffling, and card dealing
+
+## Multiplayer Server
+
+The Socket.IO server (`server/socketServer.ts`) handles:
+
+- Room management (create, join, leave, kick)
+- Real-time game state synchronization
+- Friend invites and presence tracking
+- Bot opponents for solo play
+- Automatic cleanup of stale sessions (5min presence TTL, 2min invite TTL)
 
 ## Deployment Topology
 

@@ -6,7 +6,7 @@
 // ============================================================
 'use client';
 
-import { useReducer, useEffect, useCallback, useState } from 'react';
+import { useReducer, useEffect, useCallback, useRef, useState } from 'react';
 import type { GameState } from '../types/game';
 import type { Card, CardColor } from '../types/card';
 import type { GameRules } from '../types/rules';
@@ -184,6 +184,10 @@ export function useUnoGame() {
 
   const { game, pendingWild, drawnThisTurn, botThinking, log } = state;
 
+  // Ref to always access latest game state in async callbacks
+  const gameRef = useRef<GameState | null>(game);
+  gameRef.current = game;
+
   // ── Start ─────────────────────────────────────────────────────────────────
 
   const startGame = useCallback(
@@ -314,7 +318,13 @@ export function useUnoGame() {
 
     const timer = setTimeout(() => {
       try {
-        let botState = game;
+        // Read from ref to get the latest state, avoiding stale closure
+        const currentGame = gameRef.current;
+        if (!currentGame || currentGame.winnerId) return;
+        const current = currentGame.players[currentGame.currentPlayerIndex];
+        if (!current.isBot) return;
+
+        let botState = currentGame;
         const botIndex = botState.currentPlayerIndex;
 
         const callOutTarget = botState.players.findIndex((player, idx) => (

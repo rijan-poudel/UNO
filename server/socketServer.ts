@@ -1,4 +1,5 @@
 import { createServer } from 'node:http';
+import { randomBytes } from 'node:crypto';
 import { Server } from 'socket.io';
 import { initializeGame } from '../lib/gameSetup';
 import {
@@ -70,6 +71,7 @@ interface PresenceRecord {
   deviceId: string;
   friendCode: string;
   playerName: string;
+  lastSeenAt: number;
 }
 
 interface PendingInviteRecord extends FriendInvite {
@@ -83,12 +85,7 @@ const presenceByFriendCode = new Map<string, PresenceRecord>();
 const pendingInvites = new Map<string, PendingInviteRecord>();
 
 function makeRoomId(): string {
-  const alphabet = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
-  let id = '';
-  for (let i = 0; i < 6; i += 1) {
-    id += alphabet[Math.floor(Math.random() * alphabet.length)];
-  }
-  return id;
+  return randomBytes(4).toString('base64url').toUpperCase().slice(0, 6);
 }
 
 function makePlayerId(existingCount: number): string {
@@ -212,7 +209,7 @@ function upsertPresence(socketId: string, payload: PresencePayload): string {
     presenceByFriendCode.delete(previous.friendCode);
   }
 
-  const record: PresenceRecord = { socketId, deviceId, friendCode, playerName };
+  const record: PresenceRecord = { socketId, deviceId, friendCode, playerName, lastSeenAt: Date.now() };
   presenceBySocket.set(socketId, record);
   presenceByFriendCode.set(friendCode, record);
   return friendCode;
@@ -330,7 +327,7 @@ function ensureActor(room: ServerRoom, socketId: string): { actorIndex: number; 
   return { actorIndex, actorPlayerId: actor.playerId };
 }
 
-function handleGameAction(room: ServerRoom, socketId: string, payload: RoomActionPayload): RoomSnapshot {
+function handleGameAction(room: ServerRoom, socketId: string, payload: RoomActionPayload, ioServer: Server): RoomSnapshot {
   if (!room.started || !room.game) {
     throw new Error('Game has not started.');
   }
@@ -375,6 +372,16 @@ function handleGameAction(room: ServerRoom, socketId: string, payload: RoomActio
         cardId: card.id,
         cardValue: card.value,
       };
+
+      // Auto-cancel if no color chosen within 30 seconds
+      const pendingCardId = card.id;
+      setTimeout(() => {
+        if (room.pendingColorChoice?.cardId === pendingCardId) {
+          room.pendingColorChoice = null;
+          broadcastRoom(ioServer, room);
+        }
+      }, 30_000);
+
       break;
     }
     case 'cancelWildChoice': {
@@ -526,6 +533,40 @@ const io = new Server(httpServer, {
     methods: ['GET', 'POST'],
   },
 });
+
+// ── Periodic cleanup ──────────────────────────────────────────────────────
+const CLEANUP_INTERVAL_MS = 60_000;
+const PRESENCE_TTL_MS = 5 * 60_000;
+const INVITE_TTL_MS = 2 * 60_000;
+
+setInterval(() => {
+  const now = Date.now();
+
+  // Prune stale presence records
+  for (const [socketId, record] of presenceBySocket) {
+    if (now - record.lastSeenAt > PRESENCE_TTL_MS) {
+      presenceBySocket.delete(socketId);
+      const current = presenceByFriendCode.get(record.friendCode);
+      if (current?.socketId === socketId) {
+        presenceByFriendCode.delete(record.friendCode);
+      }
+    }
+  }
+
+  // Prune expired invites
+  for (const [inviteId, invite] of pendingInvites) {
+    if (now - invite.createdAt > INVITE_TTL_MS) {
+      pendingInvites.delete(inviteId);
+    }
+  }
+
+  // Prune orphaned playerBySocket entries
+  for (const [socketId] of playerBySocket) {
+    if (!io.sockets.sockets.has(socketId)) {
+      playerBySocket.delete(socketId);
+    }
+  }
+}, CLEANUP_INTERVAL_MS);
 
 io.on('connection', (socket) => {
   socket.on('friend:status', (
@@ -968,7 +1009,7 @@ io.on('connection', (socket) => {
         return;
       }
 
-      handleGameAction(room, socket.id, payload);
+      handleGameAction(room, socket.id, payload, io);
       runOfflineBotTurns(room);
       const snapshot = toSnapshot(room);
       io.to(room.roomId).emit('room:update', snapshot);
