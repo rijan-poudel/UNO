@@ -9,6 +9,7 @@ UNO card game built with Next.js 16 (App Router) frontend and Socket.IO real-tim
 - **Customizable rules**: Stacking, double-play, jump-in, and more
 - **Responsive UI**: Mobile-friendly with smooth animations
 - **Voice announcer**: Optional voice feedback for game actions
+- **Pass button**: Quick pass action button centered above the card hand
 
 ## Requirements
 
