@@ -95,9 +95,12 @@ function shuffleHandsStartingFrom(
   state: GameState,
   startIndex: number,
 ): GameState {
-  const originalHandsSignature = state.players.map((player) => (
-    player.hand.map((card) => card.id).sort().join('|')
-  ));
+  const originalHandsSignature = state.players.map((player) =>
+    player.hand
+      .map((card) => card.id)
+      .sort()
+      .join('|'),
+  );
 
   let dealtHands: Card[][] = state.players.map(() => []);
 
@@ -106,16 +109,20 @@ function shuffleHandsStartingFrom(
     let seat = startIndex;
     for (const card of pooled) {
       nextHands[seat].push(card);
-      seat = (seat + state.direction + state.players.length) % state.players.length;
+      seat =
+        (seat + state.direction + state.players.length) % state.players.length;
     }
     return nextHands;
   };
 
-  const handsChanged = (candidateHands: Card[][]): boolean => (
-    candidateHands.some((hand, index) => (
-      hand.map((card) => card.id).sort().join('|') !== originalHandsSignature[index]
-    ))
-  );
+  const handsChanged = (candidateHands: Card[][]): boolean =>
+    candidateHands.some(
+      (hand, index) =>
+        hand
+          .map((card) => card.id)
+          .sort()
+          .join('|') !== originalHandsSignature[index],
+    );
 
   // True shuffle-hands behavior: pool every hand and deal one-by-one in turn order
   // starting from the next player after the shuffle card is played.
@@ -163,7 +170,6 @@ function resolveCardEffect(
   };
 
   switch (card.value) {
-
     // ── Skip ────────────────────────────────────────────────────────────────
     case 'skip': {
       // Skip the very next player in the current direction.
@@ -223,14 +229,17 @@ function resolveCardEffect(
         ...state,
         activeColor: requireChosenColor(),
       });
-      const nextSeat = (playedByIndex + state.direction + state.players.length) % state.players.length;
+      const nextSeat =
+        (playedByIndex + state.direction + state.players.length) %
+        state.players.length;
       result = shuffleHandsStartingFrom(result, nextSeat);
       const prevAction = result.lastAction;
       return {
         ...result,
-        lastAction: prevAction.type === 'play'
-          ? { ...prevAction, shuffledHands: true }
-          : prevAction,
+        lastAction:
+          prevAction.type === 'play'
+            ? { ...prevAction, shuffledHands: true }
+            : prevAction,
       };
     }
 
@@ -279,17 +288,27 @@ export function playCard(
   }
 
   if (isJumpIn && !canJumpInPlay(card, state)) {
-    throw new Error('Jump-in is only allowed with an exact match to the top discard.');
+    throw new Error(
+      'Jump-in is only allowed with an exact match to the top discard.',
+    );
   }
 
   // Wild cards require a color choice.
-  if (isWildCard(card) && (chosenColor === undefined || chosenColor === 'wild')) {
-    throw new Error('You must choose a non-wild color when playing a wild or wild4 card.');
+  if (
+    isWildCard(card) &&
+    !(['red', 'yellow', 'green', 'blue'] as readonly unknown[]).includes(
+      chosenColor,
+    )
+  ) {
+    throw new Error(
+      'You must choose a non-wild color when playing a wild or wild4 card.',
+    );
   }
 
   // Determine new active color (resolveCardEffect may override this for wild4).
-  const newActiveColor: CardColor =
-    isWildCard(card) ? (chosenColor ?? card.color) : card.color;
+  const newActiveColor: CardColor = isWildCard(card)
+    ? (chosenColor ?? card.color)
+    : card.color;
 
   // When a player plays down to 1 card, reset their UNO declaration flag so
   // they need to declare UNO again (they didn't on this turn yet).
@@ -339,14 +358,20 @@ export function playCard(
   // Apply the card to the discard pile and update active color.
   let newState: GameState = {
     ...effectiveState,
-    players: effectiveState.players.map((p, i) => (i === playerIndex ? postPlayPlayer : p)),
+    players: effectiveState.players.map((p, i) =>
+      i === playerIndex ? postPlayPlayer : p,
+    ),
     discardPile: [...effectiveState.discardPile, card, ...discardExtra],
     activeColor: newActiveColor,
     // Clear pending draw only for non-draw cards; draw cards add to it in resolveCardEffect.
-    pendingDraw: card.value === 'draw2' || card.value === 'wild4' ? effectiveState.pendingDraw : 0,
-    pendingDrawType: card.value === 'draw2' || card.value === 'wild4'
-      ? effectiveState.pendingDrawType
-      : null,
+    pendingDraw:
+      card.value === 'draw2' || card.value === 'wild4'
+        ? effectiveState.pendingDraw
+        : 0,
+    pendingDrawType:
+      card.value === 'draw2' || card.value === 'wild4'
+        ? effectiveState.pendingDrawType
+        : null,
     lastAction,
   };
 
@@ -371,10 +396,7 @@ export function playCard(
  *
  * Throws if there is a pendingDraw greater than zero (use drawRequiredCards instead).
  */
-export function drawOneCard(
-  state: GameState,
-  playerIndex: number,
-): GameState {
+export function drawOneCard(state: GameState, playerIndex: number): GameState {
   if (state.winnerId) throw new Error('Game is already over.');
   if (playerIndex !== state.currentPlayerIndex) {
     throw new Error(`It is not player ${playerIndex}'s turn.`);
@@ -417,9 +439,10 @@ export function drawOneCard(
 
   if (drawn.length === 0) {
     // Edge case: no cards available anywhere. Pass the turn.
-    return advanceTurn(
-      { ...state, lastAction: { type: 'draw', playerId: player.id, count: 0 } },
-    );
+    return advanceTurn({
+      ...state,
+      lastAction: { type: 'draw', playerId: player.id, count: 0 },
+    });
   }
 
   const newHand = [...player.hand, ...drawn];
@@ -455,7 +478,10 @@ export function drawRequiredCards(
   }
 
   const player = state.players[playerIndex];
-  const { drawn, state: afterDraw } = drawCardsFromPile(state, state.pendingDraw);
+  const { drawn, state: afterDraw } = drawCardsFromPile(
+    state,
+    state.pendingDraw,
+  );
 
   const newHand = [...player.hand, ...drawn];
 
@@ -481,10 +507,7 @@ export function drawRequiredCards(
  * In most implementations the UI prevents calling passTurn() before drawing.
  * Here we trust the caller to enforce that sequencing.
  */
-export function passTurn(
-  state: GameState,
-  playerIndex: number,
-): GameState {
+export function passTurn(state: GameState, playerIndex: number): GameState {
   if (state.winnerId) throw new Error('Game is already over.');
   if (playerIndex !== state.currentPlayerIndex) {
     throw new Error(`It is not player ${playerIndex}'s turn.`);
@@ -513,10 +536,7 @@ export function passTurn(
  * Can be called by any player at any time (spectator declarations are ignored
  * in practice — callers only trigger this for the relevant player).
  */
-export function declareUno(
-  state: GameState,
-  playerIndex: number,
-): GameState {
+export function declareUno(state: GameState, playerIndex: number): GameState {
   const player = state.players[playerIndex];
 
   if (player.hand.length > 2 || player.hand.length < 1) {

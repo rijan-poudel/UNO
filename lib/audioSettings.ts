@@ -4,10 +4,10 @@
  * - Voice: clips in /public/audios/ (see lib/audiosRegistry.ts).
  */
 
-export const AUDIO_SETTINGS_KEY = "uno.settings.audio";
-export const MUSIC_CONTEXT_SETTINGS_KEY = "uno.settings.musicContext";
+export const AUDIO_SETTINGS_KEY = 'uno.settings.audio';
+export const MUSIC_CONTEXT_SETTINGS_KEY = 'uno.settings.musicContext';
 
-export type MusicContext = "lobby" | "game";
+export type MusicContext = 'lobby' | 'game';
 
 export interface MusicContextSettings {
   lobbyEnabled: boolean;
@@ -15,6 +15,8 @@ export interface MusicContextSettings {
 }
 
 export interface AudioSettings {
+  /** Master mute, applied to effects, voice, and music. */
+  muted: boolean;
   /** Short synthetic beeps for plays, draws, UNO, etc. */
   chimesEnabled: boolean;
   /** In-game board announcer (plays from game events). */
@@ -26,44 +28,50 @@ export interface AudioSettings {
 }
 
 export const defaultAudioSettings: AudioSettings = {
+  muted: false,
   chimesEnabled: true,
-  voiceInGame: true,
-  musicVolume: 0.7,
-  sfxVolume: 0.8,
+  voiceInGame: false,
+  musicVolume: 0.24,
+  sfxVolume: 0.55,
 };
 
 export const defaultMusicContextSettings: MusicContextSettings = {
-  lobbyEnabled: true,
-  gameEnabled: true,
+  lobbyEnabled: false,
+  gameEnabled: false,
 };
 
 function parseStored(raw: string | null): Partial<AudioSettings> {
   if (!raw) return {};
   try {
     const v = JSON.parse(raw) as unknown;
-    if (typeof v !== "object" || v === null) return {};
+    if (typeof v !== 'object' || v === null) return {};
     const o = v as Record<string, unknown>;
     const next: Partial<AudioSettings> = {};
-    if (typeof o.chimesEnabled === "boolean")
+    if (typeof o.muted === 'boolean') next.muted = o.muted;
+    if (typeof o.chimesEnabled === 'boolean')
       next.chimesEnabled = o.chimesEnabled;
-    if (typeof o.voiceInGame === "boolean") next.voiceInGame = o.voiceInGame;
-    if (typeof o.musicVolume === "number") next.musicVolume = o.musicVolume;
-    if (typeof o.sfxVolume === "number") next.sfxVolume = o.sfxVolume;
+    if (typeof o.voiceInGame === 'boolean') next.voiceInGame = o.voiceInGame;
+    if (typeof o.musicVolume === 'number' && Number.isFinite(o.musicVolume))
+      next.musicVolume = Math.max(0, Math.min(1, o.musicVolume));
+    if (typeof o.sfxVolume === 'number' && Number.isFinite(o.sfxVolume))
+      next.sfxVolume = Math.max(0, Math.min(1, o.sfxVolume));
     return next;
   } catch {
     return {};
   }
 }
 
-function parseMusicContextStored(raw: string | null): Partial<MusicContextSettings> {
+function parseMusicContextStored(
+  raw: string | null,
+): Partial<MusicContextSettings> {
   if (!raw) return {};
   try {
     const v = JSON.parse(raw) as unknown;
-    if (typeof v !== "object" || v === null) return {};
+    if (typeof v !== 'object' || v === null) return {};
     const o = v as Record<string, unknown>;
     const next: Partial<MusicContextSettings> = {};
-    if (typeof o.lobbyEnabled === "boolean") next.lobbyEnabled = o.lobbyEnabled;
-    if (typeof o.gameEnabled === "boolean") next.gameEnabled = o.gameEnabled;
+    if (typeof o.lobbyEnabled === 'boolean') next.lobbyEnabled = o.lobbyEnabled;
+    if (typeof o.gameEnabled === 'boolean') next.gameEnabled = o.gameEnabled;
     return next;
   } catch {
     return {};
@@ -83,7 +91,7 @@ export function storedToUiVolume(stored: number): number {
 }
 
 export function getAudioSettings(): AudioSettings {
-  if (typeof window === "undefined") return { ...defaultAudioSettings };
+  if (typeof window === 'undefined') return { ...defaultAudioSettings };
   try {
     const raw = window.localStorage.getItem(AUDIO_SETTINGS_KEY);
     return { ...defaultAudioSettings, ...parseStored(raw) };
@@ -93,18 +101,18 @@ export function getAudioSettings(): AudioSettings {
 }
 
 export function setAudioSettings(partial: Partial<AudioSettings>): void {
-  if (typeof window === "undefined") return;
+  if (typeof window === 'undefined') return;
   const next = { ...getAudioSettings(), ...partial };
   try {
     window.localStorage.setItem(AUDIO_SETTINGS_KEY, JSON.stringify(next));
-    window.dispatchEvent(new CustomEvent("uno:audio-settings"));
+    window.dispatchEvent(new CustomEvent('uno:audio-settings'));
   } catch {
     // Ignore storage errors.
   }
 }
 
 export function getMusicContextSettings(): MusicContextSettings {
-  if (typeof window === "undefined") return { ...defaultMusicContextSettings };
+  if (typeof window === 'undefined') return { ...defaultMusicContextSettings };
   try {
     const raw = window.localStorage.getItem(MUSIC_CONTEXT_SETTINGS_KEY);
     return { ...defaultMusicContextSettings, ...parseMusicContextStored(raw) };
@@ -115,21 +123,26 @@ export function getMusicContextSettings(): MusicContextSettings {
 
 export function isMusicEnabledForContext(context: MusicContext): boolean {
   const settings = getMusicContextSettings();
-  return context === "game" ? settings.gameEnabled : settings.lobbyEnabled;
+  return context === 'game' ? settings.gameEnabled : settings.lobbyEnabled;
 }
 
 export function setMusicEnabledForContext(
   context: MusicContext,
   enabled: boolean,
 ): void {
-  if (typeof window === "undefined") return;
+  if (typeof window === 'undefined') return;
   const next = {
     ...getMusicContextSettings(),
-    ...(context === "game" ? { gameEnabled: enabled } : { lobbyEnabled: enabled }),
+    ...(context === 'game'
+      ? { gameEnabled: enabled }
+      : { lobbyEnabled: enabled }),
   };
   try {
-    window.localStorage.setItem(MUSIC_CONTEXT_SETTINGS_KEY, JSON.stringify(next));
-    window.dispatchEvent(new CustomEvent("uno:audio-settings"));
+    window.localStorage.setItem(
+      MUSIC_CONTEXT_SETTINGS_KEY,
+      JSON.stringify(next),
+    );
+    window.dispatchEvent(new CustomEvent('uno:audio-settings'));
   } catch {
     // Ignore storage errors.
   }

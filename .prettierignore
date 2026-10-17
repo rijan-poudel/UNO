@@ -1,0 +1,9 @@
+node_modules
+.next
+.delta
+agent
+.impeccable
+package-lock.json
+skills-lock.json
+demo.ts
+opencode.json

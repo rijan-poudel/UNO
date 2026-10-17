@@ -9,7 +9,12 @@ import type { Card, CardColor } from '../types/card';
 import { defaultRules } from '../types/rules';
 import { isActionCard, isWildCard, STANDARD_COLORS } from '../types/card';
 import { MIN_SUPPORTED_MAX_PLAYERS } from './gameLimits';
-import { createStandardUnoDeck, shuffleDeck, dealCards, resetCardIdCounter } from './deck';
+import {
+  createStandardUnoDeck,
+  shuffleDeck,
+  dealCards,
+  resetCardIdCounter,
+} from './deck';
 
 // ── Internal helpers ──────────────────────────────────────────────────────────
 
@@ -30,7 +35,10 @@ function drawStartingCard(
     const candidate = remaining[remaining.length - 1];
     remaining = remaining.slice(0, -1);
 
-    const isInvalid = !allowAction && (isActionCard(candidate) || isWildCard(candidate));
+    // There is no player choosing a color before the opening turn. Keep wilds
+    // in the deck; the opening discard must establish a real playable color.
+    const isInvalid =
+      isWildCard(candidate) || (!allowAction && isActionCard(candidate));
     if (isInvalid) {
       rejected.push(candidate);
       continue;
@@ -41,15 +49,14 @@ function drawStartingCard(
 
   throw new Error(
     'Could not find a valid starting card. ' +
-    'Try allowStartingActionCard: true or add more cards.',
+      'Try allowStartingActionCard: true or add more cards.',
   );
 }
 
 /**
  * Derive the active color from the starting discard card.
- * Wild cards don't carry a color, so activeColor starts as null when a
- * wild is the first card — though this should not happen when allowStartingActionCard
- * is false, and the rules should ideally handle it.
+ * The opening-card selector excludes wilds, so a normal game always starts
+ * with one of the four playable colors.
  */
 function getInitialActiveColor(card: Card): CardColor | null {
   return STANDARD_COLORS.includes(card.color as CardColor)
@@ -79,7 +86,10 @@ export function initializeGame(
     ...defaultRules,
     ...rules,
     // Guard against stale persisted configs forcing old 4-player caps.
-    maxPlayers: Math.max(MIN_SUPPORTED_MAX_PLAYERS, rules?.maxPlayers ?? defaultRules.maxPlayers),
+    maxPlayers: Math.max(
+      MIN_SUPPORTED_MAX_PLAYERS,
+      rules?.maxPlayers ?? defaultRules.maxPlayers,
+    ),
   };
 
   // ── 2. Validate player count ─────────────────────────────────────────────
@@ -89,7 +99,7 @@ export function initializeGame(
   if (playerNames.length > mergedRules.maxPlayers) {
     throw new Error(
       `Too many players (${playerNames.length}). ` +
-      `This game's rules allow a maximum of ${mergedRules.maxPlayers}.`,
+        `This game's rules allow a maximum of ${mergedRules.maxPlayers}.`,
     );
   }
 
@@ -104,7 +114,8 @@ export function initializeGame(
 
   // ── 4. Create and shuffle deck ────────────────────────────────────────────
   let deck = createStandardUnoDeck().filter((card) => {
-    if (card.value === 'discardAll' && !mergedRules.allowDiscardAll) return false;
+    if (card.value === 'discardAll' && !mergedRules.allowDiscardAll)
+      return false;
     if (card.value === 'shuffle' && !mergedRules.allowShuffleCard) return false;
     return true;
   });
@@ -121,10 +132,11 @@ export function initializeGame(
   }
 
   // ── 6. Flip starting card ─────────────────────────────────────────────────
-  const { card: startCard, deck: deckAfterStart, rejected } = drawStartingCard(
-    deck,
-    mergedRules.allowStartingActionCard,
-  );
+  const {
+    card: startCard,
+    deck: deckAfterStart,
+    rejected,
+  } = drawStartingCard(deck, mergedRules.allowStartingActionCard);
 
   // Rejected cards go back to the bottom of the draw pile so nothing is lost.
   deck = [...rejected, ...deckAfterStart];
@@ -135,13 +147,18 @@ export function initializeGame(
   // ── 8. Assemble initial state ─────────────────────────────────────────────
   const state: GameState = {
     players,
-    currentPlayerIndex: 0,
-    direction: 1,
+    currentPlayerIndex:
+      startCard.value === 'skip'
+        ? 1
+        : startCard.value === 'reverse'
+          ? players.length - 1
+          : 0,
+    direction: startCard.value === 'reverse' ? -1 : 1,
     drawPile: deck,
     discardPile: [startCard],
     activeColor,
-    pendingDraw: 0,
-    pendingDrawType: null,
+    pendingDraw: startCard.value === 'draw2' ? 2 : 0,
+    pendingDrawType: startCard.value === 'draw2' ? 'draw2' : null,
     winnerId: null,
     rules: mergedRules,
     turnCount: 0,

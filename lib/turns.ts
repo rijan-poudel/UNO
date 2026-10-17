@@ -19,7 +19,7 @@ export function getNextPlayerIndex(state: GameState, steps = 1): number {
   const { players, currentPlayerIndex, direction } = state;
   const n = players.length;
   // The modulo is applied twice-over to handle negative results from direction === -1.
-  return ((currentPlayerIndex + direction * steps) % n + n) % n;
+  return (((currentPlayerIndex + direction * steps) % n) + n) % n;
 }
 
 /**

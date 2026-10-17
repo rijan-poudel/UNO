@@ -1,1171 +1,426 @@
+// Preferences use the same controls and typography as the rest of the club.
 "use client";
-
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import {
+  AudioLines,
+  Copy,
+  RotateCcw,
+  SlidersHorizontal,
+  User,
+  Palette,
+  Check,
+} from "lucide-react";
 import type { GameRules } from "../types/rules";
 import { defaultRules } from "../types/rules";
 import {
-  defaultAudioSettings,
   getAudioSettings,
+  getMusicContextSettings,
   setAudioSettings,
+  setMusicEnabledForContext,
   type AudioSettings,
-  uiToStoredVolume,
-  storedToUiVolume,
 } from "../lib/audioSettings";
 import {
-  Blend,
-  Crown,
-  Equal,
-  Gamepad2,
-  Hand,
-  Layers,
-  ListChecks,
-  Palette,
-  ShieldPlus,
-  Shuffle,
-  SkipForward,
-  User,
-  Volume2,
-  AudioLines,
-  Mic,
-} from "lucide-react";
-import type { LucideIcon } from "lucide-react";
-
-const safeStoredToUi = (v: number) =>
-  typeof storedToUiVolume === "function" ? storedToUiVolume(v) : v;
-
-const ONLINE_PLAYER_NAME_KEY = "uno.online.playerName";
-const PLAYER_NAME_UPDATED_EVENT = "uno:player-name-updated";
-const READABLE_MUTED = "color-mix(in oklab, var(--ui-text) 72%, transparent)";
-const MONKEYTYPE_MONO = "var(--font-monkeytype-mono), 'Roboto Mono', monospace";
-const EASE_OUT = "cubic-bezier(0.23, 1, 0.32, 1)";
-const EASE_OUT_SOFT = "cubic-bezier(0.22, 1, 0.36, 1)";
-
-function getStoredProfileName(): string {
-  if (typeof window === "undefined") return "Player 1";
-  try {
-    const stored = window.localStorage.getItem(ONLINE_PLAYER_NAME_KEY);
-    return stored && stored.trim() ? stored.trim().slice(0, 18) : "Player 1";
-  } catch {
-    return "Player 1";
-  }
-}
-
-function sanitizeProfileName(value: string): string {
-  const normalized = value.trim().slice(0, 18);
-  const lowered = normalized.toLowerCase();
-  if (!normalized || lowered === "null" || lowered === "undefined") {
-    return "Player 1";
-  }
-  return normalized;
-}
-
-interface SettingsModalProps {
+  primeTableAudioFromUserGesture,
+  playTableChime,
+} from "../lib/tableChimes";
+import Modal from "./Modal";
+import RulePresets from "./RulePresets";
+interface Props {
   open: boolean;
   initialTab?: "profile" | "controls" | "audio";
   rules: Partial<GameRules>;
   friendCode?: string;
+  themeLabel?: string;
+  onSelectTheme?: (theme: string) => void;
   onCopyFriendCode?: () => void;
   onChange: (rules: Partial<GameRules>) => void;
   onClose: () => void;
 }
-
-interface RuleToggle {
+const RULES: Array<{
   key: keyof GameRules;
   label: string;
   description: string;
-}
-
-const RULE_TOGGLES: RuleToggle[] = [
+}> = [
   {
     key: "stackDraw2",
-    label: "Stack +2",
-    description: "Chain draw-two cards together.",
+    label: "Stack draw two",
+    description: "Answer a +2 with another +2.",
   },
   {
     key: "stackWild4",
-    label: "Stack +4",
-    description: "Chain wild-four cards together.",
+    label: "Stack draw four",
+    description: "Pass a +4 along with another +4.",
   },
   {
     key: "allowWild4OnDraw2",
-    label: "+4 counters +2",
-    description: "Wild four can answer a draw two.",
-  },
-  {
-    key: "allowDiscardAll",
-    label: "Discard All card",
-    description:
-      "Enable the Discard All card that drops all cards in that card color.",
-  },
-  {
-    key: "allowShuffleCard",
-    label: "Shuffle Hands card",
-    description:
-      "Enable the wild shuffle card (choose color after shuffling all hands).",
-  },
-  {
-    key: "allowJumpIn",
-    label: "Jump-in",
-    description: "Play an exact top-card match out of turn.",
+    label: "Four beats two",
+    description: "Answer a +2 with a wild +4.",
   },
   {
     key: "drawUntilPlayable",
-    label: "Draw until playable",
+    label: "Draw until you can play",
     description: "Keep drawing until a card matches.",
   },
   {
-    key: "reverseActsAsSkipInTwoPlayer",
-    label: "Reverse = Skip (2p)",
-    description: "Reverse skips in heads-up.",
-  },
-  {
     key: "mustDeclareUno",
-    label: "Must call UNO",
-    description: "Missed UNO can be penalised.",
+    label: "Call UNO",
+    description: "One card left? Say it before someone catches you.",
   },
   {
     key: "penalizeFalseCallOut",
     label: "False call-out penalty",
-    description: "Invalid UNO call-out gives the caller +2 cards.",
+    description: "A wrong accusation costs two cards.",
+  },
+  {
+    key: "allowJumpIn",
+    label: "Jump in",
+    description: "An exact matching card can interrupt another turn.",
+  },
+  {
+    key: "allowDiscardAll",
+    label: "Discard all cards",
+    description: "Add a special card that clears one color from your hand.",
+  },
+  {
+    key: "allowShuffleCard",
+    label: "Shuffle hands",
+    description: "Add a wild that redistributes everyone’s cards.",
+  },
+  {
+    key: "reverseActsAsSkipInTwoPlayer",
+    label: "Heads-up reverse",
+    description: "Reverse acts as Skip with two players.",
   },
   {
     key: "allowStartingActionCard",
-    label: "Action start card",
-    description: "Action card can open the game.",
-  },
-  {
-    key: "allowDoublePlaySameNumber",
-    label: "Double play",
-    description: "Play two same-number cards at once.",
+    label: "Start with an action",
+    description: "Allow a special card to open the round.",
   },
   {
     key: "canFinishWithActionCard",
-    label: "Finish with action card",
-    description: "Players can go out on skip, reverse, +2 or wilds.",
+    label: "Finish on anything",
+    description: "Win with a number, action, or wild card.",
   },
 ];
-
-const RETRO_ICON_BADGE_STYLE = {
-  display: "inline-flex",
-  alignItems: "center",
-  justifyContent: "center",
-  width: 14,
-  height: 14,
-  color: "var(--ui-text)",
-  flexShrink: 0,
-} as const;
-
-const CONTROL_RULE_ICONS: Partial<Record<keyof GameRules, LucideIcon>> = {
-  stackDraw2: Layers,
-  stackWild4: ShieldPlus,
-  allowWild4OnDraw2: Equal,
-  allowDiscardAll: SkipForward,
-  allowShuffleCard: Shuffle,
-  allowJumpIn: Hand,
-  drawUntilPlayable: ListChecks,
-  reverseActsAsSkipInTwoPlayer: SkipForward,
-  mustDeclareUno: Crown,
-  penalizeFalseCallOut: ShieldPlus,
-  allowStartingActionCard: Gamepad2,
-  allowDoublePlaySameNumber: Layers,
-  canFinishWithActionCard: Blend,
-};
-
-function Toggle({ on, onClick }: { on: boolean; onClick: () => void }) {
+export function Toggle({
+  checked,
+  onChange,
+  label,
+  description,
+  disabled = false,
+}: {
+  checked: boolean;
+  onChange: (value: boolean) => void;
+  label: string;
+  description?: string;
+  disabled?: boolean;
+}) {
   return (
-    <button
-      className="settings-toggle"
-      type="button"
-      onClick={onClick}
-      aria-checked={on}
-      role="switch"
-      style={{
-        width: 40,
-        height: 24,
-        border: `1.5px solid ${on ? "var(--ui-text)" : "var(--ui-line)"}`,
-        background: on ? "var(--ui-text)" : "transparent",
-        position: "relative",
-        cursor: "pointer",
-        transition: `background 0.16s ${EASE_OUT_SOFT}, border-color 0.16s ${EASE_OUT_SOFT}, transform 0.12s ${EASE_OUT}`,
-        flexShrink: 0,
-      }}
-    >
-      <span
-        className="settings-toggle-thumb"
-        style={{
-          position: "absolute",
-          top: 3,
-          left: on ? 20 : 3,
-          width: 14,
-          height: 14,
-          background: on ? "var(--ui-bg)" : "var(--ui-muted)",
-          transition: `left 0.16s ${EASE_OUT}, background 0.16s ${EASE_OUT_SOFT}`,
-        }}
+    <label className={`preference-row ${disabled ? "disabled" : ""}`}>
+      <span>
+        <strong>{label}</strong>
+        {description && <small>{description}</small>}
+      </span>
+      <input
+        type="checkbox"
+        role="switch"
+        checked={checked}
+        disabled={disabled}
+        onChange={(e) => onChange(e.target.checked)}
       />
-    </button>
+      <span className="switch-track" aria-hidden="true" />
+    </label>
   );
 }
-
+function readName() {
+  try {
+    return localStorage.getItem("uno.online.playerName") ?? "You";
+  } catch {
+    return "You";
+  }
+}
 export default function SettingsModal({
   open,
   initialTab = "controls",
   rules,
   friendCode,
+  themeLabel,
+  onSelectTheme,
   onCopyFriendCode,
   onChange,
   onClose,
-}: SettingsModalProps) {
-  const [tab, setTab] = useState<"profile" | "controls" | "audio">(initialTab);
-  const [profileName, setProfileName] = useState(getStoredProfileName);
-  const [audio, setAudio] = useState<AudioSettings>(() => ({
-    ...defaultAudioSettings,
-  }));
-
-  const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
-  const musicUi = safeStoredToUi(audio.musicVolume);
-  const sfxUi = safeStoredToUi(audio.sfxVolume);
-
-  const adjustMusicVolume = (deltaUi: number) => {
-    const nextUi = clamp01(Math.round((musicUi + deltaUi) * 10) / 10);
-    setAudioSettings({ musicVolume: uiToStoredVolume(nextUi) });
+}: Props) {
+  const [tab, setTab] = useState<"profile" | "controls" | "audio" | "look">(
+    initialTab,
+  );
+  const [audio, setAudio] = useState(getAudioSettings);
+  const [music, setMusic] = useState(getMusicContextSettings);
+  const [name, setName] = useState(readName);
+  const [saved, setSaved] = useState(false);
+  const updateAudio = (partial: Partial<AudioSettings>) => {
+    setAudioSettings(partial);
     setAudio(getAudioSettings());
   };
-
-  const adjustSfxVolume = (deltaUi: number) => {
-    const nextUi = clamp01(Math.round((sfxUi + deltaUi) * 10) / 10);
-    setAudioSettings({ sfxVolume: uiToStoredVolume(nextUi) });
-    setAudio(getAudioSettings());
-  };
-
-  useEffect(() => {
-    if (!open) return;
-    const t = window.setTimeout(() => setAudio(getAudioSettings()), 0);
-    return () => window.clearTimeout(t);
-  }, [open]);
-
-  const persistProfileName = (rawValue: string) => {
-    const sanitized = sanitizeProfileName(rawValue);
-    setProfileName(sanitized);
+  const saveName = () => {
+    const next = name.trim().slice(0, 18) || "You";
     try {
-      window.localStorage.setItem(ONLINE_PLAYER_NAME_KEY, sanitized);
-      window.dispatchEvent(new CustomEvent(PLAYER_NAME_UPDATED_EVENT, { detail: { name: sanitized } }));
-    } catch {
-      // Ignore storage issues.
-    }
+      localStorage.setItem("uno.online.playerName", next);
+      window.dispatchEvent(new CustomEvent("uno:player-name-updated"));
+    } catch {}
+    setName(next);
+    setSaved(true);
   };
-
-  if (!open) return null;
-
   return (
-    <div
-      className="settings-modal-backdrop"
-      style={{
-        position: "fixed",
-        inset: 0,
-        zIndex: 95,
-        background: "color-mix(in srgb, var(--ui-bg) 58%, #000 42%)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: 14,
-      }}
-      onClick={onClose}
+    <Modal
+      open={open}
+      title="Make it your game."
+      onClose={onClose}
+      className="settings-modal"
     >
-      <style>{`
-        @keyframes settingsFade {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-
-        @keyframes settingsPop {
-          from { opacity: 0; transform: translateY(14px) scale(0.98); }
-          to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
-        .settings-modal-backdrop {
-          animation: settingsFade 0.2s ${EASE_OUT_SOFT};
-        }
-
-        .settings-modal-panel {
-          animation: settingsPop 0.22s ${EASE_OUT};
-        }
-
-        .settings-scroll {
-          scrollbar-width: thin;
-          scrollbar-color: color-mix(in oklab, var(--ui-text) 42%, transparent)
-            color-mix(in oklab, var(--ui-bg) 86%, transparent);
-        }
-
-        .settings-scroll::-webkit-scrollbar {
-          width: 10px;
-        }
-
-        .settings-scroll::-webkit-scrollbar-track {
-          background: color-mix(in oklab, var(--ui-bg) 90%, transparent);
-          border-left: 1px solid var(--ui-line);
-        }
-
-        .settings-scroll::-webkit-scrollbar-thumb {
-          background: linear-gradient(
-            180deg,
-            color-mix(in oklab, var(--ui-text) 58%, transparent),
-            color-mix(in oklab, var(--ui-text) 38%, transparent)
-          );
-          border: 2px solid color-mix(in oklab, var(--ui-bg) 90%, transparent);
-          border-radius: 999px;
-        }
-
-        .settings-scroll::-webkit-scrollbar-thumb:hover {
-          background: color-mix(in oklab, var(--ui-text) 66%, transparent);
-        }
-
-        .settings-profile-input {
-          outline: none;
-          box-shadow: none;
-        }
-
-        .settings-profile-input:focus {
-          outline: none;
-          box-shadow: none;
-          border-bottom-color: color-mix(in oklab, var(--ui-text) 72%, transparent);
-        }
-
-        .settings-btn {
-          transition: transform 0.12s ${EASE_OUT}, color 0.14s ${EASE_OUT_SOFT}, background-color 0.14s ${EASE_OUT_SOFT}, border-color 0.14s ${EASE_OUT_SOFT}, opacity 0.14s ${EASE_OUT_SOFT};
-        }
-
-        .settings-btn:hover {
-          transform: translateY(-1px);
-        }
-
-        .settings-btn:active {
-          transform: scale(0.97);
-        }
-
-        .settings-tab-btn {
-          transition: transform 0.12s ${EASE_OUT}, color 0.14s ${EASE_OUT_SOFT}, background-color 0.14s ${EASE_OUT_SOFT};
-        }
-
-        .settings-tab-btn:hover {
-          transform: translateY(-1px);
-        }
-
-        .settings-tab-btn:active {
-          transform: scale(0.98);
-        }
-
-        .settings-toggle:active {
-          transform: scale(0.97);
-        }
-      `}</style>
-
       <div
-        className="settings-modal-panel"
-        onClick={(e) => e.stopPropagation()}
-        style={{
-          width: "min(860px, 100%)",
-          height: "min(760px, 90dvh)",
-          maxHeight: "90dvh",
-          overflow: "hidden",
-          background: "var(--ui-surface)",
-          border: "1px solid var(--ui-line)",
-          padding: 22,
-          display: "grid",
-          gap: 16,
-          gridTemplateRows: "auto auto minmax(0, 1fr)",
-          fontFamily: MONKEYTYPE_MONO,
+        className="settings-tabs"
+        role="tablist"
+        aria-label="Settings categories"
+        onKeyDown={(e) => {
+          const tabs = ["profile", "controls", "audio", "look"] as const;
+          const offset =
+            e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
+          if (offset) {
+            e.preventDefault();
+            const next =
+              tabs[(tabs.indexOf(tab) + offset + tabs.length) % tabs.length];
+            setTab(next);
+            document.getElementById(`settings-${next}`)?.focus();
+          }
         }}
       >
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            gap: 8,
-          }}
-        >
-          <p
-            style={{
-              margin: 0,
-              fontFamily: MONKEYTYPE_MONO,
-              fontSize: 34,
-              letterSpacing: "0.05em",
-              color: "var(--ui-text)",
-            }}
-          >
-            Settings
-          </p>
+        {[
+          { id: "profile", label: "Profile", Icon: User },
+          { id: "controls", label: "Rules", Icon: SlidersHorizontal },
+          { id: "audio", label: "Audio", Icon: AudioLines },
+          { id: "look", label: "Look", Icon: Palette },
+        ].map((t) => (
           <button
-            className="settings-btn"
-            onClick={onClose}
-            style={{
-              border: "1px solid var(--ui-line)",
-              background: "transparent",
-              color: "var(--ui-muted)",
-              padding: "8px 10px",
-              cursor: "pointer",
-              fontSize: 11,
-              letterSpacing: "0.08em",
-              textTransform: "uppercase",
-            }}
+            id={`settings-${t.id}`}
+            role="tab"
+            tabIndex={tab === t.id ? 0 : -1}
+            aria-selected={tab === t.id}
+            aria-controls={`panel-${t.id}`}
+            key={t.id}
+            onClick={() => setTab(t.id as typeof tab)}
           >
-            Close
+            <t.Icon size={17} />
+            {t.label}
           </button>
-        </div>
-
-        <p
-          style={{
-            margin: 0,
-            fontSize: 12,
-            color: READABLE_MUTED,
-            letterSpacing: "0.06em",
-            textTransform: "uppercase",
-            lineHeight: 1.5,
-          }}
-        >
-          Grouped by task to keep setup clear
-        </p>
-
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "minmax(170px, 220px) minmax(0, 1fr)",
-            gap: 18,
-            alignItems: "stretch",
-            minHeight: 0,
-          }}
-        >
-          <aside
-            style={{
-              border: "1px solid var(--ui-line)",
-              background: "color-mix(in oklab, var(--ui-bg) 92%, transparent)",
-              display: "grid",
-              alignContent: "start",
-            }}
-          >
-            <button
-              className="settings-tab-btn"
-              type="button"
-              onClick={() => setTab("profile")}
-              style={{
-                border: "none",
-                borderBottom: "1px solid var(--ui-line)",
-                background: tab === "profile" ? "var(--ui-text)" : "transparent",
-                color: tab === "profile" ? "var(--ui-bg)" : "var(--ui-text)",
-                padding: "14px 12px",
-                fontFamily: MONKEYTYPE_MONO,
-                fontSize: 12,
-                fontWeight: 700,
-                letterSpacing: "0.06em",
-                textTransform: "uppercase",
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "flex-start",
-                gap: 8,
-                cursor: "pointer",
-              }}
-            >
-              <User size={14} strokeWidth={2.5} />
-              Profile
-            </button>
-            <button
-              className="settings-tab-btn"
-              type="button"
-              onClick={() => setTab("controls")}
-              style={{
-                border: "none",
-                borderBottom: "1px solid var(--ui-line)",
-                background: tab === "controls" ? "var(--ui-text)" : "transparent",
-                color: tab === "controls" ? "var(--ui-bg)" : "var(--ui-text)",
-                padding: "14px 12px",
-                fontFamily: MONKEYTYPE_MONO,
-                fontSize: 12,
-                fontWeight: 700,
-                letterSpacing: "0.06em",
-                textTransform: "uppercase",
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "flex-start",
-                gap: 8,
-                cursor: "pointer",
-              }}
-            >
-              <Gamepad2 size={14} strokeWidth={2.5} />
-              Controls
-            </button>
-            <button
-              className="settings-tab-btn"
-              type="button"
-              onClick={() => setTab("audio")}
-              style={{
-                border: "none",
-                background: tab === "audio" ? "var(--ui-text)" : "transparent",
-                color: tab === "audio" ? "var(--ui-bg)" : "var(--ui-text)",
-                padding: "14px 12px",
-                fontFamily: MONKEYTYPE_MONO,
-                fontSize: 12,
-                fontWeight: 700,
-                letterSpacing: "0.06em",
-                textTransform: "uppercase",
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "flex-start",
-                gap: 8,
-                cursor: "pointer",
-              }}
-            >
-              <Volume2 size={14} strokeWidth={2.5} />
-              Audio
-            </button>
-          </aside>
-
-          <section
-            className="settings-scroll"
-            style={{
-              border: "1px solid var(--ui-line)",
-              padding: 18,
-              display: "grid",
-              gap: 14,
-              alignContent: "start",
-              minHeight: 0,
-              overflowY: "auto",
-            }}
-          >
-
-        {tab === "profile" ? (
-          <div
-            style={{
-              display: "grid",
-              gap: 12,
-              alignContent: "start",
-            }}
-          >
-            <p
-              style={{
-                margin: 0,
-                fontSize: 10,
-                letterSpacing: "0.14em",
-                textTransform: "uppercase",
-                color: "var(--ui-muted)",
-              }}
-            >
-              Player name
-            </p>
-            <input
-              className="settings-profile-input"
-              value={profileName}
-              onChange={(e) => persistProfileName(e.target.value)}
-              onBlur={() => persistProfileName(profileName)}
-              maxLength={18}
-              placeholder="Player 1"
-              style={{
-                background: "transparent",
-                border: "none",
-                borderBottom: "1px solid var(--ui-line)",
-                fontFamily: MONKEYTYPE_MONO,
-                fontSize: 13,
-                fontWeight: 700,
-                color: "var(--ui-text)",
-                padding: "2px 0",
-                width: "100%",
-                outline: "none",
-              }}
-            />
-
-            <div style={{ height: 1, background: "var(--ui-line)" }} />
-
-            <p
-              style={{
-                margin: 0,
-                fontSize: 10,
-                letterSpacing: "0.14em",
-                textTransform: "uppercase",
-                color: "var(--ui-muted)",
-              }}
-            >
-              Friend code
-            </p>
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr auto",
-                gap: 8,
-              }}
-            >
-              <div
-                style={{
-                  border: "1px solid var(--ui-line)",
-                  padding: "8px 10px",
-                  fontFamily: MONKEYTYPE_MONO,
-                  fontSize: 13,
-                  fontWeight: 700,
-                  letterSpacing: "0.12em",
-                  color: "var(--ui-text)",
-                }}
-              >
-                {friendCode || "Syncing..."}
-              </div>
+        ))}
+      </div>
+      <div
+        role="tabpanel"
+        id={`panel-${tab}`}
+        aria-labelledby={`settings-${tab}`}
+        className="settings-panel"
+      >
+        {tab === "look" && (
+          <div className="theme-options">
+            {[
+              { key: "paper", label: "Daylight" },
+              { key: "midnight", label: "After hours" },
+              { key: "forest", label: "Club green" },
+              { key: "sunset", label: "Clay" },
+            ].map((t) => (
               <button
-                className="settings-btn"
-                type="button"
-                onClick={onCopyFriendCode}
-                style={{
-                  border: "1px solid var(--ui-line)",
-                  background: "transparent",
-                  color: "var(--ui-text)",
-                  padding: "8px 10px",
-                  cursor: "pointer",
-                  fontSize: 10,
-                  letterSpacing: "0.08em",
-                  textTransform: "uppercase",
+                className="theme-option"
+                aria-pressed={themeLabel === t.label}
+                key={t.key}
+                onClick={() => onSelectTheme?.(t.key)}
+              >
+                <i data-swatch={t.key} />
+                {t.label}
+                {themeLabel === t.label && <Check size={17} />}
+              </button>
+            ))}
+          </div>
+        )}
+        {tab === "profile" && (
+          <>
+            <p className="muted">
+              The name your friends will see at the table.
+            </p>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                saveName();
+              }}
+            >
+              <label className="field-label" htmlFor="profile-name">
+                Your name
+              </label>
+              <input
+                id="profile-name"
+                value={name}
+                maxLength={18}
+                onChange={(e) => {
+                  setName(e.target.value);
+                  setSaved(false);
+                }}
+              />
+              <button className="button primary" style={{ marginTop: 16 }}>
+                {saved ? "Name saved" : "Save name"}
+              </button>
+            </form>
+            {friendCode && (
+              <div className="friend-code-block">
+                <span>Your friend code</span>
+                <button
+                  onClick={onCopyFriendCode}
+                  className="code-button"
+                  aria-label={`Copy friend code ${friendCode}`}
+                >
+                  {friendCode}
+                  <Copy size={17} />
+                </button>
+                <p>Share it so friends can invite you to their table.</p>
+              </div>
+            )}
+          </>
+        )}
+        {tab === "controls" && (
+          <>
+            <p className="muted">
+              House rules apply to the next round you host.
+            </p>
+            <RulePresets rules={rules} onChange={onChange} />
+            <label className="preference-row">
+              <span>
+                <strong>Starting hand</strong>
+                <small>Cards dealt to each player.</small>
+              </span>
+              <select
+                aria-label="Starting hand size"
+                value={rules.startingHandSize ?? defaultRules.startingHandSize}
+                onChange={(e) =>
+                  onChange({
+                    ...rules,
+                    startingHandSize: Number(e.target.value),
+                  })
+                }
+              >
+                {[5, 7, 9, 12].map((n) => (
+                  <option key={n} value={n}>
+                    {n} cards
+                  </option>
+                ))}
+              </select>
+            </label>
+            {RULES.map((r) => (
+              <Toggle
+                key={r.key}
+                label={r.label}
+                description={r.description}
+                checked={Boolean(rules[r.key] ?? defaultRules[r.key])}
+                onChange={(v) => onChange({ ...rules, [r.key]: v })}
+              />
+            ))}
+            <button
+              className="text-button"
+              onClick={() => onChange({ ...defaultRules, maxPlayers: 6 })}
+            >
+              <RotateCcw size={16} />
+              Reset to classic rules
+            </button>
+          </>
+        )}
+        {tab === "audio" && (
+          <>
+            <p className="muted">
+              Quick card sounds by default. Music and the announcer are
+              optional.
+            </p>
+            <Toggle
+              label="Mute everything"
+              checked={audio.muted}
+              onChange={(v) => updateAudio({ muted: v })}
+            />
+            <Toggle
+              label="Card sounds"
+              description="Soft, immediate feedback for plays and draws."
+              checked={audio.chimesEnabled}
+              onChange={(v) => updateAudio({ chimesEnabled: v })}
+            />
+            <Toggle
+              label="Voice announcer"
+              description="Announce special cards. Never delays the next turn."
+              checked={audio.voiceInGame}
+              onChange={(v) => updateAudio({ voiceInGame: v })}
+            />
+            <div className="volume-row">
+              <label htmlFor="sfx-volume">
+                Effects & voice
+                <output>{Math.round(audio.sfxVolume * 100)}%</output>
+              </label>
+              <input
+                id="sfx-volume"
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                value={audio.sfxVolume}
+                onChange={(e) =>
+                  updateAudio({ sfxVolume: Number(e.target.value) })
+                }
+              />
+              <button
+                className="text-button"
+                onClick={() => {
+                  primeTableAudioFromUserGesture();
+                  playTableChime("cardPlay");
                 }}
               >
-                Copy
+                Preview card sound
               </button>
             </div>
-            <p style={{ margin: 0, fontSize: 12, color: "var(--ui-muted)" }}>
-              Share this code with friends so they can send room invites.
-            </p>
-          </div>
-        ) : tab === "audio" ? (
-          <div style={{ display: "grid", gap: 12, minWidth: 260 }}>
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr auto",
-                gap: 16,
-                alignItems: "center",
-                padding: "12px 0",
-                borderBottom: "1px solid var(--ui-line)",
+            <Toggle
+              label="Music in the lobby"
+              checked={music.lobbyEnabled}
+              onChange={(v) => {
+                setMusicEnabledForContext("lobby", v);
+                setMusic(getMusicContextSettings());
               }}
-            >
-              <div>
-                <p
-                  style={{
-                    margin: 0,
-                    fontSize: 13,
-                    fontWeight: 700,
-                    color: "var(--ui-text)",
-                    fontFamily: MONKEYTYPE_MONO,
-                    letterSpacing: "0.04em",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 8,
-                  }}
-                >
-                  <AudioLines size={13} strokeWidth={2.5} />
-                  Music volume
-                </p>
-                <p
-                  style={{
-                    margin: "3px 0 0",
-                    fontSize: 11,
-                    fontFamily: MONKEYTYPE_MONO,
-                    color: "var(--ui-muted)",
-                    lineHeight: 1.45,
-                  }}
-                >
-                  Controls the background music volume.
-                </p>
-              </div>
-              <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-                <button
-                  className="settings-btn"
-                  type="button"
-                  onClick={() => adjustMusicVolume(-0.1)}
-                  style={{
-                    width: 32,
-                    height: 32,
-                    border: "1px solid var(--ui-line)",
-                    background: "transparent",
-                    color: "var(--ui-text)",
-                    cursor: "pointer",
-                    fontSize: 18,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  −
-                </button>
-                <div
-                  style={{
-                    width: 20,
-                    textAlign: "center",
-                    fontSize: 16,
-                    fontWeight: 700,
-                    color: "var(--ui-text)",
-                  }}
-                >
-                  {Math.round(musicUi * 10)}
-                </div>
-                <button
-                  className="settings-btn"
-                  type="button"
-                  onClick={() => adjustMusicVolume(0.1)}
-                  style={{
-                    width: 32,
-                    height: 32,
-                    border: "1px solid var(--ui-line)",
-                    background: "transparent",
-                    color: "var(--ui-text)",
-                    cursor: "pointer",
-                    fontSize: 18,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  +
-                </button>
-              </div>
-            </div>
-
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr auto",
-                gap: 16,
-                alignItems: "center",
-                padding: "12px 0",
-                borderBottom: "1px solid var(--ui-line)",
+            />
+            <Toggle
+              label="Music at the table"
+              checked={music.gameEnabled}
+              onChange={(v) => {
+                setMusicEnabledForContext("game", v);
+                setMusic(getMusicContextSettings());
               }}
-            >
-              <div>
-                <p
-                  style={{
-                    margin: 0,
-                    fontSize: 13,
-                    fontWeight: 700,
-                    color: "var(--ui-text)",
-                    fontFamily: MONKEYTYPE_MONO,
-                    letterSpacing: "0.04em",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 8,
-                  }}
-                >
-                  <Volume2 size={13} strokeWidth={2.5} />
-                  In-game voice & effects volume
-                </p>
-                <p
-                  style={{
-                    margin: "3px 0 0",
-                    fontSize: 11,
-                    fontFamily: MONKEYTYPE_MONO,
-                    color: "var(--ui-muted)",
-                    lineHeight: 1.45,
-                  }}
-                >
-                  Controls voice announcer and card sounds.
-                </p>
-              </div>
-              <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-                <button
-                  className="settings-btn"
-                  type="button"
-                  onClick={() => adjustSfxVolume(-0.1)}
-                  style={{
-                    width: 32,
-                    height: 32,
-                    border: "1px solid var(--ui-line)",
-                    background: "transparent",
-                    color: "var(--ui-text)",
-                    cursor: "pointer",
-                    fontSize: 18,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  −
-                </button>
-                <div
-                  style={{
-                    width: 20,
-                    textAlign: "center",
-                    fontSize: 16,
-                    fontWeight: 700,
-                    color: "var(--ui-text)",
-                  }}
-                >
-                  {Math.round(sfxUi * 10)}
-                </div>
-                <button
-                  className="settings-btn"
-                  type="button"
-                  onClick={() => adjustSfxVolume(0.1)}
-                  style={{
-                    width: 32,
-                    height: 32,
-                    border: "1px solid var(--ui-line)",
-                    background: "transparent",
-                    color: "var(--ui-text)",
-                    cursor: "pointer",
-                    fontSize: 18,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  +
-                </button>
-              </div>
-            </div>
-            <p
-              style={{
-                margin: 0,
-                fontSize: 11,
-                fontFamily: MONKEYTYPE_MONO,
-                color: "var(--ui-muted)",
-                letterSpacing: "0.08em",
-                textTransform: "uppercase",
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 8,
-              }}
-            >
-              <AudioLines size={13} strokeWidth={2.5} />
-              Table chimes
-            </p>
-            <p
-              style={{
-                margin: "0 0 8px",
-                fontSize: 12,
-                fontFamily: MONKEYTYPE_MONO,
-                color: "var(--ui-muted)",
-                lineHeight: 1.45,
-              }}
-            >
-              Short beeps for plays, draws, and special cards — generated in the
-              browser, no files needed. Click the board once if you don&apos;t
-              hear anything (some browsers block audio until you interact).
-            </p>
-
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr auto",
-                gap: 16,
-                alignItems: "center",
-                padding: "12px 0",
-                borderBottom: "1px solid var(--ui-line)",
-              }}
-            >
-              <div>
-                <p
-                  style={{
-                    margin: 0,
-                    fontSize: 13,
-                    fontWeight: 700,
-                    color: "var(--ui-text)",
-                    fontFamily: MONKEYTYPE_MONO,
-                    letterSpacing: "0.04em",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 8,
-                  }}
-                >
-                  <AudioLines size={13} strokeWidth={2.5} />
-                  Chimes during play
-                </p>
-                <p
-                  style={{
-                    margin: "3px 0 0",
-                    fontSize: 11,
-                    fontFamily: MONKEYTYPE_MONO,
-                    color: "var(--ui-muted)",
-                    lineHeight: 1.45,
-                  }}
-                >
-                  Beeps when cards move, UNO is called, someone wins, etc.
-                </p>
-              </div>
-              <Toggle
-                on={audio.chimesEnabled}
-                onClick={() => {
-                  setAudioSettings({ chimesEnabled: !audio.chimesEnabled });
-                  setAudio(getAudioSettings());
-                }}
+            />
+            <div className="volume-row">
+              <label htmlFor="music-volume">
+                Music volume
+                <output>{Math.round(audio.musicVolume * 100)}%</output>
+              </label>
+              <input
+                id="music-volume"
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                value={audio.musicVolume}
+                onChange={(e) =>
+                  updateAudio({ musicVolume: Number(e.target.value) })
+                }
               />
-            </div>
-
-            <p
-              style={{
-                margin: "14px 0 0",
-                fontSize: 11,
-                fontFamily: MONKEYTYPE_MONO,
-                color: "var(--ui-muted)",
-                letterSpacing: "0.08em",
-                textTransform: "uppercase",
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 8,
-              }}
-            >
-              <Mic size={13} strokeWidth={2.5} />
-              Voice announcer
-            </p>
-            <p
-              style={{
-                margin: "0 0 8px",
-                fontSize: 12,
-                fontFamily: MONKEYTYPE_MONO,
-                color: "var(--ui-muted)",
-                lineHeight: 1.45,
-              }}
-            >
-              Uses your files in{" "}
-              <span style={{ fontFamily: MONKEYTYPE_MONO }}>
-                /public/audios/
-              </span>{" "}
-              (exact names are wired in code — you don&apos;t need to rename
-              them). Chimes stay very quiet while this is on.
-            </p>
-
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr auto",
-                gap: 16,
-                alignItems: "center",
-                padding: "12px 0",
-                borderBottom: "1px solid var(--ui-line)",
-              }}
-            >
-              <div>
-                <p
-                  style={{
-                    margin: 0,
-                    fontSize: 13,
-                    fontWeight: 700,
-                    color: "var(--ui-text)",
-                    fontFamily: MONKEYTYPE_MONO,
-                    letterSpacing: "0.04em",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 8,
-                  }}
-                >
-                  <Mic size={13} strokeWidth={2.5} />
-                  In-game voice
-                </p>
-                <p
-                  style={{
-                    margin: "3px 0 0",
-                    fontSize: 11,
-                    fontFamily: MONKEYTYPE_MONO,
-                    color: "var(--ui-muted)",
-                    lineHeight: 1.45,
-                  }}
-                >
-                  During the match (plays, UNO, call-outs, wins). Per device.
-                </p>
-              </div>
-              <Toggle
-                on={audio.voiceInGame}
-                onClick={() => {
-                  setAudioSettings({ voiceInGame: !audio.voiceInGame });
-                  setAudio(getAudioSettings());
-                }}
-              />
-            </div>
-          </div>
-        ) : (
-          <>
-            <p
-              style={{
-                margin: 0,
-                fontSize: 11,
-                fontFamily: MONKEYTYPE_MONO,
-                color: "var(--ui-muted)",
-                letterSpacing: "0.08em",
-                textTransform: "uppercase",
-              }}
-            >
-              <span
-                style={{ display: "inline-flex", alignItems: "center", gap: 8 }}
-              >
-                <span style={RETRO_ICON_BADGE_STYLE}>
-                  <Gamepad2 size={12} strokeWidth={2.6} />
-                </span>
-                Controls / House Rules (shared by local and online)
-              </span>
-            </p>
-
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr auto",
-                gap: 16,
-                alignItems: "center",
-                padding: "12px 0",
-                borderBottom: "1px solid var(--ui-line)",
-              }}
-            >
-              <div>
-                <p
-                  style={{
-                    margin: 0,
-                    fontSize: 13,
-                    fontWeight: 700,
-                    color: "var(--ui-text)",
-                    fontFamily: MONKEYTYPE_MONO,
-                    letterSpacing: "0.04em",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 8,
-                  }}
-                >
-                  <span style={RETRO_ICON_BADGE_STYLE}>
-                    <Palette size={12} strokeWidth={2.6} />
-                  </span>
-                  Starting hand size
-                </p>
-                <p
-                  style={{
-                    margin: "3px 0 0",
-                    fontSize: 11,
-                    fontFamily: MONKEYTYPE_MONO,
-                    color: "var(--ui-muted)",
-                    lineHeight: 1.45,
-                  }}
-                >
-                  How many cards each player is dealt at the start.
-                </p>
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <button
-                  className="settings-btn"
-                  type="button"
-                  onClick={() => {
-                    const cur =
-                      rules.startingHandSize ?? defaultRules.startingHandSize;
-                    if (cur > 1)
-                      onChange({ ...rules, startingHandSize: cur - 1 });
-                  }}
-                  style={{
-                    width: 28,
-                    height: 28,
-                    border: "1.5px solid var(--ui-line)",
-                    background: "transparent",
-                    color: "var(--ui-text)",
-                    cursor: "pointer",
-                    fontSize: 16,
-                    lineHeight: 1,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  −
-                </button>
-                <span
-                  style={{
-                    fontFamily: MONKEYTYPE_MONO,
-                    fontSize: 15,
-                    fontWeight: 700,
-                    color: "var(--ui-text)",
-                    minWidth: 24,
-                    textAlign: "center",
-                  }}
-                >
-                  {rules.startingHandSize ?? defaultRules.startingHandSize}
-                </span>
-                <button
-                  className="settings-btn"
-                  type="button"
-                  onClick={() => {
-                    const cur =
-                      rules.startingHandSize ?? defaultRules.startingHandSize;
-                    if (cur < 15)
-                      onChange({ ...rules, startingHandSize: cur + 1 });
-                  }}
-                  style={{
-                    width: 28,
-                    height: 28,
-                    border: "1.5px solid var(--ui-line)",
-                    background: "transparent",
-                    color: "var(--ui-text)",
-                    cursor: "pointer",
-                    fontSize: 16,
-                    lineHeight: 1,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  +
-                </button>
-              </div>
-            </div>
-
-            <div style={{ display: "grid" }}>
-              {RULE_TOGGLES.map(({ key, label, description }, i) => {
-                const isOn = !!(
-                  rules[key as keyof typeof rules] ?? defaultRules[key]
-                );
-                const RuleIcon = CONTROL_RULE_ICONS[key] ?? ListChecks;
-                return (
-                  <div
-                    key={key}
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns: "1fr auto",
-                      gap: 16,
-                      alignItems: "center",
-                      padding: "12px 0",
-                      borderBottom:
-                        i < RULE_TOGGLES.length - 1
-                          ? "1px solid var(--ui-line)"
-                          : "none",
-                    }}
-                  >
-                    <div>
-                      <p
-                        style={{
-                          margin: 0,
-                          fontSize: 13,
-                          fontWeight: 700,
-                          color: "var(--ui-text)",
-                          fontFamily: MONKEYTYPE_MONO,
-                          letterSpacing: "0.04em",
-                          display: "inline-flex",
-                          alignItems: "center",
-                          gap: 8,
-                        }}
-                      >
-                        <span style={RETRO_ICON_BADGE_STYLE}>
-                          <RuleIcon size={12} strokeWidth={2.6} />
-                        </span>
-                        {label}
-                      </p>
-                      <p
-                        style={{
-                          margin: "3px 0 0",
-                          fontSize: 11,
-                          fontFamily: MONKEYTYPE_MONO,
-                          color: "var(--ui-muted)",
-                          lineHeight: 1.45,
-                        }}
-                      >
-                        {description}
-                      </p>
-                    </div>
-                    <Toggle
-                      on={isOn}
-                      onClick={() => onChange({ ...rules, [key]: !isOn })}
-                    />
-                  </div>
-                );
-              })}
             </div>
           </>
         )}
-          </section>
-        </div>
       </div>
-    </div>
+      <div className="modal-footer">
+        <span className="muted">Saved on this device</span>
+        <button className="button secondary small" onClick={onClose}>
+          Done
+        </button>
+      </div>
+    </Modal>
   );
 }
-

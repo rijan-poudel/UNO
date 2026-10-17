@@ -1,0 +1,14 @@
+{
+  "trailingComma": "all",
+  "overrides": [
+    {
+      "files": [
+        "server/**/*.ts",
+        "lib/**/*.ts",
+        "hooks/useUno*.ts",
+        "scripts/*"
+      ],
+      "options": { "singleQuote": true }
+    }
+  ]
+}

@@ -10,15 +10,14 @@
  * Cooldowns + probabilistic lines reduce fatigue. Extend POOLS as you add modes/rules.
  */
 
-import type { GameState } from "../types/game";
-import { getAudioSettings } from "./audioSettings";
-import { audioUrlsForStem } from "./audiosRegistry";
+import type { GameState } from '../types/game';
+import { getAudioSettings } from './audioSettings';
+import { audioUrlsForStem, STEM_TO_AUDIOS } from './audiosRegistry';
 
-export type VoiceCategory = "board" | "outside";
+export type VoiceCategory = 'board' | 'outside';
 
 type VoiceAudience =
-  | { type: "room" }
-  | { type: "players"; ids: readonly string[] };
+  { type: 'room' } | { type: 'players'; ids: readonly string[] };
 
 function hashSeed(
   parts: (string | number | boolean | null | undefined)[],
@@ -35,22 +34,22 @@ function hashSeed(
 }
 
 function pickStem(pool: readonly string[], seed: number): string {
-  if (!pool.length) return "";
+  if (!pool.length) return '';
   const idx = Math.abs(seed) % pool.length;
-  return pool[idx] ?? pool[0] ?? "";
+  return pool[idx] ?? pool[0] ?? '';
 }
 
 const lastChannelAt = new Map<string, number>();
 const audioCache: Record<string, HTMLAudioElement> = {};
 let activeBoardVoice: HTMLAudioElement | null = null;
-let pendingBoardVoice: { paths: string[]; volume: number } | null = null;
-let boardVoiceBusyUntil = 0;
+let voiceRequest = 0;
+let voiceExpiry: number | null = null;
 
 function audienceAllows(
   audience: VoiceAudience,
   localPlayerId: string | null,
 ): boolean {
-  if (audience.type === "room") return true;
+  if (audience.type === 'room') return true;
   if (!localPlayerId) return false;
   return audience.ids.includes(localPlayerId);
 }
@@ -68,12 +67,13 @@ function channelOk(channel: string, minGapMs: number): boolean {
 
 function categoryEnabled(category: VoiceCategory): boolean {
   const s = getAudioSettings();
-  if (category === "board") return s.voiceInGame;
+  if (s.muted) return false;
+  if (category === 'board') return s.voiceInGame;
   return false;
 }
 
 function tryPlayPath(path: string, volume: number, onFail: () => void): void {
-  if (typeof window === "undefined" || typeof Audio === "undefined") return;
+  if (typeof window === 'undefined' || typeof Audio === 'undefined') return;
 
   const s = getAudioSettings();
   const effectiveVolume = volume * (s.sfxVolume ?? 0.8);
@@ -81,7 +81,7 @@ function tryPlayPath(path: string, volume: number, onFail: () => void): void {
   let audio = audioCache[path];
   if (!audio) {
     audio = new Audio(path);
-    audio.preload = "auto";
+    audio.preload = 'auto';
     audioCache[path] = audio;
   }
 
@@ -89,16 +89,16 @@ function tryPlayPath(path: string, volume: number, onFail: () => void): void {
   audio.currentTime = 0;
 
   const onErr = () => {
-    audio.removeEventListener("error", onErr);
+    audio.removeEventListener('error', onErr);
     onFail();
   };
-  audio.addEventListener("error", onErr, { once: true });
+  audio.addEventListener('error', onErr, { once: true });
 
-  const clearErr = () => audio.removeEventListener("error", onErr);
-  audio.addEventListener("playing", clearErr, { once: true });
+  const clearErr = () => audio.removeEventListener('error', onErr);
+  audio.addEventListener('playing', clearErr, { once: true });
 
   const result = audio.play();
-  if (result && typeof result.then === "function") {
+  if (result && typeof result.then === 'function') {
     void result.catch(() => {
       clearErr();
       onFail();
@@ -106,100 +106,72 @@ function tryPlayPath(path: string, volume: number, onFail: () => void): void {
   }
 }
 
-function playBoardVoicePath(paths: string[], volume: number): void {
-  if (typeof window === "undefined" || typeof Audio === "undefined") return;
-
-  const validPaths = paths.filter((p) => Boolean(p));
-  if (!validPaths.length) return;
-
-  const tryAt = (index: number) => {
-    if (index >= validPaths.length) {
-      if (activeBoardVoice) {
-        activeBoardVoice = null;
-      }
-      boardVoiceBusyUntil = Date.now();
-      return;
-    }
-
-    const path = validPaths[index]!;
-
-    let audio = audioCache[path];
-    if (!audio) {
-      audio = new Audio(path);
-      audio.preload = "auto";
-      audioCache[path] = audio;
-    }
-
-    // Keep a single in-game voice lane; latest request wins as pending.
-    if (activeBoardVoice && !activeBoardVoice.paused && !activeBoardVoice.ended) {
-      pendingBoardVoice = { paths: validPaths, volume };
-      return;
-    }
-
-    activeBoardVoice = audio;
-    pendingBoardVoice = null;
-
-    audio.volume = Math.min(1, Math.max(0, volume));
-    audio.currentTime = 0;
-
-    const syncBusyFromPlayback = () => {
-      if (Number.isFinite(audio.duration) && audio.duration > 0) {
-        const remainingMs = Math.max(0, (audio.duration - audio.currentTime) * 1000);
-        boardVoiceBusyUntil = Date.now() + remainingMs;
-      }
-    };
-
-    audio.onloadedmetadata = syncBusyFromPlayback;
-    audio.onplaying = syncBusyFromPlayback;
-    audio.onended = () => {
-      if (activeBoardVoice === audio) {
-        activeBoardVoice = null;
-      }
-      boardVoiceBusyUntil = Date.now();
-
-      if (pendingBoardVoice) {
-        const next = pendingBoardVoice;
-        pendingBoardVoice = null;
-        playBoardVoicePath(next.paths, next.volume);
-      }
-    };
-    audio.onerror = () => {
-      if (activeBoardVoice === audio) {
-        activeBoardVoice = null;
-      }
-      boardVoiceBusyUntil = Date.now();
-      tryAt(index + 1);
-    };
-
-    const result = audio.play();
-    if (result && typeof result.then === "function") {
-      void result.catch(() => {
-        if (activeBoardVoice === audio) {
-          activeBoardVoice = null;
-        }
-        boardVoiceBusyUntil = Date.now();
-        tryAt(index + 1);
-      });
-    }
-  };
-
-  tryAt(0);
+/** Warm the clips while the user is setting up, never on a card's critical path. */
+export function preloadBoardVoiceovers(): void {
+  if (typeof Audio === 'undefined' || !getAudioSettings().voiceInGame) return;
+  for (const stem of Object.keys(STEM_TO_AUDIOS)) {
+    const path = audioUrlsForStem(stem)[0];
+    if (!path || audioCache[path]) continue;
+    const audio = new Audio(path);
+    audio.preload = 'auto';
+    audioCache[path] = audio;
+    audio.load();
+  }
 }
 
-export function getBoardVoiceRemainingMs(): number {
-  if (activeBoardVoice && !activeBoardVoice.paused && Number.isFinite(activeBoardVoice.duration)) {
-    return Math.max(0, (activeBoardVoice.duration - activeBoardVoice.currentTime) * 1000);
-  }
-  return Math.max(0, boardVoiceBusyUntil - Date.now());
+function playBoardVoicePath(paths: string[], volume: number): void {
+  if (typeof Audio === 'undefined' || document.hidden) return;
+  stopBoardVoiceover();
+  const request = voiceRequest;
+  const path = paths[0];
+  if (!path) return;
+  const audio = audioCache[path] ?? new Audio(path);
+  audioCache[path] = audio;
+  // A clip that cannot start promptly is dropped, never queued behind the next play.
+  activeBoardVoice = audio;
+  audio.volume = Math.max(
+    0,
+    Math.min(1, volume * getAudioSettings().sfxVolume),
+  );
+  audio.currentTime = 0;
+  let started = false;
+  const expiry = window.setTimeout(() => {
+    if (voiceRequest === request && activeBoardVoice === audio && !started)
+      stopBoardVoiceover();
+  }, 180);
+  voiceExpiry = expiry;
+  audio.onplaying = () => {
+    started = true;
+    window.clearTimeout(expiry);
+  };
+  audio.onended = () => {
+    if (voiceRequest === request && activeBoardVoice === audio)
+      activeBoardVoice = null;
+  };
+  audio.onerror = () => {
+    window.clearTimeout(expiry);
+    if (voiceRequest === request && activeBoardVoice === audio)
+      activeBoardVoice = null;
+  };
+  void audio.play().catch(() => {
+    window.clearTimeout(expiry);
+    if (voiceRequest === request && activeBoardVoice === audio)
+      activeBoardVoice = null;
+  });
 }
 
 export function stopBoardVoiceover(): void {
-  pendingBoardVoice = null;
-  boardVoiceBusyUntil = Date.now();
-  if (!activeBoardVoice) return;
-  activeBoardVoice.pause();
-  activeBoardVoice.currentTime = 0;
+  voiceRequest++;
+  if (voiceExpiry) clearTimeout(voiceExpiry);
+  voiceExpiry = null;
+  const audio = activeBoardVoice;
   activeBoardVoice = null;
+  if (!audio) return;
+  audio.onplaying = null;
+  audio.onended = null;
+  audio.onerror = null;
+  audio.pause();
+  audio.currentTime = 0;
 }
 
 /**
@@ -233,7 +205,7 @@ export function playVoiceStem(
   const candidates = audioUrlsForStem(stem);
   if (!candidates.length) return;
 
-  if (opts.category === "board") {
+  if (opts.category === 'board') {
     playBoardVoicePath(candidates, volume);
     return;
   }
@@ -245,16 +217,16 @@ export function playVoiceStem(
 // ── Semantic pools (stems ↔ your spoken lines) ───────────────────────────────
 
 const POOLS = {
-  skip: ["skip"] as const,
-  reverse: ["reverse"] as const,
-  draw2: ["plus_two"] as const,
-  discardAll: ["discard_all"] as const,
-  unoDeclare: ["uno"] as const,
+  skip: ['skip'] as const,
+  reverse: ['reverse'] as const,
+  draw2: ['plus_two'] as const,
+  discardAll: ['discard_all'] as const,
+  unoDeclare: ['uno'] as const,
   plusFourByColor: {
-    red: "plus_four_red",
-    blue: "plus_four_blue",
-    yellow: "plus_four_yellow",
-    green: "plus_four_green",
+    red: 'plus_four_red',
+    blue: 'plus_four_blue',
+    yellow: 'plus_four_yellow',
+    green: 'plus_four_green',
   } as const,
   plusByCount: {
     2: 'plus_two',
@@ -287,16 +259,16 @@ const POOLS = {
     24: 'draw_twenty_four',
   } as const,
   colorChangeByColor: {
-    red: "color_change_red",
-    blue: "color_change_blue",
-    yellow: "color_change_yellow",
-    green: "color_change_green",
+    red: 'color_change_red',
+    blue: 'color_change_blue',
+    yellow: 'color_change_yellow',
+    green: 'color_change_green',
   } as const,
   wildShuffleByColor: {
-    red: "wild_shuffle_red",
-    blue: "wild_shuffle_blue",
-    yellow: "wild_shuffle_yellow",
-    green: "wild_shuffle_green",
+    red: 'wild_shuffle_red',
+    blue: 'wild_shuffle_blue',
+    yellow: 'wild_shuffle_yellow',
+    green: 'wild_shuffle_green',
   } as const,
 } as const;
 
@@ -323,9 +295,14 @@ function resolveForcedDrawStem(count: number): string | null {
 
 function normalizeActionColor(
   color: string | null | undefined,
-): "red" | "blue" | "yellow" | "green" | null {
-  if (!color || color === "wild") return null;
-  if (color === "red" || color === "blue" || color === "yellow" || color === "green") {
+): 'red' | 'blue' | 'yellow' | 'green' | null {
+  if (!color || color === 'wild') return null;
+  if (
+    color === 'red' ||
+    color === 'blue' ||
+    color === 'yellow' ||
+    color === 'green'
+  ) {
     return color;
   }
   return null;
@@ -340,6 +317,7 @@ export function announceBoardFromTransition(
   localPlayerId: string | null,
   actionKey: string,
 ): void {
+  stopBoardVoiceover();
   if (next.winnerId) {
     stopBoardVoiceover();
     return;
@@ -349,22 +327,21 @@ export function announceBoardFromTransition(
   const seed = hashSeed([actionKey, next.turnCount, action.type]);
 
   switch (action.type) {
-    case "init": {
+    case 'init': {
       break;
     }
 
-    case "play": {
-      const { card, chosenColor, discardAllCount, shuffledHands } =
-        action;
+    case 'play': {
+      const { card, chosenColor, discardAllCount, shuffledHands } = action;
 
       if (shuffledHands) {
         const mapped = normalizeActionColor(chosenColor);
         if (mapped) {
           playVoiceStem(POOLS.wildShuffleByColor[mapped], {
-            category: "board",
-            audience: { type: "room" },
+            category: 'board',
+            audience: { type: 'room' },
             localPlayerId,
-            channel: "board:shuffle",
+            channel: 'board:shuffle',
             minGapMs: 2200,
           });
         }
@@ -374,86 +351,87 @@ export function announceBoardFromTransition(
       if (discardAllCount && discardAllCount > 0) {
         const stem = pickStem(POOLS.discardAll, seed);
         playVoiceStem(stem, {
-          category: "board",
-          audience: { type: "room" },
+          category: 'board',
+          audience: { type: 'room' },
           localPlayerId,
-          channel: "board:discard_all",
+          channel: 'board:discard_all',
           minGapMs: 5000,
         });
       }
 
-      if (card.value === "skip") {
+      if (card.value === 'skip') {
         const stem = pickStem(POOLS.skip, seed);
         playVoiceStem(stem, {
-          category: "board",
-          audience: { type: "room" },
+          category: 'board',
+          audience: { type: 'room' },
           localPlayerId,
-          channel: "board:skip",
+          channel: 'board:skip',
           minGapMs: 2000,
         });
         return;
       }
 
-      if (card.value === "reverse") {
+      if (card.value === 'reverse') {
         const stem = pickStem(POOLS.reverse, seed);
         playVoiceStem(stem, {
-          category: "board",
-          audience: { type: "room" },
+          category: 'board',
+          audience: { type: 'room' },
           localPlayerId,
-          channel: "board:reverse",
+          channel: 'board:reverse',
           minGapMs: 2000,
         });
         return;
       }
 
-      if (card.value === "draw2") {
+      if (card.value === 'draw2') {
         playVoiceStem(pickStem(POOLS.draw2, seed), {
-          category: "board",
-          audience: { type: "room" },
+          category: 'board',
+          audience: { type: 'room' },
           localPlayerId,
-          channel: "board:draw2",
+          channel: 'board:draw2',
           minGapMs: 2200,
         });
         return;
       }
 
-      if (card.value === "wild4") {
+      if (card.value === 'wild4') {
         const mapped = normalizeActionColor(chosenColor);
         const stem = mapped
           ? POOLS.plusFourByColor[mapped]
-          : (stemForPlusCount(4) ?? pickStem(Object.values(POOLS.plusFourByColor), seed));
+          : (stemForPlusCount(4) ??
+            pickStem(Object.values(POOLS.plusFourByColor), seed));
         playVoiceStem(stem, {
-          category: "board",
-          audience: { type: "room" },
+          category: 'board',
+          audience: { type: 'room' },
           localPlayerId,
-          channel: "board:wild4",
+          channel: 'board:wild4',
           minGapMs: 2200,
         });
         return;
       }
 
-      if (card.value === "wild") {
+      if (card.value === 'wild') {
         const mapped = normalizeActionColor(chosenColor);
         if (mapped) {
           playVoiceStem(POOLS.colorChangeByColor[mapped], {
-            category: "board",
-            audience: { type: "room" },
+            category: 'board',
+            audience: { type: 'room' },
             localPlayerId,
-            channel: "board:wild",
+            channel: 'board:wild',
             minGapMs: 2200,
           });
         }
         return;
       }
 
-      if (card.value === "shuffle") {
+      if (card.value === 'shuffle') {
         const mapped = normalizeActionColor(chosenColor);
         if (mapped) {
           playVoiceStem(POOLS.wildShuffleByColor[mapped], {
-            category: "board",
-            audience: { type: "room" },
+            category: 'board',
+            audience: { type: 'room' },
             localPlayerId,
-            channel: "board:shuffle_card",
+            channel: 'board:shuffle_card',
             minGapMs: 2200,
           });
         }
@@ -462,7 +440,7 @@ export function announceBoardFromTransition(
       break;
     }
 
-    case "draw": {
+    case 'draw': {
       const { count } = action;
       if (count <= 0) return;
 
@@ -473,8 +451,8 @@ export function announceBoardFromTransition(
         const forcedStem = resolveForcedDrawStem(forcedCount);
         if (forcedStem) {
           playVoiceStem(forcedStem, {
-            category: "board",
-            audience: { type: "room" },
+            category: 'board',
+            audience: { type: 'room' },
             localPlayerId,
             channel: `board:forced_draw_${forcedCount}`,
             minGapMs: 1000,
@@ -486,31 +464,31 @@ export function announceBoardFromTransition(
       break;
     }
 
-    case "declareUno": {
+    case 'declareUno': {
       const stem = pickStem(POOLS.unoDeclare, seed);
       playVoiceStem(stem, {
-        category: "board",
-        audience: { type: "room" },
+        category: 'board',
+        audience: { type: 'room' },
         localPlayerId,
-        channel: "board:uno",
+        channel: 'board:uno',
         minGapMs: 4500,
       });
       break;
     }
 
-    case "callOut": {
+    case 'callOut': {
       const stem = pickStem(POOLS.unoDeclare, seed);
       playVoiceStem(stem, {
-        category: "board",
-        audience: { type: "room" },
+        category: 'board',
+        audience: { type: 'room' },
         localPlayerId,
-        channel: "board:uno_callout",
+        channel: 'board:uno_callout',
         minGapMs: 1200,
       });
       break;
     }
 
-    case "pass":
+    case 'pass':
     default:
       break;
   }
@@ -535,7 +513,7 @@ export function announceOutside(
   seed?: number,
   probability = 1,
 ): void {
-  if (!categoryEnabled("outside")) return;
+  if (!categoryEnabled('outside')) return;
   const stem = pickStem(pool, seed ?? Date.now());
   if (!stem) return;
   if (!channelOk(channel, minGapMs)) return;
@@ -561,9 +539,9 @@ const UI_ROOM = [] as const;
 export function voiceUiConnected(): void {
   announceOutside(
     UI_CONNECT,
-    "ui:socket_connect",
+    'ui:socket_connect',
     14000,
-    hashSeed(["connect", Date.now()]),
+    hashSeed(['connect', Date.now()]),
     0.55,
   );
 }
@@ -571,9 +549,9 @@ export function voiceUiConnected(): void {
 export function voiceUiDisconnected(): void {
   announceOutside(
     UI_DISCONNECT,
-    "ui:socket_disconnect",
+    'ui:socket_disconnect',
     14000,
-    hashSeed(["disconnect", Date.now()]),
+    hashSeed(['disconnect', Date.now()]),
     0.4,
   );
 }
@@ -581,9 +559,9 @@ export function voiceUiDisconnected(): void {
 export function voiceUiRoomJoined(): void {
   announceOutside(
     UI_ROOM,
-    "ui:room_join",
+    'ui:room_join',
     10000,
-    hashSeed(["room", Date.now()]),
+    hashSeed(['room', Date.now()]),
     0.35,
   );
 }

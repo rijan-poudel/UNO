@@ -30,7 +30,12 @@ function makeCard(color: CardColor, value: CardValue): Card {
 
 // ── Standard deck composition ────────────────────────────────────────────────
 
-const COLOR_ACTION_VALUES: ReadonlyArray<CardValue> = ['skip', 'reverse', 'draw2', 'discardAll'];
+const COLOR_ACTION_VALUES: ReadonlyArray<CardValue> = [
+  'skip',
+  'reverse',
+  'draw2',
+  'discardAll',
+];
 
 /**
  * Creates a fresh, unshuffled 108-card standard UNO deck:
@@ -50,7 +55,17 @@ export function createStandardUnoDeck(): Card[] {
     cards.push(makeCard(color, '0'));
 
     // Two copies of 1–9
-    for (const n of ['1', '2', '3', '4', '5', '6', '7', '8', '9'] as CardValue[]) {
+    for (const n of [
+      '1',
+      '2',
+      '3',
+      '4',
+      '5',
+      '6',
+      '7',
+      '8',
+      '9',
+    ] as CardValue[]) {
       cards.push(makeCard(color, n));
       cards.push(makeCard(color, n));
     }

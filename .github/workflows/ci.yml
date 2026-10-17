@@ -1,0 +1,30 @@
+name: Verify game
+on:
+  push:
+  pull_request:
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run check:types
+      - run: npm run check:game
+      - name: Check multiplayer protocol
+        run: |
+          npm run start:socket > /tmp/uno-socket.log 2>&1 &
+          SOCKET_PID=$!
+          trap 'kill "$SOCKET_PID" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 30); do
+            if curl -fsS http://localhost:3001/health; then break; fi
+            sleep 1
+          done
+          npm run check:multiplayer
+      - run: npm run build
+      - run: npm audit --omit=dev

@@ -15,11 +15,14 @@ import type {
 import { toast } from 'sonner';
 import { getPlayableCards } from '../lib/gameRules';
 import { resolvePlayerName } from '../lib/playerNames';
-import { getBoardVoiceRemainingMs } from '../lib/voiceAnnouncer';
-import { voiceUiConnected, voiceUiDisconnected, voiceUiRoomJoined } from '../lib/voiceAnnouncer';
+import {
+  voiceUiConnected,
+  voiceUiDisconnected,
+  voiceUiRoomJoined,
+} from '../lib/voiceAnnouncer';
 
-const AUTO_PASS_AFTER_DRAW_MS = 1000;
-const POST_ACTION_HANDOFF_DELAY_MS = 1000;
+const AUTO_PASS_AFTER_DRAW_MS = 650;
+const ACTIVE_ROOM_KEY = 'uno.online.activeRoom';
 const ONLINE_DEVICE_ID_KEY = 'uno.online.deviceId';
 const ONLINE_FRIEND_CODE_KEY = 'uno.online.friendCode';
 const ONLINE_RECENT_ROOMS_KEY = 'uno.online.recentRooms';
@@ -40,7 +43,10 @@ interface SavedFriendEntry {
   lastSeenAt: number;
 }
 
-function cleanFriendName(rawName: string | undefined, fallbackCode: string): string {
+function cleanFriendName(
+  rawName: string | undefined,
+  fallbackCode: string,
+): string {
   const trimmed = (rawName ?? '').trim().slice(0, 20);
   const normalized = trimmed.toLowerCase();
   const blocked = new Set(['friend', 'friends', 'player', 'unknown', 'guest']);
@@ -55,7 +61,11 @@ interface OutgoingInvitePending {
 }
 
 function normalizeFriendCode(value: string): string {
-  return value.trim().toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 8);
+  return value
+    .trim()
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, '')
+    .slice(0, 8);
 }
 
 function loadSavedFriends(): SavedFriendEntry[] {
@@ -71,9 +81,11 @@ function loadSavedFriends(): SavedFriendEntry[] {
       .filter((item): item is SavedFriendEntry => {
         if (typeof item !== 'object' || item === null) return false;
         const candidate = item as Partial<SavedFriendEntry>;
-        return typeof candidate.friendCode === 'string'
-          && typeof candidate.name === 'string'
-          && typeof candidate.lastSeenAt === 'number';
+        return (
+          typeof candidate.friendCode === 'string' &&
+          typeof candidate.name === 'string' &&
+          typeof candidate.lastSeenAt === 'number'
+        );
       })
       .map((item) => ({
         friendCode: normalizeFriendCode(item.friendCode),
@@ -119,9 +131,10 @@ function getOrCreateDeviceId(): string {
     const existing = window.localStorage.getItem(ONLINE_DEVICE_ID_KEY);
     if (existing && existing.trim()) return existing.trim();
 
-    const generated = typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
-      ? crypto.randomUUID()
-      : `device-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+    const generated =
+      typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+        ? crypto.randomUUID()
+        : `device-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
     window.localStorage.setItem(ONLINE_DEVICE_ID_KEY, generated);
     return generated;
   } catch {
@@ -135,7 +148,11 @@ function getOrCreateFriendCode(): string {
   try {
     const existing = window.localStorage.getItem(ONLINE_FRIEND_CODE_KEY);
     if (existing && existing.trim()) {
-      return existing.trim().toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 8);
+      return existing
+        .trim()
+        .toUpperCase()
+        .replace(/[^A-Z0-9]/g, '')
+        .slice(0, 8);
     }
 
     const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -163,10 +180,12 @@ function loadRecentRooms(): RecentRoomEntry[] {
       .filter((item): item is RecentRoomEntry => {
         if (typeof item !== 'object' || item === null) return false;
         const candidate = item as Partial<RecentRoomEntry>;
-        return typeof candidate.roomId === 'string'
-          && typeof candidate.label === 'string'
-          && typeof candidate.lastVisitedAt === 'number'
-          && typeof candidate.lastPlayerName === 'string';
+        return (
+          typeof candidate.roomId === 'string' &&
+          typeof candidate.label === 'string' &&
+          typeof candidate.lastVisitedAt === 'number' &&
+          typeof candidate.lastPlayerName === 'string'
+        );
       })
       .map((item) => ({
         roomId: item.roomId.trim().toUpperCase().slice(0, 6),
@@ -199,7 +218,9 @@ function rememberStartedRoom(room: RoomSnapshot, playerId: string | null) {
   if (typeof window === 'undefined') return;
   if (!room.roomId || !room.started || !room.game || !playerId) return;
 
-  const localPlayer = room.players.find((player) => player.playerId === playerId);
+  const localPlayer = room.players.find(
+    (player) => player.playerId === playerId,
+  );
   const playerName = localPlayer?.name?.trim() || 'Player';
   const now = Date.now();
   const prev = loadRecentRooms();
@@ -282,8 +303,8 @@ export function useUnoOnlineGame() {
 
   useEffect(() => {
     const socketUrl =
-      process.env.NEXT_PUBLIC_SOCKET_URL
-      ?? `${window.location.protocol}//${window.location.hostname}:3001`;
+      process.env.NEXT_PUBLIC_SOCKET_URL ??
+      `${window.location.protocol}//${window.location.hostname}:3001`;
 
     const socket = io(socketUrl, {
       transports: ['websocket'],
@@ -294,6 +315,61 @@ export function useUnoOnlineGame() {
     socket.on('connect', () => {
       setState((prev) => ({ ...prev, connected: true, error: null }));
       voiceUiConnected();
+      try {
+        const saved = JSON.parse(
+          sessionStorage.getItem(ACTIVE_ROOM_KEY) ?? 'null',
+        ) as { roomId?: string; playerName?: string } | null;
+        if (saved?.roomId && typeof saved.roomId === 'string') {
+          socket.timeout(6000).emit(
+            'room:join',
+            {
+              roomId: saved.roomId,
+              playerName: saved.playerName || 'You',
+              deviceId,
+            },
+            (
+              error: Error | null,
+              ack?: Ack<{ room: RoomSnapshot; playerId: string }>,
+            ) => {
+              if (error || !ack?.ok) {
+                // A vanished server/room ends this session; don't send actions with stale membership.
+                try {
+                  sessionStorage.removeItem(ACTIVE_ROOM_KEY);
+                } catch {}
+                setState((prev) => ({
+                  ...prev,
+                  room: null,
+                  game: null,
+                  playerId: null,
+                  error: error
+                    ? 'Could not reconnect. Join the room again.'
+                    : ack && !ack.ok
+                      ? ack.error
+                      : 'Could not restore your table.',
+                }));
+                return;
+              }
+              setState((prev) => ({
+                ...prev,
+                room: ack.data.room,
+                game: ack.data.room.game,
+                playerId: ack.data.playerId,
+                drawnThisTurn:
+                  ack.data.room.game?.lastAction.type === 'draw' &&
+                  ack.data.room.game.lastAction.playerId ===
+                    ack.data.playerId &&
+                  ack.data.room.game.pendingDraw === 0 &&
+                  ack.data.room.game.players[
+                    ack.data.room.game.currentPlayerIndex
+                  ]?.id === ack.data.playerId,
+                error: null,
+              }));
+            },
+          );
+        }
+      } catch {
+        /* Session storage is optional. */
+      }
     });
 
     socket.on('disconnect', () => {
@@ -306,13 +382,21 @@ export function useUnoOnlineGame() {
         let nextLog = prev.log;
         if (room.game) {
           const actionLine = describeAction(room.game);
-          nextLog = [actionLine, ...prev.log.filter((entry) => entry !== actionLine)].slice(0, 30);
+          nextLog = [
+            actionLine,
+            ...prev.log.filter((entry) => entry !== actionLine),
+          ].slice(0, 30);
         }
 
         // Derive drawnThisTurn purely from server state to avoid desync
-        let drawnThisTurn = false;
+        let drawnThisTurn =
+          prev.drawnThisTurn &&
+          room.game?.turnCount === prev.game?.turnCount &&
+          room.game?.currentPlayerIndex === prev.game?.currentPlayerIndex;
         if (room.game && prev.playerId) {
-          const localIndex = room.game.players.findIndex((p) => p.id === prev.playerId);
+          const localIndex = room.game.players.findIndex(
+            (p) => p.id === prev.playerId,
+          );
           if (
             localIndex >= 0 &&
             room.game.lastAction.type === 'draw' &&
@@ -336,6 +420,9 @@ export function useUnoOnlineGame() {
     });
 
     socket.on('room:kicked', (payload?: { message?: string }) => {
+      try {
+        sessionStorage.removeItem(ACTIVE_ROOM_KEY);
+      } catch {}
       setState((prev) => ({
         ...prev,
         room: null,
@@ -351,7 +438,12 @@ export function useUnoOnlineGame() {
     socket.on('friend:invite', (invite: FriendInvite) => {
       setState((prev) => ({
         ...prev,
-        incomingInvites: [invite, ...prev.incomingInvites.filter((entry) => entry.inviteId !== invite.inviteId)]
+        incomingInvites: [
+          invite,
+          ...prev.incomingInvites.filter(
+            (entry) => entry.inviteId !== invite.inviteId,
+          ),
+        ]
           .sort((a, b) => b.createdAt - a.createdAt)
           .slice(0, 10),
       }));
@@ -364,39 +456,74 @@ export function useUnoOnlineGame() {
       if (!payload?.inviteId) return;
       setState((prev) => ({
         ...prev,
-        incomingInvites: prev.incomingInvites.filter((invite) => invite.inviteId !== payload.inviteId),
-        outgoingInvites: prev.outgoingInvites.filter((invite) => invite.inviteId !== payload.inviteId),
+        incomingInvites: prev.incomingInvites.filter(
+          (invite) => invite.inviteId !== payload.inviteId,
+        ),
+        outgoingInvites: prev.outgoingInvites.filter(
+          (invite) => invite.inviteId !== payload.inviteId,
+        ),
       }));
     });
 
-    socket.on('friend:invite:accepted', (payload?: {
-      inviteId?: string;
-      targetFriendCode?: string;
-      targetName?: string;
-    }) => {
-      if (!payload?.inviteId || !payload?.targetFriendCode) return;
-      persistAcceptedFriend(payload.targetFriendCode, payload.targetName);
-      setState((prev) => ({
-        ...prev,
-        outgoingInvites: prev.outgoingInvites.filter((invite) => invite.inviteId !== payload.inviteId),
-        log: [`${payload.targetName ?? payload.targetFriendCode} accepted your invite`, ...prev.log].slice(0, 30),
-      }));
-    });
+    socket.on(
+      'friend:invite:accepted',
+      (payload?: {
+        inviteId?: string;
+        targetFriendCode?: string;
+        targetName?: string;
+      }) => {
+        if (!payload?.inviteId || !payload?.targetFriendCode) return;
+        persistAcceptedFriend(payload.targetFriendCode, payload.targetName);
+        setState((prev) => ({
+          ...prev,
+          outgoingInvites: prev.outgoingInvites.filter(
+            (invite) => invite.inviteId !== payload.inviteId,
+          ),
+          log: [
+            `${payload.targetName ?? payload.targetFriendCode} accepted your invite`,
+            ...prev.log,
+          ].slice(0, 30),
+        }));
+      },
+    );
 
-    socket.on('friend:invite:declined', (payload?: { inviteId?: string; targetFriendCode?: string }) => {
-      if (!payload?.inviteId) return;
-      setState((prev) => ({
-        ...prev,
-        outgoingInvites: prev.outgoingInvites.filter((invite) => invite.inviteId !== payload.inviteId),
-        log: [`${payload.targetFriendCode ?? 'Friend'} declined invite`, ...prev.log].slice(0, 30),
-      }));
-    });
+    socket.on(
+      'friend:invite:declined',
+      (payload?: { inviteId?: string; targetFriendCode?: string }) => {
+        if (!payload?.inviteId) return;
+        setState((prev) => ({
+          ...prev,
+          outgoingInvites: prev.outgoingInvites.filter(
+            (invite) => invite.inviteId !== payload.inviteId,
+          ),
+          log: [
+            `${payload.targetFriendCode ?? 'Friend'} declined invite`,
+            ...prev.log,
+          ].slice(0, 30),
+        }));
+      },
+    );
 
     return () => {
       socket.disconnect();
       socketRef.current = null;
     };
-  }, []);
+  }, [deviceId]);
+
+  useEffect(() => {
+    if (!state.room || !state.playerId) return;
+    try {
+      sessionStorage.setItem(
+        ACTIVE_ROOM_KEY,
+        JSON.stringify({
+          roomId: state.room.roomId,
+          playerName:
+            state.room.players.find((p) => p.playerId === state.playerId)
+              ?.name ?? 'You',
+        }),
+      );
+    } catch {}
+  }, [state.room, state.playerId]);
 
   useEffect(() => {
     const id = state.room?.roomId ?? null;
@@ -410,123 +537,176 @@ export function useUnoOnlineGame() {
   }, [state.room?.roomId]);
 
   useEffect(() => {
-    if (!state.room?.roomId || !state.room.started || !state.room.game || !state.playerId) return;
+    if (
+      !state.room?.roomId ||
+      !state.room.started ||
+      !state.room.game ||
+      !state.playerId
+    )
+      return;
     if (startedRoomHistoryRef.current.has(state.room.roomId)) return;
 
     rememberStartedRoom(state.room, state.playerId);
     startedRoomHistoryRef.current.add(state.room.roomId);
   }, [state.room, state.playerId]);
 
-  const callAck = useCallback(<T,>(event: string, payload: object): Promise<Ack<T>> => {
-    const socket = socketRef.current;
-    if (!socket) return Promise.resolve({ ok: false, error: 'Socket not connected.' });
+  const callAck = useCallback(
+    <T>(event: string, payload: object): Promise<Ack<T>> => {
+      const socket = socketRef.current;
+      if (!socket?.connected)
+        return Promise.resolve({
+          ok: false,
+          error:
+            'Connection lost. Wait for the table to reconnect, then try again.',
+        });
 
-    return new Promise((resolve) => {
-      socket.emit(event, payload, (ack: Ack<T>) => resolve(ack));
-    });
-  }, []);
+      return new Promise((resolve) => {
+        socket
+          .timeout(6000)
+          .emit(event, payload, (error: Error | null, ack?: Ack<T>) =>
+            resolve(
+              error
+                ? { ok: false, error: 'That took too long. Please try again.' }
+                : (ack ?? { ok: false, error: 'No response from the table.' }),
+            ),
+          );
+      });
+    },
+    [],
+  );
 
-  const syncPresence = useCallback(async (playerName: string) => {
-    const trimmedName = playerName.trim();
-    if (!trimmedName) return false;
+  const syncPresence = useCallback(
+    async (playerName: string) => {
+      const trimmedName = playerName.trim();
+      if (!trimmedName) return false;
 
-    const ack = await callAck<{ friendCode: string }>('presence:update', {
-      playerName: trimmedName,
-      deviceId,
-      friendCode,
-    });
-    if (!ack.ok) {
-      setState((prev) => ({ ...prev, error: ack.error }));
-      return false;
-    }
-
-    if (ack.data.friendCode !== friendCode) {
-      setFriendCode(ack.data.friendCode);
-      try {
-        window.localStorage.setItem(ONLINE_FRIEND_CODE_KEY, ack.data.friendCode);
-      } catch {
-        // Ignore storage errors.
+      const ack = await callAck<{ friendCode: string }>('presence:update', {
+        playerName: trimmedName,
+        deviceId,
+        friendCode,
+      });
+      if (!ack.ok) {
+        setState((prev) => ({ ...prev, error: ack.error }));
+        return false;
       }
-    }
 
-    setState((prev) => ({ ...prev, error: null, friendCode: ack.data.friendCode }));
-    return true;
-  }, [callAck, deviceId, friendCode]);
+      if (ack.data.friendCode !== friendCode) {
+        setFriendCode(ack.data.friendCode);
+        try {
+          window.localStorage.setItem(
+            ONLINE_FRIEND_CODE_KEY,
+            ack.data.friendCode,
+          );
+        } catch {
+          // Ignore storage errors.
+        }
+      }
 
-  const createRoom = useCallback(async (playerName: string) => {
-    const ack = await callAck<{ room: RoomSnapshot; playerId: string }>('room:create', { playerName, deviceId });
-    if (!ack.ok) {
-      setState((prev) => ({ ...prev, error: ack.error }));
-      return false;
-    }
+      setState((prev) => ({
+        ...prev,
+        error: null,
+        friendCode: ack.data.friendCode,
+      }));
+      return true;
+    },
+    [callAck, deviceId, friendCode],
+  );
 
-    setState((prev) => ({
-      ...prev,
-      room: ack.data.room,
-      game: ack.data.room.game,
-      playerId: ack.data.playerId,
-      error: null,
-      log: ['Room created'],
-    }));
-    return true;
-  }, [callAck, deviceId]);
+  const createRoom = useCallback(
+    async (playerName: string) => {
+      const ack = await callAck<{ room: RoomSnapshot; playerId: string }>(
+        'room:create',
+        { playerName, deviceId },
+      );
+      if (!ack.ok) {
+        setState((prev) => ({ ...prev, error: ack.error }));
+        return false;
+      }
 
-  const joinRoom = useCallback(async (roomId: string, playerName: string) => {
-    const ack = await callAck<{ room: RoomSnapshot; playerId: string }>('room:join', { roomId, playerName, deviceId });
-    if (!ack.ok) {
-      setState((prev) => ({ ...prev, error: ack.error }));
-      return false;
-    }
+      setState((prev) => ({
+        ...prev,
+        room: ack.data.room,
+        game: ack.data.room.game,
+        playerId: ack.data.playerId,
+        error: null,
+        log: ['Room created'],
+      }));
+      return true;
+    },
+    [callAck, deviceId],
+  );
 
-    setState((prev) => ({
-      ...prev,
-      room: ack.data.room,
-      game: ack.data.room.game,
-      playerId: ack.data.playerId,
-      error: null,
-      log: [`Joined room ${ack.data.room.roomId}`],
-    }));
-    return true;
-  }, [callAck, deviceId]);
+  const joinRoom = useCallback(
+    async (roomId: string, playerName: string) => {
+      const ack = await callAck<{ room: RoomSnapshot; playerId: string }>(
+        'room:join',
+        { roomId, playerName, deviceId },
+      );
+      if (!ack.ok) {
+        setState((prev) => ({ ...prev, error: ack.error }));
+        return false;
+      }
 
-  const startOnlineGame = useCallback(async (rules: Partial<GameRules>) => {
-    if (!state.room) return false;
-    const ack = await callAck<{ room: RoomSnapshot }>('room:start', { roomId: state.room.roomId, rules });
-    if (!ack.ok) {
-      setState((prev) => ({ ...prev, error: ack.error }));
-      return false;
-    }
+      setState((prev) => ({
+        ...prev,
+        room: ack.data.room,
+        game: ack.data.room.game,
+        playerId: ack.data.playerId,
+        error: null,
+        log: [`Joined room ${ack.data.room.roomId}`],
+      }));
+      return true;
+    },
+    [callAck, deviceId],
+  );
 
-    setState((prev) => ({
-      ...prev,
-      room: ack.data.room,
-      game: ack.data.room.game,
-      error: null,
-      log: ['Game started', ...prev.log].slice(0, 30),
-    }));
-    return true;
-  }, [callAck, state.room]);
+  const startOnlineGame = useCallback(
+    async (rules: Partial<GameRules>) => {
+      if (!state.room) return false;
+      const ack = await callAck<{ room: RoomSnapshot }>('room:start', {
+        roomId: state.room.roomId,
+        rules,
+      });
+      if (!ack.ok) {
+        setState((prev) => ({ ...prev, error: ack.error }));
+        return false;
+      }
 
-  const kickPlayer = useCallback(async (targetPlayerId: string) => {
-    if (!state.room) return false;
-    const ack = await callAck<{ room: RoomSnapshot }>('room:kick', {
-      roomId: state.room.roomId,
-      targetPlayerId,
-    });
-    if (!ack.ok) {
-      setState((prev) => ({ ...prev, error: ack.error }));
-      return false;
-    }
+      setState((prev) => ({
+        ...prev,
+        room: ack.data.room,
+        game: ack.data.room.game,
+        error: null,
+        log: ['Game started', ...prev.log].slice(0, 30),
+      }));
+      return true;
+    },
+    [callAck, state.room],
+  );
 
-    setState((prev) => ({
-      ...prev,
-      room: ack.data.room,
-      game: ack.data.room.game,
-      error: null,
-      log: ['Player removed by host', ...prev.log].slice(0, 30),
-    }));
-    return true;
-  }, [callAck, state.room]);
+  const kickPlayer = useCallback(
+    async (targetPlayerId: string) => {
+      if (!state.room) return false;
+      const ack = await callAck<{ room: RoomSnapshot }>('room:kick', {
+        roomId: state.room.roomId,
+        targetPlayerId,
+      });
+      if (!ack.ok) {
+        setState((prev) => ({ ...prev, error: ack.error }));
+        return false;
+      }
+
+      setState((prev) => ({
+        ...prev,
+        room: ack.data.room,
+        game: ack.data.room.game,
+        error: null,
+        log: ['Player removed by host', ...prev.log].slice(0, 30),
+      }));
+      return true;
+    },
+    [callAck, state.room],
+  );
 
   const addBotToRoom = useCallback(async () => {
     if (!state.room) return false;
@@ -567,91 +747,122 @@ export function useUnoOnlineGame() {
     return true;
   }, [callAck, state.room]);
 
-  const sendFriendInvite = useCallback(async (targetFriendCode: string, playerName: string) => {
-    const ack = await callAck<{ room: RoomSnapshot; playerId: string; invite: FriendInvite }>('friend:invite', {
-      targetFriendCode,
-      playerName,
-      deviceId,
-      friendCode,
-    });
-    if (!ack.ok) {
-      setState((prev) => ({ ...prev, error: ack.error }));
-      return false;
-    }
-
-    setState((prev) => ({
-      ...prev,
-      room: ack.data.room,
-      game: ack.data.room.game,
-      playerId: ack.data.playerId,
-      outgoingInvites: [
-        {
-          inviteId: ack.data.invite.inviteId,
-          targetFriendCode: targetFriendCode.toUpperCase(),
-          targetName: undefined,
-        },
-        ...prev.outgoingInvites.filter((invite) => invite.inviteId !== ack.data.invite.inviteId),
-      ].slice(0, 10),
-      error: null,
-      log: [`Invite sent to ${targetFriendCode.toUpperCase()}`, ...prev.log].slice(0, 30),
-    }));
-    return true;
-  }, [callAck, deviceId, friendCode]);
-
-  const acceptFriendInvite = useCallback(async (inviteId: string, playerName: string) => {
-    const acceptedInvite = state.incomingInvites.find((invite) => invite.inviteId === inviteId) ?? null;
-    const ack = await callAck<{ room: RoomSnapshot; playerId: string }>('friend:invite:accept', {
-      inviteId,
-      playerName,
-      deviceId,
-      friendCode,
-    });
-    if (!ack.ok) {
-      setState((prev) => ({ ...prev, error: ack.error }));
-      return false;
-    }
-
-    setState((prev) => ({
-      ...prev,
-      room: ack.data.room,
-      game: ack.data.room.game,
-      playerId: ack.data.playerId,
-      incomingInvites: prev.incomingInvites.filter((invite) => invite.inviteId !== inviteId),
-      error: null,
-      log: [`Joined ${ack.data.room.roomId} from invite`, ...prev.log].slice(0, 30),
-    }));
-
-    if (acceptedInvite) {
-      persistAcceptedFriend(acceptedInvite.fromFriendCode, acceptedInvite.fromName);
-    }
-
-    return true;
-  }, [callAck, deviceId, friendCode, state.incomingInvites]);
-
-  const declineFriendInvite = useCallback(async (inviteId: string) => {
-    const ack = await callAck<{ inviteId: string }>('friend:invite:decline', { inviteId });
-    if (!ack.ok) {
-      setState((prev) => ({ ...prev, error: ack.error }));
-      return false;
-    }
-
-    setState((prev) => ({
-      ...prev,
-      incomingInvites: prev.incomingInvites.filter((invite) => invite.inviteId !== inviteId),
-      error: null,
-    }));
-    return true;
-  }, [callAck]);
-
-  const leaveRoom = useCallback(async () => {
-    if (state.room) {
-      const ack = await callAck<{ left: true }>('room:leave', { roomId: state.room.roomId });
+  const sendFriendInvite = useCallback(
+    async (targetFriendCode: string, playerName: string) => {
+      const ack = await callAck<{
+        room: RoomSnapshot;
+        playerId: string;
+        invite: FriendInvite;
+      }>('friend:invite', {
+        targetFriendCode,
+        playerName,
+        deviceId,
+        friendCode,
+      });
       if (!ack.ok) {
         setState((prev) => ({ ...prev, error: ack.error }));
         return false;
       }
-    }
 
+      setState((prev) => ({
+        ...prev,
+        room: ack.data.room,
+        game: ack.data.room.game,
+        playerId: ack.data.playerId,
+        outgoingInvites: [
+          {
+            inviteId: ack.data.invite.inviteId,
+            targetFriendCode: targetFriendCode.toUpperCase(),
+            targetName: undefined,
+          },
+          ...prev.outgoingInvites.filter(
+            (invite) => invite.inviteId !== ack.data.invite.inviteId,
+          ),
+        ].slice(0, 10),
+        error: null,
+        log: [
+          `Invite sent to ${targetFriendCode.toUpperCase()}`,
+          ...prev.log,
+        ].slice(0, 30),
+      }));
+      return true;
+    },
+    [callAck, deviceId, friendCode],
+  );
+
+  const acceptFriendInvite = useCallback(
+    async (inviteId: string, playerName: string) => {
+      const acceptedInvite =
+        state.incomingInvites.find((invite) => invite.inviteId === inviteId) ??
+        null;
+      const ack = await callAck<{ room: RoomSnapshot; playerId: string }>(
+        'friend:invite:accept',
+        {
+          inviteId,
+          playerName,
+          deviceId,
+          friendCode,
+        },
+      );
+      if (!ack.ok) {
+        setState((prev) => ({ ...prev, error: ack.error }));
+        return false;
+      }
+
+      setState((prev) => ({
+        ...prev,
+        room: ack.data.room,
+        game: ack.data.room.game,
+        playerId: ack.data.playerId,
+        incomingInvites: prev.incomingInvites.filter(
+          (invite) => invite.inviteId !== inviteId,
+        ),
+        error: null,
+        log: [`Joined ${ack.data.room.roomId} from invite`, ...prev.log].slice(
+          0,
+          30,
+        ),
+      }));
+
+      if (acceptedInvite) {
+        persistAcceptedFriend(
+          acceptedInvite.fromFriendCode,
+          acceptedInvite.fromName,
+        );
+      }
+
+      return true;
+    },
+    [callAck, deviceId, friendCode, state.incomingInvites],
+  );
+
+  const declineFriendInvite = useCallback(
+    async (inviteId: string) => {
+      const ack = await callAck<{ inviteId: string }>('friend:invite:decline', {
+        inviteId,
+      });
+      if (!ack.ok) {
+        setState((prev) => ({ ...prev, error: ack.error }));
+        return false;
+      }
+
+      setState((prev) => ({
+        ...prev,
+        incomingInvites: prev.incomingInvites.filter(
+          (invite) => invite.inviteId !== inviteId,
+        ),
+        error: null,
+      }));
+      return true;
+    },
+    [callAck],
+  );
+
+  const leaveRoom = useCallback(async () => {
+    const roomId = state.room?.roomId;
+    try {
+      sessionStorage.removeItem(ACTIVE_ROOM_KEY);
+    } catch {}
     setState((prev) => ({
       ...prev,
       room: null,
@@ -662,37 +873,51 @@ export function useUnoOnlineGame() {
       log: [],
       error: null,
     }));
-
+    // Leaving must always work locally, including after a server restart.
+    if (roomId && socketRef.current?.connected)
+      await callAck<{ left: true }>('room:leave', { roomId });
     return true;
   }, [callAck, state.room]);
 
-  const sendAction = useCallback(async (action: MultiplayerAction) => {
-    if (!state.room) return;
-    const ack = await callAck<{ room: RoomSnapshot }>('game:action', {
-      roomId: state.room.roomId,
-      action,
-    });
+  const sendAction = useCallback(
+    async (action: MultiplayerAction) => {
+      if (!state.room) return;
+      const ack = await callAck<{ room: RoomSnapshot }>('game:action', {
+        roomId: state.room.roomId,
+        action,
+      });
 
-    if (!ack.ok) {
-      setState((prev) => ({ ...prev, error: ack.error }));
-    }
-  }, [callAck, state.room]);
+      if (!ack.ok) {
+        setState((prev) => ({ ...prev, error: ack.error }));
+      }
+    },
+    [callAck, state.room],
+  );
 
-  const checkFriendOnline = useCallback(async (friendCodes: string[]) => {
-    const normalized = Array.from(new Set(friendCodes.map((code) => normalizeFriendCode(code)).filter(Boolean)));
-    if (!normalized.length) return {} as Record<string, FriendPresenceState>;
+  const checkFriendOnline = useCallback(
+    async (friendCodes: string[]) => {
+      const normalized = Array.from(
+        new Set(
+          friendCodes.map((code) => normalizeFriendCode(code)).filter(Boolean),
+        ),
+      );
+      if (!normalized.length) return {} as Record<string, FriendPresenceState>;
 
-    const ack = await callAck<{ statuses: Record<string, FriendPresenceState> }>('friend:status', {
-      friendCodes: normalized,
-    });
+      const ack = await callAck<{
+        statuses: Record<string, FriendPresenceState>;
+      }>('friend:status', {
+        friendCodes: normalized,
+      });
 
-    if (!ack.ok) {
-      setState((prev) => ({ ...prev, error: ack.error }));
-      return {} as Record<string, FriendPresenceState>;
-    }
+      if (!ack.ok) {
+        setState((prev) => ({ ...prev, error: ack.error }));
+        return {} as Record<string, FriendPresenceState>;
+      }
 
-    return ack.data.statuses;
-  }, [callAck]);
+      return ack.data.statuses;
+    },
+    [callAck],
+  );
 
   const game = state.game;
   const localPlayerIndex = useMemo(() => {
@@ -706,12 +931,15 @@ export function useUnoOnlineGame() {
   const isLocalTurn = !!game && game.currentPlayerIndex === localPlayerIndex;
 
   const playableCardIds = useMemo(
-    () => new Set(
-      game && localPlayer && isLocalTurn
-        ? getPlayableCards(localPlayer.hand, game, localPlayerIndex).map((c) => c.id)
-        : [],
-    ),
-    [game, localPlayer, isLocalTurn, localPlayerIndex],
+    () =>
+      new Set(
+        game && localPlayer
+          ? getPlayableCards(localPlayer.hand, game, localPlayerIndex).map(
+              (c) => c.id,
+            )
+          : [],
+      ),
+    [game, localPlayer, localPlayerIndex],
   );
 
   const canPass = state.drawnThisTurn && (game?.pendingDraw ?? 0) === 0;
@@ -719,17 +947,31 @@ export function useUnoOnlineGame() {
   const pendingWild = useMemo(() => {
     if (!pendingColorChoice || !game || !state.playerId) return null;
     if (pendingColorChoice.playerId !== state.playerId) return null;
-    const localSeat = game.players.findIndex((player) => player.id === state.playerId);
+    const localSeat = game.players.findIndex(
+      (player) => player.id === state.playerId,
+    );
     if (localSeat < 0) return null;
-    return game.players[localSeat].hand.find((card) => card.id === pendingColorChoice.cardId) ?? null;
+    return (
+      game.players[localSeat].hand.find(
+        (card) => card.id === pendingColorChoice.cardId,
+      ) ?? null
+    );
   }, [pendingColorChoice, game, state.playerId]);
 
   const wildPickerPlayerName = useMemo(() => {
     if (!pendingColorChoice || !state.room) return null;
-    return state.room.players.find((player) => player.playerId === pendingColorChoice.playerId)?.name ?? null;
+    return (
+      state.room.players.find(
+        (player) => player.playerId === pendingColorChoice.playerId,
+      )?.name ?? null
+    );
   }, [pendingColorChoice, state.room]);
   const hasPendingStackOption = !!(
-    game && localPlayer && isLocalTurn && game.pendingDraw > 0 && playableCardIds.size > 0
+    game &&
+    localPlayer &&
+    isLocalTurn &&
+    game.pendingDraw > 0 &&
+    playableCardIds.size > 0
   );
 
   useEffect(() => {
@@ -738,10 +980,7 @@ export function useUnoOnlineGame() {
     if ((game.pendingDraw ?? 0) > 0) return;
     if (playableCardIds.size > 0) return;
 
-    const coordinatedAutoPassDelay = Math.max(
-      AUTO_PASS_AFTER_DRAW_MS,
-      getBoardVoiceRemainingMs() + POST_ACTION_HANDOFF_DELAY_MS,
-    );
+    const coordinatedAutoPassDelay = AUTO_PASS_AFTER_DRAW_MS;
 
     const timer = window.setTimeout(() => {
       void sendAction({ type: 'pass' });
@@ -758,19 +997,29 @@ export function useUnoOnlineGame() {
     sendAction,
   ]);
 
-  const selectCard = useCallback((card: Card) => {
-    if (!game) return;
-    if (card.color === 'wild') {
-      void sendAction({ type: 'prepareWild', cardId: card.id });
-      return;
-    }
-    void sendAction({ type: 'play', cardId: card.id });
-  }, [game, sendAction]);
+  const selectCard = useCallback(
+    (card: Card) => {
+      if (!game) return;
+      if (card.color === 'wild') {
+        void sendAction({ type: 'prepareWild', cardId: card.id });
+        return;
+      }
+      void sendAction({ type: 'play', cardId: card.id });
+    },
+    [game, sendAction],
+  );
 
-  const confirmWildColor = useCallback((color: CardColor) => {
-    if (!pendingWild) return;
-    void sendAction({ type: 'play', cardId: pendingWild.id, chosenColor: color });
-  }, [pendingWild, sendAction]);
+  const confirmWildColor = useCallback(
+    (color: CardColor) => {
+      if (!pendingWild) return;
+      void sendAction({
+        type: 'play',
+        cardId: pendingWild.id,
+        chosenColor: color,
+      });
+    },
+    [pendingWild, sendAction],
+  );
 
   const cancelWild = useCallback(() => {
     void sendAction({ type: 'cancelWildChoice' });
@@ -788,12 +1037,15 @@ export function useUnoOnlineGame() {
     void sendAction({ type: 'sayUno' });
   }, [sendAction]);
 
-  const callOut = useCallback((_callerIndex: number, targetIndex: number) => {
-    if (!game) return;
-    const target = game.players[targetIndex];
-    if (!target) return;
-    void sendAction({ type: 'callOut', targetPlayerId: target.id });
-  }, [game, sendAction]);
+  const callOut = useCallback(
+    (_callerIndex: number, targetIndex: number) => {
+      if (!game) return;
+      const target = game.players[targetIndex];
+      if (!target) return;
+      void sendAction({ type: 'callOut', targetPlayerId: target.id });
+    },
+    [game, sendAction],
+  );
 
   const resetGame = useCallback(() => {
     void (async () => {

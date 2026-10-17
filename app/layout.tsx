@@ -1,131 +1,54 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono, Roboto_Mono } from "next/font/google";
-import "./globals.css";
+import type { Metadata, Viewport } from "next";
+import { Fredoka, Nunito_Sans } from "next/font/google";
 import { Toaster } from "sonner";
+import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const bodyFont = Nunito_Sans({
+  variable: "--font-body",
   subsets: ["latin"],
+  display: "swap",
 });
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-const monkeytypeMono = Roboto_Mono({
-  variable: "--font-monkeytype-mono",
+const displayFont = Fredoka({
+  variable: "--font-display",
   subsets: ["latin"],
   display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "UNO — Card Game",
-  description: "A customisable UNO-style card game with bot support and house rules.",
+  title: "UNO — Your table. Your rules.",
+  description:
+    "A seat for everyone. Play UNO with friends or bots, with your favorite house rules.",
+};
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#fff8ec",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
-        <link
-          rel="preload"
-          as="audio"
-          href="/audios/background_music.wav"
-          type="audio/wav"
-        />
         <script
           dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                const themeVars = {
-                  paper: {
-                    '--ui-bg': '#fafafa',
-                    '--ui-surface': '#ffffff',
-                    '--ui-text': '#212121',
-                    '--ui-muted': 'rgba(33,33,33,0.54)',
-                    '--ui-line': 'rgba(0,0,0,0.12)',
-                    '--ui-accent-red': '#e53935',
-                    '--ui-accent-yellow': '#f9a825',
-                    '--ui-accent-green': '#43a047',
-                    '--ui-accent-blue': '#1e88e5',
-                  },
-                  midnight: {
-                    '--ui-bg': '#121212',
-                    '--ui-surface': '#1e1e1e',
-                    '--ui-text': '#e0e0e0',
-                    '--ui-muted': 'rgba(224,224,224,0.6)',
-                    '--ui-line': 'rgba(255,255,255,0.12)',
-                    '--ui-accent-red': '#e53935',
-                    '--ui-accent-yellow': '#f9a825',
-                    '--ui-accent-green': '#43a047',
-                    '--ui-accent-blue': '#1e88e5',
-                  },
-                  forest: {
-                    '--ui-bg': '#e0f2f1',
-                    '--ui-surface': '#ffffff',
-                    '--ui-text': '#004d40',
-                    '--ui-muted': 'rgba(0,77,64,0.6)',
-                    '--ui-line': 'rgba(0,77,64,0.15)',
-                    '--ui-accent-red': '#e53935',
-                    '--ui-accent-yellow': '#f9a825',
-                    '--ui-accent-green': '#43a047',
-                    '--ui-accent-blue': '#1e88e5',
-                  },
-                  sunset: {
-                    '--ui-bg': '#1a0033',
-                    '--ui-surface': '#2d0057',
-                    '--ui-text': '#ede7f6',
-                    '--ui-muted': 'rgba(237,231,246,0.65)',
-                    '--ui-line': 'rgba(237,231,246,0.18)',
-                    '--ui-accent-red': '#e53935',
-                    '--ui-accent-yellow': '#f9a825',
-                    '--ui-accent-green': '#43a047',
-                    '--ui-accent-blue': '#1e88e5',
-                  },
-                };
-
-                const theme = 'midnight';
-                const vars = themeVars[theme] || themeVars.midnight;
-                Object.entries(vars).forEach(([key, value]) => {
-                  document.documentElement.style.setProperty(key, value);
-                });
-                document.documentElement.style.backgroundColor = vars['--ui-bg'];
-              })();
-            `,
+            __html: `(function(){try{var t=localStorage.getItem('uno.preferred.theme');if(['paper','midnight','forest','sunset'].includes(t))document.documentElement.dataset.theme=t}catch(e){}})();`,
           }}
         />
       </head>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} ${monkeytypeMono.variable} antialiased`}
-      >
+      <body className={`${bodyFont.variable} ${displayFont.variable}`}>
+        <span hidden data-design-contract="playful-continuation">
+          Playful card playground: original graphics, expressive type, tactile
+          card motion and immediate sound. See .impeccable/playful-direction.md.
+        </span>
         {children}
         <Toaster
           position="bottom-right"
-          richColors={false}
           closeButton
-          expand={false}
-          visibleToasts={3}
-          offset={12}
-          toastOptions={{
-            duration: 2800,
-            classNames: {
-              toast: "uno-toast",
-              title: "uno-toast-title",
-              description: "uno-toast-description",
-              actionButton: "uno-toast-action",
-              cancelButton: "uno-toast-cancel",
-              closeButton: "uno-toast-close",
-              success: "uno-toast-success",
-              error: "uno-toast-error",
-              warning: "uno-toast-warning",
-              info: "uno-toast-info",
-            },
-          }}
+          visibleToasts={2}
+          toastOptions={{ className: "uno-toast", duration: 3200 }}
         />
       </body>
     </html>

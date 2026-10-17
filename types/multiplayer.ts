@@ -1,6 +1,6 @@
-import type { GameState } from './game';
-import type { GameRules } from './rules';
-import type { CardColor, CardValue } from './card';
+import type { GameState } from "./game";
+import type { GameRules } from "./rules";
+import type { CardColor, CardValue } from "./card";
 
 export interface RoomPlayer {
   playerId: string;
@@ -34,13 +34,13 @@ export interface FriendInvite {
 }
 
 export type MultiplayerAction =
-  | { type: 'prepareWild'; cardId: string }
-  | { type: 'cancelWildChoice' }
-  | { type: 'play'; cardId: string; chosenColor?: CardColor }
-  | { type: 'draw' }
-  | { type: 'pass' }
-  | { type: 'sayUno' }
-  | { type: 'callOut'; targetPlayerId: string };
+  | { type: "prepareWild"; cardId: string }
+  | { type: "cancelWildChoice" }
+  | { type: "play"; cardId: string; chosenColor?: CardColor }
+  | { type: "draw" }
+  | { type: "pass" }
+  | { type: "sayUno" }
+  | { type: "callOut"; targetPlayerId: string };
 
 export interface CreateRoomPayload {
   playerName: string;
@@ -108,7 +108,7 @@ export interface FriendStatusPayload {
   friendCodes: string[];
 }
 
-export type FriendPresenceState = 'offline' | 'online' | 'playing';
+export type FriendPresenceState = "offline" | "online" | "playing";
 
 export interface FriendStatusResponse {
   statuses: Record<string, FriendPresenceState>;

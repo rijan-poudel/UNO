@@ -1,0 +1,1046 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-17T09:31:06.403804+00:00",
+  "title": "Design System: UNO \u2014 Playful card world",
+  "extensions": {
+    "colorMeta": {
+      "ui-bg": {
+        "role": "neutral",
+        "displayName": "Ui Bg",
+        "canonical": "#fff8ec",
+        "tonalRamp": [
+          "oklch(15.000% 0.01751 81.333)",
+          "oklch(26.429% 0.01751 81.333)",
+          "oklch(37.857% 0.01751 81.333)",
+          "oklch(49.286% 0.01751 81.333)",
+          "oklch(60.714% 0.01751 81.333)",
+          "oklch(72.143% 0.01751 81.333)",
+          "oklch(83.571% 0.01751 81.333)",
+          "oklch(95.000% 0.01751 81.333)"
+        ]
+      },
+      "ui-surface": {
+        "role": "neutral",
+        "displayName": "Ui Surface",
+        "canonical": "#fffcf5",
+        "tonalRamp": [
+          "oklch(15.000% 0.00976 87.470)",
+          "oklch(26.429% 0.00976 87.470)",
+          "oklch(37.857% 0.00976 87.470)",
+          "oklch(49.286% 0.00976 87.470)",
+          "oklch(60.714% 0.00976 87.470)",
+          "oklch(72.143% 0.00976 87.470)",
+          "oklch(83.571% 0.00976 87.470)",
+          "oklch(95.000% 0.00976 87.470)"
+        ]
+      },
+      "ui-text": {
+        "role": "neutral",
+        "displayName": "Ui Text",
+        "canonical": "#2c2c32",
+        "tonalRamp": [
+          "oklch(15.000% 0.01078 285.722)",
+          "oklch(26.429% 0.01078 285.722)",
+          "oklch(37.857% 0.01078 285.722)",
+          "oklch(49.286% 0.01078 285.722)",
+          "oklch(60.714% 0.01078 285.722)",
+          "oklch(72.143% 0.01078 285.722)",
+          "oklch(83.571% 0.01078 285.722)",
+          "oklch(95.000% 0.01078 285.722)"
+        ]
+      },
+      "ui-muted": {
+        "role": "neutral",
+        "displayName": "Ui Muted",
+        "canonical": "#706b65",
+        "tonalRamp": [
+          "oklch(15.000% 0.01116 72.566)",
+          "oklch(26.429% 0.01116 72.566)",
+          "oklch(37.857% 0.01116 72.566)",
+          "oklch(49.286% 0.01116 72.566)",
+          "oklch(60.714% 0.01116 72.566)",
+          "oklch(72.143% 0.01116 72.566)",
+          "oklch(83.571% 0.01116 72.566)",
+          "oklch(95.000% 0.01116 72.566)"
+        ]
+      },
+      "ui-line": {
+        "role": "neutral",
+        "displayName": "Ui Line",
+        "canonical": "#e3dbce",
+        "tonalRamp": [
+          "oklch(15.000% 0.01959 80.113)",
+          "oklch(26.429% 0.01959 80.113)",
+          "oklch(37.857% 0.01959 80.113)",
+          "oklch(49.286% 0.01959 80.113)",
+          "oklch(60.714% 0.01959 80.113)",
+          "oklch(72.143% 0.01959 80.113)",
+          "oklch(83.571% 0.01959 80.113)",
+          "oklch(95.000% 0.01959 80.113)"
+        ]
+      },
+      "ui-accent-red": {
+        "role": "primary",
+        "displayName": "Ui Accent Red",
+        "canonical": "#c74531",
+        "tonalRamp": [
+          "oklch(15.000% 0.16927 31.405)",
+          "oklch(26.429% 0.16927 31.405)",
+          "oklch(37.857% 0.16927 31.405)",
+          "oklch(49.286% 0.16927 31.405)",
+          "oklch(60.714% 0.16927 31.405)",
+          "oklch(72.143% 0.16927 31.405)",
+          "oklch(83.571% 0.16927 31.405)",
+          "oklch(95.000% 0.16927 31.405)"
+        ]
+      },
+      "ui-accent-green": {
+        "role": "secondary",
+        "displayName": "Ui Accent Green",
+        "canonical": "#28694c",
+        "tonalRamp": [
+          "oklch(15.000% 0.08194 161.368)",
+          "oklch(26.429% 0.08194 161.368)",
+          "oklch(37.857% 0.08194 161.368)",
+          "oklch(49.286% 0.08194 161.368)",
+          "oklch(60.714% 0.08194 161.368)",
+          "oklch(72.143% 0.08194 161.368)",
+          "oklch(83.571% 0.08194 161.368)",
+          "oklch(95.000% 0.08194 161.368)"
+        ]
+      },
+      "ui-accent-blue": {
+        "role": "secondary",
+        "displayName": "Ui Accent Blue",
+        "canonical": "#3265a0",
+        "tonalRamp": [
+          "oklch(15.000% 0.10945 253.665)",
+          "oklch(26.429% 0.10945 253.665)",
+          "oklch(37.857% 0.10945 253.665)",
+          "oklch(49.286% 0.10945 253.665)",
+          "oklch(60.714% 0.10945 253.665)",
+          "oklch(72.143% 0.10945 253.665)",
+          "oklch(83.571% 0.10945 253.665)",
+          "oklch(95.000% 0.10945 253.665)"
+        ]
+      },
+      "ui-table": {
+        "role": "secondary",
+        "displayName": "Ui Table",
+        "canonical": "#345d4c",
+        "tonalRamp": [
+          "oklch(15.000% 0.05461 165.546)",
+          "oklch(26.429% 0.05461 165.546)",
+          "oklch(37.857% 0.05461 165.546)",
+          "oklch(49.286% 0.05461 165.546)",
+          "oklch(60.714% 0.05461 165.546)",
+          "oklch(72.143% 0.05461 165.546)",
+          "oklch(83.571% 0.05461 165.546)",
+          "oklch(95.000% 0.05461 165.546)"
+        ]
+      },
+      "ui-table-deep": {
+        "role": "secondary",
+        "displayName": "Ui Table Deep",
+        "canonical": "#294d3e",
+        "tonalRamp": [
+          "oklch(15.000% 0.04941 165.261)",
+          "oklch(26.429% 0.04941 165.261)",
+          "oklch(37.857% 0.04941 165.261)",
+          "oklch(49.286% 0.04941 165.261)",
+          "oklch(60.714% 0.04941 165.261)",
+          "oklch(72.143% 0.04941 165.261)",
+          "oklch(83.571% 0.04941 165.261)",
+          "oklch(95.000% 0.04941 165.261)"
+        ]
+      },
+      "ui-table-text": {
+        "role": "neutral",
+        "displayName": "Ui Table Text",
+        "canonical": "#f4f1e6",
+        "tonalRamp": [
+          "oklch(15.000% 0.01492 94.200)",
+          "oklch(26.429% 0.01492 94.200)",
+          "oklch(37.857% 0.01492 94.200)",
+          "oklch(49.286% 0.01492 94.200)",
+          "oklch(60.714% 0.01492 94.200)",
+          "oklch(72.143% 0.01492 94.200)",
+          "oklch(83.571% 0.01492 94.200)",
+          "oklch(95.000% 0.01492 94.200)"
+        ]
+      },
+      "ui-table-muted": {
+        "role": "neutral",
+        "displayName": "Ui Table Muted",
+        "canonical": "#c1d2c3",
+        "tonalRamp": [
+          "oklch(15.000% 0.02756 148.775)",
+          "oklch(26.429% 0.02756 148.775)",
+          "oklch(37.857% 0.02756 148.775)",
+          "oklch(49.286% 0.02756 148.775)",
+          "oklch(60.714% 0.02756 148.775)",
+          "oklch(72.143% 0.02756 148.775)",
+          "oklch(83.571% 0.02756 148.775)",
+          "oklch(95.000% 0.02756 148.775)"
+        ]
+      },
+      "midnight-bg": {
+        "role": "neutral",
+        "displayName": "Midnight Bg",
+        "canonical": "#24272e",
+        "tonalRamp": [
+          "oklch(15.000% 0.01369 267.055)",
+          "oklch(26.429% 0.01369 267.055)",
+          "oklch(37.857% 0.01369 267.055)",
+          "oklch(49.286% 0.01369 267.055)",
+          "oklch(60.714% 0.01369 267.055)",
+          "oklch(72.143% 0.01369 267.055)",
+          "oklch(83.571% 0.01369 267.055)",
+          "oklch(95.000% 0.01369 267.055)"
+        ]
+      },
+      "midnight-surface": {
+        "role": "neutral",
+        "displayName": "Midnight Surface",
+        "canonical": "#30343c",
+        "tonalRamp": [
+          "oklch(15.000% 0.01525 264.337)",
+          "oklch(26.429% 0.01525 264.337)",
+          "oklch(37.857% 0.01525 264.337)",
+          "oklch(49.286% 0.01525 264.337)",
+          "oklch(60.714% 0.01525 264.337)",
+          "oklch(72.143% 0.01525 264.337)",
+          "oklch(83.571% 0.01525 264.337)",
+          "oklch(95.000% 0.01525 264.337)"
+        ]
+      },
+      "midnight-text": {
+        "role": "neutral",
+        "displayName": "Midnight Text",
+        "canonical": "#fff8ec",
+        "tonalRamp": [
+          "oklch(15.000% 0.01751 81.333)",
+          "oklch(26.429% 0.01751 81.333)",
+          "oklch(37.857% 0.01751 81.333)",
+          "oklch(49.286% 0.01751 81.333)",
+          "oklch(60.714% 0.01751 81.333)",
+          "oklch(72.143% 0.01751 81.333)",
+          "oklch(83.571% 0.01751 81.333)",
+          "oklch(95.000% 0.01751 81.333)"
+        ]
+      },
+      "midnight-muted": {
+        "role": "neutral",
+        "displayName": "Midnight Muted",
+        "canonical": "#c5c3be",
+        "tonalRamp": [
+          "oklch(15.000% 0.00727 88.653)",
+          "oklch(26.429% 0.00727 88.653)",
+          "oklch(37.857% 0.00727 88.653)",
+          "oklch(49.286% 0.00727 88.653)",
+          "oklch(60.714% 0.00727 88.653)",
+          "oklch(72.143% 0.00727 88.653)",
+          "oklch(83.571% 0.00727 88.653)",
+          "oklch(95.000% 0.00727 88.653)"
+        ]
+      },
+      "midnight-line": {
+        "role": "neutral",
+        "displayName": "Midnight Line",
+        "canonical": "#4a4d54",
+        "tonalRamp": [
+          "oklch(15.000% 0.01224 267.227)",
+          "oklch(26.429% 0.01224 267.227)",
+          "oklch(37.857% 0.01224 267.227)",
+          "oklch(49.286% 0.01224 267.227)",
+          "oklch(60.714% 0.01224 267.227)",
+          "oklch(72.143% 0.01224 267.227)",
+          "oklch(83.571% 0.01224 267.227)",
+          "oklch(95.000% 0.01224 267.227)"
+        ]
+      },
+      "midnight-accent-red": {
+        "role": "primary",
+        "displayName": "Midnight Accent Red",
+        "canonical": "#f18c70",
+        "tonalRamp": [
+          "oklch(15.000% 0.12983 36.348)",
+          "oklch(26.429% 0.12983 36.348)",
+          "oklch(37.857% 0.12983 36.348)",
+          "oklch(49.286% 0.12983 36.348)",
+          "oklch(60.714% 0.12983 36.348)",
+          "oklch(72.143% 0.12983 36.348)",
+          "oklch(83.571% 0.12983 36.348)",
+          "oklch(95.000% 0.12983 36.348)"
+        ]
+      },
+      "forest-bg": {
+        "role": "neutral",
+        "displayName": "Forest Bg",
+        "canonical": "#e5eddb",
+        "tonalRamp": [
+          "oklch(15.000% 0.02537 126.555)",
+          "oklch(26.429% 0.02537 126.555)",
+          "oklch(37.857% 0.02537 126.555)",
+          "oklch(49.286% 0.02537 126.555)",
+          "oklch(60.714% 0.02537 126.555)",
+          "oklch(72.143% 0.02537 126.555)",
+          "oklch(83.571% 0.02537 126.555)",
+          "oklch(95.000% 0.02537 126.555)"
+        ]
+      },
+      "forest-surface": {
+        "role": "neutral",
+        "displayName": "Forest Surface",
+        "canonical": "#f3f6e9",
+        "tonalRamp": [
+          "oklch(15.000% 0.01742 117.288)",
+          "oklch(26.429% 0.01742 117.288)",
+          "oklch(37.857% 0.01742 117.288)",
+          "oklch(49.286% 0.01742 117.288)",
+          "oklch(60.714% 0.01742 117.288)",
+          "oklch(72.143% 0.01742 117.288)",
+          "oklch(83.571% 0.01742 117.288)",
+          "oklch(95.000% 0.01742 117.288)"
+        ]
+      },
+      "forest-text": {
+        "role": "neutral",
+        "displayName": "Forest Text",
+        "canonical": "#2d4032",
+        "tonalRamp": [
+          "oklch(15.000% 0.03434 152.520)",
+          "oklch(26.429% 0.03434 152.520)",
+          "oklch(37.857% 0.03434 152.520)",
+          "oklch(49.286% 0.03434 152.520)",
+          "oklch(60.714% 0.03434 152.520)",
+          "oklch(72.143% 0.03434 152.520)",
+          "oklch(83.571% 0.03434 152.520)",
+          "oklch(95.000% 0.03434 152.520)"
+        ]
+      },
+      "forest-muted": {
+        "role": "neutral",
+        "displayName": "Forest Muted",
+        "canonical": "#5c6d58",
+        "tonalRamp": [
+          "oklch(15.000% 0.03839 139.717)",
+          "oklch(26.429% 0.03839 139.717)",
+          "oklch(37.857% 0.03839 139.717)",
+          "oklch(49.286% 0.03839 139.717)",
+          "oklch(60.714% 0.03839 139.717)",
+          "oklch(72.143% 0.03839 139.717)",
+          "oklch(83.571% 0.03839 139.717)",
+          "oklch(95.000% 0.03839 139.717)"
+        ]
+      },
+      "forest-line": {
+        "role": "neutral",
+        "displayName": "Forest Line",
+        "canonical": "#c7d3bf",
+        "tonalRamp": [
+          "oklch(15.000% 0.03015 132.629)",
+          "oklch(26.429% 0.03015 132.629)",
+          "oklch(37.857% 0.03015 132.629)",
+          "oklch(49.286% 0.03015 132.629)",
+          "oklch(60.714% 0.03015 132.629)",
+          "oklch(72.143% 0.03015 132.629)",
+          "oklch(83.571% 0.03015 132.629)",
+          "oklch(95.000% 0.03015 132.629)"
+        ]
+      },
+      "sunset-bg": {
+        "role": "neutral",
+        "displayName": "Sunset Bg",
+        "canonical": "#f4dfd1",
+        "tonalRamp": [
+          "oklch(15.000% 0.02990 55.985)",
+          "oklch(26.429% 0.02990 55.985)",
+          "oklch(37.857% 0.02990 55.985)",
+          "oklch(49.286% 0.02990 55.985)",
+          "oklch(60.714% 0.02990 55.985)",
+          "oklch(72.143% 0.02990 55.985)",
+          "oklch(83.571% 0.02990 55.985)",
+          "oklch(95.000% 0.02990 55.985)"
+        ]
+      },
+      "sunset-surface": {
+        "role": "neutral",
+        "displayName": "Sunset Surface",
+        "canonical": "#fff1e6",
+        "tonalRamp": [
+          "oklch(15.000% 0.02108 60.752)",
+          "oklch(26.429% 0.02108 60.752)",
+          "oklch(37.857% 0.02108 60.752)",
+          "oklch(49.286% 0.02108 60.752)",
+          "oklch(60.714% 0.02108 60.752)",
+          "oklch(72.143% 0.02108 60.752)",
+          "oklch(83.571% 0.02108 60.752)",
+          "oklch(95.000% 0.02108 60.752)"
+        ]
+      },
+      "sunset-text": {
+        "role": "neutral",
+        "displayName": "Sunset Text",
+        "canonical": "#51372f",
+        "tonalRamp": [
+          "oklch(15.000% 0.03998 37.814)",
+          "oklch(26.429% 0.03998 37.814)",
+          "oklch(37.857% 0.03998 37.814)",
+          "oklch(49.286% 0.03998 37.814)",
+          "oklch(60.714% 0.03998 37.814)",
+          "oklch(72.143% 0.03998 37.814)",
+          "oklch(83.571% 0.03998 37.814)",
+          "oklch(95.000% 0.03998 37.814)"
+        ]
+      },
+      "sunset-muted": {
+        "role": "neutral",
+        "displayName": "Sunset Muted",
+        "canonical": "#795c4f",
+        "tonalRamp": [
+          "oklch(15.000% 0.04331 45.299)",
+          "oklch(26.429% 0.04331 45.299)",
+          "oklch(37.857% 0.04331 45.299)",
+          "oklch(49.286% 0.04331 45.299)",
+          "oklch(60.714% 0.04331 45.299)",
+          "oklch(72.143% 0.04331 45.299)",
+          "oklch(83.571% 0.04331 45.299)",
+          "oklch(95.000% 0.04331 45.299)"
+        ]
+      },
+      "sunset-line": {
+        "role": "neutral",
+        "displayName": "Sunset Line",
+        "canonical": "#dfc4b4",
+        "tonalRamp": [
+          "oklch(15.000% 0.03778 52.619)",
+          "oklch(26.429% 0.03778 52.619)",
+          "oklch(37.857% 0.03778 52.619)",
+          "oklch(49.286% 0.03778 52.619)",
+          "oklch(60.714% 0.03778 52.619)",
+          "oklch(72.143% 0.03778 52.619)",
+          "oklch(83.571% 0.03778 52.619)",
+          "oklch(95.000% 0.03778 52.619)"
+        ]
+      },
+      "sunset-table": {
+        "role": "secondary",
+        "displayName": "Sunset Table",
+        "canonical": "#6a4b40",
+        "tonalRamp": [
+          "oklch(15.000% 0.04610 40.371)",
+          "oklch(26.429% 0.04610 40.371)",
+          "oklch(37.857% 0.04610 40.371)",
+          "oklch(49.286% 0.04610 40.371)",
+          "oklch(60.714% 0.04610 40.371)",
+          "oklch(72.143% 0.04610 40.371)",
+          "oklch(83.571% 0.04610 40.371)",
+          "oklch(95.000% 0.04610 40.371)"
+        ]
+      },
+      "sunset-table-deep": {
+        "role": "secondary",
+        "displayName": "Sunset Table Deep",
+        "canonical": "#51382f",
+        "tonalRamp": [
+          "oklch(15.000% 0.03908 40.639)",
+          "oklch(26.429% 0.03908 40.639)",
+          "oklch(37.857% 0.03908 40.639)",
+          "oklch(49.286% 0.03908 40.639)",
+          "oklch(60.714% 0.03908 40.639)",
+          "oklch(72.143% 0.03908 40.639)",
+          "oklch(83.571% 0.03908 40.639)",
+          "oklch(95.000% 0.03908 40.639)"
+        ]
+      },
+      "sunset-table-muted": {
+        "role": "neutral",
+        "displayName": "Sunset Table Muted",
+        "canonical": "#e2c7b7",
+        "tonalRamp": [
+          "oklch(15.000% 0.03767 52.627)",
+          "oklch(26.429% 0.03767 52.627)",
+          "oklch(37.857% 0.03767 52.627)",
+          "oklch(49.286% 0.03767 52.627)",
+          "oklch(60.714% 0.03767 52.627)",
+          "oklch(72.143% 0.03767 52.627)",
+          "oklch(83.571% 0.03767 52.627)",
+          "oklch(95.000% 0.03767 52.627)"
+        ]
+      },
+      "card-red": {
+        "role": "secondary",
+        "displayName": "Card Red",
+        "canonical": "#bd4430",
+        "tonalRamp": [
+          "oklch(15.000% 0.15973 31.801)",
+          "oklch(26.429% 0.15973 31.801)",
+          "oklch(37.857% 0.15973 31.801)",
+          "oklch(49.286% 0.15973 31.801)",
+          "oklch(60.714% 0.15973 31.801)",
+          "oklch(72.143% 0.15973 31.801)",
+          "oklch(83.571% 0.15973 31.801)",
+          "oklch(95.000% 0.15973 31.801)"
+        ]
+      },
+      "card-yellow": {
+        "role": "secondary",
+        "displayName": "Card Yellow",
+        "canonical": "#edbf45",
+        "tonalRamp": [
+          "oklch(15.000% 0.14447 87.594)",
+          "oklch(26.429% 0.14447 87.594)",
+          "oklch(37.857% 0.14447 87.594)",
+          "oklch(49.286% 0.14447 87.594)",
+          "oklch(60.714% 0.14447 87.594)",
+          "oklch(72.143% 0.14447 87.594)",
+          "oklch(83.571% 0.14447 87.594)",
+          "oklch(95.000% 0.14447 87.594)"
+        ]
+      },
+      "card-green": {
+        "role": "secondary",
+        "displayName": "Card Green",
+        "canonical": "#317257",
+        "tonalRamp": [
+          "oklch(15.000% 0.08012 163.683)",
+          "oklch(26.429% 0.08012 163.683)",
+          "oklch(37.857% 0.08012 163.683)",
+          "oklch(49.286% 0.08012 163.683)",
+          "oklch(60.714% 0.08012 163.683)",
+          "oklch(72.143% 0.08012 163.683)",
+          "oklch(83.571% 0.08012 163.683)",
+          "oklch(95.000% 0.08012 163.683)"
+        ]
+      },
+      "card-blue": {
+        "role": "secondary",
+        "displayName": "Card Blue",
+        "canonical": "#3265a0",
+        "tonalRamp": [
+          "oklch(15.000% 0.10945 253.665)",
+          "oklch(26.429% 0.10945 253.665)",
+          "oklch(37.857% 0.10945 253.665)",
+          "oklch(49.286% 0.10945 253.665)",
+          "oklch(60.714% 0.10945 253.665)",
+          "oklch(72.143% 0.10945 253.665)",
+          "oklch(83.571% 0.10945 253.665)",
+          "oklch(95.000% 0.10945 253.665)"
+        ]
+      },
+      "card-wild": {
+        "role": "secondary",
+        "displayName": "Card Wild",
+        "canonical": "#30352e",
+        "tonalRamp": [
+          "oklch(15.000% 0.01397 136.663)",
+          "oklch(26.429% 0.01397 136.663)",
+          "oklch(37.857% 0.01397 136.663)",
+          "oklch(49.286% 0.01397 136.663)",
+          "oklch(60.714% 0.01397 136.663)",
+          "oklch(72.143% 0.01397 136.663)",
+          "oklch(83.571% 0.01397 136.663)",
+          "oklch(95.000% 0.01397 136.663)"
+        ]
+      },
+      "card-paper": {
+        "role": "neutral",
+        "displayName": "Card Paper",
+        "canonical": "#fcf6e7",
+        "tonalRamp": [
+          "oklch(15.000% 0.02077 88.718)",
+          "oklch(26.429% 0.02077 88.718)",
+          "oklch(37.857% 0.02077 88.718)",
+          "oklch(49.286% 0.02077 88.718)",
+          "oklch(60.714% 0.02077 88.718)",
+          "oklch(72.143% 0.02077 88.718)",
+          "oklch(83.571% 0.02077 88.718)",
+          "oklch(95.000% 0.02077 88.718)"
+        ]
+      },
+      "card-dark-ink": {
+        "role": "neutral",
+        "displayName": "Card Dark Ink",
+        "canonical": "#30372c",
+        "tonalRamp": [
+          "oklch(15.000% 0.02124 134.134)",
+          "oklch(26.429% 0.02124 134.134)",
+          "oklch(37.857% 0.02124 134.134)",
+          "oklch(49.286% 0.02124 134.134)",
+          "oklch(60.714% 0.02124 134.134)",
+          "oklch(72.143% 0.02124 134.134)",
+          "oklch(83.571% 0.02124 134.134)",
+          "oklch(95.000% 0.02124 134.134)"
+        ]
+      },
+      "action-light-ink": {
+        "role": "neutral",
+        "displayName": "Action Light Ink",
+        "canonical": "#fffaf1",
+        "tonalRamp": [
+          "oklch(15.000% 0.01302 82.402)",
+          "oklch(26.429% 0.01302 82.402)",
+          "oklch(37.857% 0.01302 82.402)",
+          "oklch(49.286% 0.01302 82.402)",
+          "oklch(60.714% 0.01302 82.402)",
+          "oklch(72.143% 0.01302 82.402)",
+          "oklch(83.571% 0.01302 82.402)",
+          "oklch(95.000% 0.01302 82.402)"
+        ]
+      },
+      "active-red": {
+        "role": "secondary",
+        "displayName": "Active Red",
+        "canonical": "#e57c64",
+        "tonalRamp": [
+          "oklch(15.000% 0.13527 33.957)",
+          "oklch(26.429% 0.13527 33.957)",
+          "oklch(37.857% 0.13527 33.957)",
+          "oklch(49.286% 0.13527 33.957)",
+          "oklch(60.714% 0.13527 33.957)",
+          "oklch(72.143% 0.13527 33.957)",
+          "oklch(83.571% 0.13527 33.957)",
+          "oklch(95.000% 0.13527 33.957)"
+        ]
+      },
+      "active-yellow": {
+        "role": "secondary",
+        "displayName": "Active Yellow",
+        "canonical": "#edbf45",
+        "tonalRamp": [
+          "oklch(15.000% 0.14447 87.594)",
+          "oklch(26.429% 0.14447 87.594)",
+          "oklch(37.857% 0.14447 87.594)",
+          "oklch(49.286% 0.14447 87.594)",
+          "oklch(60.714% 0.14447 87.594)",
+          "oklch(72.143% 0.14447 87.594)",
+          "oklch(83.571% 0.14447 87.594)",
+          "oklch(95.000% 0.14447 87.594)"
+        ]
+      },
+      "active-green": {
+        "role": "secondary",
+        "displayName": "Active Green",
+        "canonical": "#8ac695",
+        "tonalRamp": [
+          "oklch(15.000% 0.09315 149.504)",
+          "oklch(26.429% 0.09315 149.504)",
+          "oklch(37.857% 0.09315 149.504)",
+          "oklch(49.286% 0.09315 149.504)",
+          "oklch(60.714% 0.09315 149.504)",
+          "oklch(72.143% 0.09315 149.504)",
+          "oklch(83.571% 0.09315 149.504)",
+          "oklch(95.000% 0.09315 149.504)"
+        ]
+      },
+      "active-blue": {
+        "role": "secondary",
+        "displayName": "Active Blue",
+        "canonical": "#8cb8ea",
+        "tonalRamp": [
+          "oklch(15.000% 0.08618 252.106)",
+          "oklch(26.429% 0.08618 252.106)",
+          "oklch(37.857% 0.08618 252.106)",
+          "oklch(49.286% 0.08618 252.106)",
+          "oklch(60.714% 0.08618 252.106)",
+          "oklch(72.143% 0.08618 252.106)",
+          "oklch(83.571% 0.08618 252.106)",
+          "oklch(95.000% 0.08618 252.106)"
+        ]
+      },
+      "play-yellow": {
+        "role": "secondary",
+        "displayName": "Play Yellow",
+        "canonical": "#f1c95b",
+        "tonalRamp": [
+          "oklch(15.000% 0.13506 89.197)",
+          "oklch(26.429% 0.13506 89.197)",
+          "oklch(37.857% 0.13506 89.197)",
+          "oklch(49.286% 0.13506 89.197)",
+          "oklch(60.714% 0.13506 89.197)",
+          "oklch(72.143% 0.13506 89.197)",
+          "oklch(83.571% 0.13506 89.197)",
+          "oklch(95.000% 0.13506 89.197)"
+        ]
+      },
+      "play-green": {
+        "role": "secondary",
+        "displayName": "Play Green",
+        "canonical": "#c9dcb4",
+        "tonalRamp": [
+          "oklch(15.000% 0.05746 128.270)",
+          "oklch(26.429% 0.05746 128.270)",
+          "oklch(37.857% 0.05746 128.270)",
+          "oklch(49.286% 0.05746 128.270)",
+          "oklch(60.714% 0.05746 128.270)",
+          "oklch(72.143% 0.05746 128.270)",
+          "oklch(83.571% 0.05746 128.270)",
+          "oklch(95.000% 0.05746 128.270)"
+        ]
+      },
+      "play-ink": {
+        "role": "neutral",
+        "displayName": "Play Ink",
+        "canonical": "#2c2c32",
+        "tonalRamp": [
+          "oklch(15.000% 0.01078 285.722)",
+          "oklch(26.429% 0.01078 285.722)",
+          "oklch(37.857% 0.01078 285.722)",
+          "oklch(49.286% 0.01078 285.722)",
+          "oklch(60.714% 0.01078 285.722)",
+          "oklch(72.143% 0.01078 285.722)",
+          "oklch(83.571% 0.01078 285.722)",
+          "oklch(95.000% 0.01078 285.722)"
+        ]
+      },
+      "avatar-red": {
+        "role": "secondary",
+        "displayName": "Avatar Red",
+        "canonical": "#ef755d",
+        "tonalRamp": [
+          "oklch(15.000% 0.15559 32.590)",
+          "oklch(26.429% 0.15559 32.590)",
+          "oklch(37.857% 0.15559 32.590)",
+          "oklch(49.286% 0.15559 32.590)",
+          "oklch(60.714% 0.15559 32.590)",
+          "oklch(72.143% 0.15559 32.590)",
+          "oklch(83.571% 0.15559 32.590)",
+          "oklch(95.000% 0.15559 32.590)"
+        ]
+      },
+      "avatar-blue": {
+        "role": "secondary",
+        "displayName": "Avatar Blue",
+        "canonical": "#8db6ed",
+        "tonalRamp": [
+          "oklch(15.000% 0.09097 255.932)",
+          "oklch(26.429% 0.09097 255.932)",
+          "oklch(37.857% 0.09097 255.932)",
+          "oklch(49.286% 0.09097 255.932)",
+          "oklch(60.714% 0.09097 255.932)",
+          "oklch(72.143% 0.09097 255.932)",
+          "oklch(83.571% 0.09097 255.932)",
+          "oklch(95.000% 0.09097 255.932)"
+        ]
+      },
+      "avatar-yellow": {
+        "role": "secondary",
+        "displayName": "Avatar Yellow",
+        "canonical": "#e4c455",
+        "tonalRamp": [
+          "oklch(15.000% 0.13377 93.141)",
+          "oklch(26.429% 0.13377 93.141)",
+          "oklch(37.857% 0.13377 93.141)",
+          "oklch(49.286% 0.13377 93.141)",
+          "oklch(60.714% 0.13377 93.141)",
+          "oklch(72.143% 0.13377 93.141)",
+          "oklch(83.571% 0.13377 93.141)",
+          "oklch(95.000% 0.13377 93.141)"
+        ]
+      },
+      "avatar-green": {
+        "role": "secondary",
+        "displayName": "Avatar Green",
+        "canonical": "#a8c991",
+        "tonalRamp": [
+          "oklch(15.000% 0.08426 132.863)",
+          "oklch(26.429% 0.08426 132.863)",
+          "oklch(37.857% 0.08426 132.863)",
+          "oklch(49.286% 0.08426 132.863)",
+          "oklch(60.714% 0.08426 132.863)",
+          "oklch(72.143% 0.08426 132.863)",
+          "oklch(83.571% 0.08426 132.863)",
+          "oklch(95.000% 0.08426 132.863)"
+        ]
+      },
+      "avatar-lilac": {
+        "role": "secondary",
+        "displayName": "Avatar Lilac",
+        "canonical": "#c5afe5",
+        "tonalRamp": [
+          "oklch(15.000% 0.07881 303.240)",
+          "oklch(26.429% 0.07881 303.240)",
+          "oklch(37.857% 0.07881 303.240)",
+          "oklch(49.286% 0.07881 303.240)",
+          "oklch(60.714% 0.07881 303.240)",
+          "oklch(72.143% 0.07881 303.240)",
+          "oklch(83.571% 0.07881 303.240)",
+          "oklch(95.000% 0.07881 303.240)"
+        ]
+      },
+      "avatar-peach": {
+        "role": "secondary",
+        "displayName": "Avatar Peach",
+        "canonical": "#edae86",
+        "tonalRamp": [
+          "oklch(15.000% 0.09142 53.420)",
+          "oklch(26.429% 0.09142 53.420)",
+          "oklch(37.857% 0.09142 53.420)",
+          "oklch(49.286% 0.09142 53.420)",
+          "oklch(60.714% 0.09142 53.420)",
+          "oklch(72.143% 0.09142 53.420)",
+          "oklch(83.571% 0.09142 53.420)",
+          "oklch(95.000% 0.09142 53.420)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Home invitation."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Setup and lobby headings."
+      },
+      "dialog-title": {
+        "displayName": "Dialog Title",
+        "purpose": "Dialog and desktop live-turn headings."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Page copy and fields."
+      },
+      "body-muted": {
+        "displayName": "Body Muted",
+        "purpose": "Secondary explanations."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Form labels."
+      },
+      "button": {
+        "displayName": "Button",
+        "purpose": "Standard actions."
+      },
+      "wordmark": {
+        "displayName": "Wordmark",
+        "purpose": "Compact header identity."
+      }
+    },
+    "shadows": [
+      {
+        "name": "ambient",
+        "value": "var(--ui-shadow)",
+        "purpose": "Dialog and floating surface separation."
+      },
+      {
+        "name": "play-choice",
+        "value": "0 6px 14px #2c2c3228",
+        "purpose": "Soft tactile lift for the two play choices."
+      },
+      {
+        "name": "character",
+        "value": "1px 3px 6px #32313938",
+        "purpose": "Small card-character lift."
+      },
+      {
+        "name": "table",
+        "value": "inset 0 2px 0 #ffffff14, 0 5px 14px #23362a20",
+        "purpose": "Table material and page separation."
+      },
+      {
+        "name": "card",
+        "value": "0 3px 5px #071b2526",
+        "purpose": "Real playing-card material."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-out",
+        "value": "cubic-bezier(0.2, 0.8, 0.2, 1)",
+        "purpose": "Shared quick settling."
+      },
+      {
+        "name": "throw",
+        "value": "280ms",
+        "purpose": "Arcing card throw and settle."
+      },
+      {
+        "name": "draw",
+        "value": "260ms",
+        "purpose": "Deck-to-hand travel."
+      },
+      {
+        "name": "hand-reflow",
+        "value": "180ms",
+        "purpose": "Preserve hand spatial continuity."
+      },
+      {
+        "name": "deal-stagger",
+        "value": "35ms capped at 175ms",
+        "purpose": "Bounded initial deal."
+      },
+      {
+        "name": "special-reaction",
+        "value": "850ms",
+        "purpose": "Brief special-card signal."
+      },
+      {
+        "name": "victory",
+        "value": "1300ms",
+        "purpose": "Bounded completion burst."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "wide-home",
+        "value": "min-width: 1450px"
+      },
+      {
+        "name": "medium",
+        "value": "max-width: 1000px"
+      },
+      {
+        "name": "phone",
+        "value": "max-width: 700px"
+      },
+      {
+        "name": "narrow-phone",
+        "value": "max-width: 380px"
+      },
+      {
+        "name": "short-desktop",
+        "value": "max-height: 700px and min-width: 701px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Vermilion form action with immediate press feedback.",
+      "html": "<button class=\"ds-primary\">Deal cards</button>",
+      "css": ".ds-primary{font-family:var(--font-body, \"Nunito Sans\"),sans-serif;display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:50px;padding:14px 22px;border:1px solid transparent;border-radius:14px;font-size:14px;font-weight:800;line-height:1.25;cursor:pointer;transition:background 160ms,color 160ms,transform 120ms var(--ease-out);background:var(--ui-accent-red);color:var(--ui-bg)}:host-context(:root:not([data-theme=\"midnight\"])) .ds-primary{color:#fffaf1}.ds-primary:focus-visible{outline:3px solid var(--ui-accent-blue);outline-offset:4px;}.ds-primary:active{transform:scale(.98)}@media(hover:hover) and (pointer:fine){.ds-primary:hover{background:color-mix(in srgb,var(--ui-accent-red) 85%,var(--ui-text))}}@media(prefers-reduced-motion:reduce){.ds-primary{transition-duration:.01ms}}"
+    },
+    {
+      "name": "Secondary button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Outlined supporting action.",
+      "html": "<button class=\"ds-secondary\">Done</button>",
+      "css": ".ds-secondary{font-family:var(--font-body, \"Nunito Sans\"),sans-serif;display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:50px;padding:14px 22px;border:1px solid transparent;border-radius:14px;font-size:14px;font-weight:800;line-height:1.25;cursor:pointer;transition:background 160ms,color 160ms,transform 120ms var(--ease-out);background:transparent;color:var(--ui-text);border-color:var(--ui-line)}.ds-secondary:focus-visible{outline:3px solid var(--ui-accent-blue);outline-offset:4px;}.ds-secondary:active{transform:scale(.98)}@media(hover:hover) and (pointer:fine){.ds-secondary:hover{background:color-mix(in srgb,var(--ui-text) 5%,transparent)}}@media(prefers-reduced-motion:reduce){.ds-secondary{transition-duration:.01ms}}"
+    },
+    {
+      "name": "Text button",
+      "kind": "button",
+      "refersTo": "button-text",
+      "description": "Quiet inline action.",
+      "html": "<button class=\"ds-text\">Back to home</button>",
+      "css": ".ds-text{font-family:var(--font-body, \"Nunito Sans\"),sans-serif;display:inline-flex;align-items:center;gap:8px;min-height:38px;padding:4px 0;border:0;background:transparent;color:var(--ui-text);font-size:13px;font-weight:500;text-underline-offset:4px;cursor:pointer}.ds-text:focus-visible{outline:3px solid var(--ui-accent-blue);outline-offset:4px;}@media(hover:hover) and (pointer:fine){.ds-text:hover{text-decoration:underline}}"
+    },
+    {
+      "name": "Icon button",
+      "kind": "button",
+      "refersTo": "button-icon",
+      "description": "Compact named utility control.",
+      "html": "<button class=\"ds-icon\" aria-label=\"Sound settings\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z\"/><path d=\"M16 9a5 5 0 0 1 0 6M19.364 18.364a9 9 0 0 0 0-12.728\"/></svg></button>",
+      "css": ".ds-icon{font-family:var(--font-body, \"Nunito Sans\"),sans-serif;display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;border:0;border-radius:10px;background:transparent;color:var(--ui-text);cursor:pointer;transition:background 160ms,transform 120ms}.ds-icon:focus-visible{outline:3px solid var(--ui-accent-blue);outline-offset:4px;}.ds-icon:active{transform:scale(.98)}@media(hover:hover) and (pointer:fine){.ds-icon:hover{background:color-mix(in srgb,var(--ui-text) 7%,transparent)}}@media(prefers-reduced-motion:reduce){.ds-icon{transition-duration:.01ms}}"
+    },
+    {
+      "name": "Text field",
+      "kind": "input",
+      "refersTo": "field",
+      "description": "Native labeled field on light paper.",
+      "html": "<label class=\"ds-field-label\" for=\"ds-name\">Your name</label><input class=\"ds-field\" id=\"ds-name\" placeholder=\"You\" />",
+      "css": ".ds-field-label{font-family:var(--font-body, \"Nunito Sans\"),sans-serif;display:block;color:var(--ui-text);font-size:13px;font-weight:600;margin-bottom:8px}.ds-field{font-family:var(--font-body, \"Nunito Sans\"),sans-serif;box-sizing:border-box;width:100%;min-width:0;height:50px;padding:12px 15px;border:1px solid var(--ui-line);border-radius:10px;background:var(--ui-surface);color:var(--ui-text);font-size:15px;caret-color:var(--ui-accent-red);transition:border-color 150ms}.ds-field::placeholder{color:var(--ui-muted);opacity:1}.ds-field:focus{border-color:var(--ui-text)}.ds-field:focus-visible{outline:3px solid var(--ui-accent-blue);outline-offset:4px;}@media(prefers-reduced-motion:reduce){.ds-field{transition-duration:.01ms}}"
+    },
+    {
+      "name": "Play choice",
+      "kind": "button",
+      "refersTo": "play-choice-primary",
+      "description": "Principal two-line invitation to play.",
+      "html": "<button class=\"ds-choice\"><span><strong>Play with bots</strong><small>Jump straight in</small></span><svg width=\"21\" height=\"21\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M5 12h14m-6-6 6 6-6 6\"/></svg></button>",
+      "css": ".ds-choice{font-family:var(--font-body,\"Nunito Sans\"),sans-serif;display:flex;align-items:center;justify-content:space-between;text-align:left;gap:15px;padding:14px 19px 14px 14px;border:2px solid #2c2c32;border-radius:21px;background:#f1c95b;color:#2c2c32;box-shadow:0 6px 14px #2c2c3228;cursor:pointer;transition:background 160ms,transform 160ms}.ds-choice strong{display:block;font-family:var(--font-display,\"Fredoka\"),sans-serif;font-size:23px;font-weight:550}.ds-choice small{display:block;margin-top:4px;color:#655425;font-size:13px;font-weight:700}.ds-choice:focus-visible{outline:3px solid var(--ui-accent-blue);outline-offset:4px}.ds-choice:active{transform:translateY(3px) scale(.985);box-shadow:none}@media(hover:hover){.ds-choice:hover{background:#f7d775;transform:translateY(-3px)}}@media(prefers-reduced-motion:reduce){.ds-choice{transition:none}.ds-choice:hover,.ds-choice:active{transform:none}}"
+    },
+    {
+      "name": "Settings tabs",
+      "kind": "nav",
+      "refersTo": "button-text",
+      "description": "Three equal tabs with a fine baseline and red selection.",
+      "html": "<nav class=\"ds-tabs\" aria-label=\"Settings\"><button aria-current=\"page\">Profile</button><button>Rules</button><button>Audio</button><button class=\"ds-tab\" role=\"tab\" aria-selected=\"false\">Look</button></nav>",
+      "css": ".ds-tabs{display:flex;border-bottom:1px solid var(--ui-line);gap:12px}.ds-tabs button{font-family:var(--font-body, \"Nunito Sans\"),sans-serif;flex:1;border:0;border-bottom:2px solid transparent;background:transparent;padding:13px 3px;color:var(--ui-muted);font-size:13px;cursor:pointer}.ds-tabs button[aria-current=\"page\"]{color:var(--ui-text);border-bottom-color:var(--ui-accent-red);font-weight:600}.ds-tabs button:focus-visible{outline:3px solid var(--ui-accent-blue);outline-offset:4px;}"
+    },
+    {
+      "name": "UNO card",
+      "kind": "custom",
+      "refersTo": "uno-card",
+      "description": "The physical face shared by hand, piles, and showcase.",
+      "html": "<div class=\"ds-card\" role=\"img\" aria-label=\"Red nine\"><span class=\"ds-index ds-top\">9</span><span class=\"ds-orbit\"></span><span class=\"ds-value\">9</span><span class=\"ds-index ds-bottom\">9</span></div>",
+      "css": ".ds-card{box-sizing:border-box;position:relative;display:inline-block;width:82px;height:122px;overflow:hidden;border:4px solid #fcf6e7;border-radius:9px;background:#bd4430;color:#fcf6e7;font-family:var(--font-display,\"Fredoka\"),sans-serif;box-shadow:0 3px 5px #071b2526;user-select:none}.ds-index{position:absolute;z-index:2;width:28px;height:24px;display:grid;place-items:center;font-size:16px;font-weight:700;line-height:1}.ds-top{top:5px;left:0}.ds-bottom{bottom:5px;right:0;transform:rotate(180deg)}.ds-orbit{position:absolute;box-sizing:border-box;width:82%;height:68%;left:9%;top:16%;border:1.5px solid currentColor;border-radius:50%;transform:rotate(24deg);opacity:.7}.ds-value{position:absolute;inset:15% 0;display:flex;align-items:center;justify-content:center;font-size:48px;font-weight:700;letter-spacing:-.04em;line-height:1}"
+    },
+    {
+      "name": "Player character",
+      "kind": "custom",
+      "refersTo": "player-character",
+      "description": "Small physical card identity shared by setup and the playing table.",
+      "html": "<span class=\"ds-character\" aria-hidden=\"true\"><span class=\"ds-eyes\"><i></i><i></i></span><span class=\"ds-smile\"></span></span>",
+      "css": ".ds-character{position:relative;display:inline-flex;width:33px;height:41px;background:#ef755d;border:2px solid #323139;border-radius:8px;box-shadow:1px 3px 6px #32313938;transform:rotate(-8deg)}.ds-eyes{position:absolute;top:33%;left:22%;right:22%;display:flex;justify-content:space-between}.ds-eyes i{width:4px;height:6px;border-radius:50%;background:#323139}.ds-smile{position:absolute;left:35%;top:56%;width:10px;height:6px;border:2px solid #323139;border-top:0;border-radius:0 0 10px 10px}"
+    },
+    {
+      "name": "Local turn badge",
+      "kind": "chip",
+      "refersTo": "local-turn-badge",
+      "description": "Truthful active-turn status on the table.",
+      "html": "<span class=\"ds-turn\">Your turn</span>",
+      "css": ".ds-turn{font-family:var(--font-body,\"Nunito Sans\"),sans-serif;display:inline-flex;align-items:center;gap:7px;border-radius:8px;padding:5px 13px;background:#e8bd4e;color:#30372c;font-size:11px}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The card playground",
+    "overview": "UNO feels like a playful gathering around physical cards. Original clay card characters, rounded Fredoka lettering, cream surfaces and cheerful color establish the personality. Controls stay clear and direct so the game can carry the fun.\n\nThe home screen is led by graphics and two illustrated play choices. During a round, the table, hand and player identities take over. Reactions belong to meaningful plays and results; ordinary navigation stays quiet. The owner explicitly replaced the earlier restrained, text-heavy treatment with this direction.",
+    "keyCharacteristics": [
+      "Original clay characters and small card-face player identities.",
+      "Rounded display lettering with readable, friendly control text.",
+      "Warm cream, coral actions, yellow and mint choices, and a deep green table.",
+      "Physical indexed cards, spatial continuity and immediate sound.",
+      "Sparse navigation, readable phone seats and an independently scrolling hand."
+    ],
+    "rules": [
+      {
+        "name": "The Shared Table Rule",
+        "body": "Use theme-aware interface variables around the game; preserve stable card colors and explicit color names on the table.",
+        "section": "colors"
+      },
+      {
+        "name": "The Two Voices Rule",
+        "body": "Use Fredoka for expressive display and game values; use Nunito Sans for controls and information people must act on quickly.",
+        "section": "typography"
+      },
+      {
+        "name": "The Hand Owns Its Width Rule",
+        "body": "Keep horizontal overflow inside the hand, with room above cards for focus and lift; preserve a readable playing surface at 320px, 390px and 688px.",
+        "section": "layout"
+      },
+      {
+        "name": "The Physical Stack Rule",
+        "body": "Reserve hard stacked edges for physical card piles; use soft cast shadows on controls, avatars and containers.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Play Comes First Rule",
+        "body": "Reactions explain real plays and results without queuing old actions, blocking controls or changing turn timing.",
+        "section": "components"
+      }
+    ],
+    "dos": [
+      "Do lead with original graphics, cards and player identities; keep supporting copy short.",
+      "Do use the theme variables for interface surfaces and the shared card face for gameplay.",
+      "Do keep navigation sparse and move preferences into the existing Settings tabs.",
+      "Do preserve readable six-seat phone badges and an independently scrolling hand.",
+      "Do keep turn, active color, legal plays and UNO status explicit beyond color alone.",
+      "Do honor keyboard focus, reduced motion, mute and hidden-page cleanup.",
+      "Do tie motion and sound to current published state without delaying play."
+    ],
+    "donts": [
+      "Don't reintroduce long marketing copy, a third font family or a parallel component library.",
+      "Don't use Unicode glyphs in place of the established icon system.",
+      "Don't use hard cast block shadows on controls or player badges.",
+      "Don't shrink player information to make room for redundant card fans.",
+      "Don't queue narration or block the game on sound, animations or splashes.",
+      "Don't present unimplemented variants or unearned ranks as playable progress."
+    ]
+  }
+}

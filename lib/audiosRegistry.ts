@@ -1,11 +1,11 @@
 /**
- * Maps game logic stems → exact file basenames in `public/audios/` (your exports).
- * Do not rename files: URLs are built from these strings + `.wav` (then mp3/m4a/ogg).
+ * Maps game events to trimmed, normalized MP3 clips in public/audio/voice.
+ * Regenerate from original recordings with node scripts/prepare-audio.mjs.
  */
 
-export const AUDIOS_PUBLIC_PATH = '/audios';
+export const AUDIOS_PUBLIC_PATH = '/audio/voice';
 
-const EXTS = ['wav', 'mp3', 'm4a', 'ogg'] as const;
+const EXTS = ['mp3'] as const;
 
 /**
  * Each stem → one or more exact BaseNames as returned by the filesystem (no extension).
@@ -32,7 +32,7 @@ export const STEM_TO_AUDIOS: Record<string, readonly string[]> = {
   // Incoming draw-count clips (prefer these for draw-pile resolutions)
   draw_two: ['Draw two!'],
   draw_four: ['Draw four'],
-  draw_six: ['Draw Six', 'Draw six'],
+  draw_six: ['Draw Six'],
   draw_eight: ['Draw eight'],
   draw_ten: ['Draw ten'],
   draw_twelve: ['Draw twelve'],
@@ -41,10 +41,10 @@ export const STEM_TO_AUDIOS: Record<string, readonly string[]> = {
   draw_eighteen: ['Draw eighteen'],
   draw_twenty: ['Draw twenty'],
   draw_twentytwo: ['Draw twentytwo'],
-  draw_twenty_four: ['Draw twentyFour', 'Draw twenty four'],
+  draw_twenty_four: ['Draw twentyFour'],
 
   // Generic plus fallbacks still used when no draw-count clip exists.
-  plus_four_generic: ['Draw four', 'Plus four'],
+  plus_four_generic: ['Draw four'],
 
   wild_shuffle_red: ['Wild shuffle red'],
   wild_shuffle_blue: ['Wild shuffle Blue'],

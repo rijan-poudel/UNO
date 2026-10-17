@@ -6,7 +6,14 @@
 // ============================================================
 'use client';
 
-import { useReducer, useEffect, useCallback, useRef, useState } from 'react';
+import {
+  useReducer,
+  useEffect,
+  useLayoutEffect,
+  useCallback,
+  useRef,
+  useState,
+} from 'react';
 import type { GameState } from '../types/game';
 import type { Card, CardColor } from '../types/card';
 import type { GameRules } from '../types/rules';
@@ -22,11 +29,10 @@ import {
 import { canPlayCard, getPlayableCards } from '../lib/gameRules';
 import { getBotMove } from '../lib/botSupport';
 import { resolvePlayerName } from '../lib/playerNames';
-import { getBoardVoiceRemainingMs } from '../lib/voiceAnnouncer';
 
-const BOT_ACTION_DELAY_MS = 1500;
-const AUTO_PASS_AFTER_DRAW_MS = 1000;
-const POST_ACTION_HANDOFF_DELAY_MS = 1000;
+const BOT_ACTION_DELAY_MS = 760;
+const AUTO_PASS_AFTER_DRAW_MS = 650;
+const POST_ACTION_HANDOFF_DELAY_MS = 180;
 
 function reportHookError(context: string, error: unknown): void {
   if (process.env.NODE_ENV !== 'production') {
@@ -40,14 +46,20 @@ function getActionPresentationDelay(game: GameState): number {
   if (action.type === 'init') return 260;
   if (action.type === 'declareUno') return 300;
   if (action.type === 'callOut') return 420;
-  if (action.type === 'draw') return Math.min(950, 360 + (action.count * 110));
+  if (action.type === 'draw') return Math.min(950, 360 + action.count * 110);
   if (action.type === 'pass') return 200;
 
   if (action.type === 'play') {
     if (action.card.value === 'shuffle') return 460;
     if (action.card.value === 'discardAll') return 400;
-    if (action.card.value === 'wild4' || action.card.value === 'draw2') return 360;
-    if (action.card.value === 'reverse' || action.card.value === 'skip' || action.card.value === 'wild') return 340;
+    if (action.card.value === 'wild4' || action.card.value === 'draw2')
+      return 360;
+    if (
+      action.card.value === 'reverse' ||
+      action.card.value === 'skip' ||
+      action.card.value === 'wild'
+    )
+      return 340;
     return 240;
   }
 
@@ -71,8 +83,9 @@ export interface UnoUIState {
 
 type UIAction =
   | { type: 'INIT'; game: GameState }
-  | { type: 'PLAY'; game: GameState }       // turn-advancing action (play / pass / forced-draw)
-  | { type: 'DRAW_ONE'; game: GameState }   // voluntary draw: turn stays with current player
+  | { type: 'PLAY'; game: GameState } // turn-advancing action (play / pass / forced-draw)
+  | { type: 'META'; game: GameState }
+  | { type: 'DRAW_ONE'; game: GameState } // voluntary draw: turn stays with current player
   | { type: 'SELECT_WILD'; card: Card }
   | { type: 'CANCEL_WILD' }
   | { type: 'BOT_THINKING'; value: boolean }
@@ -134,13 +147,20 @@ function reducer(state: UnoUIState, action: UIAction): UnoUIState {
       };
     }
 
+    case 'META':
+      return {
+        ...state,
+        game: action.game,
+        log: [describeAction(action.game), ...state.log].slice(0, 30),
+      };
+
     case 'DRAW_ONE': {
       const entry = describeAction(action.game);
       return {
         ...state,
         game: action.game,
         pendingWild: null,
-        drawnThisTurn: true,   // keeps turn on the current player
+        drawnThisTurn: true, // keeps turn on the current player
         botThinking: false,
         log: [entry, ...state.log].slice(0, 30),
       };
@@ -186,7 +206,9 @@ export function useUnoGame() {
 
   // Ref to always access latest game state in async callbacks
   const gameRef = useRef<GameState | null>(game);
-  gameRef.current = game;
+  useLayoutEffect(() => {
+    gameRef.current = game;
+  }, [game]);
 
   // ── Start ─────────────────────────────────────────────────────────────────
 
@@ -204,20 +226,20 @@ export function useUnoGame() {
 
   const selectCard = useCallback(
     (card: Card) => {
-      if (!game) return;
+      if (!game || !canPlayCard(card, game, localPlayerIndex)) return;
       if (card.color === 'wild') {
         // Wild cards need a color choice first — open the picker
         dispatch({ type: 'SELECT_WILD', card });
       } else {
         try {
-          const next = enginePlayCard(game, game.currentPlayerIndex, card.id);
+          const next = enginePlayCard(game, localPlayerIndex, card.id);
           dispatch({ type: 'PLAY', game: next });
         } catch (e) {
           reportHookError('playCard error', e);
         }
       }
     },
-    [game],
+    [game, localPlayerIndex],
   );
 
   // ── Human: confirm wild color selection ───────────────────────────────────
@@ -226,7 +248,12 @@ export function useUnoGame() {
     (color: CardColor) => {
       if (!game || !pendingWild) return;
       try {
-        const next = enginePlayCard(game, game.currentPlayerIndex, pendingWild.id, color);
+        const next = enginePlayCard(
+          game,
+          game.currentPlayerIndex,
+          pendingWild.id,
+          color,
+        );
         dispatch({ type: 'PLAY', game: next });
       } catch (e) {
         reportHookError('confirmWildColor error', e);
@@ -281,7 +308,7 @@ export function useUnoGame() {
     (playerIndex: number) => {
       if (!game) return;
       const next = declareUno(game, playerIndex);
-      dispatch({ type: 'PLAY', game: next });
+      dispatch({ type: 'META', game: next });
     },
     [game],
   );
@@ -290,7 +317,7 @@ export function useUnoGame() {
     (callerIndex: number, targetIndex: number) => {
       if (!game) return;
       const next = callOutUno(game, callerIndex, targetIndex);
-      dispatch({ type: 'PLAY', game: next });
+      dispatch({ type: 'META', game: next });
     },
     [game],
   );
@@ -313,7 +340,6 @@ export function useUnoGame() {
     const coordinatedDelay = Math.max(
       BOT_ACTION_DELAY_MS,
       getActionPresentationDelay(game) + POST_ACTION_HANDOFF_DELAY_MS,
-      getBoardVoiceRemainingMs() + POST_ACTION_HANDOFF_DELAY_MS,
     );
 
     const timer = setTimeout(() => {
@@ -327,9 +353,10 @@ export function useUnoGame() {
         let botState = currentGame;
         const botIndex = botState.currentPlayerIndex;
 
-        const callOutTarget = botState.players.findIndex((player, idx) => (
-          idx !== botIndex && player.hand.length === 1 && !player.saidUno
-        ));
+        const callOutTarget = botState.players.findIndex(
+          (player, idx) =>
+            idx !== botIndex && player.hand.length === 1 && !player.saidUno,
+        );
 
         if (callOutTarget >= 0) {
           botState = callOutUno(botState, botIndex, callOutTarget);
@@ -348,19 +375,24 @@ export function useUnoGame() {
           if (drawnCard && canPlayCard(drawnCard, afterDraw, botIndex)) {
             const color =
               drawnCard.color === 'wild'
-                ? (move as { chosenColor?: CardColor }).chosenColor ?? 'red'
+                ? ((move as { chosenColor?: CardColor }).chosenColor ?? 'red')
                 : undefined;
             next = enginePlayCard(afterDraw, botIndex, drawnCard.id, color);
           } else {
             next = passTurn(afterDraw, botIndex);
           }
         } else {
-          next = enginePlayCard(botState, botIndex, move.cardId, move.chosenColor);
+          next = enginePlayCard(
+            botState,
+            botIndex,
+            move.cardId,
+            move.chosenColor,
+          );
         }
 
         // Auto-declare UNO for bot when hand drops to 1 card
         if (!next.winnerId && next.players[botIndex].hand.length === 1) {
-          next = declareUno(next, botIndex);
+          next = { ...declareUno(next, botIndex), lastAction: next.lastAction };
         }
 
         dispatch({ type: 'PLAY', game: next });
@@ -371,7 +403,7 @@ export function useUnoGame() {
     }, coordinatedDelay);
 
     return () => clearTimeout(timer);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [game?.currentPlayerIndex, game?.turnCount, game?.winnerId]);
 
   // ── Derived values ────────────────────────────────────────────────────────
@@ -381,8 +413,10 @@ export function useUnoGame() {
   const isLocalTurn = !!game && game.currentPlayerIndex === localPlayerIndex;
 
   const playableCardIds = new Set(
-    game && localPlayer && isLocalTurn && !localPlayer.isBot
-      ? getPlayableCards(localPlayer.hand, game, localPlayerIndex).map((c) => c.id)
+    game && localPlayer && !localPlayer.isBot
+      ? getPlayableCards(localPlayer.hand, game, localPlayerIndex).map(
+          (c) => c.id,
+        )
       : [],
   );
 
@@ -410,10 +444,7 @@ export function useUnoGame() {
     const playable = getPlayableCards(player.hand, game, localPlayerIndex);
     if (playable.length > 0) return;
 
-    const coordinatedAutoPassDelay = Math.max(
-      AUTO_PASS_AFTER_DRAW_MS,
-      getBoardVoiceRemainingMs() + POST_ACTION_HANDOFF_DELAY_MS,
-    );
+    const coordinatedAutoPassDelay = Math.max(AUTO_PASS_AFTER_DRAW_MS);
 
     const timer = window.setTimeout(() => {
       try {

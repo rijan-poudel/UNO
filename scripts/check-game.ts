@@ -1,0 +1,149 @@
+// Framework-free engine smoke check. Run with npm run check:game.
+import assert from 'node:assert/strict';
+import { initializeGame } from '../lib/gameSetup';
+import {
+  playCard,
+  drawOneCard,
+  drawRequiredCards,
+  passTurn,
+  declareUno,
+  callOutUno,
+} from '../lib/gameActions';
+import { RULE_PRESETS, matchesPreset } from '../lib/rulePresets';
+import { parseProgress, addRoundResult } from '../lib/playerProgress';
+import { canPlayCard } from '../lib/gameRules';
+import { getBotMove } from '../lib/botSupport';
+import type { CardColor } from '../types/card';
+
+for (const extraRules of [
+  ...RULE_PRESETS.map((p) => p.rules),
+  { allowShuffleCard: true, allowDiscardAll: true, drawUntilPlayable: true },
+]) {
+  for (let round = 0; round < 15; round++) {
+    let game = initializeGame(
+      ['One', 'Two', 'Three', 'Four', 'Five', 'Six'],
+      { ...extraRules, maxPlayers: 6 },
+      Array(6).fill(true),
+    );
+    const opener = game.discardPile[0];
+    assert.notEqual(
+      opener.color,
+      'wild',
+      'Opening discard always establishes a color',
+    );
+    assert.ok(game.activeColor && game.activeColor !== 'wild');
+    if (opener.value === 'draw2') assert.equal(game.pendingDraw, 2);
+    if (opener.value === 'skip') assert.equal(game.currentPlayerIndex, 1);
+    if (opener.value === 'reverse') assert.equal(game.direction, -1);
+    const initialCount =
+      game.players.flatMap((p) => p.hand).length +
+      game.drawPile.length +
+      game.discardPile.length;
+    let steps = 0;
+    while (!game.winnerId && steps++ < 3000) {
+      const before = JSON.stringify(game);
+      const oldGame = game;
+      const i = game.currentPlayerIndex;
+      const move = getBotMove(game, i);
+      if (move.action === 'drawRequired') game = drawRequiredCards(game, i);
+      else if (move.action === 'play')
+        game = playCard(game, i, move.cardId, move.chosenColor);
+      else {
+        game = drawOneCard(game, i);
+        const card = game.players[i].hand.at(-1);
+        if (card && canPlayCard(card, game, i))
+          game = playCard(
+            game,
+            i,
+            card.id,
+            card.color === 'wild' ? 'red' : undefined,
+          );
+        else game = passTurn(game, i);
+      }
+      if (game.players[i].hand.length === 1 && !game.winnerId)
+        game = declareUno(game, i);
+      assert.equal(
+        JSON.stringify(oldGame),
+        before,
+        'Actions must not mutate input',
+      );
+      const cards = [
+        ...game.drawPile,
+        ...game.discardPile,
+        ...game.players.flatMap((p) => p.hand),
+      ];
+      assert.equal(
+        cards.length,
+        initialCount,
+        'Every action conserves the deck',
+      );
+      assert.equal(
+        new Set(cards.map((c) => c.id)).size,
+        initialCount,
+        'No duplicated cards',
+      );
+      assert.ok(game.currentPlayerIndex >= 0 && game.currentPlayerIndex < 6);
+      assert.ok(JSON.parse(JSON.stringify(game)), 'Game stays serializable');
+    }
+    assert.ok(game.winnerId, 'Every simulated round finishes within the cap');
+  }
+}
+const initial = initializeGame(['One', 'Two'], {}, [false, false]);
+const wild = {
+  id: 'validation-wild',
+  color: 'wild' as const,
+  value: 'wild' as const,
+};
+const pending = {
+  ...initial,
+  players: initial.players.map((p, i) =>
+    i === initial.currentPlayerIndex ? { ...p, hand: [wild] } : p,
+  ),
+};
+assert.throws(
+  () =>
+    playCard(
+      pending,
+      pending.currentPlayerIndex,
+      wild.id,
+      'invalid' as CardColor,
+    ),
+  /color/i,
+);
+const target = {
+  ...initial,
+  players: initial.players.map((p, i) =>
+    i === 1 ? { ...p, hand: p.hand.slice(0, 1), saidUno: false } : p,
+  ),
+};
+assert.equal(callOutUno(target, 0, 1).players[1].hand.length, 3);
+console.log(
+  'Passed: 60 complete rounds, deck conservation, immutable inputs, serialization, wild validation, and UNO call-out.',
+);
+
+// Completed rounds count once, survive reload parsing, and only wins extend a streak.
+const fresh = parseProgress(null);
+const firstWin = addRoundResult(fresh, 'round-a', true);
+assert.equal(fresh.rounds, 0, 'Progress updates preserve input');
+assert.equal(firstWin.wins, 1);
+assert.equal(
+  addRoundResult(firstWin, 'round-a', true),
+  firstWin,
+  'Remounting a result does not count it twice',
+);
+const secondWin = addRoundResult(firstWin, 'round-b', true);
+const loss = addRoundResult(secondWin, 'round-c', false);
+assert.equal(loss.streak, 0);
+assert.equal(loss.bestStreak, 2);
+assert.deepEqual(parseProgress(JSON.stringify(loss)), loss);
+assert.equal(parseProgress('{"rounds":1,"wins":9}').rounds, 0);
+assert.equal(parseProgress('broken').wins, 0);
+for (const preset of RULE_PRESETS) {
+  assert.ok(
+    matchesPreset(
+      { ...preset.rules, startingHandSize: 12, maxPlayers: 6 },
+      preset.rules,
+    ),
+  );
+}
+console.log('Progress and supported rule presets passed.');

@@ -1,264 +1,131 @@
-'use client';
-
-import type { ReactNode } from 'react';
-import { useEffect, useState } from 'react';
-import SetupShell from './SetupShell';
-import { CountBadge, PrimaryButton, SectionDivider, SetupIntro } from './ui/PageChrome';
-
-interface PlayerRow {
-  name: string;
-  isBot: boolean;
-  uid: number; // stable key for animation, independent of index
+// Local play has one human; every additional seat is a bot.
+"use client";
+import { useEffect, useState, type ReactNode } from "react";
+import { ArrowRight, Minus, Plus } from "lucide-react";
+import type { GameRules } from "../types/rules";
+import RulePresets from "./RulePresets";
+import PlayerAvatar from "./PlayerAvatar";
+import SetupShell from "./SetupShell";
+import { SetupIntro } from "./ui/PageChrome";
+const NAMES = ["You", "Cleo", "Jules", "Robin", "Frankie", "Lou"];
+function getNames(): string[] {
+  try {
+    const stored: unknown = JSON.parse(
+      localStorage.getItem("uno.local.playerNames") ?? "null",
+    );
+    const profile = localStorage.getItem("uno.online.playerName");
+    const names = Array.isArray(stored)
+      ? stored.filter((n): n is string => typeof n === "string").slice(0, 6)
+      : NAMES.slice(0, 3);
+    if (profile) names[0] = profile;
+    return names.length >= 2 ? names : NAMES.slice(0, 3);
+  } catch {
+    return NAMES.slice(0, 3);
+  }
 }
-
-interface GameSetupProps {
-  onStart: (names: string[], botFlags: boolean[]) => void;
+export default function GameSetup({
+  onStart,
+  controls,
+  onBack,
+  startingHandSize = 7,
+  rules,
+  onRulesChange,
+}: {
+  onStart: (names: string[], bots: boolean[]) => void;
   controls?: ReactNode;
   onBack?: () => void;
-}
-
-const MAX_PLAYERS = 6;
-const LOCAL_PLAYER_NAMES_KEY = 'uno.local.playerNames';
-const ONLINE_PLAYER_NAME_KEY = 'uno.online.playerName';
-let uidCounter = 0;
-const nextUid = () => ++uidCounter;
-
-function getStoredProfileName(): string | null {
-  if (typeof window === 'undefined') return null;
-  try {
-    const raw = window.localStorage.getItem(ONLINE_PLAYER_NAME_KEY);
-    if (!raw) return null;
-    const normalized = raw.trim().slice(0, 18);
-    if (!normalized) return null;
-    const lowered = normalized.toLowerCase();
-    if (lowered === 'null' || lowered === 'undefined') return null;
-    return normalized;
-  } catch {
-    return null;
-  }
-}
-
-function getInitialPlayers(): PlayerRow[] {
-  const storedProfileName = getStoredProfileName();
-  const defaults: PlayerRow[] = [
-    { name: storedProfileName ?? 'Player 1', isBot: false, uid: nextUid() },
-    { name: 'Player 2', isBot: true,  uid: nextUid() },
-  ];
-
-  if (typeof window === 'undefined') return defaults;
-
-  try {
-    const raw = window.localStorage.getItem(LOCAL_PLAYER_NAMES_KEY);
-    if (!raw) return defaults;
-    const parsed = JSON.parse(raw) as unknown;
-    if (!Array.isArray(parsed)) return defaults;
-    const names = parsed
-      .filter((item): item is string => typeof item === 'string')
-      .map(n => n.trim()).filter(n => n.length > 0).slice(0, MAX_PLAYERS);
-    if (names.length < 2) return defaults;
-    if (storedProfileName) {
-      names[0] = storedProfileName;
-    }
-    return names.map((name, i) => ({ name, isBot: i !== 0, uid: nextUid() }));
-  } catch {
-    return defaults;
-  }
-}
-
-export default function GameSetup({ onStart, controls, onBack }: GameSetupProps) {
-  const [players, setPlayers] = useState<PlayerRow[]>(getInitialPlayers);
-  // Track newly added row ids for one-shot enter animation.
-  const [justAddedIds, setJustAddedIds] = useState<Set<number>>(new Set());
-
-  const addPlayer = () => {
-    if (players.length >= MAX_PLAYERS) return;
-    const uid = nextUid();
-    setJustAddedIds((prev) => new Set(prev).add(uid));
-    setPlayers(prev => [...prev, { name: `Player ${prev.length + 1}`, isBot: true, uid }]);
-    // Clear the "just added" flag after animation completes
-    setTimeout(() => {
-      setJustAddedIds((prev) => {
-        const next = new Set(prev);
-        next.delete(uid);
-        return next;
-      });
-    }, 320);
-  };
-
-  const removePlayer = (i: number) => {
-    if (players.length <= 2) return;
-    setPlayers(prev => prev.filter((_, idx) => idx !== i));
-  };
-
-  const updateName = (i: number, name: string) =>
-    setPlayers(prev => prev.map((p, idx) => idx === i ? { ...p, name } : p));
-
+  startingHandSize?: number;
+  rules: Partial<GameRules>;
+  onRulesChange: (rules: Partial<GameRules>) => void;
+}) {
+  const [names, setNames] = useState(getNames);
   useEffect(() => {
     try {
-      const names = players.map((p, i) => p.name.trim() || `Player ${i + 1}`);
-      window.localStorage.setItem(LOCAL_PLAYER_NAMES_KEY, JSON.stringify(names));
-    } catch { /* ignore */ }
-  }, [players]);
-
-  const handleStart = () => {
-    const names = players.map((p, i) => p.name.trim() || `Player ${i + 1}`);
-    onStart(names, players.map((_, idx) => idx !== 0));
-  };
-
-  const atMax = players.length >= MAX_PLAYERS;
-
+      localStorage.setItem("uno.local.playerNames", JSON.stringify(names));
+    } catch {}
+  }, [names]);
   return (
-    <>
-      <style>{`
-        @keyframes rowSlideIn {
-          from { opacity: 0; transform: translateY(-6px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-        .setup-input { outline: none !important; }
-        .setup-input::placeholder { color: var(--ui-muted); opacity: 0.5; }
-        .setup-input:focus { border-bottom-color: var(--ui-text) !important; }
-        .remove-btn:hover { color: var(--ui-accent-red) !important; }
-        .add-btn:hover   { border-color: var(--ui-text) !important; color: var(--ui-text) !important; }
-        .setup-primary-btn:hover { opacity: 0.78 !important; }
-        .player-row:last-of-type { border-bottom: none !important; }
-      `}</style>
-
-      <SetupShell
-        subtitle="Local multiplayer"
-        controls={controls}
-        footer={(
-          <>
-            <SectionDivider style={{ marginBottom: 32 }} />
-            <PrimaryButton onClick={handleStart}>DEAL CARDS</PrimaryButton>
-          </>
-        )}
-      >
-        <SetupIntro
-          title="Play with Computer"
-          description="Choose local seats and bot players for this device"
-          onBack={onBack}
-          trailing={<CountBadge current={players.length} total={MAX_PLAYERS} alert={atMax} />}
-        />
-
-        {/* Player rows */}
-        <div>
-          {players.map((player, index) => {
-            const isNew = justAddedIds.has(player.uid);
-            return (
-              <div
-                key={player.uid}
-                className="player-row"
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'auto 1fr auto auto',
-                  gap: 12,
-                  alignItems: 'center',
-                  borderBottom: '1px solid var(--ui-line)',
-                  padding: '13px 0',
-                  animation: isNew ? 'rowSlideIn 0.28s ease' : 'none',
-                }}
-              >
-                {/* Index number — subtle, helps orientation */}
-                <span style={{
-                  fontFamily: "'Courier Prime', monospace",
-                  fontSize: 10,
-                  color: 'var(--ui-muted)',
-                  letterSpacing: '0.06em',
-                  userSelect: 'none',
-                  minWidth: 16,
-                  textAlign: 'right',
-                }}>{index + 1}</span>
-
-                {/* Name input */}
-                <input
-                  type="text"
-                  value={player.name}
-                  maxLength={18}
-                  onChange={e => updateName(index, e.target.value)}
-                  placeholder={`Player ${index + 1}`}
-                  className="setup-input"
-                  style={{
-                    background: 'transparent',
-                    border: 'none',
-                    borderBottom: '1px solid transparent',
-                    fontFamily: "'Courier Prime', monospace",
-                    fontSize: 15,
-                    fontWeight: 700,
-                    color: 'var(--ui-text)',
-                    padding: '2px 0',
-                    width: '100%',
-                    transition: 'border-bottom-color 0.12s',
-                  }}
-                />
-
-                <span
-                  style={{
-                    fontFamily: "'Courier Prime', monospace",
-                    fontSize: 10,
-                    fontWeight: 700,
-                    letterSpacing: '0.1em',
-                    textTransform: 'uppercase',
-                    background: index === 0 ? 'transparent' : 'var(--ui-text)',
-                    color: index === 0 ? 'var(--ui-muted)' : 'var(--ui-bg)',
-                    border: `1px solid ${index === 0 ? 'var(--ui-line)' : 'var(--ui-text)'}`,
-                    padding: '5px 10px',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {index === 0 ? 'You' : 'Bot'}
-                </span>
-
-                {/* Remove — only when > 2 players */}
-                {players.length > 2 ? (
-                  <button
-                    type="button"
-                    onClick={() => removePlayer(index)}
-                    className="remove-btn"
-                    title="Remove player"
-                    style={{
-                      background: 'transparent',
-                      border: 'none',
-                      color: 'var(--ui-muted)',
-                      fontSize: 20,
-                      lineHeight: 1,
-                      cursor: 'pointer',
-                      padding: '4px',
-                      transition: 'color 0.12s',
-                    }}
-                  >×</button>
-                ) : <div style={{ width: 24 }} />}
-              </div>
-            );
-          })}
-
-          {/* Add player — dims and shows "max reached" when full */}
+    <SetupShell
+      subtitle="Play with bots"
+      controls={controls}
+      footer={
+        <>
+          <p className="muted">
+            {startingHandSize} cards each. First to an empty hand wins.
+          </p>
           <button
-            type="button"
-            onClick={addPlayer}
-            disabled={atMax}
-            className={atMax ? '' : 'add-btn'}
-            style={{
-              width: '100%',
-              marginTop: 16,
-              fontFamily: "'Courier Prime', monospace",
-              fontSize: 10,
-              fontWeight: 700,
-              letterSpacing: '0.14em',
-              textTransform: 'uppercase',
-              background: 'transparent',
-              color: atMax ? 'var(--ui-muted)' : 'var(--ui-muted)',
-              border: `1px dashed ${atMax ? 'transparent' : 'var(--ui-line)'}`,
-              padding: '13px 16px',
-              cursor: atMax ? 'default' : 'pointer',
-              textAlign: 'left',
-              opacity: atMax ? 0.35 : 1,
-              transition: 'all 0.12s',
-            }}
+            className="button primary wide"
+            onClick={() =>
+              onStart(
+                names.map((n, i) => n.trim() || NAMES[i]),
+                names.map((_, i) => i > 0),
+              )
+            }
           >
-            {atMax ? `Maximum ${MAX_PLAYERS} players` : '+ Add player'}
+            Deal me in
+            <ArrowRight size={20} />
+          </button>
+        </>
+      }
+    >
+      <SetupIntro
+        title="Take your seat."
+        description="Pick your crew. Deal some trouble."
+        onBack={onBack}
+      />
+      <div className="seat-count">
+        <div>
+          <h2>Seats at the table</h2>
+          <p>
+            You, plus {names.length - 1} {names.length === 2 ? "bot" : "bots"}.
+          </p>
+        </div>
+        <div className="stepper">
+          <button
+            className="icon-button"
+            aria-label="Remove a bot"
+            disabled={names.length <= 2}
+            onClick={() => setNames((n) => n.slice(0, -1))}
+          >
+            <Minus size={18} />
+          </button>
+          <output aria-live="polite">{names.length}</output>
+          <button
+            className="icon-button"
+            aria-label="Add a bot"
+            disabled={names.length >= 6}
+            onClick={() => setNames((n) => [...n, NAMES[n.length]])}
+          >
+            <Plus size={18} />
           </button>
         </div>
-      </SetupShell>
-    </>
+      </div>
+      <div className="seat-list">
+        {names.map((name, i) => (
+          <div className="seat-row" key={i}>
+            <PlayerAvatar seed={String(i)} large />
+            <label className="seat-name">
+              <span>{i === 0 ? "Your name" : `Bot ${i}`}</span>
+              <input
+                aria-label={i === 0 ? "Your name" : `Bot ${i} name`}
+                value={name}
+                maxLength={18}
+                onChange={(e) =>
+                  setNames((n) =>
+                    n.map((v, j) => (j === i ? e.target.value : v)),
+                  )
+                }
+              />
+            </label>
+            <span className="seat-type">{i === 0 ? "You" : "Bot"}</span>
+          </div>
+        ))}
+      </div>
+      <section className="setup-rules">
+        <h2>Pick your rules.</h2>
+        <RulePresets rules={rules} onChange={onRulesChange} />
+        <p className="muted">Fine-tune any rule in Settings.</p>
+      </section>
+    </SetupShell>
   );
 }

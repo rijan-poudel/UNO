@@ -1,177 +1,90 @@
+// Background music is optional; immediate card feedback uses the shared Web Audio context.
+"use client";
 import { useCallback, useEffect } from "react";
 import {
   getAudioSettings,
   isMusicEnabledForContext,
   type MusicContext,
 } from "../lib/audioSettings";
-
-let globalMusic: HTMLAudioElement | null = null;
-let globalCardMixing: HTMLAudioElement | null = null;
-let globalCardThrowing: HTMLAudioElement | null = null;
-let globalCardMixingStopTimer: number | null = null;
-let lastCardMixingAt = 0;
-let activeMusicContext: MusicContext = "lobby";
-let unlockListenersBound = false;
-
-function ensureMusicElement(): HTMLAudioElement {
-  if (!globalMusic) {
-    globalMusic = new Audio("/audios/background_music.wav");
-    globalMusic.loop = true;
-    globalMusic.preload = "auto";
-  }
-  return globalMusic;
-}
-
-export function primeMusicForFastStart(context: MusicContext = "lobby"): void {
+import {
+  playTableChime,
+  primeTableAudioFromUserGesture,
+} from "../lib/tableChimes";
+import { preloadBoardVoiceovers } from "../lib/voiceAnnouncer";
+let music: HTMLAudioElement | null = null;
+let activeContext: MusicContext = "lobby";
+let users = 0;
+function syncMusic(): void {
   if (typeof window === "undefined") return;
-  activeMusicContext = context;
-  const music = ensureMusicElement();
-  music.preload = "auto";
-  try {
-    music.load();
-  } catch {
-    // Ignore media preload failures.
-  }
-}
-
-if (typeof window !== "undefined") {
-  primeMusicForFastStart("lobby");
-}
-
-function getContextMusicVolume(): number {
   const settings = getAudioSettings();
-  const enabled = isMusicEnabledForContext(activeMusicContext);
-  return enabled ? settings.musicVolume ?? 0.7 : 0;
-}
-
-function applyMusicVolume(): void {
-  if (!globalMusic) return;
-  globalMusic.volume = getContextMusicVolume();
-}
-
-function tryPlayMusic(): void {
-  const music = ensureMusicElement();
-  applyMusicVolume();
-
-  if (music.volume <= 0) return;
-  if (!music.paused) return;
-
-  const playPromise = music.play();
-  if (playPromise !== undefined) {
-    playPromise.catch(() => {});
+  if (
+    settings.muted ||
+    document.hidden ||
+    !isMusicEnabledForContext(activeContext) ||
+    settings.musicVolume <= 0
+  ) {
+    music?.pause();
+    return;
   }
+  music ??= Object.assign(new Audio("/audio/music.mp3"), {
+    loop: true,
+    preload: "none",
+  });
+  music.volume = settings.musicVolume * 0.5;
+  if (music.paused) void music.play().catch(() => {});
 }
-
-function bindMusicUnlockListeners(): void {
-  if (typeof window === "undefined") return;
-  if (unlockListenersBound) return;
-  unlockListenersBound = true;
-
-  const unlock = () => {
-    tryPlayMusic();
-    const music = globalMusic;
-    if (!music || music.paused) return;
-
-    window.removeEventListener("pointerdown", unlock);
-    window.removeEventListener("touchstart", unlock);
-    window.removeEventListener("keydown", unlock);
-  };
-
-  window.addEventListener("pointerdown", unlock, { passive: true });
-  window.addEventListener("touchstart", unlock, { passive: true });
-  window.addEventListener("keydown", unlock);
+function unlock() {
+  primeTableAudioFromUserGesture();
+  syncMusic();
 }
-
+function applySettings() {
+  syncMusic();
+  preloadBoardVoiceovers();
+}
+export function primeMusicForFastStart(context: MusicContext = "lobby") {
+  activeContext = context;
+  primeTableAudioFromUserGesture();
+  syncMusic();
+}
 export function useAudioManager() {
-  const setMusicContext = useCallback((context: MusicContext) => {
-    activeMusicContext = context;
-    applyMusicVolume();
-    tryPlayMusic();
-  }, []);
-
-  // Play background music (looped)
-  const playMusic = useCallback((context?: MusicContext) => {
-    if (context) {
-      activeMusicContext = context;
-    }
-    tryPlayMusic();
-  }, []);
-
-  const pauseMusic = useCallback(() => {
-    globalMusic?.pause();
-  }, []);
-
-  // Play card mixing sound
-  const playCardMixing = useCallback((durationMs = 180) => {
-    if (!globalCardMixing) {
-      globalCardMixing = new Audio("/audios/card_mixing.mp3");
-      globalCardMixing.preload = "auto";
-    }
-
-    const now = Date.now();
-    if (now - lastCardMixingAt < 70) return;
-    lastCardMixingAt = now;
-
-    const settings = getAudioSettings();
-    globalCardMixing.volume = settings.sfxVolume ?? 0.8;
-    globalCardMixing.currentTime = 0;
-    globalCardMixing.play().catch(() => {});
-
-    if (globalCardMixingStopTimer !== null) {
-      window.clearTimeout(globalCardMixingStopTimer);
-    }
-    globalCardMixingStopTimer = window.setTimeout(() => {
-      if (!globalCardMixing) return;
-      globalCardMixing.pause();
-      globalCardMixing.currentTime = 0;
-      globalCardMixingStopTimer = null;
-    }, Math.max(80, durationMs));
-  }, []);
-
-  const stopCardMixing = useCallback(() => {
-    if (globalCardMixingStopTimer !== null) {
-      window.clearTimeout(globalCardMixingStopTimer);
-      globalCardMixingStopTimer = null;
-    }
-    if (!globalCardMixing) return;
-    globalCardMixing.pause();
-    globalCardMixing.currentTime = 0;
-  }, []);
-
-  // Play card throwing sound (lower volume)
-  const playCardThrowing = useCallback(() => {
-    if (!globalCardThrowing) {
-      globalCardThrowing = new Audio("/audios/card_throwing.mp3");
-      globalCardThrowing.preload = "auto";
-    }
-    const settings = getAudioSettings();
-    globalCardThrowing.volume = (settings.sfxVolume ?? 0.8) * 0.5;
-    globalCardThrowing.currentTime = 0;
-    globalCardThrowing.play().catch(() => {});
-  }, []);
-
-  // React to volume/context changes
   useEffect(() => {
-    bindMusicUnlockListeners();
-    tryPlayMusic();
-
-    const handler = () => {
-      applyMusicVolume();
-      tryPlayMusic();
-      const settings = getAudioSettings();
-      if (globalCardMixing) globalCardMixing.volume = settings.sfxVolume ?? 0.8;
-      if (globalCardThrowing) globalCardThrowing.volume = (settings.sfxVolume ?? 0.8) * 0.5;
+    users++;
+    preloadBoardVoiceovers();
+    if (users === 1) {
+      window.addEventListener("uno:audio-settings", applySettings);
+      window.addEventListener("pointerdown", unlock, { passive: true });
+      window.addEventListener("keydown", unlock);
+      document.addEventListener("visibilitychange", syncMusic);
+    }
+    return () => {
+      users--;
+      if (users === 0) {
+        window.removeEventListener("uno:audio-settings", applySettings);
+        window.removeEventListener("pointerdown", unlock);
+        window.removeEventListener("keydown", unlock);
+        document.removeEventListener("visibilitychange", syncMusic);
+        music?.pause();
+      }
     };
-    window.addEventListener("uno:audio-settings", handler);
-    return () => window.removeEventListener("uno:audio-settings", handler);
   }, []);
-
+  const setMusicContext = useCallback((context: MusicContext) => {
+    activeContext = context;
+    syncMusic();
+  }, []);
+  const playMusic = useCallback((context?: MusicContext) => {
+    if (context) activeContext = context;
+    syncMusic();
+  }, []);
+  const pauseMusic = useCallback(() => music?.pause(), []);
+  const playCardMixing = useCallback(() => playTableChime("shuffleMotion"), []);
+  const playCardThrowing = useCallback(() => playTableChime("cardPlay"), []);
+  const stopCardMixing = useCallback(() => {}, []);
   return {
+    setMusicContext,
     playMusic,
     pauseMusic,
-    setMusicContext,
     playCardMixing,
-    stopCardMixing,
     playCardThrowing,
+    stopCardMixing,
   };
 }

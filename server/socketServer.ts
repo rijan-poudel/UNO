@@ -35,7 +35,7 @@ import type {
 } from '../types/multiplayer';
 
 const PORT = Number(process.env.PORT ?? process.env.UNO_SOCKET_PORT ?? 3001);
-const MAX_ROOM_PLAYERS = 4;
+const MAX_ROOM_PLAYERS = 6;
 
 const configuredCorsOrigins = (process.env.UNO_CORS_ORIGINS ?? '')
   .split(',')
@@ -45,12 +45,18 @@ const configuredCorsOrigins = (process.env.UNO_CORS_ORIGINS ?? '')
 function isAllowedOrigin(origin: string): boolean {
   const normalized = origin.trim().replace(/\/$/, '');
 
-  const isLocalhostOrigin = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(normalized);
-  const isLanOrigin = /^https?:\/\/192\.168\.\d+\.\d+(:\d+)?$/i.test(normalized)
-    || /^https?:\/\/10\.\d+\.\d+\.\d+(:\d+)?$/i.test(normalized)
-    || /^https?:\/\/172\.(1[6-9]|2\d|3[0-1])\.\d+\.\d+(:\d+)?$/i.test(normalized);
+  const isLocalhostOrigin =
+    /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(normalized);
+  const isLanOrigin =
+    /^https?:\/\/192\.168\.\d+\.\d+(:\d+)?$/i.test(normalized) ||
+    /^https?:\/\/10\.\d+\.\d+\.\d+(:\d+)?$/i.test(normalized) ||
+    /^https?:\/\/172\.(1[6-9]|2\d|3[0-1])\.\d+\.\d+(:\d+)?$/i.test(normalized);
 
-  return isLocalhostOrigin || isLanOrigin || configuredCorsOrigins.includes(normalized);
+  return (
+    isLocalhostOrigin ||
+    isLanOrigin ||
+    configuredCorsOrigins.includes(normalized)
+  );
 }
 
 interface ServerRoomPlayer extends RoomPlayer {
@@ -80,13 +86,18 @@ interface PendingInviteRecord extends FriendInvite {
 }
 
 const rooms = new Map<string, ServerRoom>();
+const orphanedRoomTimers = new Map<string, ReturnType<typeof setTimeout>>();
 const playerBySocket = new Map<string, { roomId: string; playerId: string }>();
 const presenceBySocket = new Map<string, PresenceRecord>();
 const presenceByFriendCode = new Map<string, PresenceRecord>();
 const pendingInvites = new Map<string, PendingInviteRecord>();
 
 function makeRoomId(): string {
-  return randomBytes(4).toString('base64url').toUpperCase().slice(0, 6);
+  const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  return Array.from(
+    randomBytes(6),
+    (byte) => alphabet[byte % alphabet.length],
+  ).join('');
 }
 
 function makePlayerId(existingCount: number): string {
@@ -94,11 +105,15 @@ function makePlayerId(existingCount: number): string {
 }
 
 function makeInviteId(): string {
-  return `invite_${Math.random().toString(36).slice(2, 10)}${Date.now().toString(36).slice(-4)}`;
+  return `invite_${randomBytes(12).toString('hex')}`;
 }
 
 function normalizeFriendCode(value: string): string {
-  return value.trim().toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 8);
+  return value
+    .trim()
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, '')
+    .slice(0, 8);
 }
 
 function makeNextPlayerId(players: ServerRoomPlayer[]): string {
@@ -115,14 +130,16 @@ function toSnapshot(room: ServerRoom): RoomSnapshot {
     roomId: room.roomId,
     hostPlayerId: room.hostPlayerId,
     players: room.players.map((p) => {
-      const presence = p.socketId ? presenceBySocket.get(p.socketId) : undefined;
+      const presence = p.socketId
+        ? presenceBySocket.get(p.socketId)
+        : undefined;
       return {
-      playerId: p.playerId,
-      name: p.name,
-      connected: p.connected,
-      isBot: p.isBot,
-      friendCode: presence?.friendCode,
-      ready: p.ready,
+        playerId: p.playerId,
+        name: p.name,
+        connected: p.connected,
+        isBot: p.isBot,
+        friendCode: presence?.friendCode,
+        ready: p.ready,
       };
     }),
     started: room.started,
@@ -131,7 +148,11 @@ function toSnapshot(room: ServerRoom): RoomSnapshot {
   };
 }
 
-function createRoomForPlayer(socketId: string, playerName: string, deviceId: string): { room: ServerRoom; playerId: string } {
+function createRoomForPlayer(
+  socketId: string,
+  playerName: string,
+  deviceId: string,
+): { room: ServerRoom; playerId: string } {
   let roomId = makeRoomId();
   while (rooms.has(roomId)) {
     roomId = makeRoomId();
@@ -141,7 +162,17 @@ function createRoomForPlayer(socketId: string, playerName: string, deviceId: str
   const room: ServerRoom = {
     roomId,
     hostPlayerId: playerId,
-    players: [{ playerId, socketId, name: playerName, connected: true, deviceId, isBot: false, ready: false }],
+    players: [
+      {
+        playerId,
+        socketId,
+        name: playerName,
+        connected: true,
+        deviceId,
+        isBot: false,
+        ready: false,
+      },
+    ],
     started: false,
     game: null,
     pendingColorChoice: null,
@@ -152,18 +183,31 @@ function createRoomForPlayer(socketId: string, playerName: string, deviceId: str
   return { room, playerId };
 }
 
-function joinRoomAsPlayer(room: ServerRoom, socketId: string, playerName: string, deviceId: string): string {
-  const existingPlayerForDevice = room.players.find((player) => player.deviceId === deviceId);
+function joinRoomAsPlayer(
+  room: ServerRoom,
+  socketId: string,
+  playerName: string,
+  deviceId: string,
+): string {
+  const existingPlayerForDevice = room.players.find(
+    (player) => player.deviceId === deviceId,
+  );
   if (existingPlayerForDevice) {
     if (existingPlayerForDevice.connected) {
       throw new Error('This device is already connected in the room.');
     }
 
+    const cleanup = orphanedRoomTimers.get(room.roomId);
+    if (cleanup) clearTimeout(cleanup);
+    orphanedRoomTimers.delete(room.roomId);
     existingPlayerForDevice.socketId = socketId;
     existingPlayerForDevice.connected = true;
     existingPlayerForDevice.ready = false;
     existingPlayerForDevice.name = playerName;
-    playerBySocket.set(socketId, { roomId: room.roomId, playerId: existingPlayerForDevice.playerId });
+    playerBySocket.set(socketId, {
+      roomId: room.roomId,
+      playerId: existingPlayerForDevice.playerId,
+    });
     return existingPlayerForDevice.playerId;
   }
 
@@ -172,7 +216,15 @@ function joinRoomAsPlayer(room: ServerRoom, socketId: string, playerName: string
   }
 
   const playerId = makeNextPlayerId(room.players);
-  room.players.push({ playerId, socketId, name: playerName, connected: true, deviceId, isBot: false, ready: false });
+  room.players.push({
+    playerId,
+    socketId,
+    name: playerName,
+    connected: true,
+    deviceId,
+    isBot: false,
+    ready: false,
+  });
   playerBySocket.set(socketId, { roomId: room.roomId, playerId });
   return playerId;
 }
@@ -204,7 +256,11 @@ function upsertPresence(socketId: string, payload: PresencePayload): string {
   }
 
   const existing = presenceByFriendCode.get(friendCode);
-  if (existing && existing.socketId !== socketId && existing.deviceId !== deviceId) {
+  if (
+    existing &&
+    existing.socketId !== socketId &&
+    existing.deviceId !== deviceId
+  ) {
     throw new Error('Friend code already in use.');
   }
 
@@ -213,7 +269,13 @@ function upsertPresence(socketId: string, payload: PresencePayload): string {
     presenceByFriendCode.delete(previous.friendCode);
   }
 
-  const record: PresenceRecord = { socketId, deviceId, friendCode, playerName, lastSeenAt: Date.now() };
+  const record: PresenceRecord = {
+    socketId,
+    deviceId,
+    friendCode,
+    playerName,
+    lastSeenAt: Date.now(),
+  };
   presenceBySocket.set(socketId, record);
   presenceByFriendCode.set(friendCode, record);
   return friendCode;
@@ -236,19 +298,31 @@ function removeInvite(inviteId: string, ioServer: Server): void {
 
   const targetPresence = presenceByFriendCode.get(invite.toFriendCode);
   if (targetPresence) {
-    ioServer.to(targetPresence.socketId).emit('friend:invite:removed', { inviteId });
+    ioServer
+      .to(targetPresence.socketId)
+      .emit('friend:invite:removed', { inviteId });
   }
 
-  const senderMembership = Array.from(playerBySocket.entries()).find(([, membership]) => membership.playerId === invite.fromPlayerId && membership.roomId === invite.roomId);
+  const senderMembership = Array.from(playerBySocket.entries()).find(
+    ([, membership]) =>
+      membership.playerId === invite.fromPlayerId &&
+      membership.roomId === invite.roomId,
+  );
   if (senderMembership) {
-    ioServer.to(senderMembership[0]).emit('friend:invite:removed', { inviteId });
+    ioServer
+      .to(senderMembership[0])
+      .emit('friend:invite:removed', { inviteId });
   }
 }
 
-function findSenderSocketIdForInvite(invite: PendingInviteRecord): string | null {
-  const senderMembership = Array.from(playerBySocket.entries()).find(([, membership]) => (
-    membership.playerId === invite.fromPlayerId && membership.roomId === invite.roomId
-  ));
+function findSenderSocketIdForInvite(
+  invite: PendingInviteRecord,
+): string | null {
+  const senderMembership = Array.from(playerBySocket.entries()).find(
+    ([, membership]) =>
+      membership.playerId === invite.fromPlayerId &&
+      membership.roomId === invite.roomId,
+  );
   return senderMembership ? senderMembership[0] : null;
 }
 
@@ -268,7 +342,9 @@ function leaveRoomForSocket(socketId: string, ioServer: Server): void {
   const room = rooms.get(membership.roomId);
   if (!room) return;
 
-  const playerIndex = room.players.findIndex((player) => player.playerId === membership.playerId);
+  const playerIndex = room.players.findIndex(
+    (player) => player.playerId === membership.playerId,
+  );
   if (playerIndex === -1) return;
 
   const player = room.players[playerIndex];
@@ -278,8 +354,10 @@ function leaveRoomForSocket(socketId: string, ioServer: Server): void {
     player.ready = true;
 
     if (room.hostPlayerId === player.playerId) {
-      const nextHost = room.players.find((p) => p.playerId !== player.playerId && p.connected)
-        ?? room.players.find((p) => p.playerId !== player.playerId);
+      const nextHost =
+        room.players.find(
+          (p) => p.playerId !== player.playerId && p.connected,
+        ) ?? room.players.find((p) => p.playerId !== player.playerId);
       if (nextHost) {
         room.hostPlayerId = nextHost.playerId;
       }
@@ -289,17 +367,35 @@ function leaveRoomForSocket(socketId: string, ioServer: Server): void {
   } else {
     room.players.splice(playerIndex, 1);
     if (room.hostPlayerId === player.playerId && room.players.length > 0) {
-      const nextHost = room.players.find((entry) => !entry.isBot && entry.connected)
-        ?? room.players.find((entry) => !entry.isBot)
-        ?? room.players[0];
+      const nextHost =
+        room.players.find((entry) => !entry.isBot && entry.connected) ??
+        room.players.find((entry) => !entry.isBot) ??
+        room.players[0];
       room.hostPlayerId = nextHost.playerId;
     }
   }
 
   const hasConnectedPlayers = room.players.some((p) => p.connected);
   if (!hasConnectedPlayers) {
-    removeInvitesForRoom(room.roomId, ioServer);
-    rooms.delete(room.roomId);
+    const timer = botTimers.get(room.roomId);
+    if (timer) clearTimeout(timer);
+    botTimers.delete(room.roomId);
+    // Keep a short reconnect window when the final human refreshes their page.
+    if (!orphanedRoomTimers.has(room.roomId)) {
+      orphanedRoomTimers.set(
+        room.roomId,
+        setTimeout(() => {
+          orphanedRoomTimers.delete(room.roomId);
+          if (
+            rooms.get(room.roomId) !== room ||
+            room.players.some((p) => p.connected)
+          )
+            return;
+          removeInvitesForRoom(room.roomId, ioServer);
+          rooms.delete(room.roomId);
+        }, 45_000),
+      );
+    }
     return;
   }
 
@@ -314,7 +410,10 @@ function ackError<T>(message: string): Ack<T> {
   return { ok: false, error: message };
 }
 
-function ensureActor(room: ServerRoom, socketId: string): { actorIndex: number; actorPlayerId: string } {
+function ensureActor(
+  room: ServerRoom,
+  socketId: string,
+): { actorIndex: number; actorPlayerId: string } {
   if (!room.game) {
     throw new Error('Game is not started yet.');
   }
@@ -324,7 +423,9 @@ function ensureActor(room: ServerRoom, socketId: string): { actorIndex: number; 
     throw new Error('Player is not part of this room.');
   }
 
-  const actorIndex = room.game.players.findIndex((p) => p.id === actor.playerId);
+  const actorIndex = room.game.players.findIndex(
+    (p) => p.id === actor.playerId,
+  );
   if (actorIndex === -1) {
     throw new Error('Player not found in active game state.');
   }
@@ -332,7 +433,12 @@ function ensureActor(room: ServerRoom, socketId: string): { actorIndex: number; 
   return { actorIndex, actorPlayerId: actor.playerId };
 }
 
-function handleGameAction(room: ServerRoom, socketId: string, payload: RoomActionPayload, ioServer: Server): RoomSnapshot {
+function handleGameAction(
+  room: ServerRoom,
+  socketId: string,
+  payload: RoomActionPayload,
+  ioServer: Server,
+): RoomSnapshot {
   if (!room.started || !room.game) {
     throw new Error('Game has not started.');
   }
@@ -354,14 +460,20 @@ function handleGameAction(room: ServerRoom, socketId: string, payload: RoomActio
     throw new Error('Waiting for active player to choose a color.');
   }
 
-  if (activeChoice && action.type !== 'play' && action.type !== 'cancelWildChoice') {
+  if (
+    activeChoice &&
+    action.type !== 'play' &&
+    action.type !== 'cancelWildChoice'
+  ) {
     throw new Error('Choose a color for the selected wild card first.');
   }
 
   switch (action.type) {
     case 'prepareWild': {
       requireTurn();
-      const card = state.players[actorIndex]?.hand.find((entry) => entry.id === action.cardId);
+      const card = state.players[actorIndex]?.hand.find(
+        (entry) => entry.id === action.cardId,
+      );
       if (!card) {
         throw new Error('Selected card is not in your hand.');
       }
@@ -379,9 +491,12 @@ function handleGameAction(room: ServerRoom, socketId: string, payload: RoomActio
       };
 
       // Auto-cancel if no color chosen within 30 seconds
-      const pendingCardId = card.id;
+      const pendingChoice = room.pendingColorChoice;
       setTimeout(() => {
-        if (room.pendingColorChoice?.cardId === pendingCardId) {
+        if (
+          rooms.get(room.roomId) === room &&
+          room.pendingColorChoice === pendingChoice
+        ) {
           room.pendingColorChoice = null;
           broadcastRoom(ioServer, room);
         }
@@ -402,9 +517,13 @@ function handleGameAction(room: ServerRoom, socketId: string, payload: RoomActio
     }
     case 'play': {
       if (!isActorTurn) {
-        const jumpInCard = state.players[actorIndex]?.hand.find((entry) => entry.id === action.cardId);
+        const jumpInCard = state.players[actorIndex]?.hand.find(
+          (entry) => entry.id === action.cardId,
+        );
         if (!jumpInCard || !canJumpInPlay(jumpInCard, state)) {
-          throw new Error('Only exact-match jump-in plays are allowed out of turn.');
+          throw new Error(
+            'Only exact-match jump-in plays are allowed out of turn.',
+          );
         }
       }
       if (activeChoice) {
@@ -415,7 +534,12 @@ function handleGameAction(room: ServerRoom, socketId: string, payload: RoomActio
           throw new Error('Choose a color before playing this card.');
         }
       }
-      room.game = playCard(state, actorIndex, action.cardId, action.chosenColor);
+      room.game = playCard(
+        state,
+        actorIndex,
+        action.cardId,
+        action.chosenColor,
+      );
       room.pendingColorChoice = null;
       break;
     }
@@ -436,13 +560,14 @@ function handleGameAction(room: ServerRoom, socketId: string, payload: RoomActio
       break;
     }
     case 'sayUno': {
-      requireTurn();
       room.game = declareUno(state, actorIndex);
       break;
     }
     case 'callOut': {
       requireTurn();
-      const targetIndex = state.players.findIndex((p) => p.id === action.targetPlayerId);
+      const targetIndex = state.players.findIndex(
+        (p) => p.id === action.targetPlayerId,
+      );
       if (targetIndex === -1) {
         throw new Error('Target player not found.');
       }
@@ -451,68 +576,115 @@ function handleGameAction(room: ServerRoom, socketId: string, payload: RoomActio
     }
     default: {
       const unreachable: never = action;
-      throw new Error(`Unsupported action ${(unreachable as { type?: string }).type ?? 'unknown'}.`);
+      throw new Error(
+        `Unsupported action ${(unreachable as { type?: string }).type ?? 'unknown'}.`,
+      );
     }
   }
 
   return toSnapshot(room);
 }
 
+const botTimers = new Map<string, ReturnType<typeof setTimeout>>();
+const BOT_TURN_DELAY_MS = 760;
+
 function runOfflineBotTurns(room: ServerRoom): void {
-  if (!room.started || !room.game || room.game.winnerId) return;
-
-  let safety = 0;
-  while (room.game && !room.game.winnerId && safety < 50) {
-    const state: GameState | null = room.game;
-    if (!state) break;
-    const currentGamePlayer = state.players[state.currentPlayerIndex];
-    const roomPlayer = room.players.find((p) => p.playerId === currentGamePlayer.id);
-
-    if (roomPlayer?.connected) {
-      break;
-    }
-
-    room.pendingColorChoice = null;
-
-    const currentIndex = state.currentPlayerIndex;
-    let botState: GameState = state;
-    const callOutTargetIndex = botState.players.findIndex((player, idx) => (
-      idx !== currentIndex && player.hand.length === 1 && !player.saidUno
-    ));
-
-    if (callOutTargetIndex >= 0) {
-      botState = callOutUno(botState, currentIndex, callOutTargetIndex);
-    }
-
-    const move = getBotMove(botState, currentIndex);
-    let nextState: GameState = botState;
-
-    if (move.action === 'drawRequired') {
-      nextState = drawRequiredCards(botState, currentIndex);
-    } else if (move.action === 'draw') {
-      const afterDraw = drawOneCard(botState, currentIndex);
-      const updatedHand = afterDraw.players[currentIndex].hand;
-      const drawnCard = updatedHand[updatedHand.length - 1];
-
-      if (drawnCard && canPlayCard(drawnCard, afterDraw, currentIndex)) {
-        const chosenColor = drawnCard.color === 'wild'
-          ? (move as { chosenColor?: CardColor }).chosenColor ?? 'red'
-          : undefined;
-        nextState = playCard(afterDraw, currentIndex, drawnCard.id, chosenColor);
-      } else {
-        nextState = passTurn(afterDraw, currentIndex);
+  if (
+    botTimers.has(room.roomId) ||
+    !room.started ||
+    !room.game ||
+    room.game.winnerId
+  )
+    return;
+  if (!room.players.some((player) => player.connected)) return;
+  const expectedGame = room.game;
+  const current = expectedGame.players[expectedGame.currentPlayerIndex];
+  if (room.players.find((player) => player.playerId === current.id)?.connected)
+    return;
+  botTimers.set(
+    room.roomId,
+    setTimeout(() => {
+      botTimers.delete(room.roomId);
+      if (rooms.get(room.roomId) !== room || !room.game || room.game.winnerId)
+        return;
+      if (room.game !== expectedGame) {
+        runOfflineBotTurns(room);
+        return;
       }
-    } else {
-      nextState = playCard(botState, currentIndex, move.cardId, move.chosenColor);
-    }
+      const state = room.game;
+      if (
+        room.players.find(
+          (player) =>
+            player.playerId === state.players[state.currentPlayerIndex].id,
+        )?.connected
+      )
+        return;
+      try {
+        room.pendingColorChoice = null;
 
-    if (!nextState.winnerId && nextState.players[currentIndex]?.hand.length === 1) {
-      nextState = declareUno(nextState, currentIndex);
-    }
+        const currentIndex = state.currentPlayerIndex;
+        let botState: GameState = state;
+        const callOutTargetIndex = botState.players.findIndex(
+          (player, idx) =>
+            idx !== currentIndex && player.hand.length === 1 && !player.saidUno,
+        );
 
-    room.game = nextState;
-    safety += 1;
-  }
+        if (callOutTargetIndex >= 0) {
+          botState = callOutUno(botState, currentIndex, callOutTargetIndex);
+        }
+
+        const move = getBotMove(botState, currentIndex);
+        let nextState: GameState = botState;
+
+        if (move.action === 'drawRequired') {
+          nextState = drawRequiredCards(botState, currentIndex);
+        } else if (move.action === 'draw') {
+          const afterDraw = drawOneCard(botState, currentIndex);
+          const updatedHand = afterDraw.players[currentIndex].hand;
+          const drawnCard = updatedHand[updatedHand.length - 1];
+
+          if (drawnCard && canPlayCard(drawnCard, afterDraw, currentIndex)) {
+            const chosenColor =
+              drawnCard.color === 'wild'
+                ? ((move as { chosenColor?: CardColor }).chosenColor ?? 'red')
+                : undefined;
+            nextState = playCard(
+              afterDraw,
+              currentIndex,
+              drawnCard.id,
+              chosenColor,
+            );
+          } else {
+            nextState = passTurn(afterDraw, currentIndex);
+          }
+        } else {
+          nextState = playCard(
+            botState,
+            currentIndex,
+            move.cardId,
+            move.chosenColor,
+          );
+        }
+
+        if (
+          !nextState.winnerId &&
+          nextState.players[currentIndex]?.hand.length === 1
+        ) {
+          nextState = {
+            ...declareUno(nextState, currentIndex),
+            lastAction: nextState.lastAction,
+          };
+        }
+
+        room.game = nextState;
+
+        broadcastRoom(io, room);
+        runOfflineBotTurns(room);
+      } catch (error) {
+        console.error('Could not advance bot turn:', error);
+      }
+    }, BOT_TURN_DELAY_MS),
+  );
 }
 
 const httpServer = createServer((req, res) => {
@@ -574,499 +746,631 @@ setInterval(() => {
 }, CLEANUP_INTERVAL_MS);
 
 io.on('connection', (socket) => {
-  socket.on('friend:status', (
-    payload: { friendCodes?: string[] },
-    reply?: (ack: Ack<{ statuses: Record<string, FriendPresenceState> }>) => void,
-  ) => {
-    try {
-      const codes = Array.isArray(payload.friendCodes)
-        ? payload.friendCodes
-        : [];
+  socket.on(
+    'friend:status',
+    (
+      payload: { friendCodes?: string[] },
+      reply?: (
+        ack: Ack<{ statuses: Record<string, FriendPresenceState> }>,
+      ) => void,
+    ) => {
+      try {
+        const codes = Array.isArray(payload.friendCodes)
+          ? payload.friendCodes
+          : [];
 
-      const statuses: Record<string, FriendPresenceState> = {};
-      for (const code of codes) {
-        const normalized = normalizeFriendCode(code ?? '');
-        if (!normalized) continue;
+        const statuses: Record<string, FriendPresenceState> = {};
+        for (const code of codes) {
+          const normalized = normalizeFriendCode(code ?? '');
+          if (!normalized) continue;
 
-        const presence = presenceByFriendCode.get(normalized);
-        if (!presence) {
-          statuses[normalized] = 'offline';
-          continue;
+          const presence = presenceByFriendCode.get(normalized);
+          if (!presence) {
+            statuses[normalized] = 'offline';
+            continue;
+          }
+
+          statuses[normalized] = playerBySocket.has(presence.socketId)
+            ? 'playing'
+            : 'online';
         }
 
-        statuses[normalized] = playerBySocket.has(presence.socketId)
-          ? 'playing'
-          : 'online';
+        reply?.({ ok: true, data: { statuses } });
+      } catch (error) {
+        reply?.(ackError((error as Error).message));
       }
+    },
+  );
 
-      reply?.({ ok: true, data: { statuses } });
-    } catch (error) {
-      reply?.(ackError((error as Error).message));
-    }
-  });
-
-  socket.on('presence:update', (payload: PresencePayload, reply?: (ack: Ack<{ friendCode: string }>) => void) => {
-    try {
-      const friendCode = upsertPresence(socket.id, payload);
-      reply?.({ ok: true, data: { friendCode } });
-    } catch (error) {
-      reply?.(ackError((error as Error).message));
-    }
-  });
-
-  socket.on('room:create', (payload: CreateRoomPayload, reply?: (ack: Ack<{ room: RoomSnapshot; playerId: string }>) => void) => {
-    try {
-      const playerName = payload.playerName?.trim();
-      const deviceId = payload.deviceId?.trim();
-      if (!playerName || !deviceId) {
-        reply?.(ackError('Player name and device id are required.'));
-        return;
+  socket.on(
+    'presence:update',
+    (
+      payload: PresencePayload,
+      reply?: (ack: Ack<{ friendCode: string }>) => void,
+    ) => {
+      try {
+        const friendCode = upsertPresence(socket.id, payload);
+        reply?.({ ok: true, data: { friendCode } });
+      } catch (error) {
+        reply?.(ackError((error as Error).message));
       }
+    },
+  );
 
-      if (playerBySocket.has(socket.id)) {
-        reply?.(ackError('You are already in a room.'));
-        return;
-      }
+  socket.on(
+    'room:create',
+    (
+      payload: CreateRoomPayload,
+      reply?: (ack: Ack<{ room: RoomSnapshot; playerId: string }>) => void,
+    ) => {
+      try {
+        const playerName = payload.playerName?.trim();
+        const deviceId = payload.deviceId?.trim();
+        if (!playerName || !deviceId) {
+          reply?.(ackError('Player name and device id are required.'));
+          return;
+        }
 
-      const { room, playerId } = createRoomForPlayer(socket.id, playerName, deviceId);
-      socket.join(room.roomId);
+        if (playerBySocket.has(socket.id)) {
+          reply?.(ackError('You are already in a room.'));
+          return;
+        }
 
-      reply?.({ ok: true, data: { room: toSnapshot(room), playerId } });
-      broadcastRoom(io, room);
-    } catch (error) {
-      reply?.(ackError((error as Error).message));
-    }
-  });
-
-  socket.on('room:join', (payload: JoinRoomPayload, reply?: (ack: Ack<{ room: RoomSnapshot; playerId: string }>) => void) => {
-    try {
-      const playerName = payload.playerName?.trim();
-      const roomId = payload.roomId?.trim().toUpperCase();
-      const deviceId = payload.deviceId?.trim();
-      if (!playerName || !roomId || !deviceId) {
-        reply?.(ackError('Room code, player name and device id are required.'));
-        return;
-      }
-
-      if (playerBySocket.has(socket.id)) {
-        reply?.(ackError('You are already in a room.'));
-        return;
-      }
-
-      const room = rooms.get(roomId);
-      if (!room) {
-        reply?.(ackError('Room not found.'));
-        return;
-      }
-      if (room.started) {
-        reply?.(ackError('Game already started for this room.'));
-        return;
-      }
-
-      const playerId = joinRoomAsPlayer(room, socket.id, playerName, deviceId);
-      socket.join(roomId);
-
-      reply?.({ ok: true, data: { room: toSnapshot(room), playerId } });
-      broadcastRoom(io, room);
-    } catch (error) {
-      reply?.(ackError((error as Error).message));
-    }
-  });
-
-  socket.on('friend:invite', (payload: SendFriendInvitePayload, reply?: (ack: Ack<{ room: RoomSnapshot; playerId: string; invite: FriendInvite }>) => void) => {
-    try {
-      const playerName = payload.playerName?.trim();
-      const deviceId = payload.deviceId?.trim();
-      const targetFriendCode = normalizeFriendCode(payload.targetFriendCode ?? '');
-      if (!playerName || !deviceId || targetFriendCode.length < 4) {
-        reply?.(ackError('Friend code, player name and device id are required.'));
-        return;
-      }
-
-      const senderFriendCode = upsertPresence(socket.id, {
-        playerName,
-        deviceId,
-        friendCode: payload.friendCode,
-      });
-
-      if (senderFriendCode === targetFriendCode) {
-        reply?.(ackError('You cannot invite yourself.'));
-        return;
-      }
-
-      const targetPresence = presenceByFriendCode.get(targetFriendCode);
-      if (!targetPresence) {
-        reply?.(ackError('That friend is not online right now.'));
-        return;
-      }
-
-      const membership = playerBySocket.get(socket.id);
-      let room: ServerRoom;
-      let playerId: string;
-
-      if (!membership) {
-        const created = createRoomForPlayer(socket.id, playerName, deviceId);
-        room = created.room;
-        playerId = created.playerId;
+        const { room, playerId } = createRoomForPlayer(
+          socket.id,
+          playerName,
+          deviceId,
+        );
         socket.join(room.roomId);
-      } else {
-        room = rooms.get(membership.roomId)!;
-        if (!room) {
-          reply?.(ackError('Current room was not found.'));
-          return;
-        }
-        if (room.started) {
-          reply?.(ackError('Cannot send invites after the game starts.'));
-          return;
-        }
-        playerId = membership.playerId;
-      }
 
-      if (room.players.some((player) => player.deviceId === targetPresence.deviceId)) {
-        reply?.(ackError('That friend is already in this room.'));
-        return;
-      }
-
-      if (room.players.length >= MAX_ROOM_PLAYERS) {
-        reply?.(ackError('Room is full.'));
-        return;
-      }
-
-      const existingInvite = Array.from(pendingInvites.values()).find((invite) => (
-        invite.roomId === room.roomId
-        && invite.fromPlayerId === playerId
-        && invite.toFriendCode === targetFriendCode
-      ));
-
-      const inviteRecord: PendingInviteRecord = existingInvite ?? {
-        inviteId: makeInviteId(),
-        roomId: room.roomId,
-        fromPlayerId: playerId,
-        fromName: playerName,
-        fromFriendCode: senderFriendCode,
-        toFriendCode: targetFriendCode,
-        createdAt: Date.now(),
-      };
-
-      pendingInvites.set(inviteRecord.inviteId, inviteRecord);
-      io.to(targetPresence.socketId).emit('friend:invite', inviteRecord);
-
-      if (!membership) {
+        reply?.({ ok: true, data: { room: toSnapshot(room), playerId } });
         broadcastRoom(io, room);
+      } catch (error) {
+        reply?.(ackError((error as Error).message));
       }
+    },
+  );
 
-      reply?.({ ok: true, data: { room: toSnapshot(room), playerId, invite: inviteRecord } });
-    } catch (error) {
-      reply?.(ackError((error as Error).message));
-    }
-  });
-
-  socket.on('friend:invite:accept', (payload: RespondFriendInvitePayload, reply?: (ack: Ack<{ room: RoomSnapshot; playerId: string }>) => void) => {
-    try {
-      const invite = pendingInvites.get(payload.inviteId);
-      if (!invite) {
-        reply?.(ackError('Invite no longer exists.'));
-        return;
-      }
-
-      const playerName = payload.playerName?.trim();
-      const deviceId = payload.deviceId?.trim();
-      if (!playerName || !deviceId) {
-        reply?.(ackError('Player name and device id are required.'));
-        return;
-      }
-
-      const friendCode = upsertPresence(socket.id, {
-        playerName,
-        deviceId,
-        friendCode: payload.friendCode,
-      });
-      if (invite.toFriendCode !== friendCode) {
-        reply?.(ackError('This invite was not sent to your friend code.'));
-        return;
-      }
-
-      const membership = playerBySocket.get(socket.id);
-      if (membership && membership.roomId !== invite.roomId) {
-        reply?.(ackError('Leave your current room before accepting another invite.'));
-        return;
-      }
-
-      const room = rooms.get(invite.roomId);
-      if (!room || room.started) {
-        removeInvite(invite.inviteId, io);
-        reply?.(ackError('That room is no longer available.'));
-        return;
-      }
-
-      const playerId = membership?.roomId === invite.roomId
-        ? membership.playerId
-        : joinRoomAsPlayer(room, socket.id, playerName, deviceId);
-      socket.join(room.roomId);
-
-      const senderSocketId = findSenderSocketIdForInvite(invite);
-      removeInvite(invite.inviteId, io);
-      if (senderSocketId) {
-        io.to(senderSocketId).emit('friend:invite:accepted', {
-          inviteId: invite.inviteId,
-          roomId: invite.roomId,
-          targetFriendCode: invite.toFriendCode,
-          targetName: playerName,
-        });
-      }
-      const snapshot = toSnapshot(room);
-      broadcastRoom(io, room);
-      reply?.({ ok: true, data: { room: snapshot, playerId } });
-    } catch (error) {
-      reply?.(ackError((error as Error).message));
-    }
-  });
-
-  socket.on('friend:invite:decline', (payload: DismissFriendInvitePayload, reply?: (ack: Ack<{ inviteId: string }>) => void) => {
-    try {
-      const invite = pendingInvites.get(payload.inviteId);
-      if (!invite) {
-        reply?.(ackError('Invite no longer exists.'));
-        return;
-      }
-
-      const presence = presenceBySocket.get(socket.id);
-      if (!presence || presence.friendCode !== invite.toFriendCode) {
-        reply?.(ackError('Only the invited friend can decline this request.'));
-        return;
-      }
-
-      const senderSocketId = findSenderSocketIdForInvite(invite);
-      removeInvite(payload.inviteId, io);
-      if (senderSocketId) {
-        io.to(senderSocketId).emit('friend:invite:declined', {
-          inviteId: invite.inviteId,
-          roomId: invite.roomId,
-          targetFriendCode: invite.toFriendCode,
-        });
-      }
-      reply?.({ ok: true, data: { inviteId: payload.inviteId } });
-    } catch (error) {
-      reply?.(ackError((error as Error).message));
-    }
-  });
-
-  socket.on('room:start', (payload: StartRoomPayload, reply?: (ack: Ack<{ room: RoomSnapshot }>) => void) => {
-    try {
-      const roomId = payload.roomId?.trim().toUpperCase();
-      if (!roomId) {
-        reply?.(ackError('Room code is required.'));
-        return;
-      }
-
-      const room = rooms.get(roomId);
-      if (!room) {
-        reply?.(ackError('Room not found.'));
-        return;
-      }
-
-      const actor = room.players.find((p) => p.socketId === socket.id);
-      if (!actor || actor.playerId !== room.hostPlayerId) {
-        reply?.(ackError('Only the host can start the game.'));
-        return;
-      }
-
-      if (room.players.length < 2) {
-        reply?.(ackError('At least 2 players are required to start.'));
-        return;
-      }
-
-      room.started = true;
-      room.pendingColorChoice = null;
-      room.game = initializeGame(
-        room.players.map((p) => p.name),
-        payload.rules,
-        room.players.map((p) => p.isBot),
-      );
-      removeInvitesForRoom(room.roomId, io);
-      
-      // Reset ready status for all players
-      for (const p of room.players) {
-        p.ready = false;
-      }
-
-      runOfflineBotTurns(room);
-
-      const snapshot = toSnapshot(room);
-      io.to(roomId).emit('room:update', snapshot);
-      reply?.({ ok: true, data: { room: snapshot } });
-    } catch (error) {
-      reply?.(ackError((error as Error).message));
-    }
-  });
-
-  socket.on('room:add-bot', (payload: AddBotPayload, reply?: (ack: Ack<{ room: RoomSnapshot }>) => void) => {
-    try {
-      const roomId = payload.roomId?.trim().toUpperCase();
-      if (!roomId) {
-        reply?.(ackError('Room code is required.'));
-        return;
-      }
-
-      const room = rooms.get(roomId);
-      if (!room) {
-        reply?.(ackError('Room not found.'));
-        return;
-      }
-
-      const actor = room.players.find((p) => p.socketId === socket.id);
-      if (!actor || actor.playerId !== room.hostPlayerId) {
-        reply?.(ackError('Only the host can add bots.'));
-        return;
-      }
-
-      if (room.started) {
-        reply?.(ackError('Cannot add bots after the game starts.'));
-        return;
-      }
-
-      if (room.players.length >= MAX_ROOM_PLAYERS) {
-        reply?.(ackError('Room is full.'));
-        return;
-      }
-
-      addBotSeat(room);
-      const snapshot = toSnapshot(room);
-      io.to(room.roomId).emit('room:update', snapshot);
-      reply?.({ ok: true, data: { room: snapshot } });
-    } catch (error) {
-      reply?.(ackError((error as Error).message));
-    }
-  });
-
-  socket.on('room:kick', (payload: KickPlayerPayload, reply?: (ack: Ack<{ room: RoomSnapshot }>) => void) => {
-    try {
-      const roomId = payload.roomId?.trim().toUpperCase();
-      const targetPlayerId = payload.targetPlayerId?.trim();
-      if (!roomId || !targetPlayerId) {
-        reply?.(ackError('Room code and target player are required.'));
-        return;
-      }
-
-      const room = rooms.get(roomId);
-      if (!room) {
-        reply?.(ackError('Room not found.'));
-        return;
-      }
-
-      const actor = room.players.find((p) => p.socketId === socket.id);
-      if (!actor || actor.playerId !== room.hostPlayerId) {
-        reply?.(ackError('Only the host can remove players.'));
-        return;
-      }
-
-      if (room.started) {
-        reply?.(ackError('Cannot remove players after the game starts.'));
-        return;
-      }
-
-      if (targetPlayerId === room.hostPlayerId) {
-        reply?.(ackError('Host cannot remove themselves.'));
-        return;
-      }
-
-      const targetIndex = room.players.findIndex((p) => p.playerId === targetPlayerId);
-      if (targetIndex === -1) {
-        reply?.(ackError('Target player not found.'));
-        return;
-      }
-
-      const [removed] = room.players.splice(targetIndex, 1);
-      if (removed.socketId) {
-        const kickedSocket = io.sockets.sockets.get(removed.socketId);
-        if (kickedSocket) {
-          kickedSocket.leave(roomId);
-          kickedSocket.emit('room:kicked', { roomId, message: 'You were removed by the host.' });
+  socket.on(
+    'room:join',
+    (
+      payload: JoinRoomPayload,
+      reply?: (ack: Ack<{ room: RoomSnapshot; playerId: string }>) => void,
+    ) => {
+      try {
+        const playerName = payload.playerName?.trim();
+        const roomId = payload.roomId?.trim().toUpperCase();
+        const deviceId = payload.deviceId?.trim();
+        if (!playerName || !roomId || !deviceId) {
+          reply?.(
+            ackError('Room code, player name and device id are required.'),
+          );
+          return;
         }
-        playerBySocket.delete(removed.socketId);
+
+        if (playerBySocket.has(socket.id)) {
+          reply?.(ackError('You are already in a room.'));
+          return;
+        }
+
+        const room = rooms.get(roomId);
+        if (!room) {
+          reply?.(ackError('Room not found.'));
+          return;
+        }
+        if (
+          room.started &&
+          !room.players.some((player) => player.deviceId === deviceId)
+        ) {
+          reply?.(ackError('Game already started for this room.'));
+          return;
+        }
+
+        const playerId = joinRoomAsPlayer(
+          room,
+          socket.id,
+          playerName,
+          deviceId,
+        );
+        socket.join(roomId);
+
+        reply?.({ ok: true, data: { room: toSnapshot(room), playerId } });
+        broadcastRoom(io, room);
+      } catch (error) {
+        reply?.(ackError((error as Error).message));
       }
+    },
+  );
 
-      const snapshot = toSnapshot(room);
-      io.to(room.roomId).emit('room:update', snapshot);
-      reply?.({ ok: true, data: { room: snapshot } });
-    } catch (error) {
-      reply?.(ackError((error as Error).message));
-    }
-  });
+  socket.on(
+    'friend:invite',
+    (
+      payload: SendFriendInvitePayload,
+      reply?: (
+        ack: Ack<{
+          room: RoomSnapshot;
+          playerId: string;
+          invite: FriendInvite;
+        }>,
+      ) => void,
+    ) => {
+      try {
+        const playerName = payload.playerName?.trim();
+        const deviceId = payload.deviceId?.trim();
+        const targetFriendCode = normalizeFriendCode(
+          payload.targetFriendCode ?? '',
+        );
+        if (!playerName || !deviceId || targetFriendCode.length < 4) {
+          reply?.(
+            ackError('Friend code, player name and device id are required.'),
+          );
+          return;
+        }
 
-  socket.on('room:leave', (payload: LeaveRoomPayload, reply?: (ack: Ack<{ left: true }>) => void) => {
-    try {
-      const roomId = payload.roomId?.trim().toUpperCase();
-      const membership = playerBySocket.get(socket.id);
-      if (!roomId || !membership || membership.roomId !== roomId) {
-        reply?.(ackError('You are not in that room.'));
-        return;
+        const senderFriendCode = upsertPresence(socket.id, {
+          playerName,
+          deviceId,
+          friendCode: payload.friendCode,
+        });
+
+        if (senderFriendCode === targetFriendCode) {
+          reply?.(ackError('You cannot invite yourself.'));
+          return;
+        }
+
+        const targetPresence = presenceByFriendCode.get(targetFriendCode);
+        if (!targetPresence) {
+          reply?.(ackError('That friend is not online right now.'));
+          return;
+        }
+
+        const membership = playerBySocket.get(socket.id);
+        let room: ServerRoom;
+        let playerId: string;
+
+        if (!membership) {
+          const created = createRoomForPlayer(socket.id, playerName, deviceId);
+          room = created.room;
+          playerId = created.playerId;
+          socket.join(room.roomId);
+        } else {
+          room = rooms.get(membership.roomId)!;
+          if (!room) {
+            reply?.(ackError('Current room was not found.'));
+            return;
+          }
+          if (room.started) {
+            reply?.(ackError('Cannot send invites after the game starts.'));
+            return;
+          }
+          playerId = membership.playerId;
+        }
+
+        if (
+          room.players.some(
+            (player) => player.deviceId === targetPresence.deviceId,
+          )
+        ) {
+          reply?.(ackError('That friend is already in this room.'));
+          return;
+        }
+
+        if (room.players.length >= MAX_ROOM_PLAYERS) {
+          reply?.(ackError('Room is full.'));
+          return;
+        }
+
+        const existingInvite = Array.from(pendingInvites.values()).find(
+          (invite) =>
+            invite.roomId === room.roomId &&
+            invite.fromPlayerId === playerId &&
+            invite.toFriendCode === targetFriendCode,
+        );
+
+        const inviteRecord: PendingInviteRecord = existingInvite ?? {
+          inviteId: makeInviteId(),
+          roomId: room.roomId,
+          fromPlayerId: playerId,
+          fromName: playerName,
+          fromFriendCode: senderFriendCode,
+          toFriendCode: targetFriendCode,
+          createdAt: Date.now(),
+        };
+
+        pendingInvites.set(inviteRecord.inviteId, inviteRecord);
+        io.to(targetPresence.socketId).emit('friend:invite', inviteRecord);
+
+        if (!membership) {
+          broadcastRoom(io, room);
+        }
+
+        reply?.({
+          ok: true,
+          data: { room: toSnapshot(room), playerId, invite: inviteRecord },
+        });
+      } catch (error) {
+        reply?.(ackError((error as Error).message));
       }
+    },
+  );
 
-      socket.leave(roomId);
-      leaveRoomForSocket(socket.id, io);
-      reply?.({ ok: true, data: { left: true } });
-    } catch (error) {
-      reply?.(ackError((error as Error).message));
-    }
-  });
+  socket.on(
+    'friend:invite:accept',
+    (
+      payload: RespondFriendInvitePayload,
+      reply?: (ack: Ack<{ room: RoomSnapshot; playerId: string }>) => void,
+    ) => {
+      try {
+        const invite = pendingInvites.get(payload.inviteId);
+        if (!invite) {
+          reply?.(ackError('Invite no longer exists.'));
+          return;
+        }
 
-  socket.on('room:ready', (payload: ReadyPayload, reply?: (ack: Ack<{ room: RoomSnapshot }>) => void) => {
-    try {
-      const roomId = payload.roomId?.trim().toUpperCase();
-      if (!roomId) {
-        reply?.(ackError('Room code is required.'));
-        return;
+        const playerName = payload.playerName?.trim();
+        const deviceId = payload.deviceId?.trim();
+        if (!playerName || !deviceId) {
+          reply?.(ackError('Player name and device id are required.'));
+          return;
+        }
+
+        const friendCode = upsertPresence(socket.id, {
+          playerName,
+          deviceId,
+          friendCode: payload.friendCode,
+        });
+        if (invite.toFriendCode !== friendCode) {
+          reply?.(ackError('This invite was not sent to your friend code.'));
+          return;
+        }
+
+        const membership = playerBySocket.get(socket.id);
+        if (membership && membership.roomId !== invite.roomId) {
+          reply?.(
+            ackError(
+              'Leave your current room before accepting another invite.',
+            ),
+          );
+          return;
+        }
+
+        const room = rooms.get(invite.roomId);
+        if (!room || room.started) {
+          removeInvite(invite.inviteId, io);
+          reply?.(ackError('That room is no longer available.'));
+          return;
+        }
+
+        const playerId =
+          membership?.roomId === invite.roomId
+            ? membership.playerId
+            : joinRoomAsPlayer(room, socket.id, playerName, deviceId);
+        socket.join(room.roomId);
+
+        const senderSocketId = findSenderSocketIdForInvite(invite);
+        removeInvite(invite.inviteId, io);
+        if (senderSocketId) {
+          io.to(senderSocketId).emit('friend:invite:accepted', {
+            inviteId: invite.inviteId,
+            roomId: invite.roomId,
+            targetFriendCode: invite.toFriendCode,
+            targetName: playerName,
+          });
+        }
+        const snapshot = toSnapshot(room);
+        broadcastRoom(io, room);
+        reply?.({ ok: true, data: { room: snapshot, playerId } });
+      } catch (error) {
+        reply?.(ackError((error as Error).message));
       }
+    },
+  );
 
-      const room = rooms.get(roomId);
-      if (!room) {
-        reply?.(ackError('Room not found.'));
-        return;
+  socket.on(
+    'friend:invite:decline',
+    (
+      payload: DismissFriendInvitePayload,
+      reply?: (ack: Ack<{ inviteId: string }>) => void,
+    ) => {
+      try {
+        const invite = pendingInvites.get(payload.inviteId);
+        if (!invite) {
+          reply?.(ackError('Invite no longer exists.'));
+          return;
+        }
+
+        const presence = presenceBySocket.get(socket.id);
+        if (!presence || presence.friendCode !== invite.toFriendCode) {
+          reply?.(
+            ackError('Only the invited friend can decline this request.'),
+          );
+          return;
+        }
+
+        const senderSocketId = findSenderSocketIdForInvite(invite);
+        removeInvite(payload.inviteId, io);
+        if (senderSocketId) {
+          io.to(senderSocketId).emit('friend:invite:declined', {
+            inviteId: invite.inviteId,
+            roomId: invite.roomId,
+            targetFriendCode: invite.toFriendCode,
+          });
+        }
+        reply?.({ ok: true, data: { inviteId: payload.inviteId } });
+      } catch (error) {
+        reply?.(ackError((error as Error).message));
       }
+    },
+  );
 
-      const player = room.players.find((p) => p.socketId === socket.id);
-      if (!player) {
-        reply?.(ackError('You are not in this room.'));
-        return;
+  socket.on(
+    'room:start',
+    (
+      payload: StartRoomPayload,
+      reply?: (ack: Ack<{ room: RoomSnapshot }>) => void,
+    ) => {
+      try {
+        const roomId = payload.roomId?.trim().toUpperCase();
+        if (!roomId) {
+          reply?.(ackError('Room code is required.'));
+          return;
+        }
+
+        const room = rooms.get(roomId);
+        if (!room) {
+          reply?.(ackError('Room not found.'));
+          return;
+        }
+
+        const actor = room.players.find((p) => p.socketId === socket.id);
+        if (!actor || actor.playerId !== room.hostPlayerId) {
+          reply?.(ackError('Only the host can start the game.'));
+          return;
+        }
+
+        if (room.players.length < 2) {
+          reply?.(ackError('At least 2 players are required to start.'));
+          return;
+        }
+
+        room.started = true;
+        room.pendingColorChoice = null;
+        room.game = initializeGame(
+          room.players.map((p) => p.name),
+          payload.rules,
+          room.players.map((p) => p.isBot),
+        );
+        // Preserve room identities when a lobby seat has been removed or replaced.
+        room.game = {
+          ...room.game,
+          players: room.game.players.map((player, index) => ({
+            ...player,
+            id: room.players[index].playerId,
+          })),
+        };
+        const timer = botTimers.get(room.roomId);
+        if (timer) clearTimeout(timer);
+        botTimers.delete(room.roomId);
+        removeInvitesForRoom(room.roomId, io);
+
+        // Reset ready status for all players
+        for (const p of room.players) {
+          p.ready = false;
+        }
+
+        runOfflineBotTurns(room);
+
+        const snapshot = toSnapshot(room);
+        io.to(roomId).emit('room:update', snapshot);
+        reply?.({ ok: true, data: { room: snapshot } });
+      } catch (error) {
+        reply?.(ackError((error as Error).message));
       }
+    },
+  );
 
-      // Toggle ready status (but bots are always ready)
-      if (!player.isBot) {
-        player.ready = !player.ready;
+  socket.on(
+    'room:add-bot',
+    (
+      payload: AddBotPayload,
+      reply?: (ack: Ack<{ room: RoomSnapshot }>) => void,
+    ) => {
+      try {
+        const roomId = payload.roomId?.trim().toUpperCase();
+        if (!roomId) {
+          reply?.(ackError('Room code is required.'));
+          return;
+        }
+
+        const room = rooms.get(roomId);
+        if (!room) {
+          reply?.(ackError('Room not found.'));
+          return;
+        }
+
+        const actor = room.players.find((p) => p.socketId === socket.id);
+        if (!actor || actor.playerId !== room.hostPlayerId) {
+          reply?.(ackError('Only the host can add bots.'));
+          return;
+        }
+
+        if (room.started) {
+          reply?.(ackError('Cannot add bots after the game starts.'));
+          return;
+        }
+
+        if (room.players.length >= MAX_ROOM_PLAYERS) {
+          reply?.(ackError('Room is full.'));
+          return;
+        }
+
+        addBotSeat(room);
+        const snapshot = toSnapshot(room);
+        io.to(room.roomId).emit('room:update', snapshot);
+        reply?.({ ok: true, data: { room: snapshot } });
+      } catch (error) {
+        reply?.(ackError((error as Error).message));
       }
+    },
+  );
 
-      const snapshot = toSnapshot(room);
-      io.to(room.roomId).emit('room:update', snapshot);
-      reply?.({ ok: true, data: { room: snapshot } });
-    } catch (error) {
-      reply?.(ackError((error as Error).message));
-    }
-  });
+  socket.on(
+    'room:kick',
+    (
+      payload: KickPlayerPayload,
+      reply?: (ack: Ack<{ room: RoomSnapshot }>) => void,
+    ) => {
+      try {
+        const roomId = payload.roomId?.trim().toUpperCase();
+        const targetPlayerId = payload.targetPlayerId?.trim();
+        if (!roomId || !targetPlayerId) {
+          reply?.(ackError('Room code and target player are required.'));
+          return;
+        }
 
-  socket.on('game:action', (payload: RoomActionPayload, reply?: (ack: Ack<{ room: RoomSnapshot }>) => void) => {
-    try {
-      const room = rooms.get(payload.roomId?.trim().toUpperCase());
-      if (!room) {
-        reply?.(ackError('Room not found.'));
-        return;
+        const room = rooms.get(roomId);
+        if (!room) {
+          reply?.(ackError('Room not found.'));
+          return;
+        }
+
+        const actor = room.players.find((p) => p.socketId === socket.id);
+        if (!actor || actor.playerId !== room.hostPlayerId) {
+          reply?.(ackError('Only the host can remove players.'));
+          return;
+        }
+
+        if (room.started) {
+          reply?.(ackError('Cannot remove players after the game starts.'));
+          return;
+        }
+
+        if (targetPlayerId === room.hostPlayerId) {
+          reply?.(ackError('Host cannot remove themselves.'));
+          return;
+        }
+
+        const targetIndex = room.players.findIndex(
+          (p) => p.playerId === targetPlayerId,
+        );
+        if (targetIndex === -1) {
+          reply?.(ackError('Target player not found.'));
+          return;
+        }
+
+        const [removed] = room.players.splice(targetIndex, 1);
+        if (removed.socketId) {
+          const kickedSocket = io.sockets.sockets.get(removed.socketId);
+          if (kickedSocket) {
+            kickedSocket.leave(roomId);
+            kickedSocket.emit('room:kicked', {
+              roomId,
+              message: 'You were removed by the host.',
+            });
+          }
+          playerBySocket.delete(removed.socketId);
+        }
+
+        const snapshot = toSnapshot(room);
+        io.to(room.roomId).emit('room:update', snapshot);
+        reply?.({ ok: true, data: { room: snapshot } });
+      } catch (error) {
+        reply?.(ackError((error as Error).message));
       }
+    },
+  );
 
-      handleGameAction(room, socket.id, payload, io);
-      runOfflineBotTurns(room);
-      const snapshot = toSnapshot(room);
-      io.to(room.roomId).emit('room:update', snapshot);
-      reply?.({ ok: true, data: { room: snapshot } });
-    } catch (error) {
-      reply?.(ackError((error as Error).message));
-    }
-  });
+  socket.on(
+    'room:leave',
+    (payload: LeaveRoomPayload, reply?: (ack: Ack<{ left: true }>) => void) => {
+      try {
+        const roomId = payload.roomId?.trim().toUpperCase();
+        const membership = playerBySocket.get(socket.id);
+        if (!roomId || !membership || membership.roomId !== roomId) {
+          reply?.(ackError('You are not in that room.'));
+          return;
+        }
+
+        socket.leave(roomId);
+        leaveRoomForSocket(socket.id, io);
+        reply?.({ ok: true, data: { left: true } });
+      } catch (error) {
+        reply?.(ackError((error as Error).message));
+      }
+    },
+  );
+
+  socket.on(
+    'room:ready',
+    (
+      payload: ReadyPayload,
+      reply?: (ack: Ack<{ room: RoomSnapshot }>) => void,
+    ) => {
+      try {
+        const roomId = payload.roomId?.trim().toUpperCase();
+        if (!roomId) {
+          reply?.(ackError('Room code is required.'));
+          return;
+        }
+
+        const room = rooms.get(roomId);
+        if (!room) {
+          reply?.(ackError('Room not found.'));
+          return;
+        }
+
+        const player = room.players.find((p) => p.socketId === socket.id);
+        if (!player) {
+          reply?.(ackError('You are not in this room.'));
+          return;
+        }
+
+        // Toggle ready status (but bots are always ready)
+        if (!player.isBot) {
+          player.ready = !player.ready;
+        }
+
+        const snapshot = toSnapshot(room);
+        io.to(room.roomId).emit('room:update', snapshot);
+        reply?.({ ok: true, data: { room: snapshot } });
+      } catch (error) {
+        reply?.(ackError((error as Error).message));
+      }
+    },
+  );
+
+  socket.on(
+    'game:action',
+    (
+      payload: RoomActionPayload,
+      reply?: (ack: Ack<{ room: RoomSnapshot }>) => void,
+    ) => {
+      try {
+        const room = rooms.get(payload.roomId?.trim().toUpperCase());
+        if (!room) {
+          reply?.(ackError('Room not found.'));
+          return;
+        }
+
+        handleGameAction(room, socket.id, payload, io);
+        runOfflineBotTurns(room);
+        const snapshot = toSnapshot(room);
+        io.to(room.roomId).emit('room:update', snapshot);
+        reply?.({ ok: true, data: { room: snapshot } });
+      } catch (error) {
+        reply?.(ackError((error as Error).message));
+      }
+    },
+  );
 
   socket.on('disconnect', () => {
     const presence = presenceBySocket.get(socket.id);
     if (presence) {
       for (const invite of Array.from(pendingInvites.values())) {
-        if (invite.fromFriendCode === presence.friendCode || invite.toFriendCode === presence.friendCode) {
+        if (
+          invite.fromFriendCode === presence.friendCode ||
+          invite.toFriendCode === presence.friendCode
+        ) {
           removeInvite(invite.inviteId, io);
         }
       }

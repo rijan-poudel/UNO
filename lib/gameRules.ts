@@ -44,7 +44,8 @@ export function canPlayCard(
     return canJumpInPlay(card, state);
   }
 
-  const { activeColor, pendingDraw, pendingDrawType, rules, discardPile } = state;
+  const { activeColor, pendingDraw, pendingDrawType, rules, discardPile } =
+    state;
   const topDiscard = discardPile[discardPile.length - 1];
   if (!topDiscard) return false;
 
@@ -62,7 +63,11 @@ export function canPlayCard(
   // If the player is down to their last card and canFinishWithActionCard is false,
   // block action/wild cards from being played as the final card.
   const playerHand = state.players[playerIndex]?.hand ?? [];
-  if (!rules.canFinishWithActionCard && playerHand.length === 1 && isActionCard(card)) {
+  if (
+    !rules.canFinishWithActionCard &&
+    playerHand.length === 1 &&
+    isActionCard(card)
+  ) {
     return false;
   }
 
@@ -164,13 +169,15 @@ export function getPlayableMultiCardCombos(
 
         // At least one card in the pair must be playable as the "lead" card.
         const eitherPlayable =
-          (activeColor !== null && (a.color === activeColor || b.color === activeColor)) ||
+          (activeColor !== null &&
+            (a.color === activeColor || b.color === activeColor)) ||
           a.value === topCard.value; // value always matches within the group
 
         if (!eitherPlayable) continue;
 
         // Exact-match mode: both cards must also share the same color.
-        if (rules.allowDoublePlayExactMatchOnly && a.color !== b.color) continue;
+        if (rules.allowDoublePlayExactMatchOnly && a.color !== b.color)
+          continue;
 
         combos.push([a, b]);
       }

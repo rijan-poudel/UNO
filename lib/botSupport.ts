@@ -36,7 +36,10 @@ export type BotAction =
  */
 export function getBotPreferredColor(hand: Card[]): CardColor {
   const counts: Record<string, number> = {
-    red: 0, yellow: 0, green: 0, blue: 0,
+    red: 0,
+    yellow: 0,
+    green: 0,
+    blue: 0,
   };
 
   for (const card of hand) {
@@ -71,13 +74,20 @@ export function getBotPreferredColor(hand: Card[]): CardColor {
  */
 function scoreCard(card: Card): number {
   switch (card.value) {
-    case 'wild4':   return 100;
-    case 'shuffle': return 92;
-    case 'draw2':   return 80;
-    case 'discardAll': return 76;
-    case 'skip':    return 70;
-    case 'reverse': return 60;
-    case 'wild':    return 50;
+    case 'wild4':
+      return 100;
+    case 'shuffle':
+      return 92;
+    case 'draw2':
+      return 80;
+    case 'discardAll':
+      return 76;
+    case 'skip':
+      return 70;
+    case 'reverse':
+      return 60;
+    case 'wild':
+      return 50;
     default: {
       // Number cards: prefer higher numbers (more points removed from hand)
       const n = parseInt(card.value, 10);
@@ -129,9 +139,7 @@ export function getBotMove(state: GameState, playerIndex: number): BotAction {
   const best = sorted[0];
 
   const chosenColor =
-    best.color === 'wild'
-      ? getBotPreferredColor(player.hand)
-      : undefined;
+    best.color === 'wild' ? getBotPreferredColor(player.hand) : undefined;
 
   return { action: 'play', cardId: best.id, chosenColor };
 }

@@ -5,8 +5,8 @@
 // to support saving, network transport, and time-travel debugging.
 // ============================================================
 
-import type { Card, CardColor } from './card';
-import type { GameRules } from './rules';
+import type { Card, CardColor } from "./card";
+import type { GameRules } from "./rules";
 
 // ── Player ────────────────────────────────────────────────────────────────────
 
@@ -28,19 +28,19 @@ export interface Player {
 // without parsing strings, and safe to branch on in reducers.
 
 export type LastAction =
-  | { type: 'init' }
+  | { type: "init" }
   | {
-      type: 'play';
+      type: "play";
       playerId: string;
       card: Card;
       chosenColor?: CardColor;
       discardAllCount?: number;
       shuffledHands?: boolean;
     }
-  | { type: 'draw'; playerId: string; count: number }
-  | { type: 'pass'; playerId: string }
-  | { type: 'declareUno'; playerId: string }
-  | { type: 'callOut'; callerId: string; targetId: string; penalty: number };
+  | { type: "draw"; playerId: string; count: number }
+  | { type: "pass"; playerId: string }
+  | { type: "declareUno"; playerId: string }
+  | { type: "callOut"; callerId: string; targetId: string; penalty: number };
 
 // ── Game State ────────────────────────────────────────────────────────────────
 
@@ -96,7 +96,7 @@ export interface GameState {
    * Which draw card type created the current pendingDraw, so stacking rules
    * can be checked correctly. Null when pendingDraw === 0.
    */
-  pendingDrawType: 'draw2' | 'wild4' | null;
+  pendingDrawType: "draw2" | "wild4" | null;
 
   /** Set to the winning player's id the moment a player empties their hand. */
   winnerId: string | null;

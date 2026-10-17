@@ -1,6 +1,11 @@
 "use client";
 
-import { useEffect, useState, useRef, type ReactNode } from "react";
+import {
+  useEffect,
+  useState,
+  useSyncExternalStore,
+  type ReactNode,
+} from "react";
 import type { GameRules } from "../types/rules";
 import { useUnoGame } from "../hooks/useUnoGame";
 import { useUnoOnlineGame } from "../hooks/useUnoOnlineGame";
@@ -13,6 +18,7 @@ import NotificationPanel from "../components/NotificationPanel";
 import SettingsModal from "../components/SettingsModal";
 import { toast } from "sonner";
 
+const subscribeToClient = () => () => {};
 const SHARED_RULES_KEY = "uno.shared.rules";
 const PREFERRED_THEME_KEY = "uno.preferred.theme";
 const ONLINE_PREFILL_FRIEND_CODE_KEY = "uno.online.prefill.friendCode";
@@ -21,66 +27,11 @@ const MIN_SUPPORTED_MAX_PLAYERS = 6;
 
 type ThemeName = "paper" | "midnight" | "forest" | "sunset";
 
-const THEMES: Record<
-  ThemeName,
-  { label: string; vars: Record<string, string> }
-> = {
-  paper: {
-    label: "Light",
-    vars: {
-      "--ui-bg": "#fafafa",
-      "--ui-surface": "#ffffff",
-      "--ui-text": "#212121",
-      "--ui-muted": "rgba(33,33,33,0.54)",
-      "--ui-line": "rgba(0,0,0,0.12)",
-      "--ui-accent-red": "#e53935",
-      "--ui-accent-yellow": "#f9a825",
-      "--ui-accent-green": "#43a047",
-      "--ui-accent-blue": "#1e88e5",
-    },
-  },
-  midnight: {
-    label: "Dark",
-    vars: {
-      "--ui-bg": "#121212",
-      "--ui-surface": "#1e1e1e",
-      "--ui-text": "#e0e0e0",
-      "--ui-muted": "rgba(224,224,224,0.6)",
-      "--ui-line": "rgba(255,255,255,0.12)",
-      "--ui-accent-red": "#ef5350",
-      "--ui-accent-yellow": "#fdd835",
-      "--ui-accent-green": "#66bb6a",
-      "--ui-accent-blue": "#42a5f5",
-    },
-  },
-  forest: {
-    label: "Teal",
-    vars: {
-      "--ui-bg": "#e0f2f1",
-      "--ui-surface": "#ffffff",
-      "--ui-text": "#004d40",
-      "--ui-muted": "rgba(0,77,64,0.6)",
-      "--ui-line": "rgba(0,77,64,0.15)",
-      "--ui-accent-red": "#e53935",
-      "--ui-accent-yellow": "#f9a825",
-      "--ui-accent-green": "#00897b",
-      "--ui-accent-blue": "#1e88e5",
-    },
-  },
-  sunset: {
-    label: "Purple",
-    vars: {
-      "--ui-bg": "#1a0033",
-      "--ui-surface": "#2d0057",
-      "--ui-text": "#ede7f6",
-      "--ui-muted": "rgba(237,231,246,0.65)",
-      "--ui-line": "rgba(237,231,246,0.18)",
-      "--ui-accent-red": "#ef9a9a",
-      "--ui-accent-yellow": "#fff59d",
-      "--ui-accent-green": "#a5d6a7",
-      "--ui-accent-blue": "#ce93d8",
-    },
-  },
+const THEMES: Record<ThemeName, { label: string }> = {
+  paper: { label: "Daylight" },
+  midnight: { label: "After hours" },
+  forest: { label: "Club green" },
+  sunset: { label: "Clay" },
 };
 
 const DEFAULT_RULES: Partial<GameRules> = {
@@ -107,7 +58,9 @@ function getInitialRules(): Partial<GameRules> {
     };
     const normalizedMaxPlayers = Math.max(
       MIN_SUPPORTED_MAX_PLAYERS,
-      parsed.maxPlayers ?? DEFAULT_RULES.maxPlayers ?? MIN_SUPPORTED_MAX_PLAYERS,
+      parsed.maxPlayers ??
+        DEFAULT_RULES.maxPlayers ??
+        MIN_SUPPORTED_MAX_PLAYERS,
     );
 
     return {
@@ -125,73 +78,61 @@ function getInitialRules(): Partial<GameRules> {
 }
 
 function getInitialTheme(): ThemeName {
-  return "midnight";
-}
-
-function WelcomeOverlay({ onComplete }: { onComplete: () => void }) {
-  const containerRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    void import("@dotlottie/player-component");
-  }, []);
-
-  useEffect(() => {
-    const player = containerRef.current?.querySelector("dotlottie-player");
-    if (!player) return;
-
-    const handleComplete = () => {
-      onComplete();
-    };
-
-    player.addEventListener("complete", handleComplete);
-    return () => {
-      player.removeEventListener("complete", handleComplete);
-    };
-  }, [onComplete]);
-
-  return (
-    <div
-      ref={containerRef}
-      style={{
-        position: "fixed",
-        inset: 0,
-        background: "var(--ui-bg)",
-        color: "var(--ui-text)",
-        display: "grid",
-        placeItems: "center",
-        overflow: "hidden",
-        zIndex: 120,
-        pointerEvents: "auto",
-      }}
-    >
-      <dotlottie-player
-        src="/loadingPage/Welcome.lottie"
-        background="transparent"
-        speed="1"
-        style={{ width: "min(460px, 76vw)", height: "min(460px, 76vw)" }}
-        autoplay
-      />
-    </div>
-  );
+  if (typeof window === "undefined") return "paper";
+  try {
+    const value = localStorage.getItem(PREFERRED_THEME_KEY);
+    return value === "paper" ||
+      value === "midnight" ||
+      value === "forest" ||
+      value === "sunset"
+      ? value
+      : "paper";
+  } catch {
+    return "paper";
+  }
 }
 
 // ── Root ───────────────────────────────────────────────────────────────────────
 export default function Home() {
-  const [mode, setMode] = useState<"online" | "computer">("computer");
-  const [view, setView] = useState<"home" | "computer" | "friends">("home");
+  const [mode, setMode] = useState<"online" | "computer">(() =>
+    typeof window !== "undefined" &&
+    new URLSearchParams(window.location.search).has("room")
+      ? "online"
+      : "computer",
+  );
+  const [view, setView] = useState<"home" | "computer" | "friends">(() =>
+    typeof window !== "undefined" &&
+    new URLSearchParams(window.location.search).has("room")
+      ? "friends"
+      : "home",
+  );
   const [panel, setPanel] = useState<"create" | "join">("create");
   const [theme, setTheme] = useState<ThemeName>(getInitialTheme);
   const [showS, setShowS] = useState(false);
-  const [settingsTab, setSettingsTab] = useState<"profile" | "controls" | "audio">("controls");
+  const [settingsTab, setSettingsTab] = useState<
+    "profile" | "controls" | "audio"
+  >("controls");
   const [rules, setRules] = useState<Partial<GameRules>>(getInitialRules);
   // On client this is always true; on server it's false (SSR guard)
-  const mounted = typeof window !== 'undefined';
-  const [showWelcomeOverlay, setShowWelcomeOverlay] = useState(true);
+  const mounted = useSyncExternalStore(
+    subscribeToClient,
+    () => true,
+    () => false,
+  );
   const { playMusic, setMusicContext } = useAudioManager();
 
   const local = useUnoGame();
   const online = useUnoOnlineGame();
   const api = mode === "computer" ? local : online;
+
+  useEffect(() => {
+    if (!online.room || view !== "home") return;
+    const timer = setTimeout(() => {
+      setMode("online");
+      setView("friends");
+    }, 0);
+    return () => clearTimeout(timer);
+  }, [online.room, view]);
 
   // Derive gameContext directly from api.game to avoid setState-in-effect
   const gameContext = api.game !== null ? "game" : "lobby";
@@ -205,14 +146,11 @@ export default function Home() {
   }, [rules, mounted]);
 
   useEffect(() => {
-    if (mounted) {
-      try {
-        window.localStorage.setItem(PREFERRED_THEME_KEY, theme);
-      } catch {}
-    }
-    const root = document.documentElement;
-    for (const [k, v] of Object.entries(THEMES[theme].vars))
-      root.style.setProperty(k, v);
+    if (!mounted) return;
+    try {
+      window.localStorage.setItem(PREFERRED_THEME_KEY, theme);
+    } catch {}
+    document.documentElement.dataset.theme = theme;
   }, [theme, mounted]);
 
   useEffect(() => {
@@ -235,7 +173,12 @@ export default function Home() {
   };
 
   const selectTheme = (themeName: string) => {
-    if (themeName === 'paper' || themeName === 'midnight' || themeName === 'forest' || themeName === 'sunset') {
+    if (
+      themeName === "paper" ||
+      themeName === "midnight" ||
+      themeName === "forest" ||
+      themeName === "sunset"
+    ) {
       setTheme(themeName);
     }
   };
@@ -262,6 +205,8 @@ export default function Home() {
       key={`settings-${settingsTab}-${showS ? "open" : "closed"}`}
       open={showS}
       initialTab={settingsTab}
+      themeLabel={label}
+      onSelectTheme={selectTheme}
       rules={rules}
       friendCode={online.friendCode}
       onCopyFriendCode={() => {
@@ -280,10 +225,31 @@ export default function Home() {
       onOpenControlsSettings={() => openSettingsAt("controls")}
       onOpenAudioSettings={() => openSettingsAt("audio")}
       incomingInviteCount={online.incomingInvites.length}
+      incomingInvites={online.incomingInvites}
+      onAcceptFriendInvite={async (id) => {
+        let name = "You";
+        try {
+          name = localStorage.getItem(ONLINE_PLAYER_NAME_KEY)?.trim() || name;
+        } catch {}
+        const joined = await online.acceptFriendInvite(id, name);
+        if (joined) {
+          setMode("online");
+          setView("friends");
+        }
+        return joined;
+      }}
+      onDeclineFriendInvite={online.declineFriendInvite}
     />
   );
 
-  let content: ReactNode = null;
+  let content: ReactNode = (
+    <main className="loading-screen">
+      <span className="wordmark">
+        uno<span>.</span>
+      </span>
+      <p>Getting the table ready…</p>
+    </main>
+  );
 
   // Active game
   if (mounted && api.game) {
@@ -291,7 +257,7 @@ export default function Home() {
     content = (
       <>
         <GameBoard
-          gameApi={api as ReturnType<typeof useUnoGame>}
+          gameApi={api}
           onReset={() => {
             api.resetGame();
             setMode("computer");
@@ -325,6 +291,7 @@ export default function Home() {
           onOpenAudioSettings={() => openSettingsAt("audio")}
           onOpenProfileSettings={() => openSettingsAt("profile")}
           onComputer={() => {
+            if (online.room) void online.leaveRoom();
             setMode("computer");
             setView("computer");
           }}
@@ -334,6 +301,20 @@ export default function Home() {
             setView("friends");
           }}
           incomingInvites={online.incomingInvites}
+          onAcceptFriendInvite={async (id) => {
+            let name = "You";
+            try {
+              name =
+                localStorage.getItem(ONLINE_PLAYER_NAME_KEY)?.trim() || name;
+            } catch {}
+            const joined = await online.acceptFriendInvite(id, name);
+            if (joined) {
+              setMode("online");
+              setView("friends");
+            }
+            return joined;
+          }}
+          onDeclineFriendInvite={online.declineFriendInvite}
           onCheckFriendOnline={online.checkFriendOnline}
           onFriendQuickInvite={async (friendCode) => {
             let playerName = "Player 1";
@@ -373,6 +354,9 @@ export default function Home() {
     content = (
       <>
         <GameSetup
+          rules={rules}
+          onRulesChange={setRules}
+          startingHandSize={rules.startingHandSize ?? 7}
           controls={topBar}
           onBack={() => setView("home")}
           onStart={(names, botFlags) => {
@@ -417,12 +401,5 @@ export default function Home() {
     );
   }
 
-  return (
-    <>
-      {content}
-      {showWelcomeOverlay && (
-        <WelcomeOverlay onComplete={() => setShowWelcomeOverlay(false)} />
-      )}
-    </>
-  );
+  return <>{content}</>;
 }

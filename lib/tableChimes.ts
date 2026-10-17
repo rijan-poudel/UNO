@@ -1,10 +1,5 @@
-/**
- * Lightweight in-browser beeps for game feedback (no audio files).
- * Separate from the arcade voice in /public/voice/.
- */
-
+// One low-latency audio context; card texture is generated once, never fetched on tap.
 import { getAudioSettings } from './audioSettings';
-
 export type TableChime =
   | 'cardPlay'
   | 'draw'
@@ -20,150 +15,171 @@ export type TableChime =
   | 'deal'
   | 'win'
   | 'lose';
-
-const GAIN: Partial<Record<TableChime, number>> = {
-  cardPlay: 0.9,
-  draw: 0.85,
-  draw2: 0.9,
-  wild4: 0.85,
-  shuffleMotion: 1,
-  skip: 0.9,
-  reverse: 0.9,
-  wild: 0.88,
-  shuffle: 0.86,
-  uno: 0.9,
-  callOut: 0.9,
-  deal: 1,
-  win: 0.88,
-  lose: 0.82,
-};
-
-let ctxRef: AudioContext | null = null;
-let lastShuffleMotionAt = 0;
-
-/** Call from a pointer/click on the game so browsers unlock AudioContext. */
-export function primeTableAudioFromUserGesture(): void {
-  void getCtx()?.resume();
+let context: AudioContext | null = null;
+let paper: AudioBuffer | null = null;
+let lastMotionAt = 0;
+const voices = new Set<AudioScheduledSourceNode>();
+function retain(source: AudioScheduledSourceNode): void {
+  voices.add(source);
+  source.addEventListener('ended', () => voices.delete(source), { once: true });
 }
-
-function getCtx(): AudioContext | null {
+function stopFeedback(): void {
+  voices.forEach((source) => {
+    try {
+      source.stop();
+    } catch {}
+  });
+  voices.clear();
+}
+let listening = false;
+function getContext(): AudioContext | null {
   if (typeof window === 'undefined') return null;
-  const AC = window.AudioContext || (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-  if (!AC) return null;
-  if (!ctxRef) ctxRef = new AC();
-  if (ctxRef.state === 'suspended') void ctxRef.resume();
-  return ctxRef;
+  const Constructor =
+    window.AudioContext ||
+    (window as typeof window & { webkitAudioContext?: typeof AudioContext })
+      .webkitAudioContext;
+  if (!Constructor) return null;
+  context ??= new Constructor({ latencyHint: 'interactive' });
+  if (!listening) {
+    listening = true;
+    window.addEventListener('uno:audio-settings', () => {
+      const settings = getAudioSettings();
+      if (settings.muted || !settings.chimesEnabled || settings.sfxVolume <= 0)
+        stopFeedback();
+    });
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) stopFeedback();
+    });
+  }
+  return context;
 }
-
-function playTone(
+export function primeTableAudioFromUserGesture(): void {
+  try {
+    const ctx = getContext();
+    if (ctx?.state === 'suspended') void ctx.resume().catch(() => {});
+  } catch {}
+}
+function cardTexture(ctx: AudioContext, volume: number, draw: boolean): void {
+  if (!paper) {
+    paper = ctx.createBuffer(
+      1,
+      Math.ceil(ctx.sampleRate * 0.085),
+      ctx.sampleRate,
+    );
+    const data = paper.getChannelData(0);
+    for (let i = 0; i < data.length; i++)
+      data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / data.length, 2);
+  }
+  const source = ctx.createBufferSource();
+  const filter = ctx.createBiquadFilter();
+  const gain = ctx.createGain();
+  source.buffer = paper;
+  source.playbackRate.value = draw ? 0.8 : 1.25;
+  filter.type = 'bandpass';
+  filter.frequency.value = draw ? 1500 : 2300;
+  filter.Q.value = 0.6;
+  gain.gain.value = volume * 0.28;
+  source.connect(filter).connect(gain).connect(ctx.destination);
+  source.onended = () => {
+    source.disconnect();
+    filter.disconnect();
+    gain.disconnect();
+  };
+  retain(source);
+  source.start();
+}
+function tone(
   ctx: AudioContext,
+  frequency: number,
   at: number,
-  freq: number,
-  duration: number,
-  type: OscillatorType,
-  gainPeak: number,
-  gainScale: number,
-  slideTo?: number,
-) {
+  volume: number,
+): void {
   const osc = ctx.createOscillator();
   const gain = ctx.createGain();
-  osc.type = type;
-  osc.frequency.setValueAtTime(freq, at);
-  if (slideTo) {
-    osc.frequency.exponentialRampToValueAtTime(slideTo, at + duration);
-  }
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(frequency, at);
   gain.gain.setValueAtTime(0.0001, at);
-  gain.gain.exponentialRampToValueAtTime(gainPeak * gainScale, at + Math.min(0.02, duration * 0.4));
-  gain.gain.exponentialRampToValueAtTime(0.0001, at + duration);
-  osc.connect(gain);
-  gain.connect(ctx.destination);
+  gain.gain.exponentialRampToValueAtTime(
+    Math.max(0.0001, volume * 0.07),
+    at + 0.008,
+  );
+  gain.gain.exponentialRampToValueAtTime(0.0001, at + 0.14);
+  osc.connect(gain).connect(ctx.destination);
+  osc.onended = () => {
+    osc.disconnect();
+    gain.disconnect();
+  };
+  retain(osc);
   osc.start(at);
-  osc.stop(at + duration + 0.01);
+  osc.stop(at + 0.15);
 }
-
-/** Card motion / shuffle micro-chime; rate-limited. */
-export function playShuffleMotionChime(): void {
-  if (!getAudioSettings().chimesEnabled) return;
-  const now = Date.now();
-  if (now - lastShuffleMotionAt < 120) return;
-  lastShuffleMotionAt = now;
-  playTableChime('shuffleMotion');
+function landing(ctx: AudioContext, volume: number): void {
+  const at = ctx.currentTime + 0.2;
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.frequency.setValueAtTime(135, at);
+  osc.frequency.exponentialRampToValueAtTime(65, at + 0.045);
+  gain.gain.setValueAtTime(Math.max(0.0001, volume * 0.16), at);
+  gain.gain.exponentialRampToValueAtTime(0.0001, at + 0.065);
+  osc.connect(gain).connect(ctx.destination);
+  osc.onended = () => {
+    osc.disconnect();
+    gain.disconnect();
+  };
+  retain(osc);
+  osc.start(at);
+  osc.stop(at + 0.07);
 }
-
 export function playTableChime(event: TableChime): void {
-  if (typeof window === 'undefined') return;
   const settings = getAudioSettings();
-  if (!settings.chimesEnabled) return;
-
+  if (
+    settings.muted ||
+    !settings.chimesEnabled ||
+    settings.sfxVolume <= 0 ||
+    (typeof document !== 'undefined' && document.hidden)
+  )
+    return;
   try {
-    const ctx = getCtx();
-    if (!ctx) return;
-    const now = ctx.currentTime;
-    /** Keep synthetic beeps faint while arcade voice is on so clips are audible. */
-    const duck = settings.voiceInGame ? 0.08 : 1;
-    const gainScale = (GAIN[event] ?? 0.85) * duck;
-
-    switch (event) {
-      case 'cardPlay':
-        playTone(ctx, now, 420, 0.08, 'triangle', 0.024, gainScale, 360);
-        break;
-      case 'draw':
-        playTone(ctx, now, 270, 0.09, 'sine', 0.02, gainScale, 210);
-        break;
-      case 'draw2':
-        playTone(ctx, now, 290, 0.08, 'square', 0.02, gainScale, 240);
-        playTone(ctx, now + 0.08, 240, 0.08, 'square', 0.02, gainScale, 190);
-        break;
-      case 'wild4':
-        playTone(ctx, now, 360, 0.1, 'sawtooth', 0.02, gainScale, 220);
-        playTone(ctx, now + 0.11, 220, 0.12, 'sawtooth', 0.022, gainScale, 150);
-        break;
-      case 'shuffleMotion':
-        playTone(ctx, now, 330, 0.055, 'sawtooth', 0.028, gainScale, 270);
-        playTone(ctx, now + 0.045, 260, 0.055, 'sawtooth', 0.028, gainScale, 320);
-        playTone(ctx, now + 0.09, 360, 0.06, 'triangle', 0.022, gainScale, 290);
-        break;
-      case 'skip':
-        playTone(ctx, now, 640, 0.07, 'square', 0.02, gainScale);
-        playTone(ctx, now + 0.08, 520, 0.07, 'square', 0.018, gainScale);
-        break;
-      case 'reverse':
-        playTone(ctx, now, 260, 0.09, 'triangle', 0.02, gainScale, 480);
-        playTone(ctx, now + 0.09, 480, 0.08, 'triangle', 0.018, gainScale, 300);
-        break;
-      case 'wild':
-        playTone(ctx, now, 320, 0.08, 'sine', 0.018, gainScale, 520);
-        playTone(ctx, now + 0.09, 560, 0.09, 'triangle', 0.018, gainScale, 700);
-        break;
-      case 'shuffle':
-        playTone(ctx, now, 280, 0.07, 'sawtooth', 0.016, gainScale, 460);
-        playTone(ctx, now + 0.07, 360, 0.07, 'sawtooth', 0.016, gainScale, 240);
-        playTone(ctx, now + 0.14, 300, 0.08, 'triangle', 0.018, gainScale, 520);
-        break;
-      case 'uno':
-        playTone(ctx, now, 610, 0.09, 'triangle', 0.024, gainScale);
-        playTone(ctx, now + 0.1, 760, 0.1, 'triangle', 0.022, gainScale);
-        break;
-      case 'callOut':
-        playTone(ctx, now, 210, 0.1, 'sawtooth', 0.02, gainScale, 170);
-        playTone(ctx, now + 0.1, 170, 0.12, 'sawtooth', 0.02, gainScale, 140);
-        break;
-      case 'deal':
-        playTone(ctx, now, 360, 0.055, 'triangle', 0.022, gainScale, 300);
-        playTone(ctx, now + 0.04, 300, 0.05, 'triangle', 0.018, gainScale, 260);
-        break;
-      case 'win':
-        playTone(ctx, now, 520, 0.12, 'triangle', 0.022, gainScale, 760);
-        playTone(ctx, now + 0.12, 760, 0.14, 'triangle', 0.022, gainScale, 980);
-        break;
-      case 'lose':
-        playTone(ctx, now, 260, 0.11, 'triangle', 0.02, gainScale, 180);
-        playTone(ctx, now + 0.12, 180, 0.16, 'triangle', 0.02, gainScale, 120);
-        break;
-      default:
-        break;
+    const ctx = getContext();
+    // Drop feedback while locked; resuming later must never replay an old action.
+    if (!ctx || ctx.state !== 'running') return;
+    const volume = settings.sfxVolume;
+    if (
+      ['cardPlay', 'draw', 'deal', 'shuffleMotion', 'shuffle'].includes(event)
+    ) {
+      cardTexture(ctx, volume, event === 'draw');
+      if (event === 'cardPlay') landing(ctx, volume);
+      if (event === 'deal')
+        [0, 0.055, 0.11].forEach((delay) =>
+          tone(ctx, 185 + delay * 300, ctx.currentTime + delay, volume * 0.35),
+        );
+      return;
     }
+    if (!['uno', 'win', 'lose', 'callOut'].includes(event)) {
+      cardTexture(ctx, volume * 0.8, false);
+      landing(ctx, volume);
+    }
+    const notes: Partial<Record<TableChime, number[]>> = {
+      skip: [430, 330],
+      reverse: [392, 523, 392],
+      draw2: [330, 270],
+      wild4: [300, 230],
+      wild: [392, 494, 587],
+      uno: [620, 820],
+      callOut: [300, 220],
+      win: [523, 659, 784, 1047],
+      lose: [330, 260],
+    };
+    (notes[event] ?? [420]).forEach((frequency, i) =>
+      tone(ctx, frequency, ctx.currentTime + i * 0.08, volume),
+    );
   } catch {
-    // Autoplay / AudioContext policies — ignore.
+    /* Audio must never interfere with play. */
   }
+}
+export function playShuffleMotionChime(): void {
+  const now = performance.now();
+  if (now - lastMotionAt < 80) return;
+  lastMotionAt = now;
+  playTableChime('shuffleMotion');
 }

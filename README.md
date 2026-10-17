@@ -1,132 +1,105 @@
-# UNO Multiplayer
+# UNO — Small cards. Big rivalry.
 
-UNO card game built with Next.js 16 (App Router) frontend and Socket.IO real-time multiplayer server.
+A responsive UNO game for one human with bots, or private online rooms with up to six players. Built with Next.js 16.4, React 19, TypeScript, and Socket.IO.
 
-## Features
+## Start playing locally
 
-- **Local multiplayer**: Play against computer bots with configurable AI
-- **Online multiplayer**: Create/join rooms with friends using invite codes
-- **Customizable rules**: Stacking, double-play, jump-in, and more
-- **Responsive UI**: Mobile-friendly with smooth animations
-- **Voice announcer**: Optional voice feedback for game actions
-- **Pass button**: Quick pass action button centered above the card hand
+Requires Node.js 22+ and npm.
 
-## Requirements
-
-- Node.js 20+
-- npm 10+
-
-## Local Development
-
-1. Install dependencies:
-
-```bash
-npm install
-```
-
-2. Start frontend and socket server together:
-
-```bash
+```sh
+npm ci
 npm run dev
 ```
 
-3. Open:
+Open [localhost:3000](http://localhost:3000). The frontend and socket server start together; socket, engine and type changes restart the socket server. Restarting that process clears its in-memory rooms.
 
-- Frontend: http://localhost:3000
-- Socket server health: http://localhost:3001/health
+## What’s here
 
-## Environment Variables
+- A playful illustrated interface with four themes, readable card faces, and a touch-friendly scrolling hand.
+- Local games with one human and one to five bots.
+- Private online tables with room codes, invitation links, friend codes, bot seats, and rematches.
+- A 45-second reconnect window, including a refresh by the last connected human.
+- House rules for stacking, jump-in, drawing, UNO calls, special cards, and finishing.
+- Immediate card sounds, optional music, optional voice, master mute, and saved volume preferences.
+- Transform-based card travel and hand repositioning, with reduced-motion support.
+- Keyboard shortcuts: **D** draw, **P** pass, **U** call UNO. Cards also work with Tab and Enter/Space. UNO may be declared with two cards before a play or with one card afterward.
 
-Create `.env.local` for frontend values and set server variables in your host.
+## Verify changes
 
-Frontend:
+```sh
+npm run lint
+npm run check:types
+npm run check:game
+npm run build
+```
 
-- `NEXT_PUBLIC_SOCKET_URL` (required in production)
+For real socket acknowledgements, reconnects, six-seat limits, and bot pacing:
 
-Socket server:
+```sh
+# In one terminal
+npm run dev:socket
+# In another
+npm run check:multiplayer
+```
 
-- `PORT` (host-provided in production)
-- `UNO_SOCKET_PORT` (local fallback if `PORT` is not set)
-- `UNO_CORS_ORIGINS` (comma-separated list of allowed origins)
+The checks use Node assertions and the installed TypeScript runner; no test framework is required. Set `UNO_CHECK_SOCKET_URL` to point the multiplayer check at a different local server. CI runs all of these checks.
 
-Example:
+## Project map
+
+- `app/page.tsx` — view routing, shared preferences, local/online API selection.
+- `components/home/HomeScreen.tsx` — entry screen and saved friends.
+- `components/GameSetup.tsx`, `OnlineLobby.tsx` — local seats and online room flow.
+- `components/GameBoard.tsx` — table, hand, available actions, result and help dialogs.
+- `components/UnoCard.tsx` — the shared card face and accessible labels.
+- `components/Modal.tsx` — native modal with focus containment and return.
+- `app/globals.css` — themes, components, breakpoints, and reduced motion.
+- `hooks/useGamePresentation.ts` — card travel, hand repositioning, and audio tied to snapshots.
+- `hooks/useUnoGame.ts`, `useUnoOnlineGame.ts` — local reducer and socket client.
+- `lib/` — immutable engine, rules, deck, bot choices, and audio.
+- `server/socketServer.ts` — authoritative online actions, room membership, invitations, reconnects, and timed bot turns.
+- `scripts/` — framework-free checks and reproducible audio preparation.
+
+Read [PRODUCT.md](PRODUCT.md), [DESIGN.md](DESIGN.md), [AGENTS.md](AGENTS.md), and [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) before changing the product.
+
+## Audio assets
+
+Playable voice files live in `public/audio/voice/`; optional music is `public/audio/music.mp3`. The original recordings remain in `public/audios/` as source material. Do not load those originals during a card interaction.
+
+Regenerate with ffmpeg installed:
+
+```sh
+npm run audio:prepare
+```
+
+The preparation script removes leading/trailing silence from voice, normalizes loudness, and writes compressed files. Preferences are in `lib/audioSettings.ts`. Sound never controls turn timing. Voice is one interruptible lane: a newer event cancels the previous event, and an unavailable clip expires rather than playing late.
+
+## Deployment
+
+Use a Next.js host for the frontend and a persistent Node process for Socket.IO. Rooms are in memory; restarting the socket process ends active rooms. A serverless frontend deployment does not run the long-lived socket process.
+
+Frontend environment:
 
 ```env
 NEXT_PUBLIC_SOCKET_URL=https://your-socket-service.example.com
-UNO_CORS_ORIGINS=https://your-app.vercel.app,https://your-domain.com
 ```
 
-## Project Structure
+Socket host environment:
 
-```
-app/           # Next.js App Router pages and layouts
-components/    # React components (PascalCase .tsx files)
-  ui/          # shadcn/ui base components
-hooks/         # Custom React hooks
-lib/           # Pure game logic, utilities
-server/        # Socket.IO multiplayer server
-types/         # TypeScript type definitions
+```env
+PORT=3001
+UNO_CORS_ORIGINS=https://your-app.example.com
 ```
 
-## Key Game Logic
+`UNO_SOCKET_PORT` is the local fallback when `PORT` is unset. Start the socket process with `npm run start:socket`. Start a built frontend with `npm start`. Socket health is `/health` on the socket host. Check room creation and joining from separate devices after deploying.
 
-The game engine in `lib/` uses immutable state transitions:
+For a phone on the same Wi-Fi, use the network URL printed by `npm run dev`. Both frontend and socket ports must be reachable. Localhost and private LAN origins are accepted by the development server.
 
-- `gameSetup.ts` - Initializes a new game with players, deck, and rules
-- `gameActions.ts` - All player actions (play, draw, pass, call out UNO)
-- `gameRules.ts` - Playability checks and valid move detection
-- `turns.ts` - Turn order and direction management
-- `deck.ts` - Deck creation, shuffling, and card dealing
+## Current boundaries
 
-## Multiplayer Server
+- Casual private rooms: snapshots currently include the full game state. Hidden information is concealed by the UI, not protected from a modified client. Anti-cheat transport is separate work.
+- Rooms and match results are not durable across a socket server restart. Local rounds are not saved across reloads.
+- Double-play pair detection exists in the engine, but playing a pair is not implemented as an action. The interface deliberately does not offer that rule.
+- `agent/` is a separate legacy tool and remains excluded from lint/type checks.
+- The production dependency audit is clean. The lint toolchain still reports an upstream `braces` advisory; npm’s proposed force fix downgrades Next’s ESLint configuration. Do not apply that incompatible downgrade.
 
-The Socket.IO server (`server/socketServer.ts`) handles:
-
-- Room management (create, join, leave, kick)
-- Real-time game state synchronization
-- Friend invites and presence tracking
-- Bot opponents for solo play
-- Automatic cleanup of stale sessions (5min presence TTL, 2min invite TTL)
-
-## Deployment Topology
-
-Use two deployments:
-
-1. Frontend on Vercel (Next.js app)
-2. Socket server on a Node host (Render, Railway, Fly, VM, etc.)
-
-Vercel does not run this repo's long-lived custom Socket.IO process directly.
-
-## Deploy Frontend (Vercel)
-
-1. Import this repo in Vercel.
-2. Set environment variable:
-	- `NEXT_PUBLIC_SOCKET_URL=https://your-socket-service.example.com`
-3. Deploy.
-
-## Deploy Socket Server (Render Example)
-
-1. Create a Web Service from this repo.
-2. Set Root Directory to `uno`.
-3. Build command:
-
-```bash
-npm install
-```
-
-4. Start command:
-
-```bash
-npm run start:socket
-```
-
-5. Add env vars:
-	- `UNO_CORS_ORIGINS=https://your-app.vercel.app`
-
-## Production Verification
-
-1. Open frontend on Vercel.
-2. Create room in one browser.
-3. Join room from second browser/device.
-4. Confirm realtime updates and turn sync.
-
+The current visual direction is playful and led by original card-character graphics, with Fredoka/Nunito Sans typography, a compact navigation bar, fast card motion, immediate paper-and-tap sound, and device-local wins and streaks. Choose Classic, Stack party, or Wild table before dealing, then fine-tune individual house rules in Settings. No Mercy, Flip and Flex remain future implementations; these presets do not claim to implement those editions.
