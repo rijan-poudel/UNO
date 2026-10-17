@@ -188,13 +188,22 @@ function joinRoomAsPlayer(
   socketId: string,
   playerName: string,
   deviceId: string,
+  io: Server,
 ): string {
   const existingPlayerForDevice = room.players.find(
     (player) => player.deviceId === deviceId,
   );
   if (existingPlayerForDevice) {
-    if (existingPlayerForDevice.connected) {
-      throw new Error('This device is already connected in the room.');
+    // A refresh may connect before the old transport closes. Move the known
+    // device's seat atomically, revoking the stale socket before notifying it.
+    const previousSocketId = existingPlayerForDevice.socketId;
+    if (previousSocketId && previousSocketId !== socketId) {
+      playerBySocket.delete(previousSocketId);
+      io.sockets.sockets.get(previousSocketId)?.leave(room.roomId);
+      io.to(previousSocketId).emit('room:kicked', {
+        roomId: room.roomId,
+        message: 'Your seat moved to another tab. You can keep playing there.',
+      });
     }
 
     const cleanup = orphanedRoomTimers.get(room.roomId);
@@ -871,6 +880,7 @@ io.on('connection', (socket) => {
           socket.id,
           playerName,
           deviceId,
+          io,
         );
         socket.join(roomId);
 
@@ -1044,7 +1054,7 @@ io.on('connection', (socket) => {
         const playerId =
           membership?.roomId === invite.roomId
             ? membership.playerId
-            : joinRoomAsPlayer(room, socket.id, playerName, deviceId);
+            : joinRoomAsPlayer(room, socket.id, playerName, deviceId, io);
         socket.join(room.roomId);
 
         const senderSocketId = findSenderSocketIdForInvite(invite);

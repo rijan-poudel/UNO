@@ -30,7 +30,7 @@ The presentation hook cancels animations and removes temporary flight nodes on u
 
 ## Reconnect and storage
 
-The online hook keeps an active room in sessionStorage, with a persistent random device identity in localStorage. On reconnect it rejoins with that identity. New devices cannot join a started game. Rejoining restores the existing seat. Deliberate leave and kick clear the saved membership. Requests time out after six seconds; never leave a busy control waiting on an unbounded acknowledgement.
+The online hook keeps an active room in sessionStorage, with a persistent random device identity in localStorage. On reconnect it rejoins with that identity. New devices cannot join a started game. Rejoining restores the existing seat. If the previous transport still looks connected during a refresh, the known device takes over the seat atomically: its old socket loses membership before receiving a seat-moved notice. A delayed old disconnect cannot evict the new connection. Deliberate leave and kick clear the saved membership. Requests time out after six seconds; never leave a busy control waiting on an unbounded acknowledgement.
 
 Rules, themes, names, friends, and audio preferences are local to the browser. Storage failure must not prevent play. The current casual-room protocol sends full game snapshots; UI concealment of opponent faces is not anti-cheat protection.
 

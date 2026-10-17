@@ -181,8 +181,64 @@ async function main() {
       restoredSolo.room.game?.turnCount,
       'A pending bot timer cannot move for a reconnected human',
     );
+    // Remote refresh can arrive while the previous transport still looks live.
+    const overlap = await connect();
+    const superseded = new Promise<void>((resolve, reject) => {
+      const timeout = setTimeout(
+        () => reject(new Error('Old connection was not notified')),
+        3000,
+      );
+      soloReturn.once('room:kicked', () => {
+        clearTimeout(timeout);
+        resolve();
+      });
+    });
+    const transferred = await request<{ room: RoomSnapshot; playerId: string }>(
+      overlap,
+      'room:join',
+      {
+        roomId: soloRoom.room.roomId,
+        playerName: 'Solo host',
+        deviceId: soloDevice,
+      },
+    );
+    await superseded;
+    assert.equal(
+      transferred.playerId,
+      restoredSolo.playerId,
+      'Overlapping refresh keeps the seat',
+    );
+    assert.equal(
+      transferred.room.players.length,
+      2,
+      'Overlapping refresh does not add a player',
+    );
+    const staleAction = (await soloReturn
+      .timeout(5000)
+      .emitWithAck('game:action', {
+        roomId: soloRoom.room.roomId,
+        action: { type: 'draw' },
+      })) as Ack<unknown>;
+    assert.equal(
+      staleAction.ok,
+      false,
+      'Superseded transport cannot play for the seat',
+    );
+    soloReturn.disconnect();
+    const afterOldDisconnect = await request<{ room: RoomSnapshot }>(
+      overlap,
+      'room:ready',
+      { roomId: soloRoom.room.roomId },
+    );
+    assert.equal(
+      afterOldDisconnect.room.players.find(
+        (p) => p.playerId === transferred.playerId,
+      )?.connected,
+      true,
+      'Late old disconnect cannot evict the new connection',
+    );
     console.log(
-      'Passed: create/join/kick, six seats, stable IDs, separate bot broadcasts, turn pacing, reconnect, and last-human refresh.',
+      'Passed: create/join/kick, six seats, stable IDs, separate bot broadcasts, turn pacing, reconnect, last-human refresh, and overlapping connection handoff.',
     );
   } finally {
     sockets.forEach((socket) => socket.disconnect());
