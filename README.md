@@ -103,3 +103,16 @@ For a phone on the same Wi-Fi, use the network URL printed by `npm run dev`. Bot
 - The production dependency audit is clean. The lint toolchain still reports an upstream `braces` advisory; npm’s proposed force fix downgrades Next’s ESLint configuration. Do not apply that incompatible downgrade.
 
 The current visual direction is playful and led by original card-character graphics, with Fredoka/Nunito Sans typography, a compact navigation bar, fast card motion, immediate paper-and-tap sound, and device-local wins and streaks. Choose Classic, Stack party, or Wild table before dealing, then fine-tune individual house rules in Settings. No Mercy, Flip and Flex remain future implementations; these presets do not claim to implement those editions.
+
+### Persistent multiplayer host
+
+The public frontend needs `NEXT_PUBLIC_SOCKET_URL` set to its separate Socket.IO host. Without it, online rooms show an unavailable state and offer local bot play; public visitors are never sent to an unserved port on the frontend domain. Local development and port-3000 previews still resolve the local server automatically.
+
+`Dockerfile.socket` packages the persistent service for a container host:
+
+```sh
+docker build -f Dockerfile.socket -t uno-socket .
+docker run --rm -p 3001:3001 -e UNO_CORS_ORIGINS=https://uno-wheat-ten.vercel.app uno-socket
+```
+
+The host must accept WebSockets, expose `/health`, and set `PORT` if it uses a port other than 3001. Set `UNO_CORS_ORIGINS` to the frontend origin. Put the resulting HTTPS host URL in the Vercel production environment, then rebuild the frontend. One process owns in-memory rooms; restarting it clears them.

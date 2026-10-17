@@ -34,6 +34,7 @@ interface Props {
   initialPanel?: "create" | "join";
   controls?: ReactNode;
   onBack?: () => void;
+  onPlayBots?: () => void;
   onSyncPresence: (name: string) => Promise<boolean>;
   onCheckFriendOnline: (
     codes: string[],
@@ -250,14 +251,20 @@ export default function OnlineLobby(props: Props) {
             className={`connection-state ${connected ? "online" : "offline"}`}
           >
             <i className={`presence-dot ${connected ? "online" : "offline"}`} />
-            {connected ? "Connected" : "Connecting…"}
+            {connected ? "Connected" : error ? "Offline" : "Connecting…"}
           </span>
         }
       />
       {(error || localError) && (
-        <p className="error-message" role="alert">
-          {localError || error}
-        </p>
+        <div className="error-message connection-recovery" role="alert">
+          <p>{localError || error}</p>
+          {!connected && !room && props.onPlayBots && (
+            <button className="text-button" onClick={props.onPlayBots}>
+              Play with bots
+              <ArrowRight size={16} />
+            </button>
+          )}
+        </div>
       )}
       {!room && (
         <>

@@ -280,7 +280,7 @@ Strong, readable controls with soft physical lift. Primary actions use coral, se
 
 ### Inputs / Fields
 
-Native text fields and selects use cream surfaces, fine borders and clear labels. Seat-name fields are an inline variant. Focus changes the border and keeps a visible blue outline. Native range inputs control audio; preference switches are labeled checkbox inputs with switch semantics. Errors name the problem and recovery action.
+Native text fields and selects use cream surfaces, fine borders and clear labels. Seat-name fields are an inline variant. Focus changes the border and keeps a visible blue outline. Native range inputs control audio; preference switches are labeled checkbox inputs with switch semantics. Errors name the problem and recovery action. An unavailable online lobby reports Offline and offers Play with bots; it does not suggest an endless connection attempt or expose hosting configuration to players.
 
 ### Navigation
 

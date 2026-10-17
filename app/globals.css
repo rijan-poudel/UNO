@@ -3100,3 +3100,12 @@ input[type="range"] {
     bottom: 15px;
   }
 }
+
+.connection-recovery {
+  display: grid;
+  gap: 6px;
+}
+.connection-recovery .text-button {
+  min-height: 40px;
+  font-weight: 800;
+}

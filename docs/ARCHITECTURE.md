@@ -51,3 +51,7 @@ Original clay card art lives in `public/art/card-pals.webp`, with its generation
 Card sounds combine an immediate paper swipe with a short landing tap scheduled on the same interactive Web Audio clock. Special cards have distinct brief tonal signatures. Muting, disabling effects, setting effects volume to zero or hiding the page cancels scheduled feedback. No sound, voice or animation controls engine timing.
 
 `lib/playerProgress.ts` records completed rounds, wins and streaks on this device. Terminal-state fingerprints prevent duplicate records on rerender/reconnect. `useSyncExternalStore` keeps home and results synchronized. Storage failures leave gameplay working. These are device-local achievements, not authenticated rankings or cross-device statistics.
+
+## Public connection configuration
+
+`lib/socketConnection.ts` resolves a neighboring port only for development and local port-3000 previews. Public deployments need an explicit `NEXT_PUBLIC_SOCKET_URL`. Missing/invalid configuration and connection failures produce an honest unavailable state with a local-bot recovery action. A successful connection clears the error. `Dockerfile.socket` packages the persistent service; Vercel serves the frontend separately. Hosting credentials and a public backend URL are operational prerequisites, not something the UI can invent.

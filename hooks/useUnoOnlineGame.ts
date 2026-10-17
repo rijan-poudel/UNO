@@ -16,6 +16,10 @@ import { toast } from 'sonner';
 import { getPlayableCards } from '../lib/gameRules';
 import { resolvePlayerName } from '../lib/playerNames';
 import {
+  ONLINE_UNAVAILABLE_MESSAGE,
+  resolveSocketEndpoint,
+} from '../lib/socketConnection';
+import {
   voiceUiConnected,
   voiceUiDisconnected,
   voiceUiRoomJoined,
@@ -302,9 +306,23 @@ export function useUnoOnlineGame() {
   const announcedRoomIdRef = useRef<string | null>(null);
 
   useEffect(() => {
-    const socketUrl =
-      process.env.NEXT_PUBLIC_SOCKET_URL ??
-      `${window.location.protocol}//${window.location.hostname}:3001`;
+    const socketUrl = resolveSocketEndpoint(
+      process.env.NEXT_PUBLIC_SOCKET_URL,
+      window.location,
+      process.env.NODE_ENV === 'development',
+    );
+    if (!socketUrl) {
+      const timeout = window.setTimeout(
+        () =>
+          setState((prev) => ({
+            ...prev,
+            connected: false,
+            error: ONLINE_UNAVAILABLE_MESSAGE,
+          })),
+        0,
+      );
+      return () => window.clearTimeout(timeout);
+    }
 
     const socket = io(socketUrl, {
       transports: ['websocket'],
@@ -370,6 +388,14 @@ export function useUnoOnlineGame() {
       } catch {
         /* Session storage is optional. */
       }
+    });
+
+    socket.on('connect_error', () => {
+      setState((prev) => ({
+        ...prev,
+        connected: false,
+        error: prev.room ? null : ONLINE_UNAVAILABLE_MESSAGE,
+      }));
     });
 
     socket.on('disconnect', () => {
@@ -556,8 +582,7 @@ export function useUnoOnlineGame() {
       if (!socket?.connected)
         return Promise.resolve({
           ok: false,
-          error:
-            'Connection lost. Wait for the table to reconnect, then try again.',
+          error: ONLINE_UNAVAILABLE_MESSAGE,
         });
 
       return new Promise((resolve) => {

@@ -371,6 +371,10 @@ export default function Home() {
     content = (
       <>
         <OnlineLobby
+          onPlayBots={() => {
+            setMode("computer");
+            setView("computer");
+          }}
           controls={topBar}
           onBack={() => setView("home")}
           initialPanel={panel}

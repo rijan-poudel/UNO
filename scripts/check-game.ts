@@ -11,6 +11,7 @@ import {
 } from '../lib/gameActions';
 import { RULE_PRESETS, matchesPreset } from '../lib/rulePresets';
 import { parseProgress, addRoundResult } from '../lib/playerProgress';
+import { resolveSocketEndpoint } from '../lib/socketConnection';
 import { canPlayCard } from '../lib/gameRules';
 import { getBotMove } from '../lib/botSupport';
 import type { CardColor } from '../types/card';
@@ -147,3 +148,38 @@ for (const preset of RULE_PRESETS) {
   );
 }
 console.log('Progress and supported rule presets passed.');
+
+// A public frontend must not silently point at a nonexistent port on its own host.
+const publicLocation = {
+  protocol: 'https:',
+  hostname: 'uno-wheat-ten.vercel.app',
+  port: '',
+};
+assert.equal(resolveSocketEndpoint(undefined, publicLocation), null);
+assert.equal(resolveSocketEndpoint('  ', publicLocation), null);
+assert.equal(
+  resolveSocketEndpoint('https://table.example.com', publicLocation),
+  'https://table.example.com/',
+);
+assert.equal(
+  resolveSocketEndpoint('javascript:alert(1)', publicLocation),
+  null,
+);
+assert.equal(resolveSocketEndpoint('invalid-url', publicLocation), null);
+assert.equal(
+  resolveSocketEndpoint(undefined, {
+    protocol: 'http:',
+    hostname: 'localhost',
+    port: '3000',
+  }),
+  'http://localhost:3001',
+);
+assert.equal(
+  resolveSocketEndpoint(undefined, {
+    protocol: 'http:',
+    hostname: '192.168.1.5',
+    port: '3000',
+  }),
+  'http://192.168.1.5:3001',
+);
+console.log('Public socket configuration and local preview endpoints passed.');

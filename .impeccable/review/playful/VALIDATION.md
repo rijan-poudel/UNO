@@ -27,3 +27,7 @@ Captures cover 1440px desktop, 688px intermediate, 390px phone and 320px narrow 
 Browser checks verify interactions and visible state; they do not measure physical speaker latency. Audio uses an interactive Web Audio clock, preloaded optional voice, no action waits, no delayed queue, and cancellation on mute/hidden state. Reduced-motion travel suppression and CSS fallbacks were reviewed in source; no OS setting was changed for this pass.
 
 Progress belongs to this device and is not an authenticated ranking. Rooms remain casual in-memory multiplayer; the existing full-snapshot protocol is not adversarial anti-cheat. No Mercy, Flip and Flex require their own deck/action implementations and are not represented as playable presets.
+
+## Public deployment follow-up
+
+The redesign was pushed to GitHub main and Vercel reported a successful production deployment. The new home was verified on `https://uno-wheat-ten.vercel.app/`. GitHub verification passed. The public multiplayer connection was unavailable, revealing a missing/unreachable external service. The subsequent connection fix makes public endpoint configuration explicit and offers local bot recovery. A persistent-service Dockerfile is prepared; completing external multiplayer hosting requires the operator’s service URL/account. No production multiplayer readiness is claimed from local checks.
