@@ -17,6 +17,44 @@ export type TableChime =
   | 'lose';
 let context: AudioContext | null = null;
 let paper: AudioBuffer | null = null;
+let recordedCard: AudioBuffer | null = null;
+let loadingCard = false;
+let resumeAttempt: Promise<void> | null = null;
+let feedbackSequence = 0;
+export type TableAudioStatus = 'locked' | 'ready' | 'unavailable';
+export function getTableAudioStatus(): TableAudioStatus {
+  if (typeof window === 'undefined') return 'locked';
+  if (
+    !window.AudioContext &&
+    !(window as typeof window & { webkitAudioContext?: typeof AudioContext })
+      .webkitAudioContext
+  )
+    return 'unavailable';
+  return context?.state === 'running' ? 'ready' : 'locked';
+}
+export function subscribeTableAudio(listener: () => void): () => void {
+  window.addEventListener('uno:audio-status', listener);
+  return () => window.removeEventListener('uno:audio-status', listener);
+}
+function notifyStatus(): void {
+  window.dispatchEvent(new Event('uno:audio-status'));
+}
+function warmCard(ctx: AudioContext): void {
+  if (loadingCard) return;
+  loadingCard = true;
+  void fetch('/audio/card-play.wav')
+    .then((response) => {
+      if (!response.ok) throw new Error('Card sound unavailable');
+      return response.arrayBuffer();
+    })
+    .then((bytes) => ctx.decodeAudioData(bytes))
+    .then((buffer) => {
+      recordedCard = buffer;
+    })
+    .catch(() => {
+      loadingCard = false;
+    });
+}
 let lastMotionAt = 0;
 const voices = new Set<AudioScheduledSourceNode>();
 function retain(source: AudioScheduledSourceNode): void {
@@ -39,7 +77,11 @@ function getContext(): AudioContext | null {
     (window as typeof window & { webkitAudioContext?: typeof AudioContext })
       .webkitAudioContext;
   if (!Constructor) return null;
-  context ??= new Constructor({ latencyHint: 'interactive' });
+  if (!context || context.state === 'closed') {
+    context = new Constructor({ latencyHint: 'interactive' });
+    context.addEventListener('statechange', notifyStatus);
+    notifyStatus();
+  }
   if (!listening) {
     listening = true;
     window.addEventListener('uno:audio-settings', () => {
@@ -53,13 +95,47 @@ function getContext(): AudioContext | null {
   }
   return context;
 }
+// Call synchronously inside a real gesture. A one-frame silent buffer unlocks iOS too.
 export function primeTableAudioFromUserGesture(): void {
   try {
     const ctx = getContext();
-    if (ctx?.state === 'suspended') void ctx.resume().catch(() => {});
-  } catch {}
+    if (!ctx) return;
+    warmCard(ctx);
+    const silent = ctx.createBufferSource();
+    silent.buffer = ctx.createBuffer(1, 1, ctx.sampleRate);
+    silent.connect(ctx.destination);
+    silent.onended = () => silent.disconnect();
+    silent.start();
+    if (ctx.state !== 'running' && !resumeAttempt) {
+      resumeAttempt = ctx
+        .resume()
+        .catch(() => {})
+        .finally(() => {
+          resumeAttempt = null;
+          notifyStatus();
+        });
+    }
+  } catch {
+    notifyStatus();
+  }
 }
 function cardTexture(ctx: AudioContext, volume: number, draw: boolean): void {
+  if (recordedCard) {
+    const source = ctx.createBufferSource();
+    const gain = ctx.createGain();
+    source.buffer = recordedCard;
+    source.playbackRate.value = draw ? 0.8 : 1;
+    gain.gain.value = volume * 0.85;
+    source.connect(gain).connect(ctx.destination);
+    source.onended = () => {
+      source.disconnect();
+      gain.disconnect();
+    };
+    retain(source);
+    source.start();
+    return;
+  }
+  // Fetch/decode never holds up the first card. This audible texture is the fallback.
   if (!paper) {
     paper = ctx.createBuffer(
       1,
@@ -78,7 +154,7 @@ function cardTexture(ctx: AudioContext, volume: number, draw: boolean): void {
   filter.type = 'bandpass';
   filter.frequency.value = draw ? 1500 : 2300;
   filter.Q.value = 0.6;
-  gain.gain.value = volume * 0.28;
+  gain.gain.value = volume * 0.85;
   source.connect(filter).connect(gain).connect(ctx.destination);
   source.onended = () => {
     source.disconnect();
@@ -100,7 +176,7 @@ function tone(
   osc.frequency.setValueAtTime(frequency, at);
   gain.gain.setValueAtTime(0.0001, at);
   gain.gain.exponentialRampToValueAtTime(
-    Math.max(0.0001, volume * 0.07),
+    Math.max(0.0001, volume * 0.2),
     at + 0.008,
   );
   gain.gain.exponentialRampToValueAtTime(0.0001, at + 0.14);
@@ -114,12 +190,12 @@ function tone(
   osc.stop(at + 0.15);
 }
 function landing(ctx: AudioContext, volume: number): void {
-  const at = ctx.currentTime + 0.2;
+  const at = ctx.currentTime + 0.008;
   const osc = ctx.createOscillator();
   const gain = ctx.createGain();
   osc.frequency.setValueAtTime(135, at);
   osc.frequency.exponentialRampToValueAtTime(65, at + 0.045);
-  gain.gain.setValueAtTime(Math.max(0.0001, volume * 0.16), at);
+  gain.gain.setValueAtTime(Math.max(0.0001, volume * 0.32), at);
   gain.gain.exponentialRampToValueAtTime(0.0001, at + 0.065);
   osc.connect(gain).connect(ctx.destination);
   osc.onended = () => {
@@ -130,19 +206,42 @@ function landing(ctx: AudioContext, volume: number): void {
   osc.start(at);
   osc.stop(at + 0.07);
 }
-export function playTableChime(event: TableChime): void {
+function canSound(): boolean {
   const settings = getAudioSettings();
-  if (
-    settings.muted ||
-    !settings.chimesEnabled ||
-    settings.sfxVolume <= 0 ||
-    (typeof document !== 'undefined' && document.hidden)
-  )
-    return;
+  return (
+    !settings.muted &&
+    settings.chimesEnabled &&
+    settings.sfxVolume > 0 &&
+    !document.hidden
+  );
+}
+export function playTableChime(event: TableChime): void {
+  if (typeof document === 'undefined' || !canSound()) return;
+  const sequence = ++feedbackSequence;
+  const requestedAt = performance.now();
   try {
     const ctx = getContext();
-    // Drop feedback while locked; resuming later must never replay an old action.
-    if (!ctx || ctx.state !== 'running') return;
+    if (!ctx) return;
+    if (ctx.state === 'running') renderChime(ctx, event);
+    else if (resumeAttempt) {
+      // Only the latest fresh action may follow gesture unlock. There is no sound queue.
+      void resumeAttempt.then(() => {
+        if (
+          sequence === feedbackSequence &&
+          performance.now() - requestedAt < 160 &&
+          ctx.state === 'running' &&
+          canSound()
+        )
+          renderChime(ctx, event);
+      });
+    }
+  } catch {
+    /* Sound cannot interfere with play. */
+  }
+}
+function renderChime(ctx: AudioContext, event: TableChime): void {
+  try {
+    const settings = getAudioSettings();
     const volume = settings.sfxVolume;
     if (
       ['cardPlay', 'draw', 'deal', 'shuffleMotion', 'shuffle'].includes(event)

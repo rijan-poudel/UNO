@@ -5,10 +5,10 @@ import {
   useMemo,
   useRef,
   useState,
+  useSyncExternalStore,
   type CSSProperties,
 } from "react";
 import {
-  ArrowDown,
   ArrowLeft,
   ArrowRight,
   Check,
@@ -33,6 +33,13 @@ import PlayerProgress from "./PlayerProgress";
 import PlayerAvatar from "./PlayerAvatar";
 import GameFeedback, { VictoryBurst } from "./GameFeedback";
 import UnoCard from "./UnoCard";
+import HandCard from "./HandCard";
+import {
+  getTableAudioStatus,
+  subscribeTableAudio,
+  playTableChime,
+  primeTableAudioFromUserGesture,
+} from "../lib/tableChimes";
 import ColorPicker from "./ColorPicker";
 import ChoiceDialog from "./ChoiceDialog";
 import Modal from "./Modal";
@@ -44,8 +51,6 @@ interface Props {
   onReset: () => void;
   onDealAgain: () => void;
   onOpenSettings: (tab?: "profile" | "controls" | "audio") => void;
-  onCycleTheme: () => void;
-  currentThemeLabel: string;
 }
 const COLORS: Record<string, number> = {
   red: 0,
@@ -159,8 +164,6 @@ export default function GameBoard({
   onReset,
   onDealAgain,
   onOpenSettings,
-  onCycleTheme,
-  currentThemeLabel,
 }: Props) {
   const {
     game,
@@ -179,7 +182,17 @@ export default function GameBoard({
   const [help, setHelp] = useState(false);
   const [history, setHistory] = useState(false);
   const [sort, setSort] = useState(true);
-  const [muted, setMuted] = useState(() => getAudioSettings().muted);
+  const [soundOn, setSoundOn] = useState(() => {
+    const audio = getAudioSettings();
+    return !audio.muted && audio.chimesEnabled && audio.sfxVolume > 0;
+  });
+  const audioStatus = useSyncExternalStore(
+    subscribeTableAudio,
+    getTableAudioStatus,
+    () => "locked" as const,
+  );
+  const soundIntent = useRef<"enable" | "mute" | null>(null);
+  const [inspectedId, setInspectedId] = useState<string | null>(null);
   const [pendingAction, setPendingAction] = useState(false);
   const pendingRef = useRef(false);
   const actionTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -203,7 +216,10 @@ export default function GameBoard({
     return () => clearTimeout(timer);
   }, [game, pendingWild]);
   useEffect(() => {
-    const sync = () => setMuted(getAudioSettings().muted);
+    const sync = () => {
+      const audio = getAudioSettings();
+      setSoundOn(!audio.muted && audio.chimesEnabled && audio.sfxVolume > 0);
+    };
     window.addEventListener("uno:audio-settings", sync);
     return () => {
       window.removeEventListener("uno:audio-settings", sync);
@@ -306,14 +322,9 @@ export default function GameBoard({
               ? "Your move."
               : "No match? Take a card."
         : `${currentPlayer.name}’s turn`;
-  const turnDescription = winner
-    ? "Room for another round?"
-    : !isLocalTurn
-      ? `${currentPlayer.hand.length} cards in hand.`
-      : game.pendingDraw
-        ? "The penalty is yours unless you can pass it on."
-        : "Match a color or value. Wilds go anywhere.";
   const select = (card: Card, element: HTMLElement) => {
+    setInspectedId(null);
+    primeTableAudioFromUserGesture();
     rememberOrigin(card.id, element);
     act(() => api.selectCard(card));
   };
@@ -324,7 +335,7 @@ export default function GameBoard({
     !localPlayer.saidUno &&
     game.rules.mustDeclareUno;
   return (
-    <div className="game-page" ref={root}>
+    <div className={`game-page ${isLocalTurn ? "local-turn" : ""}`} ref={root}>
       <header className="game-header">
         <button
           className="brand-button"
@@ -354,15 +365,43 @@ export default function GameBoard({
         <div className="header-actions">
           <button
             className="icon-button"
-            aria-label={muted ? "Unmute audio" : "Mute audio"}
-            aria-pressed={muted}
+            aria-label={
+              soundOn && audioStatus === "ready"
+                ? "Turn sound off"
+                : "Enable sound"
+            }
+            aria-pressed={soundOn}
+            onPointerDown={() => {
+              soundIntent.current =
+                soundOn && audioStatus === "ready" ? "mute" : "enable";
+            }}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" || event.key === " ")
+                soundIntent.current =
+                  soundOn && audioStatus === "ready" ? "mute" : "enable";
+            }}
             onClick={() => {
-              const next = !getAudioSettings().muted;
-              setAudioSettings({ muted: next });
-              setMuted(next);
+              const intent =
+                soundIntent.current ??
+                (soundOn && audioStatus === "ready" ? "mute" : "enable");
+              soundIntent.current = null;
+              if (intent === "mute") setAudioSettings({ muted: true });
+              else {
+                const settings = getAudioSettings();
+                setAudioSettings({
+                  muted: false,
+                  chimesEnabled: true,
+                  sfxVolume: settings.sfxVolume || 0.65,
+                });
+                primeTableAudioFromUserGesture();
+                playTableChime("cardPlay");
+              }
             }}
           >
-            {muted ? <VolumeX size={19} /> : <Volume2 size={19} />}
+            {soundOn ? <Volume2 size={19} /> : <VolumeX size={19} />}
+            <span className="sound-label">
+              {soundOn && audioStatus === "ready" ? "Sound on" : "Enable sound"}
+            </span>
           </button>
           <button
             className="button secondary small"
@@ -385,28 +424,12 @@ export default function GameBoard({
         </div>
       )}
       <main className="game-main">
-        <section className="turn-heading">
-          <div>
-            <h1 aria-live="polite">{turnTitle}</h1>
-            <p>{turnDescription}</p>
-          </div>
-          <div className="round-indicator">
-            <span>Turn {game.turnCount + 1}</span>
-            <button className="text-button" onClick={() => setHistory(true)}>
-              Table activity
-              <ArrowRight size={14} />
-            </button>
-          </div>
-        </section>
         <section
           className={`playing-table color-${activeColor} seats-${game.players.length}`}
           aria-label="Playing table"
         >
-          <div className="table-boundary" />
+          <div className="table-boundary" aria-hidden="true" />
           <GameFeedback game={game} />
-          <div className="table-watermark" aria-hidden="true">
-            uno.
-          </div>
           <div
             className="table-direction"
             aria-label={
@@ -459,15 +482,23 @@ export default function GameBoard({
                 <UnoCard
                   card={{ id: "deck", color: "wild", value: "wild" }}
                   faceDown
-                  sizeMultiplier={1.1}
+                  sizeMultiplier={1.25}
                 />
                 <span className="deck-count">{game.drawPile.length}</span>
               </button>
-              <span className="pile-label">Draw pile</span>
+              <span
+                className={`pile-label ${!drawDisabled ? "draw-available" : ""}`}
+              >
+                {!drawDisabled
+                  ? game.pendingDraw
+                    ? `Draw ${game.pendingDraw}`
+                    : "Tap to draw"
+                  : "Draw pile"}
+              </span>
             </div>
             <div className="pile-zone">
               <div data-discard-pile className="discard-pile" key={top?.id}>
-                {top && <UnoCard card={top} sizeMultiplier={1.1} />}
+                {top && <UnoCard card={top} sizeMultiplier={1.25} />}
               </div>
               <span className="pile-label">Last played</span>
             </div>
@@ -476,13 +507,10 @@ export default function GameBoard({
               aria-label={`Active color: ${activeColor}`}
             >
               <i />
-              <span>
-                {activeColor}
-                <small>Color to play</small>
-              </span>
+              <span>{activeColor}</span>
             </div>
           </div>
-          <div className="table-activity" role="status">
+          <div className="sr-only" role="status">
             {describeAction(game)}
           </div>
           {"wildPickerPlayerName" in api &&
@@ -492,9 +520,9 @@ export default function GameBoard({
                 {api.wildPickerPlayerName} is choosing a color…
               </div>
             )}
-          <div className={`local-table-marker ${isLocalTurn ? "active" : ""}`}>
-            <ArrowDown size={16} />
-            {isLocalTurn ? "Your turn" : "Your seat"}
+          <div className={`turn-cue ${isLocalTurn ? "active" : ""}`}>
+            <span className="turn-cue-dot" aria-hidden="true" />
+            <h1 aria-live="polite">{turnTitle}</h1>
           </div>
         </section>
         <section
@@ -514,13 +542,6 @@ export default function GameBoard({
               )}
             </div>
             <div className="hand-actions">
-              <button
-                className="text-button sort-button"
-                aria-pressed={sort}
-                onClick={() => setSort((s) => !s)}
-              >
-                {sort ? <Check size={14} /> : null}Sort by color
-              </button>
               {canPass && isLocalTurn && (
                 <button
                   className="button secondary small"
@@ -531,23 +552,14 @@ export default function GameBoard({
                   <ArrowRight size={16} />
                 </button>
               )}
-              <button
-                className="button draw-action small"
-                disabled={drawDisabled}
-                onClick={() => act(api.drawCard)}
-              >
-                {game.pendingDraw > 0 && isLocalTurn
-                  ? `Draw ${game.pendingDraw}`
-                  : "Draw card"}
-                <PlusCard />
-              </button>
-              <button
-                className={`button uno-button small ${canSayUno ? "uno-ready" : ""}`}
-                disabled={!canSayUno}
-                onClick={() => api.sayUno(localPlayerIndex)}
-              >
-                UNO!
-              </button>
+              {canSayUno && (
+                <button
+                  className="button uno-button small uno-ready"
+                  onClick={() => api.sayUno(localPlayerIndex)}
+                >
+                  UNO!
+                </button>
+              )}
             </div>
           </div>
           <div
@@ -568,59 +580,33 @@ export default function GameBoard({
                   !pendingAction &&
                   (!online || online.connected);
                 return (
-                  <div
-                    className={`hand-card ${legal ? "legal-card" : "quiet-card"}`}
-                    data-hand-card={card.id}
+                  <HandCard
                     key={card.id}
-                    style={
-                      {
-                        "--hand-i": i,
-                        "--hand-n": cards.length,
-                      } as CSSProperties
+                    card={card}
+                    index={i}
+                    count={cards.length}
+                    playable={legal}
+                    selected={inspectedId === card.id}
+                    onInspect={() =>
+                      setInspectedId((id) => (id === card.id ? null : card.id))
                     }
-                  >
-                    <UnoCard
-                      card={card}
-                      sizeMultiplier={1.3}
-                      isPlayable={legal}
-                      onClick={
-                        legal
-                          ? () => {
-                              const element = Array.from(
-                                root.current?.querySelectorAll<HTMLElement>(
-                                  "[data-hand-card]",
-                                ) ?? [],
-                              ).find((el) => el.dataset.handCard === card.id);
-                              if (element) select(card, element);
-                            }
-                          : undefined
-                      }
-                    />
-                    <span className="card-play-hint">
-                      {legal
-                        ? "Play"
-                        : card.color === "wild"
-                          ? "Wild"
-                          : card.color}
-                    </span>
-                  </div>
+                    onPlay={(element) => select(card, element)}
+                  />
                 );
               })}
             </div>
           </div>
           <div className="hand-footer">
             <span>
-              {isLocalTurn
-                ? `${playable.length} playable ${playable.length === 1 ? "card" : "cards"}`
-                : "Planning your next move?"}
+              {inspectedId && cards.some((c) => c.id === inspectedId)
+                ? playable.some((c) => c.id === inspectedId)
+                  ? "Tap again to play · or drag to the table"
+                  : "Keep this one for your next move"
+                : "Tap to lift a card · drag up to play"}
             </span>
-            <span className="keyboard-hint">
-              <kbd>D</kbd> Draw <kbd>P</kbd> Pass <kbd>U</kbd> UNO
-            </span>
-            <span className="mobile-hand-hint">
-              Swipe to see your hand
-              <ArrowRight size={12} />
-            </span>
+            {isLocalTurn && !pendingWild && (
+              <span>{playable.length} playable</span>
+            )}
           </div>
         </section>
       </main>
@@ -656,6 +642,11 @@ export default function GameBoard({
       {menu && (
         <Modal title="Your table." onClose={() => setMenu(false)}>
           <div className="game-menu">
+            <button aria-pressed={sort} onClick={() => setSort((s) => !s)}>
+              <Layers />
+              <span>{sort ? "Keep dealt order" : "Sort hand by color"}</span>
+              <Check size={17} style={{ opacity: sort ? 1 : 0 }} />
+            </button>
             <button
               onClick={() => {
                 setMenu(false);
@@ -720,9 +711,6 @@ export default function GameBoard({
             </p>
           </div>
           <div className="modal-footer">
-            <button className="text-button" onClick={onCycleTheme}>
-              {currentThemeLabel} theme
-            </button>
             <button
               className="button primary small"
               onClick={() => setHelp(false)}
@@ -787,12 +775,5 @@ export default function GameBoard({
         </Modal>
       )}
     </div>
-  );
-}
-function PlusCard() {
-  return (
-    <span aria-hidden="true" className="draw-plus">
-      +
-    </span>
   );
 }

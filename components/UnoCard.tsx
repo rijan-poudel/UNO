@@ -12,6 +12,7 @@ interface UnoCardProps {
   faceDown?: boolean;
   sizeMultiplier?: number;
   onClick?: () => void;
+  ariaLabel?: string;
 }
 const LABELS: Record<string, string> = {
   skip: "Skip",
@@ -54,6 +55,7 @@ export default function UnoCard({
   faceDown = false,
   sizeMultiplier = 1,
   onClick,
+  ariaLabel,
 }: UnoCardProps) {
   const label = faceDown
     ? "Face-down card"
@@ -69,7 +71,9 @@ export default function UnoCard({
         <CardSymbol value={card.value} />
       </span>
       <span className="card-orbit" aria-hidden="true" />
-      <span className="card-value">
+      <span
+        className={`card-value ${card.value.length > 1 ? "card-action-value" : ""}`}
+      >
         <CardSymbol value={card.value} />
       </span>
       <span className="card-index bottom">
@@ -84,7 +88,7 @@ export default function UnoCard({
       className={className}
       style={style}
       onClick={onClick}
-      aria-label={`Play ${label}`}
+      aria-label={ariaLabel ?? `Play ${label}`}
       aria-pressed={isSelected}
     >
       {content}

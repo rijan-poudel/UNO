@@ -22,7 +22,7 @@ Human turns are not driven by a UI idle timer. A voluntary draw with no playable
 
 `useGamePresentation` compares snapshots, animates transforms using the Web Animations API, and plays feedback during the same transition. Nothing awaits an animation or audio duration before changing game state. Never bring back `getBoardVoiceRemainingMs()` or queue narration behind old actions.
 
-`tableChimes` owns one interactive AudioContext and a cached paper-noise buffer. Browsers unlock it on a real user gesture. Locked/hidden-tab feedback is dropped. Volume, voice, card sounds, optional music, and master mute are independent preferences. `useAudioManager` owns only background music and gesture/settings subscriptions.
+`tableChimes` owns one interactive AudioContext, a decoded 280 ms recorded card sound, and an immediately available procedural fallback. Gesture unlock starts a one-frame silent buffer and resumes suspended/interrupted contexts. The latest action may survive an in-flight unlock for at most 160 ms; older actions and hidden-tab feedback are dropped. Playback never waits for fetching or decoding. The table subscribes to audio readiness and reflects effective card-sound preferences; enabling sound restores disabled effects/zero volume without changing optional voice or music. Volume, voice, card sounds, optional music, and master mute are independent preferences. `useAudioManager` owns only background music and gesture/settings subscriptions.
 
 Voice assets are preloaded when enabled, use normalized compressed files, and expire if they cannot start promptly. A newer action, mute, hidden document, or leaving the board stops the old voice. Original WAVs remain source material, not runtime requests.
 
@@ -36,13 +36,13 @@ Rules, themes, names, friends, and audio preferences are local to the browser. S
 
 ## Verification
 
-Use `check:game` for immutable transitions, deck conservation, wild color validation, UNO penalties, and simulated completed rounds. Use `check:multiplayer` against a running socket server for the actual protocol. The socket watcher explicitly includes `lib/**/*.ts` and `types/**/*.ts`; engine edits must restart that process too. Live socket checks cover opening action penalties and direction, so a stale development server cannot silently pass. Run lint, type checks, and a production build. Browser checks should cover home, local setup, a six-seat table, a large hand, a wild picker, settings, room creation, and reconnect after refresh at desktop and phone widths.
+Use `check:audio` for gesture-resume races, expired feedback, mute, hidden tabs, offline fallback and recorded-sample signal levels. Use `check:game` for immutable transitions, deck conservation, wild color validation, UNO penalties, and simulated completed rounds. Use `check:multiplayer` against a running socket server for the actual protocol. The socket watcher explicitly includes `lib/**/*.ts` and `types/**/*.ts`; engine edits must restart that process too. Live socket checks cover opening action penalties and direction, so a stale development server cannot silently pass. Run lint, type checks, and a production build. Browser checks should cover home, local setup, a six-seat table, a large hand, a wild picker, settings, room creation, and reconnect after refresh at desktop and phone widths.
 
 No formal test framework is installed. Keep the existing checks lightweight. Ask the owner before introducing a framework or a major architectural dependency.
 
 ## Playful presentation and growth
 
-Original clay card art lives in `public/art/card-pals.webp`, with its generation prompt alongside it. Fredoka is the display face; Nunito Sans is used for controls. The home header has one Settings control, plus invitations when they exist. The board keeps mute beside a compact Menu. Appearance, audio, profile and individual house rules live together in Settings.
+The launch graphic uses actual UnoCard instances; generated character art has been retired. Outfit is the interface face; Barlow Condensed is reserved for card indices and symbols. app/table.css owns the deck and immersive game styles. HandCard owns tap-to-inspect, second-tap-to-play and upward drag. Its temporary fixed-position card escapes the hand scroller and is removed on cancellation, lost capture, legality changes or unmount. Large hands scroll without shrinking card faces. The home header has one Settings control, plus invitations when they exist. The board keeps mute beside a compact Menu. Appearance, audio, profile and individual house rules live together in Settings.
 
 `RulePresets` is shared by setup and Settings. `lib/rulePresets.ts` composes Classic, Stack party and Wild table using existing engine rules. Starting hand size and room capacity do not change a preset's identity. No Mercy, Flip and Flex are future deck/action systems, not aliases for current presets.
 

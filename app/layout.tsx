@@ -1,16 +1,19 @@
 import type { Metadata, Viewport } from "next";
-import { Fredoka, Nunito_Sans } from "next/font/google";
+import { Outfit, Barlow_Condensed } from "next/font/google";
 import { Toaster } from "sonner";
 import "./globals.css";
+import "./table.css";
 
-const bodyFont = Nunito_Sans({
+const bodyFont = Outfit({
   variable: "--font-body",
   subsets: ["latin"],
   display: "swap",
 });
-const displayFont = Fredoka({
-  variable: "--font-display",
+const cardFont = Barlow_Condensed({
+  variable: "--font-card",
   subsets: ["latin"],
+  weight: ["700", "800"],
+  style: ["normal", "italic"],
   display: "swap",
 });
 
@@ -38,10 +41,10 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`${bodyFont.variable} ${displayFont.variable}`}>
-        <span hidden data-design-contract="playful-continuation">
-          Playful card playground: original graphics, expressive type, tactile
-          card motion and immediate sound. See .impeccable/playful-direction.md.
+      <body className={`${bodyFont.variable} ${cardFont.variable}`}>
+        <span hidden data-design-contract="tactile-table">
+          Held cards, situational controls, audible immediate feedback. See
+          .impeccable/tactile-direction.md.
         </span>
         {children}
         <Toaster

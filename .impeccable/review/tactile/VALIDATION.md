@@ -1,0 +1,12 @@
+# Tactile correction validation
+
+- Production Next build, lint, strict types, formatting, game and audio assertions passed.
+- Game check: 60 complete rounds, immutable inputs, deck conservation, wild/UNO validation.
+- Real Socket.IO check: create/join/kick, six seats, stable IDs, paced bot snapshots, reconnect and overlapping transport handoff passed.
+- Audio regression: first fresh effect survives asynchronous gesture resume; stale events expire at 160ms, no backlog, offline immediate fallback, mute/zero volume/effects disabled/hidden tab stay silent. Mute stops active sources. Recorded card sample: mono 44.1kHz PCM16, 280ms, peak .85 and RMS .093, no clipping; runtime URL returns 200. The table's ready state was observed and sound off/on controls verified. Physical speaker listening and a physical phone were unavailable, so perceived loudness is not certified.
+- Browser: real drag from hand to table played red Skip and reduced hand count; taps and keyboard inspection/second activation worked, including a wild at the far end of a scrolling hand. Native color-choice cancel preserved the hand. After immediate pointer-capture correction a selected blue 8 played via pointer click; hand fell 12→11, no orphan ghosts.
+- Production captures: 1440×900 desktop, 390×844 phone, 320×740 narrow phone, actual in-app 688×765. Six seats with twelve-card scrolling hand and seven-card normal hand. Home desktop/phone and wild phone dialog included. Wild dialog capture is from the production build before review layout fixes, which do not change the dialog; other files were recaptured after their fixes.
+- Home phone fan bounds x13.8…376.2 in a 390px viewport, document width390; fan bottom459.5 and primary action top512.9. At 688 first large-hand card left17.6; active-color y163.75…181.75, central opponent bottom151, turn cue y393…435.
+- Reduced motion: source honors the preference in presentation flights, card lift and return; physical preference/device emulation was not available in the browser tool.
+- Static non-system detector returned []. Old DESIGN type-scale/sidecar drift is handled by final documentation, without suppression rules.
+- Independent reviewer: fresh context full review → six fixes → final verdict ship for all six resolved fixes. No approved raster comp; owner-pinned code-led direction. Generated clay art retired; launch uses actual UnoCard geometry.

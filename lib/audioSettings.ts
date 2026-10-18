@@ -1,6 +1,6 @@
 /**
  * Client-side audio preferences (not synced across devices).
- * - Chimes: Web Audio beeps in the browser (no files).
+ * - Card effects: a cached recording with an immediate Web Audio fallback.
  * - Voice: clips in /public/audios/ (see lib/audiosRegistry.ts).
  */
 
@@ -17,7 +17,7 @@ export interface MusicContextSettings {
 export interface AudioSettings {
   /** Master mute, applied to effects, voice, and music. */
   muted: boolean;
-  /** Short synthetic beeps for plays, draws, UNO, etc. */
+  /** Immediate card texture and short tonal signatures for game events. */
   chimesEnabled: boolean;
   /** In-game board announcer (plays from game events). */
   voiceInGame: boolean;

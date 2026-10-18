@@ -16,7 +16,8 @@
     "check:multiplayer": "tsx scripts/check-multiplayer.ts",
     "audio:prepare": "node scripts/prepare-audio.mjs",
     "format": "prettier --write app components hooks lib server scripts types docs .github *.json *.ts *.mjs *.md",
-    "format:check": "prettier --check app components hooks lib server scripts types docs .github *.json *.ts *.mjs *.md"
+    "format:check": "prettier --check app components hooks lib server scripts types docs .github *.json *.ts *.mjs *.md",
+    "check:audio": "tsx scripts/check-audio.ts"
   },
   "dependencies": {
     "clsx": "^2.1.1",

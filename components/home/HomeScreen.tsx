@@ -6,7 +6,9 @@ import type {
   FriendInvite,
   FriendPresenceState,
 } from "../../types/multiplayer";
-import Image from "next/image";
+import type { CSSProperties } from "react";
+import UnoCard from "../UnoCard";
+import type { Card } from "../../types/card";
 import NotificationPanel from "../NotificationPanel";
 import PlayerProgress from "../PlayerProgress";
 import PlayerAvatar from "../PlayerAvatar";
@@ -156,21 +158,37 @@ export default function HomeScreen(props: Props) {
               </div>
             )}
           </div>
-          <div className="home-art">
-            <div className="art-disc" aria-hidden="true" />
-            <Image
-              src="/art/card-pals.webp"
-              alt="A red seven and a blue reverse card high-five, surrounded by colorful playing cards"
-              width={1536}
-              height={1024}
-              priority
-              sizes="(max-width: 700px) 100vw, 58vw"
-            />
-            <span className="art-sticker" aria-hidden="true">
-              One more
-              <br />
-              round?
-            </span>
+          <div
+            className="home-art"
+            role="img"
+            aria-label="A fan of red, blue, wild, green and yellow cards from your next game"
+          >
+            {(
+              [
+                { color: "red", value: "7" },
+                { color: "blue", value: "reverse" },
+                { color: "wild", value: "wild4" },
+                { color: "green", value: "2" },
+                { color: "yellow", value: "9" },
+              ] as Pick<Card, "color" | "value">[]
+            ).map((card, i) => (
+              <span
+                className="home-deck-card"
+                key={card.color}
+                aria-hidden="true"
+                style={
+                  {
+                    "--preview-i": i - 2,
+                    "--preview-y": Math.abs(i - 2) ** 2 * 12 + "px",
+                  } as CSSProperties
+                }
+              >
+                <UnoCard
+                  card={{ ...card, id: `preview-${i}` }}
+                  sizeMultiplier={2.25}
+                />
+              </span>
+            ))}
           </div>
         </section>
         <section className="home-friends">

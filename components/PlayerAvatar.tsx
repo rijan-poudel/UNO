@@ -1,4 +1,4 @@
-// Small card characters share the material language of the illustrated card pals.
+// Small original card-face badges identify players without image downloads.
 import type { CSSProperties } from "react";
 const COLORS = [
   "#ef755d",

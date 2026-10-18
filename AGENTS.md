@@ -17,7 +17,7 @@ npm run start:socket         # Start socket server in production
 npm run agent                # Run the agent tool (tsx agent/agent.ts)
 ```
 
-**Verification**: Run `npm run lint`, `npm run check:types`, `npm run check:game`, and `npm run build`. With the socket server running, run `npm run check:multiplayer`. These checks use Node assertions, with no test framework. Ask the user before installing a test framework.
+**Verification**: Run `npm run lint`, `npm run check:types`, `npm run check:game`, `npm run check:audio`, and `npm run build`. With the socket server running, run `npm run check:multiplayer`. These checks use Node assertions, with no test framework. Ask the user before installing a test framework.
 
 ## Project Structure
 
@@ -117,7 +117,7 @@ Path alias: `@/*` maps to the project root (e.g., `@/lib/utils`, `@/components/G
 - Keep card faces in `UnoCard`, state-transition motion/audio in `useGamePresentation`, and dialogs in the native `Modal` primitive.
 - Sound never gates turns. Do not queue voice or wait for clip durations.
 - Online bots advance one published snapshot at a time; reconnect callbacks recheck live state.
-- Match the playful card world: original graphics, Fredoka display lettering and Nunito Sans controls. Do not add blocking splashes, mixed font systems, or another parallel component library.
+- Match the tactile card world: Outfit UI lettering, Barlow Condensed card numerals, vivid native card graphics, and a quiet midnight arena. Cards live in UnoCard; tap/drag interaction lives in HandCard and table styling in app/table.css. Do not add blocking splashes, mixed font systems, or another parallel component library.
 - Presets compose only engine-supported rules in `lib/rulePresets.ts`; do not label No Mercy, Flip or Flex playable until their decks and actions exist.
 - Progress is honest device-local completed-round history (`lib/playerProgress.ts`), with idempotent result recording.
 - Check phone layouts with six seats and a large scrolling hand, keyboard navigation, and reduced motion.

@@ -1,0 +1,129 @@
+DIRECTION CONCEPT SEED (key: fa65b1b5; mode: experience; source: api; approved pool: c3b204a1eed6; 306/564 human-approved; rerun with --scope direction --mode experience --from fa65b1b5 --candidate-count 7 to reproduce this roll against this catalog revision)
+ASSIGNED INDEX: 3
+  After ordering the grounded directions by resonance, build candidate
+  3 of your own grounded list; the assignment never points at a
+  challenger. The assignment is the roll, not a suggestion: your top-ranked
+  direction is what every run would ship, so the script decides which grounded
+  direction gets built. Each direction joins a durable visual system to a
+  concrete expression for the requested first surface, decided as one. It must
+  survive the current task plus navigation, quiet and dense content,
+  interaction and state, and a substantially different future surface. In an
+  attended run, present the assigned direction fully committed and offer
+  re-roll. You may add ONE card for your top-ranked grounded candidate when
+  it is not the assigned direction, kicker IMPECCABLE’S PICK, with an honest risk line
+  naming its familiarity; one pick card, never a ranked lineup, and the pick
+  never takes the lead position. When the assignment IS your top candidate,
+  there is no pick card. Re-roll yourself only
+  on named factual grounds, when the assignment cannot carry the product's
+  truth or task; taste is never grounds.
+  The assignment exists to refuse the model's ranking rut, never to outrank
+  the user or the brief. Never expose assignment metadata in user-facing labels.
+CHALLENGERS:
+  1. a bath of thickened water where pigment floats and is combed into figures before being lifted onto paper in one contact, every mark made by moving liquid rather than by drawing on a surface
+     SOURCE ID: medium-native-ebru-floated-pigment
+     CREATIVE SPARK: Every drop pushes the last one into a ring, and you comb through the whole thing with a single hair before laying a sheet down once and lifting the only copy there will ever be.
+     SYSTEM GRAMMAR:
+       - Palette/material: pigment floating on a thickened bath, colours never mixing but displacing each other, lifted onto sized paper in a single contact
+       - Type/composition: figures drawn by dragging a stylus through floating colour, with each new drop pushing the previous ones outward into rings
+       - Topology/navigation: everything is made on one surface in one pass, so navigation is intervening in a liquid rather than moving between views
+       - Controls/state: controls are stylus strokes, each one permanently displaces the colour around it, and a lift ends the composition
+       - Responsive/motion: the bath fills any frame and figures redistribute, and motion is pigment displacing outward from each new drop
+     WEB LEVERAGE: a fluid-displacement canvas simulation with stylus interaction, irreversible stroke state, and a one-shot lift transition
+     QUALITY BAR: board https://impeccable.style/worlds/cards/medium-native-ebru-floated-pigment.webp · hero https://impeccable.style/worlds/cards/medium-native-ebru-floated-pigment-hero.webp
+  2. a crt oscilloscope on a signal bench, phosphor trace riding an etched graticule while detented knobs set channel, timebase, and trigger
+     SOURCE ID: scientific-notation-oscilloscope-signal-bench
+     CREATIVE SPARK: You clip the probe to the pin and a green line snaps out of the noise; a nudge of the trigger knob and the waveform stands still, breathing in phosphor over the etched grid, ten divisions wide, every one meaning something.
+     SYSTEM GRAMMAR:
+       - Palette/material: phosphor green blazing on near-black glass, graticule gray etched beneath, a second channel in dimmer trace; amber readouts for armed and warning states
+       - Type/composition: condensed instrument caps on knob skirts and bezels, glowing seven-segment readouts; everything on screen is measured against the ten-division graticule
+       - Topology/navigation: one screen, many signals; you travel by timebase and vertical scale, and channels overlay in the same graticule space rather than separate views
+       - Controls/state: detented knobs set scale and trigger level; an untriggered trace rolls free, a triggered one locks still, and freeze holds the waveform for cursors
+       - Responsive/motion: the graticule stays square while readouts drop below on narrow screens; the sweep is continuous
+     WEB LEVERAGE: canvas draws the persistent phosphor trace from live Web Audio or sensor input, with pointer-dragged trigger level and keyboard-stepped cursors
+     QUALITY BAR: board https://impeccable.style/worlds/cards/scientific-notation-oscilloscope-signal-bench.webp · hero https://impeccable.style/worlds/cards/scientific-notation-oscilloscope-signal-bench-hero.webp
+  3. a cloud quarry, where workers cut blocks of weather, reveal blue voids, and assemble temporary buildings that rain from their own walls
+     SOURCE ID: dream-surreal-impossible-worlds-cloud-quarry
+     CREATIVE SPARK: A silver saw opens a cumulus cliff, a cube of thunder rolls onto a crane, and a pale fog arch is set over the valley before dissolving into rain.
+     SYSTEM GRAMMAR:
+       - Palette/material: cumulus white block mass as ground, cut faces opening onto sky blue voids, thunder gray for heavy stock, one silver saw line as the active edge
+       - Type/composition: quarry-stencil industrial caps on tally boards, measurements in mono, composition stacked like cut blocks with deep blue gaps between sections
+       - Topology/navigation: Explore cloud strata through density, weather content, cut face, transport path, and atmospheric structure.
+       - Controls/state: Cut, lift, join, warm, and release cloud blocks while their weather remains active.
+       - Responsive/motion: Use sectional cloud blocks on phones and replace vapor motion with textured state changes.
+     WEB LEVERAGE: Volumetric rendering, procedural weather, and direct constructive gestures let users build transient architecture with predictable dissolution.
+     QUALITY BAR: board https://impeccable.style/worlds/cards/dream-surreal-impossible-worlds-cloud-quarry.webp · hero https://impeccable.style/worlds/cards/dream-surreal-impossible-worlds-cloud-quarry-hero.webp
+  4. a wide silk cape threaded with hidden drawcord channels, where one pull transforms a flat plane into ribs, gathers, and a protective volume
+     SOURCE ID: textiles-weave-drape-fashion-drawcord-transforming-cape
+     CREATIVE SPARK: The cape begins as a black semicircle; one gold cord is pulled and the cloth rises into a pleated shell around the shoulders.
+     SYSTEM GRAMMAR:
+       - Palette/material: matte black silk as ground, one gold drawcord as accent and control, channel stitching in graphite, gathered shadow rendered in slate
+       - Type/composition: narrow tailored grotesk with wide tracking like topstitching, labels riding the cord channels, the semicircle's radius ruling all alignment
+       - Topology/navigation: Trace cord channel, gathered region, anchor, and complete silhouette through each transformation.
+       - Controls/state: Pull, lock, release, and compare with flat, gathering, shaped, tensioned, and relaxed states.
+       - Responsive/motion: Offer a small set of named silhouettes on phones and let users advance transformations stepwise.
+     WEB LEVERAGE: A constraint-driven cloth model can demonstrate functional transformation while static pattern and pose views remain complete.
+     QUALITY BAR: board https://impeccable.style/worlds/cards/textiles-weave-drape-fashion-drawcord-transforming-cape.webp · hero https://impeccable.style/worlds/cards/textiles-weave-drape-fashion-drawcord-transforming-cape-hero.webp
+  5. a wpa national-park travel poster, a landscape flattened into stacked silkscreen planes with a ranger-voiced imperative set in blocky caps below
+     SOURCE ID: posters-covers-sleeves-wpa-park-poster
+     CREATIVE SPARK: From a canvas tent at dawn you see the geyser rendered in four flat inks, the sky one unbroken swath of teal, and beneath it two words in block caps: SEE AMERICA.
+     SYSTEM GRAMMAR:
+       - Palette/material: four flat silkscreen inks, one unbroken teal sky swath over pine green and canyon ochre planes, cream stock showing through as the light
+       - Type/composition: blocky geometric caps in a caption bar beneath the scene, one imperative per sheet, the landscape composed above it and never interrupted
+       - Topology/navigation: the scene layers into foreground, midground, and sky planes; deeper subjects live on deeper planes and travel is walking into them
+       - Controls/state: each state is a season of the same scene, inks reshuffle from summer to snow while plane edges never move, the caption bar states one imperative
+       - Responsive/motion: planes crop from the outside in so the summit always survives; motion is gentle plane parallax
+     WEB LEVERAGE: Layered SVG planes parallax under pointer and scroll, each plane a separate flat-ink shape.
+     QUALITY BAR: board https://impeccable.style/worlds/cards/posters-covers-sleeves-wpa-park-poster.webp · hero https://impeccable.style/worlds/cards/posters-covers-sleeves-wpa-park-poster-hero.webp
+  6. a travel document surface pairing a segmented boarding pass with a live gate board, the pass carrying a scannable block and a sequence number while the board reranks flights by departure and reflows a changed gate in place
+     SOURCE ID: vernacular-ephemera-boarding-pass-and-gate-board
+     CREATIVE SPARK: The gate changes and the row does not disappear and come back somewhere else; it moves, and it stays lit until you have noticed.
+     SYSTEM GRAMMAR:
+       - Palette/material: high-contrast neutral panels with one alert color reserved for changes, and a monospaced scannable block as the only texture
+       - Type/composition: the pass divided into labeled segments with tabular figures, and the board ranking flights in a fixed column grid
+       - Topology/navigation: departure time orders everything, so navigation is watching a ranking rather than searching a list
+       - Controls/state: controls are flight rows, a changed gate flashes its alert color and holds it, and boarded flights drop off the board
+       - Responsive/motion: board columns drop by priority and the pass stacks its segments, and motion is a row reranking in place
+     WEB LEVERAGE: live rerank animation preserving row identity, priority-based responsive columns, and persistent change state
+     QUALITY BAR: board https://impeccable.style/worlds/cards/vernacular-ephemera-boarding-pass-and-gate-board.webp · hero https://impeccable.style/worlds/cards/vernacular-ephemera-boarding-pass-and-gate-board-hero.webp
+Fuse each challenger before judging it: the challenger supplies the form
+  and its system grammar, the product supplies every fact, and clarity wins
+  conflicts. Weigh the fused result against the assigned direction on exactly
+  two axes, audience identification and product clarity. Losing to strong
+  grounded material is a valid outcome; beating a thin or tool-monoculture
+  list is the point. A fused challenger that wins both axes becomes the build.
+  Close the weighing with a verdict per challenger, decided before any
+  borrowing is considered: wins (beats the assigned direction on both axes),
+  competitive (holds one axis), or declined (loses both). A declined
+  challenger is not spent: name the one discipline of its system the assigned
+  direction lacks, and raise the assigned direction to match before
+  presenting it. A donation transfers ambition and system discipline, never
+  the challenger's clothes; one world owns the page. Write each raise as its
+  own named line on the presented direction, and carry every verdict, kept
+  line, and raise into the decision page payload.
+When you can view images, open the QUALITY BAR board and hero for any
+challenger you weigh seriously and for the world you build. They exist as a
+craft bar, the finish level and commitment the build is expected to reach,
+never as a mockup to copy; your surface serves this product, not that render.
+PRODUCT.md and explicit incumbent brand commitments constrain every direction.
+The seed never chooses exact colors, fonts, tokens, or a user preference, and
+it never permits the world and first surface to be selected independently.
+The CREATIVE SPARK is a complete visual system, not a theme or decorative
+reference. Translate every supplied system rule into the product: palette and
+material, type and composition, topology, controls and states, and adaptation.
+Keep the source's visible character, scale, rhythm, and interaction instead of
+reducing vivid grammar to generic nouns. When the source is already a credible
+interface language, commit to it across navigation, content, controls, and
+states. Otherwise keep a literal carrier only when it becomes functional.
+Ambitious motion, spatial media, or interaction is welcome when it strengthens
+the product without weakening semantics, performance, or fallback behavior.
+TELEMETRY: after the user's choice resolves, rerun this script once with
+  --kind <assigned|pick|challenger|canon> --from fa65b1b5 --scope direction --mode experience,
+  adding --chosen <challenger-id> when a dealt challenger won and keeping
+  --register <safer|bolder> when the resolved round came from a steered hand.
+  One ping per resolved attended round. The ping is anonymous, the card kind
+  plus the catalog id when one won; your grounded candidates' names never
+  leave the machine, and the ping is skipped automatically when DO_NOT_TRACK
+  or IMPECCABLE_NO_TELEMETRY is set.
+A user- or brief-pinned decision beats the roll, always.
+ASSIGNED INDEX (restated for truncated readers): 3. Build candidate
+3 of your own grounded list; seed key fa65b1b5.

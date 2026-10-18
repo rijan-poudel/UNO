@@ -167,11 +167,6 @@ export default function Home() {
     return () => window.removeEventListener("pointerdown", startMusic);
   }, [gameContext, setMusicContext, playMusic]);
 
-  const cycleTheme = () => {
-    const order: ThemeName[] = ["paper", "midnight", "forest", "sunset"];
-    setTheme((p) => order[(order.indexOf(p) + 1) % order.length]);
-  };
-
   const selectTheme = (themeName: string) => {
     if (
       themeName === "paper" ||
@@ -275,8 +270,6 @@ export default function Home() {
             void online.startOnlineGame(currentGame.rules);
           }}
           onOpenSettings={(tab) => openSettingsAt(tab ?? "controls")}
-          onCycleTheme={cycleTheme}
-          currentThemeLabel={label}
         />
         {settingsModal}
       </>

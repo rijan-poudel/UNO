@@ -16,6 +16,7 @@ jobs:
       - run: npm run lint
       - run: npm run check:types
       - run: npm run check:game
+      - run: npm run check:audio
       - name: Check multiplayer protocol
         run: |
           npm run start:socket > /tmp/uno-socket.log 2>&1 &

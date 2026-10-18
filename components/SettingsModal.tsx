@@ -371,12 +371,21 @@ export default function SettingsModal({
               />
               <button
                 className="text-button"
+                disabled={
+                  audio.muted || !audio.chimesEnabled || audio.sfxVolume <= 0
+                }
                 onClick={() => {
                   primeTableAudioFromUserGesture();
                   playTableChime("cardPlay");
                 }}
               >
-                Preview card sound
+                {audio.muted
+                  ? "Unmute to preview"
+                  : !audio.chimesEnabled
+                    ? "Enable card sounds to preview"
+                    : audio.sfxVolume <= 0
+                      ? "Raise volume to preview"
+                      : "Preview card sound"}
               </button>
             </div>
             <Toggle

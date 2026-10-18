@@ -1,0 +1,7 @@
+{
+  "source": "public/audios/card_throwing.mp3",
+  "origin": "Existing repository card-throwing effect; no new external audio source.",
+  "processing": "Trim leading silence below -45dB; compressor threshold 0.12 ratio 3 attack 1ms release 35ms; limiter 0.89; gain 2.4; fade out 220-280ms; mono 44.1kHz PCM16 WAV.",
+  "durationSeconds": 0.28,
+  "runtime": "Decoded once. Procedural fallback plays immediately if unavailable."
+}

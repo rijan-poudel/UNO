@@ -1,11 +1,13 @@
-# Playful continuation — owner-directed
+# Tactile table — owner-directed corrective redesign
 
-THESIS: A tactile multiplayer playground. Let graphics and cards do the explaining; keep words short and actions obvious.
-OWN-WORLD: Warm cream, ink charcoal, coral, mint and lilac. Fredoka display lettering with Nunito Sans for controls. Original clay card characters, chunky real playing cards, and expressive player badges.
-FORM: Owner-directed replacement of the restrained first pass: playful original card-character graphics, rounded display type, sparse navigation and tactile reactions. The initial games-club roll (seed c740dd9e, approved pool c3b204a1eed6, index 7) remains in seed.md for provenance; this explicitly pinned continuation is not a new random concept roll. Built in code; no approved raster comp or external catalog quality-bar image.
-STORY: Choose bots or friends, pick a real rule preset, deal, play, react, win, and rematch. Never label an unimplemented UNO variant playable.
-FIRST VIEWPORT: One short headline and two large illustrated play choices beside original card-character art. One Settings control; invitations appear only when they exist. On phones art and choices stay close and readable.
-MOTION: A short card-deal fan is the focal entrance. Throws follow a quick arc and settle; draws arrive from the deck; hand changes keep spatial continuity. Specials announce themselves with bounded graphical feedback. Victory gets a brief celebration, never an infinite loop. Repeated actions, keyboard use, reduced motion, and mute remain usable.
-AUDIO: Immediate paper swipe followed by a soft landing tap; distinct warm tonal signatures for penalties, reverse, wild, UNO, and winning. No turn waits for sound. No hover sounds.
-PRODUCT HORIZON: Classic plus current house rules now. No Mercy, Flip, Flex and community variants are a confirmed long-term direction, requiring real deck and action implementations.
-FINISH: Desktop and mobile behavior verified; the finished source and evidence are reviewed independently, and DESIGN.md is updated to reflect the shipped changes.
+THESIS: The game is the cards in your hand. Make the hand a physical fan, the pile a clear destination, and every visible action relevant to the current turn.
+OWN-WORLD: A quiet midnight playing arena, electric red/blue/green/yellow cards, ivory card stock, lime turn feedback. Outfit UI lettering and Barlow Condensed card numerals replace the rejected Fredoka treatment. No clay illustration on the game surface, no decorative dashboards.
+FORM: User-pinned modern game feel with held cards and situational actions supersedes the October 17 toy-like world. Seed fa65b1b5 assigned grounded index 3; explicit owner direction governs the build. Code-led, no approved raster comp. Quality bar: the fan must read as held cards at 320px and 1440px, preserve corner readability, and respond immediately to touch, keyboard and pointer input.
+STORY: Deal, inspect a card, play it by tap or drag, draw from the physical deck, call UNO only when eligible, rematch. Preserve actual engine rules and working multiplayer.
+FIRST VIEWPORT: Sparse header above an immersive arena. Opponents surround two oversized physical piles. A compact live turn cue connects the table to a curved foreground hand. No disabled UNO button, duplicate Draw action, per-card instruction labels, or permanent sorting controls.
+MOTION: The fan is the focal interaction: curved overlap, raised selected card, interruptible pointer drag and quick return. Actual plays travel from hand to pile; draws travel from deck to hand. Reduced motion removes flights and drag rotation; no animation blocks play. Large hands scroll while retaining a bounded arc.
+AUDIO: Browser unlock is explicit and observed, first feedback survives a short resume race but expires rather than queues. Audible short card texture with a crisp immediate contact; distinct special signatures. Master mute and card-sound preferences are reflected honestly in the table control. No music or speech by default.
+RAISE — signal bench: one unambiguous active-turn indicator, rather than repeated messages.
+RAISE — gate board: keep card identity through reordering and changed state.
+RAISE — paper lift: moving a card changes its depth and reveals its face, rather than animating unrelated chrome.
+FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance

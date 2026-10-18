@@ -30,6 +30,7 @@ Open [localhost:3000](http://localhost:3000). The frontend and socket server sta
 npm run lint
 npm run check:types
 npm run check:game
+npm run check:audio
 npm run build
 ```
 
@@ -102,7 +103,7 @@ For a phone on the same Wi-Fi, use the network URL printed by `npm run dev`. Bot
 - `agent/` is a separate legacy tool and remains excluded from lint/type checks.
 - The production dependency audit is clean. The lint toolchain still reports an upstream `braces` advisory; npm’s proposed force fix downgrades Next’s ESLint configuration. Do not apply that incompatible downgrade.
 
-The current visual direction is playful and led by original card-character graphics, with Fredoka/Nunito Sans typography, a compact navigation bar, fast card motion, immediate paper-and-tap sound, and device-local wins and streaks. Choose Classic, Stack party, or Wild table before dealing, then fine-tune individual house rules in Settings. No Mercy, Flip and Flex remain future implementations; these presets do not claim to implement those editions.
+The game uses a quiet midnight arena, vivid card faces, a curved hand, Outfit UI type and Barlow Condensed card numerals. Tap to inspect, tap again or drag upward to play. Draw from the deck; Pass and UNO appear only when eligible. Sorting and activity live in the menu. Card feedback uses a preloaded recording with an immediate fallback and bounded gesture unlock; optional music and voice never hold up turns. Wins and streaks are honest device-local history. Choose Classic, Stack party, or Wild table before dealing, then fine-tune individual house rules in Settings. No Mercy, Flip and Flex remain future implementations; these presets do not claim to implement those editions.
 
 ### Persistent multiplayer host
 
