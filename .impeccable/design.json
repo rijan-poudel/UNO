@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-18T06:53:51.987908+00:00",
+  "generatedAt": "2026-10-18T07:04:46.470037+00:00",
   "title": "Design System: UNO — Tactile table",
   "extensions": {
     "colorMeta": {
@@ -989,10 +989,6 @@
         "value": "max-width: 800px"
       },
       {
-        "name": "active-color-above",
-        "value": "min-width: 541px and max-width: 800px"
-      },
-      {
         "name": "arena-phone",
         "value": "max-width: 540px"
       },
@@ -1072,12 +1068,12 @@
       "css": ".ds-choice{font-family:var(--font-body,Outfit),sans-serif;display:flex;align-items:center;justify-content:space-between;gap:15px;text-align:left;min-height:94px;padding:14px 19px 14px 14px;border:2px solid #2c2c32;border-radius:21px;background:#f1c95b;color:#2c2c32;box-shadow:0 6px 14px #2c2c3228;cursor:pointer;transition:background 160ms,transform 160ms}.ds-choice strong{display:block;font-size:23px;font-weight:550;line-height:1.2}.ds-choice small{display:block;margin-top:4px;color:#655425;font-size:13px;font-weight:700}.ds-choice:focus-visible{outline:3px solid var(--ui-accent-blue,#3265a0);outline-offset:4px}.ds-choice:active{transform:translateY(3px) scale(.985);box-shadow:none}@media(hover:hover){.ds-choice:hover{background:#f7d775;transform:translateY(-3px) rotate(-.4deg)}}@media(prefers-reduced-motion:reduce){.ds-choice{transition:none}.ds-choice:hover,.ds-choice:active{transform:none}}"
     },
     {
-      "name": "Active opponent badge",
+      "name": "Active seat and turn cue",
       "kind": "chip",
       "refersTo": "opponent-badge-active",
-      "description": "Truthful active-seat state on midnight.",
-      "html": "<span class=\"ds-seat\"><span><strong>Alex</strong><small>4 cards</small></span><i aria-hidden=\"true\"></i></span>",
-      "css": ".ds-seat{font-family:var(--font-body,Outfit),sans-serif;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:7px 10px;max-width:140px;border-radius:12px;background:#d8ed82;color:#172130}.ds-seat strong{display:block;font-size:12px;font-weight:500}.ds-seat small{display:block;font-size:11px;color:#3f5023}.ds-seat i{width:5px;height:5px;border-radius:50%;background:#3f5023}"
+      "description": "Truthful active-seat badge and a wrapping turn cue containing the named active color.",
+      "html": "<div class=\"ds-status\"><span class=\"ds-seat\"><span><strong>Alex</strong><small>4 cards</small></span><i aria-hidden=\"true\"></i></span><div class=\"ds-cue\"><span class=\"ds-cue-dot\" aria-hidden=\"true\"></span><h1>Alex’s turn</h1><span class=\"ds-active-color\" aria-label=\"Active color: red\"><i aria-hidden=\"true\"></i><span>red</span></span></div></div>",
+      "css": ".ds-seat{font-family:var(--font-body,Outfit),sans-serif;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:7px 10px;max-width:140px;border-radius:12px;background:#d8ed82;color:#172130}.ds-seat strong{display:block;font-size:12px;font-weight:500}.ds-seat small{display:block;font-size:11px;color:#3f5023}.ds-seat i{width:5px;height:5px;border-radius:50%;background:#3f5023}.ds-status{position:relative;min-height:120px;padding:12px;background:#111925;font-family:var(--font-body,Outfit),sans-serif}.ds-cue{position:absolute;bottom:2px;left:50%;transform:translateX(-50%);min-height:42px;display:flex;align-items:center;justify-content:center;gap:9px;text-align:center;width:max-content;max-width:calc(100% - 24px);flex-wrap:wrap;row-gap:3px;padding-block:4px;color:#b1bfd2}.ds-cue h1{margin:0;min-width:0;overflow-wrap:anywhere;font-size:18px;font-weight:500;letter-spacing:-.02em;line-height:1.5}.ds-cue-dot{width:6px;height:6px;border-radius:50%;background:currentColor}.ds-active-color{display:inline-flex;align-items:center;gap:7px;margin-left:7px;font-size:12px;font-weight:400;color:#b1bfd2;text-transform:capitalize;white-space:nowrap}.ds-active-color i{width:10px;height:10px;border-radius:50%;background:#ff727a;border:1px solid #ffffff70}"
     },
     {
       "name": "UNO card",

@@ -34,3 +34,9 @@ Unread: prior-world DESIGN.md and application files outside the supplied primary
 First verdict: fixes 2–6 resolved; fix 1 partial (color and turn still touched at 688px).
 
 Final verdict: **ship** at the scope of the six scored fixes. All six resolved. The 541–800px color label is above the piles, 12.75px below the central opponent, with the turn cue separate below. No visible regressions reported. This verdict does not claim a new whole-surface approval or physical sound listening test.
+
+## Reopened two-seat finding and final verdict
+
+The public live two-seat smoke exposed color hidden by the central opponent, a state not covered by the initial six-seat matrix. Reviewer reopened fix1 and approved putting the swatch/color into the wrapping turn cue. Root implemented normal-flow color after h1, removing all absolute and breakpoint positions. Cue now wraps inside viewport padding; heading may shrink and wrap.
+
+Reviewer final disposition: **ship**, at scope of the scored fixes. Fix1 resolved across two and six seats at320/390/688/1440, including long-name320; fixes2–6 remain resolved. No visible regressions reported. The newer cue-fix/ captures supersede the old free-floating label placement in earlier captures. DESIGN.md and the sidecar were refreshed after the final source correction.

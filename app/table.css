@@ -357,15 +357,15 @@ body {
   box-shadow: 0 9px 17px #080f1e80;
 }
 .active-color {
-  position: absolute;
-  bottom: -35px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 7px;
+  margin-left: 7px;
   font-size: 12px;
+  font-weight: 400;
+  color: #b1bfd2;
   text-transform: capitalize;
+  white-space: nowrap;
 }
 .active-color i {
   width: 10px;
@@ -407,10 +407,16 @@ body {
   justify-content: center;
   gap: 9px;
   text-align: center;
-  white-space: nowrap;
+  width: max-content;
+  max-width: calc(100% - 24px);
+  flex-wrap: wrap;
+  row-gap: 3px;
+  padding-block: 4px;
   color: #b1bfd2;
 }
 .turn-cue h1 {
+  min-width: 0;
+  overflow-wrap: anywhere;
   font-size: 18px;
   font-weight: 500;
   letter-spacing: -0.02em;
@@ -760,9 +766,6 @@ body {
   .table-center {
     top: 48%;
   }
-  .active-color {
-    bottom: -24px;
-  }
   .seat-left {
     left: 10%;
   }
@@ -784,12 +787,6 @@ body {
   }
   .hand-cards {
     height: 200px;
-  }
-}
-@media (min-width: 541px) and (max-width: 800px) {
-  .active-color {
-    top: -26px;
-    bottom: auto;
   }
 }
 @media (max-width: 540px) {
@@ -838,10 +835,6 @@ body {
   .table-center .uno-card {
     --card-scale: 1.05 !important;
   }
-  .active-color {
-    bottom: -28px;
-    font-size: 11px;
-  }
   .table-direction {
     right: 9%;
     bottom: 22%;
@@ -852,6 +845,8 @@ body {
     width: 80%;
   }
   .turn-cue h1 {
+    min-width: 0;
+    overflow-wrap: anywhere;
     font-size: 16px;
   }
   .opponent {

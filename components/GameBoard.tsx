@@ -502,13 +502,6 @@ export default function GameBoard({
               </div>
               <span className="pile-label">Last played</span>
             </div>
-            <div
-              className="active-color"
-              aria-label={`Active color: ${activeColor}`}
-            >
-              <i />
-              <span>{activeColor}</span>
-            </div>
           </div>
           <div className="sr-only" role="status">
             {describeAction(game)}
@@ -523,6 +516,13 @@ export default function GameBoard({
           <div className={`turn-cue ${isLocalTurn ? "active" : ""}`}>
             <span className="turn-cue-dot" aria-hidden="true" />
             <h1 aria-live="polite">{turnTitle}</h1>
+            <div
+              className="active-color"
+              aria-label={`Active color: ${activeColor}`}
+            >
+              <i />
+              <span>{activeColor}</span>
+            </div>
           </div>
         </section>
         <section

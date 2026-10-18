@@ -320,7 +320,7 @@ The supporting shell uses centered content: the launch reaches 1450px and setup 
 
 Live play has a sparse header, an oval table with opponents around two physical piles, and the local fan in the foreground. The game container reaches 1440px. Desktop uses a 68px header and 40px side padding; the 800px breakpoint reduces the header to 62px and side padding to 16px; phones use 12px game padding. The table may extend beyond the phone edges while seats, piles and active-color text remain readable.
 
-At 541–800px the active-color label sits above the piles to clear the activity line. At 540px and below it returns below the piles. Phone seats hide decorative avatars and keep names and counts readable; five- and six-seat counts use a compact card icon where needed. The 360px breakpoint further compacts pile and opponent-card sizes. Large desktop viewports and short desktop heights have separate card-scale adjustments.
+The active-color swatch and written name sit in normal flow after the turn heading inside one wrapping cue. The cue stays within the table width minus 24px, with a 3px row gap; the heading can wrap long names at any character. This shared placement follows the cue across every viewport and seat count. Phone seats hide decorative avatars and keep names and counts readable; five- and six-seat counts use a compact card icon where needed. The 360px breakpoint further compacts pile and opponent-card sizes. Large desktop viewports and short desktop heights have separate card-scale adjustments.
 
 The hand owns horizontal overflow. It keeps generous upper clearance for lift and focus, with cards at useful physical sizes instead of reducing the entire row. Fan position is normalized and bounded: rotation stays within ±16 degrees and the arc drops at most 34px. Large phone hands reduce overlap and scroll. Safe-area padding protects the footer.
 
@@ -366,7 +366,7 @@ Use the native dialog primitive for settings, game menu, color choice and result
 
 ### Active seat and turn cue
 
-An opponent's active badge fills lime with dark text; the local active turn cue uses lime text and a small dot. Turn status follows the live state. Pile labels and the named active color complement that cue without adding repeated status banners.
+An opponent's active badge fills lime with dark text; the local active turn cue uses lime text and a small dot. Turn status follows the live state. The named active color and its swatch are static children after the turn heading, using muted ink at 12px. The cue wraps as a group within the available width, and long turn names can wrap rather than conceal color or overflow the page. Pile labels remain beside their physical piles without duplicating this combined status.
 
 ### Held hand and piles
 
