@@ -231,7 +231,7 @@ input[type="range"] {
   align-items: center;
   justify-content: flex-start;
   gap: 8px;
-  min-height: 38px;
+  min-height: 44px;
   padding: 4px 0;
   border: 0;
   background: transparent;
@@ -1235,9 +1235,6 @@ input[type="range"] {
   *,
   *::before,
   *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
 }
@@ -1777,8 +1774,7 @@ input[type="range"] {
 }
 @media (prefers-reduced-motion: reduce) {
   .game-feedback {
-    animation: none;
-    display: none;
+    animation: action-fade 900ms both;
   }
   .victory-burst {
     display: none;
@@ -2164,5 +2160,40 @@ input[type="range"] {
   }
   .home-copy .how-to {
     order: 5;
+  }
+}
+
+/* Reduced motion keeps meaningful state feedback without spatial entrances. */
+@keyframes action-fade {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  12%,
+  78% {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .modal[open],
+  .setup-content,
+  .seat-row {
+    animation: none;
+  }
+  .button,
+  .icon-button,
+  .play-choice,
+  .switch-track::after,
+  .milestone-collection summary > svg {
+    transition: none;
+  }
+  .button:active:not(:disabled),
+  .icon-button:active:not(:disabled),
+  .play-choice:active,
+  .play-choice:hover {
+    transform: none;
+  }
+  .game-page .game-feedback {
+    animation: action-fade 900ms both;
   }
 }

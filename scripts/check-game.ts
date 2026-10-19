@@ -1,4 +1,5 @@
 import './check-gesture';
+import { getCardFlight } from '../lib/cardMotion';
 // Framework-free engine smoke check. Run with npm run check:game.
 import assert from 'node:assert/strict';
 import {
@@ -315,3 +316,33 @@ try {
 console.log(
   'Shared player-name persistence, notifications, invalid data and blocked storage passed.',
 );
+
+// Physical flight starts at the release pose and lands at the real pile rotation.
+const flight = getCardFlight(
+  { x: 100, y: 600, width: 120, angle: -16 },
+  { x: 200, y: 200, width: 80, angle: 7 },
+);
+assert.equal(
+  flight.keyframes[0].transform,
+  'translate(-100px, 400px) rotate(-16deg) scale(1.5)',
+);
+assert.equal(
+  flight.keyframes.at(-1)?.transform,
+  'translate(0, 0) rotate(7deg) scale(1)',
+);
+assert.ok(flight.duration >= 190 && flight.duration <= 262);
+assert.equal(
+  getCardFlight(
+    { x: 0, y: 0, width: 80, angle: 0 },
+    { x: 0, y: 0, width: 80, angle: 0 },
+  ).duration,
+  190,
+);
+assert.equal(
+  getCardFlight(
+    { x: 10000, y: 10000, width: 80, angle: 0 },
+    { x: 0, y: 0, width: 80, angle: 0 },
+  ).duration,
+  262,
+);
+console.log('Card motion source pose, pile landing and bounded timing passed.');

@@ -929,7 +929,11 @@ export default function GameBoard({
           <PlayerProgress />
           <div className="dialog-actions round-actions">
             {!online || online.room?.hostPlayerId === online.playerId ? (
-              <button className="button primary" onClick={onDealAgain}>
+              <button
+                className="button primary"
+                onClick={onDealAgain}
+                disabled={!!online && !online.connected}
+              >
                 One more round
                 <ArrowRight size={18} />
               </button>
@@ -937,6 +941,7 @@ export default function GameBoard({
               <button
                 className="button primary"
                 onClick={() => void online.toggleReady()}
+                disabled={pendingAction || !online.connected}
               >
                 {online.room?.players.find(
                   (p) => p.playerId === online.playerId,

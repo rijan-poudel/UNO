@@ -216,9 +216,39 @@ async function main() {
     'recorded card sound has signal without clipping',
   );
   assert.ok(rms > 0.015, 'recorded card sound is not near silence');
+  const firstSignal = Array.from(
+    { length: (wav.length - dataAt) / 2 },
+    (_, i) => Math.abs(wav.readInt16LE(dataAt + i * 2)),
+  ).findIndex((value) => value > 328);
+  assert.ok(
+    firstSignal >= 0 && firstSignal / wav.readUInt32LE(24) < 0.015,
+    'card sample has no perceptible silent lead-in',
+  );
+  const { setAudioSettings, getAudioSettings } =
+    await import('../lib/audioSettings');
+  let notifications = 0;
+  windowEvents.addEventListener('uno:audio-settings', () => notifications++);
+  setAudioSettings({ muted: false, chimesEnabled: true, sfxVolume: 0.4 });
+  assert.equal(
+    getAudioSettings().muted,
+    false,
+    'sound can be enabled when storage writes fail',
+  );
+  assert.equal(getAudioSettings().sfxVolume, 0.4);
+  setAudioSettings({ muted: true });
+  assert.equal(
+    getAudioSettings().muted,
+    true,
+    'mute survives failed storage writes for this session',
+  );
+  assert.equal(
+    notifications,
+    2,
+    'audio controls notify subscribers even when storage is blocked',
+  );
   assert.ok(sources > 0);
   console.log(
-    `Audio checks passed: unlock race, offline fallback, mute, hidden tab, expiry, no backlog. Card sample peak ${peak.toFixed(2)}, RMS ${rms.toFixed(3)}.`,
+    `Audio checks passed: unlock race, offline fallback, mute, hidden tab, expiry, no backlog. Blocked storage and prompt sample onset passed. Card sample peak ${peak.toFixed(2)}, RMS ${rms.toFixed(3)}.`,
   );
 }
 void main().catch((error) => {

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-19T18:16:52.276511+00:00",
+  "generatedAt": "2026-10-19T20:42:24Z",
   "title": "Design System: UNO — Tactile table",
   "extensions": {
     "colorMeta": {
@@ -1081,13 +1081,13 @@
       },
       {
         "name": "play-flight",
-        "value": "280ms",
-        "purpose": "Current card to discard."
+        "value": "190–262ms cubic-bezier(.16,1,.3,1)",
+        "purpose": "Actual source center, width and composed rotation to the real endpoint; interrupts on a new snapshot."
       },
       {
         "name": "draw-flight",
-        "value": "260ms",
-        "purpose": "Current deck to hand."
+        "value": "190–262ms cubic-bezier(.16,1,.3,1)",
+        "purpose": "Actual source center, width and composed rotation to the real endpoint; interrupts on a new snapshot."
       },
       {
         "name": "hand-reflow",
@@ -1108,6 +1108,11 @@
         "name": "last-card-settle",
         "value": "240ms cubic-bezier(0.16, 1, 0.3, 1)",
         "purpose": "One bounded last-card marker stamp; static under reduced motion. Never gates a turn."
+      },
+      {
+        "name": "reduced-action-feedback",
+        "value": "900ms opacity only",
+        "purpose": "Retain a meaningful action cue under reduced motion without spatial movement."
       }
     ],
     "breakpoints": [
@@ -1146,6 +1151,14 @@
       {
         "name": "arena-phone-short",
         "value": "max-width: 540px and max-height: 800px"
+      },
+      {
+        "name": "arena-landscape-phone",
+        "value": "orientation: landscape and min-width: 600px and max-height: 540px"
+      },
+      {
+        "name": "arena-compact-portrait",
+        "value": "orientation: portrait and max-width: 540px and max-height: 650px"
       }
     ]
   },
@@ -1172,13 +1185,13 @@
       "refersTo": "button-text",
       "description": "Quiet inline action.",
       "html": "<button class=\"ds-text\">Back to home</button>",
-      "css": ".ds-text{font-family:var(--font-body,Outfit),sans-serif;display:inline-flex;align-items:center;gap:8px;min-height:38px;padding:4px 0;border:0;background:transparent;color:var(--ui-text,#2c2c32);font-size:13px;font-weight:500;text-underline-offset:4px;cursor:pointer}.ds-text:focus-visible{outline:3px solid var(--ui-accent-blue,#3265a0);outline-offset:4px}@media(hover:hover){.ds-text:hover{text-decoration:underline}}.ds-text:active{opacity:.8}"
+      "css": ".ds-text{font-family:var(--font-body,Outfit),sans-serif;display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:4px 0;border:0;background:transparent;color:var(--ui-text,#2c2c32);font-size:13px;font-weight:500;text-underline-offset:4px;cursor:pointer}.ds-text:focus-visible{outline:3px solid var(--ui-accent-blue,#3265a0);outline-offset:4px}@media(hover:hover){.ds-text:hover{text-decoration:underline}}.ds-text:active{opacity:.8}"
     },
     {
       "name": "Contextual move dock",
       "kind": "custom",
       "refersTo": "button-play-selected",
-      "description": "Eligible UNO belongs beside the hand; Pass is contextual and named Play is a fallback for an inspected card that becomes legal. Draw belongs solely to the deck.",
+      "description": "The same lime/dark-ink action pairing also applies to all live-arena primary actions, independently of the shell theme.",
       "html": "<div class=\"ds-hand-controls\"><div class=\"ds-hand-toolbar\"><div class=\"ds-hand-title\"><strong>You</strong><span>2 cards</span></div><button class=\"ds-move ds-uno\">UNO!</button></div><div class=\"ds-dock\"><p class=\"ds-hint\" role=\"status\">Ready to play. You can also drag it onto the table.</p><div class=\"ds-moves\"><button class=\"ds-move ds-play\"><span class=\"ds-play-label\">Play green Discard all</span><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M5 12h14m-6-6 6 6-6 6\"/></svg></button><button class=\"ds-move ds-pass\">Pass</button></div></div></div>",
       "css": ".ds-dock{font-family:var(--font-body,Outfit),sans-serif;display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:80px;padding:6px 12px 18px;background:#101c1c;color:#f1f4fa}.ds-hint{margin:0;max-width:40ch;min-width:0;color:#b1bfd2;font-size:13px;line-height:1.5}.ds-moves{display:flex;flex-shrink:0;max-width:65%;gap:8px}.ds-move{font-family:var(--font-body,Outfit),sans-serif;display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:50px;min-width:0;padding:14px 22px;border:1px solid transparent;border-radius:14px;font-size:14px;font-weight:800;line-height:1.25;cursor:pointer;transition:background 160ms,color 160ms,transform 120ms}.ds-play{background:#d8ed82;color:#202b12;box-shadow:0 4px 10px #f17d8240}.ds-pass{background:transparent;color:#f1f4fa;border-color:#3a4b63}.ds-play:hover{background:#d8ed82}.ds-pass:hover{background:color-mix(in srgb,#f1f4fa 5%,transparent)}.ds-move:focus-visible{outline:2px solid #d8ed82;outline-offset:5px}.ds-move:active{transform:translateY(3px) scale(.985);box-shadow:none}.ds-move:disabled{opacity:.44;cursor:default}@media(max-width:540px){.ds-dock{flex-direction:column;gap:8px;min-height:98px;text-align:center;padding-bottom:14px}.ds-hint{font-size:12px;min-height:18px;max-width:none}.ds-moves{justify-content:center;width:100%;max-width:100%}.ds-moves .ds-move{flex:1;max-width:220px;padding-inline:14px}}@media(prefers-reduced-motion:reduce){.ds-move{transition:none}.ds-move:active{transform:none}}.ds-hand-controls{font-family:var(--font-body,Outfit),sans-serif;background:#101c1c;color:#f1f4fa}.ds-hand-toolbar{position:relative;display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:38px;padding-inline:12px}.ds-hand-title{display:flex;align-items:center;gap:9px;font-size:12px}.ds-hand-title strong{font-weight:500;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ds-hand-title>span{color:#b1bfd2;white-space:nowrap}.ds-uno{min-height:44px;padding:6px 18px;background:#f7c934;color:#332810;font-size:18px;font-weight:800;font-style:italic;box-shadow:0 5px 15px #060b1633}.ds-uno:hover{background:#f7c934}.ds-play-label{min-width:0;overflow-wrap:anywhere}.ds-move svg{flex-shrink:0}@media(max-width:540px){.ds-hand-title{font-size:11px;gap:6px}.ds-hand-title strong{max-width:100px}}"
     },
@@ -1299,7 +1312,8 @@
       "Do honor reduced motion, mute, audio readiness and interrupted gesture cleanup.",
       "Do keep presentation responsive to the current published state without delaying play.",
       "Do derive optional milestone cards from completed device-local rounds and keep result actions reachable inside the native dialog.",
-      "Do attach pressure cues to their actual opponent hand or penalty deck and retain full accessible names."
+      "Do attach pressure cues to their actual opponent hand or penalty deck and retain full accessible names.",
+      "Do retain keyboard focus through card removal and dialog cancellation, keep landscape hands alongside the table, and preserve action feedback under reduced motion."
     ],
     "donts": [
       "Don't restore clay hero art, Fredoka, a third font family or a parallel component library.",

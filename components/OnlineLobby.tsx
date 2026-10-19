@@ -208,7 +208,11 @@ export default function OnlineLobby(props: Props) {
     }
   };
   const leave = async () => {
-    if (!room || (await run(props.onLeaveRoom))) props.onBack?.();
+    if (!room) {
+      // Back also cancels a create/join whose acknowledgement is still in flight.
+      void props.onLeaveRoom();
+      props.onBack?.();
+    } else if (await run(props.onLeaveRoom)) props.onBack?.();
   };
   return (
     <SetupShell

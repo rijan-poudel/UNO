@@ -21,10 +21,17 @@ export default function Modal({
   useEffect(() => {
     const dialog = ref.current;
     if (!dialog) return;
+    const opener = document.activeElement;
     if (open && !dialog.open) dialog.showModal();
     if (!open && dialog.open) dialog.close();
     return () => {
       if (dialog.open) dialog.close();
+      if (open && opener instanceof HTMLElement) {
+        queueMicrotask(() => {
+          if (opener.isConnected && !document.querySelector("dialog[open]"))
+            opener.focus({ preventScroll: true });
+        });
+      }
     };
   }, [open]);
   return (

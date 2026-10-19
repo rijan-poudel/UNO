@@ -26,7 +26,9 @@ export default function GameFeedback({ game }: { game: GameState }) {
     ) : value === "uno" ? (
       "UNO!"
     ) : value === "caught" ? (
-      "+2"
+      action.type === "callOut" ? (
+        `+${action.penalty}`
+      ) : null
     ) : value === "discardAll" ? (
       action.type === "play" ? (
         `−${1 + (action.discardAllCount ?? 0)}`

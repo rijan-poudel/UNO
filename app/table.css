@@ -193,6 +193,9 @@ body {
   border: 0;
 }
 .brand-button {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
   padding: 0;
   background: none;
   border: 0;
@@ -895,7 +898,7 @@ body {
     gap: 2px;
   }
   .game-header .secondary {
-    min-width: 40px;
+    min-width: 44px;
     padding: 0;
     border: 0;
   }
@@ -1549,5 +1552,287 @@ body {
   }
   .milestone-collection summary > svg {
     transition: none;
+  }
+}
+
+/* Shared action ink remains legible inside the fixed arena in every shell theme. */
+.game-page .button.primary {
+  background: var(--turn-accent);
+  color: #202b12 !important;
+}
+.hand-card:focus-within {
+  z-index: 60;
+  transition: none;
+}
+
+/* On a sideways phone the hand sits beside the table, within the same viewport. */
+@media (orientation: landscape) and (min-width: 600px) and (max-height: 540px) {
+  .game-header {
+    height: 48px;
+    padding-inline: 16px;
+  }
+  .game-header .wordmark {
+    font-size: 28px;
+  }
+  .game-header .secondary {
+    min-width: 44px;
+    padding: 0;
+    border: 0;
+  }
+  .game-header .secondary span,
+  .sound-label {
+    display: none;
+  }
+  .game-main {
+    min-height: calc(100dvh - 48px);
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    grid-template-rows: minmax(290px, 1fr);
+    gap: 14px;
+    padding: 0 16px;
+  }
+  .playing-table {
+    min-height: 0;
+  }
+  .table-boundary {
+    inset: 40px -10px 22px;
+    border-radius: 100px;
+  }
+  .table-boundary::before {
+    inset: 9px;
+  }
+  .table-boundary::after {
+    inset: 18px;
+  }
+  .game-page .table-center {
+    top: 62%;
+    gap: 24px;
+    padding-top: 0;
+  }
+  .table-center .uno-card {
+    --card-scale: 0.78 !important;
+  }
+  .pile-zone {
+    gap: 8px;
+  }
+  .pile-label {
+    font-size: 10px;
+  }
+  .opponent {
+    width: 76px;
+  }
+  .opponent-hand {
+    width: 55px;
+    height: 39px;
+  }
+  .opponent-hand .uno-card {
+    --card-scale: 0.31 !important;
+  }
+  .opponent-hand > span {
+    left: calc(11px + (var(--back-i) - (var(--back-count) - 1) / 2) * 7px);
+  }
+  .opponent-label {
+    padding: 4px 6px;
+    max-width: 76px;
+    gap: 4px;
+  }
+  .opponent-label .player-avatar {
+    display: none;
+  }
+  .opponent-label strong {
+    max-width: 54px;
+    font-size: 11px;
+  }
+  .opponent-label small {
+    font-size: 10px;
+  }
+  .count-word {
+    display: none;
+  }
+  .count-icon {
+    display: block;
+  }
+  .game-page .seat-top {
+    top: 52px;
+  }
+  .game-page .seat-upper-left {
+    top: 58px;
+    left: 20%;
+  }
+  .game-page .seat-upper-right {
+    top: 58px;
+    left: 80%;
+  }
+  .game-page .seat-left {
+    top: 43%;
+    left: 5%;
+  }
+  .game-page .seat-right {
+    top: 43%;
+    left: 95%;
+  }
+  .turn-cue {
+    bottom: 0;
+    gap: 5px;
+    min-height: 32px;
+  }
+  .turn-cue h1 {
+    font-size: 14px;
+  }
+  .active-color {
+    font-size: 11px;
+    margin-left: 0;
+  }
+  .turn-cue-dot {
+    display: none;
+  }
+  .table-direction {
+    right: 12%;
+    bottom: 15%;
+  }
+  .card-landing {
+    inset: 70px 14% 55px;
+    padding-bottom: 2px;
+  }
+  .game-page .game-feedback {
+    top: 38%;
+  }
+  .hand-section {
+    align-self: center;
+    margin: 0;
+  }
+  .hand-toolbar {
+    min-height: 44px;
+  }
+  .hand-title {
+    font-size: 11px;
+    gap: 5px;
+  }
+  .hand-title strong {
+    max-width: 90px;
+  }
+  .hand-scroll {
+    margin: 0 -8px;
+    padding: 25px 8px 8px;
+  }
+  .hand-cards {
+    height: 173px;
+    padding-inline: 12px;
+  }
+  .hand-card {
+    margin-left: -29px;
+  }
+  .hand-card .uno-card {
+    --card-scale: 1.02 !important;
+  }
+  .move-dock {
+    flex-direction: column;
+    text-align: center;
+    gap: 4px;
+    min-height: 44px;
+    padding-bottom: max(6px, env(safe-area-inset-bottom));
+  }
+  .move-hint {
+    font-size: 11px;
+  }
+  .move-buttons {
+    max-width: 100%;
+  }
+  .move-buttons .button {
+    min-height: 44px;
+    padding: 8px 14px;
+  }
+  .last-card-stamp {
+    height: 23px;
+    min-width: 23px;
+    font-size: 17px;
+  }
+  .draw-penalty {
+    font-size: 40px;
+  }
+}
+
+@media (orientation: portrait) and (max-width: 540px) and (max-height: 650px) {
+  .game-header {
+    height: 52px;
+  }
+  .game-main {
+    min-height: calc(100dvh - 52px);
+    grid-template-rows: minmax(232px, 1fr) auto;
+    padding-top: 0;
+  }
+  .playing-table {
+    min-height: 232px;
+  }
+  .table-boundary {
+    inset-block: 45px 16px;
+  }
+  .game-page .table-center {
+    top: 59%;
+    padding-top: 0;
+    gap: 24px;
+  }
+  .table-center .uno-card {
+    --card-scale: 0.78 !important;
+  }
+  .pile-zone {
+    gap: 7px;
+  }
+  .turn-cue {
+    min-height: 32px;
+    gap: 5px;
+  }
+  .turn-cue h1 {
+    font-size: 14px;
+  }
+  .active-color {
+    font-size: 11px;
+  }
+  .hand-toolbar {
+    min-height: 38px;
+  }
+  .hand-scroll {
+    padding-block: 26px 10px;
+  }
+  .hand-cards {
+    height: 157px;
+  }
+  .hand-card .uno-card {
+    --card-scale: 0.96 !important;
+  }
+  .seat-top,
+  .seats-5 .seat-top,
+  .seats-6 .seat-top {
+    top: 40px;
+  }
+  .seat-upper-left,
+  .seat-upper-right,
+  .seats-5 .seat-upper-left,
+  .seats-6 .seat-upper-left,
+  .seats-5 .seat-upper-right,
+  .seats-6 .seat-upper-right {
+    top: 47px;
+  }
+  .seats-5 .seat-left,
+  .seats-6 .seat-left,
+  .seats-5 .seat-right,
+  .seats-6 .seat-right {
+    top: 54%;
+  }
+  .opponent-hand {
+    height: 30px;
+  }
+  .opponent-hand .uno-card {
+    --card-scale: 0.3 !important;
+  }
+  .game-page .game-feedback {
+    top: 32%;
+  }
+  .game-page .game-feedback > span {
+    min-width: 50px;
+    height: 44px;
+    font-size: 30px;
+  }
+  .move-dock {
+    padding-bottom: max(8px, env(safe-area-inset-bottom));
   }
 }

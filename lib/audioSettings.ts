@@ -90,8 +90,11 @@ export function storedToUiVolume(stored: number): number {
   return Math.pow(clamped / CAP, 1 / 2.3);
 }
 
+let fallbackAudioSettings: AudioSettings | null = null;
+
 export function getAudioSettings(): AudioSettings {
   if (typeof window === 'undefined') return { ...defaultAudioSettings };
+  if (fallbackAudioSettings) return { ...fallbackAudioSettings };
   try {
     const raw = window.localStorage.getItem(AUDIO_SETTINGS_KEY);
     return { ...defaultAudioSettings, ...parseStored(raw) };
@@ -105,10 +108,11 @@ export function setAudioSettings(partial: Partial<AudioSettings>): void {
   const next = { ...getAudioSettings(), ...partial };
   try {
     window.localStorage.setItem(AUDIO_SETTINGS_KEY, JSON.stringify(next));
-    window.dispatchEvent(new CustomEvent('uno:audio-settings'));
+    fallbackAudioSettings = null;
   } catch {
-    // Ignore storage errors.
+    fallbackAudioSettings = next;
   }
+  window.dispatchEvent(new Event('uno:audio-settings'));
 }
 
 export function getMusicContextSettings(): MusicContextSettings {

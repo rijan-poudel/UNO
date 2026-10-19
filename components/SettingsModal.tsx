@@ -175,10 +175,16 @@ export default function SettingsModal({
           const tabs = ["profile", "controls", "audio", "look"] as const;
           const offset =
             e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
-          if (offset) {
+          if (offset || e.key === "Home" || e.key === "End") {
             e.preventDefault();
             const next =
-              tabs[(tabs.indexOf(tab) + offset + tabs.length) % tabs.length];
+              e.key === "Home"
+                ? tabs[0]
+                : e.key === "End"
+                  ? tabs[3]
+                  : tabs[
+                      (tabs.indexOf(tab) + offset + tabs.length) % tabs.length
+                    ];
             setTab(next);
             document.getElementById(`settings-${next}`)?.focus();
           }
@@ -277,7 +283,8 @@ export default function SettingsModal({
         {tab === "controls" && (
           <>
             <p className="muted">
-              House rules apply to the next round you host.
+              Changes apply when you set up your next table. Rematches keep the
+              current table’s rules.
             </p>
             <RulePresets rules={rules} onChange={onChange} />
             <label className="preference-row">

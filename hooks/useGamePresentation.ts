@@ -1,4 +1,4 @@
-// Present state transitions without holding up the engine or animating layout properties.
+// Present snapshots with physical card continuity. Neither motion nor audio gates a turn.
 "use client";
 import { useEffect, useLayoutEffect, useRef, type RefObject } from "react";
 import type { GameState } from "../types/game";
@@ -10,6 +10,8 @@ import {
 import { playTableChime, type TableChime } from "../lib/tableChimes";
 import { recordRound } from "../lib/playerProgress";
 import { getAudioSettings } from "../lib/audioSettings";
+import { getCardFlight, type CardPose } from "../lib/cardMotion";
+
 const ACTION_SOUNDS: Record<string, TableChime> = {
   skip: "skip",
   reverse: "reverse",
@@ -18,19 +20,56 @@ const ACTION_SOUNDS: Record<string, TableChime> = {
   wild: "wild",
   shuffle: "shuffle",
 };
-type Origin = { cardId: string; rect: DOMRect };
+
+function cardPose(element: HTMLElement): CardPose {
+  const rect = element.getBoundingClientRect();
+  // Card, fan and pile rotations compose. Translation alone cannot recover this.
+  let angle = 0;
+  for (
+    let node: HTMLElement | null = element;
+    node;
+    node = node.parentElement
+  ) {
+    const transform = getComputedStyle(node).transform;
+    if (transform !== "none") {
+      const matrix = new DOMMatrixReadOnly(transform);
+      angle += Math.atan2(matrix.b, matrix.a) * (180 / Math.PI);
+    }
+  }
+  return {
+    x: rect.x + rect.width / 2,
+    y: rect.y + rect.height / 2,
+    width: element.offsetWidth,
+    angle,
+  };
+}
+
+type HandPosition = { left: number; top: number; transform: string };
 export function useGamePresentation(
   game: GameState | null,
   localPlayerId: string | undefined,
   root: RefObject<HTMLElement | null>,
 ) {
   const previous = useRef<GameState | null>(null);
-  const handRects = useRef<Map<string, DOMRect>>(new Map());
-  const selectedOrigin = useRef<Origin | null>(null);
+  const handPositions = useRef<Map<string, HandPosition>>(new Map());
+  const selectedOrigin = useRef<{
+    cardId: string;
+    pose: CardPose;
+    nextId?: string;
+    restoreFocus: boolean;
+  } | null>(null);
   const running = useRef<Set<Animation>>(new Set());
   const ghosts = useRef<Set<HTMLElement>>(new Set());
   const rememberOrigin = (cardId: string, element: HTMLElement) => {
-    selectedOrigin.current = { cardId, rect: element.getBoundingClientRect() };
+    const wrapper = element.closest<HTMLElement>("[data-hand-card]");
+    const neighbor =
+      wrapper?.nextElementSibling ?? wrapper?.previousElementSibling;
+    selectedOrigin.current = {
+      cardId,
+      pose: cardPose(element),
+      nextId: (neighbor as HTMLElement | null)?.dataset.handCard,
+      restoreFocus: document.activeElement === element,
+    };
   };
   useLayoutEffect(() => {
     if (!game || !root.current) return;
@@ -39,9 +78,13 @@ export function useGamePresentation(
       game.lastAction.type === "init" && prior?.winnerId ? null : prior;
     previous.current = game;
     if (before === game) return;
+    // A rapid jump-in/reconnect interrupts the old picture instead of piling up ghosts.
+    running.current.forEach((animation) => animation.cancel());
+    ghosts.current.forEach((element) => element.remove());
+    ghosts.current.clear();
     const board = root.current;
     if (!before) {
-      handRects.current.clear();
+      handPositions.current.clear();
       selectedOrigin.current = null;
     }
     const reduced =
@@ -55,122 +98,118 @@ export function useGamePresentation(
       Array.from(board.querySelectorAll<HTMLElement>("[data-hand-card]")).find(
         (el) => el.dataset.handCard === id,
       )?.firstElementChild as HTMLElement | null;
-    const deck = board.querySelector<HTMLElement>("[data-draw-pile]");
+    const deck = board.querySelector<HTMLElement>("[data-draw-pile] .uno-card");
     const discard = board.querySelector<HTMLElement>(
       "[data-discard-pile] .uno-card",
     );
     function track(animation: Animation) {
       running.current.add(animation);
-      animation.finished
+      void animation.finished
         .catch(() => {})
         .finally(() => running.current.delete(animation));
     }
-    function arrive(element: HTMLElement, from: DOMRect, delay = 0) {
+    function fly(
+      element: HTMLElement,
+      from: CardPose,
+      delay = 0,
+      hideDestination = true,
+    ) {
       if (reduced) return;
-      const to = element.getBoundingClientRect();
-      const animation = element.animate(
-        [
-          {
-            transform: `translate(${from.x + from.width / 2 - to.x - to.width / 2}px, ${from.y + from.height / 2 - to.y - to.height / 2}px) rotate(-12deg) scale(0.72)`,
-            opacity: 0.2,
-          },
-          { transform: "translate(0, 0) rotate(0deg) scale(1)", opacity: 1 },
-        ],
-        {
-          duration: 260,
-          delay,
-          easing: "cubic-bezier(0.2, 0.8, 0.2, 1)",
-          fill: "backwards",
-        },
+      const to = cardPose(element);
+      if (!to.width || !from.width) return;
+      const { keyframes, duration } = getCardFlight(from, to);
+      const ghost = element.cloneNode(true) as HTMLElement;
+      ghost.removeAttribute("aria-label");
+      ghost.setAttribute("aria-hidden", "true");
+      ghost.tabIndex = -1;
+      ghost.dataset.presentationCard = "";
+      Object.assign(ghost.style, {
+        position: "fixed",
+        left: `${to.x - element.offsetWidth / 2}px`,
+        top: `${to.y - element.offsetHeight / 2}px`,
+        width: `${element.offsetWidth}px`,
+        height: `${element.offsetHeight}px`,
+        margin: "0",
+        pointerEvents: "none",
+        transition: "none",
+        zIndex: "90",
+      });
+      ghost.style.setProperty(
+        "--card-scale",
+        getComputedStyle(element).getPropertyValue("--card-scale"),
       );
-      track(animation);
+      document.body.append(ghost);
+      ghosts.current.add(ghost);
+      const flight = ghost.animate(keyframes, {
+        duration,
+        delay,
+        easing: "cubic-bezier(.16,1,.3,1)",
+        fill: "backwards",
+      });
+      track(flight);
+      // The real endpoint remains in layout; only one visible copy moves to it.
+      if (hideDestination)
+        track(
+          element.animate([{ opacity: 0 }, { opacity: 0 }], {
+            duration: duration + delay,
+          }),
+        );
+      void flight.finished
+        .catch(() => {})
+        .finally(() => {
+          ghost.remove();
+          ghosts.current.delete(ghost);
+        });
     }
     const top = game.discardPile.at(-1);
     const oldTop = before?.discardPile.at(-1);
-    const playAction = game.lastAction.type === "play" ? game.lastAction : null;
-    if (before && top && top.id !== oldTop?.id && discard && !reduced) {
-      const felt = board.querySelector<HTMLElement>(".table-boundary");
-      if (felt)
-        track(
-          felt.animate(
-            [
-              { transform: "translateY(0)" },
-              { transform: "translateY(2px)", offset: 0.65 },
-              { transform: "translateY(0)" },
-            ],
-            { duration: 240, easing: "ease-out" },
-          ),
-        );
-      const actor =
-        playAction?.playerId ?? before.players[before.currentPlayerIndex]?.id;
+    const action = game.lastAction;
+    const origin = selectedOrigin.current;
+    if (
+      before &&
+      action.type === "play" &&
+      top &&
+      top.id !== oldTop?.id &&
+      discard
+    ) {
+      const actorCard = findSeat(action.playerId)?.querySelector<HTMLElement>(
+        ".opponent-hand .uno-card",
+      );
       const from =
-        selectedOrigin.current?.cardId === top.id
-          ? selectedOrigin.current.rect
-          : actor
-            ? findSeat(actor)?.getBoundingClientRect()
-            : undefined;
-      if (from) {
-        const to = discard.getBoundingClientRect();
-        const ghost = discard.cloneNode(true) as HTMLElement;
-        ghost.setAttribute("aria-hidden", "true");
-        ghost.classList.add("flying-card");
-        Object.assign(ghost.style, {
-          position: "fixed",
-          left: `${to.x}px`,
-          top: `${to.y}px`,
-          width: `${to.width}px`,
-          height: `${to.height}px`,
-          margin: "0",
-          pointerEvents: "none",
-          zIndex: "90",
-        });
-        document.body.append(ghost);
-        ghosts.current.add(ghost);
-        const flight = ghost.animate(
-          [
-            {
-              transform: `translate(${from.x + from.width / 2 - to.x - to.width / 2}px, ${from.y + from.height / 2 - to.y - to.height / 2}px) rotate(-10deg) scale(0.9)`,
-            },
-            {
-              transform: `translate(${(from.x + from.width / 2 - to.x - to.width / 2) * 0.3}px, ${(from.y + from.height / 2 - to.y - to.height / 2) * 0.3 - 28}px) rotate(7deg) scale(1.04)`,
-              offset: 0.6,
-            },
-            {
-              transform: "translate(0, 0) rotate(-2deg) scale(1.035)",
-              offset: 0.88,
-            },
-            { transform: "translate(0, 0) rotate(0deg) scale(1)" },
-          ],
-          { duration: 280, easing: "cubic-bezier(0.2, 0.7, 0.3, 1)" },
-        );
-        track(flight);
-        flight.finished
-          .catch(() => {})
-          .finally(() => {
-            ghost.remove();
-            ghosts.current.delete(ghost);
-          });
-        track(
-          discard.animate([{ opacity: 0 }, { opacity: 0 }], { duration: 280 }),
-        );
-      }
-      selectedOrigin.current = null;
+        origin?.cardId === action.card.id
+          ? origin.pose
+          : actorCard
+            ? cardPose(actorCard)
+            : null;
+      if (from) fly(discard, from);
     }
+    if (
+      action.type === "play" &&
+      origin?.cardId === action.card.id &&
+      origin.restoreFocus
+    ) {
+      queueMicrotask(() => {
+        if (
+          !board.isConnected ||
+          document.activeElement !== document.body ||
+          document.querySelector("dialog[open]")
+        )
+          return;
+        const next =
+          (origin.nextId && findCard(origin.nextId)) ||
+          board.querySelector<HTMLElement>("[data-hand-card] .uno-card");
+        next?.focus({ preventScroll: true });
+      });
+    }
+    selectedOrigin.current = null;
     const local = game.players.find((p) => p.id === localPlayerId);
     const priorIds = new Set(
       before?.players
         .find((p) => p.id === localPlayerId)
         ?.hand.map((c) => c.id),
     );
-    // Reveal an actual new draw before measuring/animating its arrival.
-    // Initial deals, opponent draws and hand shuffles keep the reader's position.
-    if (
-      before &&
-      local &&
-      game.lastAction.type === "draw" &&
-      game.lastAction.playerId === localPlayerId
-    ) {
-      const added = local.hand.filter((card) => !priorIds.has(card.id));
+    const added = local?.hand.filter((card) => !priorIds.has(card.id)) ?? [];
+    if (before && action.type === "draw" && action.playerId === localPlayerId) {
       const newest = added.at(-1);
       if (newest)
         findCard(newest.id)?.closest("[data-hand-card]")?.scrollIntoView({
@@ -179,112 +218,95 @@ export function useGamePresentation(
           behavior: "instant",
         });
     }
-    const nextRects = new Map<string, DOMRect>();
+    // Read positions together before applying FLIP, preserving the fan's actual transform.
+    const nextPositions = new Map<string, HandPosition>();
+    const reflows: {
+      element: HTMLElement;
+      from: HandPosition;
+      to: HandPosition;
+    }[] = [];
     board
       .querySelectorAll<HTMLElement>("[data-hand-card]")
       .forEach((wrapper) => {
         const id = wrapper.dataset.handCard;
-        const element = wrapper.firstElementChild as HTMLElement | null;
-        if (!id || !element) return;
-        const to = wrapper.getBoundingClientRect();
-        const from = handRects.current.get(id);
-        nextRects.set(id, to);
+        if (!id) return;
+        const to = {
+          left: wrapper.offsetLeft,
+          top: wrapper.offsetTop,
+          transform: getComputedStyle(wrapper).transform,
+        };
+        nextPositions.set(id, to);
+        const from = handPositions.current.get(id);
         if (
           from &&
           !reduced &&
-          (Math.abs(from.x - to.x) > 1 || Math.abs(from.y - to.y) > 1)
-        ) {
-          track(
-            element.animate(
-              [
-                {
-                  transform: `translate(${from.x - to.x}px, ${from.y - to.y}px)`,
-                },
-                { transform: "translate(0, 0)" },
-              ],
-              { duration: 180, easing: "cubic-bezier(0.2, 0.8, 0.2, 1)" },
-            ),
-          );
-        }
+          (Math.abs(from.left - to.left) > 1 ||
+            Math.abs(from.top - to.top) > 1 ||
+            from.transform !== to.transform)
+        )
+          reflows.push({ element: wrapper, from, to });
       });
-    handRects.current = nextRects;
-    if (local && deck)
-      local.hand
-        .filter((c) => !priorIds.has(c.id))
+    handPositions.current = nextPositions;
+    reflows.forEach(({ element, from, to }) =>
+      track(
+        element.animate(
+          [
+            {
+              transform: `translate(${from.left - to.left}px, ${from.top - to.top}px) ${from.transform === "none" ? "" : from.transform}`,
+            },
+            { transform: to.transform },
+          ],
+          { duration: 180, easing: "cubic-bezier(.16,1,.3,1)" },
+        ),
+      ),
+    );
+    if (deck) {
+      const origin = cardPose(
+        action.type === "play" && action.shuffledHands && discard
+          ? discard
+          : deck,
+      );
+      // Six representative arrivals maximum, including the newest card in a large draw.
+      added
+        .filter((_, i) => i < 5 || i === added.length - 1)
         .forEach((card, i) => {
           const element = findCard(card.id);
-          if (element)
-            arrive(element, deck.getBoundingClientRect(), Math.min(i, 5) * 35);
+          if (element) fly(element, origin, i * 25);
         });
-    if (before)
-      for (const player of game.players) {
-        const oldPlayer = before.players.find((p) => p.id === player.id);
-        if (
-          player.id !== localPlayerId &&
-          oldPlayer &&
-          player.hand.length > oldPlayer.hand.length
-        ) {
-          const seat = findSeat(player.id);
-          if (seat && deck && !reduced) {
-            const source = deck.querySelector<HTMLElement>(".uno-card");
-            if (source) {
-              const from = source.getBoundingClientRect();
-              const to = seat.getBoundingClientRect();
-              const ghost = source.cloneNode(true) as HTMLElement;
-              ghost.setAttribute("aria-hidden", "true");
-              Object.assign(ghost.style, {
-                position: "fixed",
-                left: `${from.x}px`,
-                top: `${from.y}px`,
-                width: `${from.width}px`,
-                height: `${from.height}px`,
-                pointerEvents: "none",
-                zIndex: "90",
-              });
-              document.body.append(ghost);
-              ghosts.current.add(ghost);
-              const flight = ghost.animate(
-                [
-                  { transform: "translate(0, 0) scale(1)", opacity: 1 },
-                  {
-                    transform: `translate(${to.x + to.width / 2 - from.x - from.width / 2}px, ${to.y + to.height / 2 - from.y - from.height / 2}px) rotate(12deg) scale(0.4)`,
-                    opacity: 0.2,
-                  },
-                ],
-                { duration: 260, easing: "cubic-bezier(0.2, 0.8, 0.2, 1)" },
-              );
-              track(flight);
-              flight.finished
-                .catch(() => {})
-                .finally(() => {
-                  ghost.remove();
-                  ghosts.current.delete(ghost);
-                });
-            }
+      if (before && !reduced)
+        for (const player of game.players) {
+          const oldPlayer = before.players.find((p) => p.id === player.id);
+          if (
+            player.id !== localPlayerId &&
+            oldPlayer &&
+            player.hand.length > oldPlayer.hand.length
+          ) {
+            const endpoint = findSeat(player.id)?.querySelector<HTMLElement>(
+              ".opponent-hand .uno-card",
+            );
+            if (endpoint) fly(endpoint, origin, 0, false);
           }
         }
-      }
-    // Sound is tied to this same snapshot, never a voice duration or animation timer.
+    }
+    // Effects describe the current snapshot immediately; no queue or duration wait.
     if (!before) playTableChime("deal");
-    else {
-      const changed =
-        JSON.stringify(before.lastAction) !== JSON.stringify(game.lastAction) ||
-        before.turnCount !== game.turnCount;
-      if (changed) {
-        announceBoardFromTransition(
-          before,
-          game,
-          localPlayerId ?? null,
-          `${game.turnCount}:${JSON.stringify(game.lastAction)}`,
-        );
-        if (game.winnerId && !before.winnerId)
-          playTableChime(game.winnerId === localPlayerId ? "win" : "lose");
-        else if (top?.id !== oldTop?.id)
-          playTableChime(ACTION_SOUNDS[top?.value ?? ""] ?? "cardPlay");
-        else if (game.lastAction.type === "draw") playTableChime("draw");
-        else if (game.lastAction.type === "declareUno") playTableChime("uno");
-        else if (game.lastAction.type === "callOut") playTableChime("callOut");
-      }
+    else if (
+      JSON.stringify(before.lastAction) !== JSON.stringify(action) ||
+      before.turnCount !== game.turnCount
+    ) {
+      announceBoardFromTransition(
+        before,
+        game,
+        localPlayerId ?? null,
+        `${game.turnCount}:${JSON.stringify(action)}`,
+      );
+      if (game.winnerId && !before.winnerId)
+        playTableChime(game.winnerId === localPlayerId ? "win" : "lose");
+      else if (action.type === "play" && top?.id !== oldTop?.id)
+        playTableChime(ACTION_SOUNDS[action.card.value] ?? "cardPlay");
+      else if (action.type === "draw") playTableChime("draw");
+      else if (action.type === "declareUno") playTableChime("uno");
+      else if (action.type === "callOut") playTableChime("callOut");
     }
   }, [game, localPlayerId, root]);
   useEffect(() => {
@@ -297,24 +319,34 @@ export function useGamePresentation(
         stopBoardVoiceover();
       else preloadBoardVoiceovers();
     };
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const interrupt = () => {
+      running.current.forEach((animation) => animation.cancel());
+      ghosts.current.forEach((element) => element.remove());
+      ghosts.current.clear();
+      selectedOrigin.current = null;
+    };
     const onVisibility = () => {
       if (document.hidden) {
         stopBoardVoiceover();
-        running.current.forEach((animation) => animation.cancel());
-        ghosts.current.forEach((element) => element.remove());
-        ghosts.current.clear();
+        interrupt();
       }
+    };
+    const onMotion = () => {
+      if (media.matches) interrupt();
     };
     window.addEventListener("uno:audio-settings", onSettings);
     document.addEventListener("visibilitychange", onVisibility);
+    media.addEventListener("change", onMotion);
     const active = running.current;
     const activeGhosts = ghosts.current;
     return () => {
       window.removeEventListener("uno:audio-settings", onSettings);
       document.removeEventListener("visibilitychange", onVisibility);
+      media.removeEventListener("change", onMotion);
       stopBoardVoiceover();
-      active.forEach((a) => a.cancel());
-      activeGhosts.forEach((el) => el.remove());
+      active.forEach((animation) => animation.cancel());
+      activeGhosts.forEach((element) => element.remove());
       active.clear();
       activeGhosts.clear();
     };

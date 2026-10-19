@@ -133,7 +133,6 @@ export default function HandCard({
       onPointerDown={(event) => {
         if (!event.isPrimary || event.button !== 0 || gesture.current) return;
         primeTableAudioFromUserGesture();
-        playTableChime("pickup");
         suppressClick.current = false;
         ghost.current?.remove();
         ghost.current = null;
@@ -160,6 +159,7 @@ export default function HandCard({
         const dy = event.clientY - start.y;
         if (!start.dragging && dy < -10 && Math.abs(dy) > Math.abs(dx)) {
           start.dragging = true;
+          playTableChime("pickup");
           onDragChange("lifting");
           event.currentTarget.classList.add("dragging-card");
           const element = face();
@@ -218,8 +218,13 @@ export default function HandCard({
             return;
           }
           const element = face();
+          element?.focus({ preventScroll: true });
           if (playable && element) onPlay(element);
-          else onInspect();
+          else {
+            primeTableAudioFromUserGesture();
+            playTableChime("pickup");
+            onInspect();
+          }
         }}
       />
     </div>
