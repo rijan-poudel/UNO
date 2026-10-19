@@ -1,5 +1,6 @@
 // Framework-free engine smoke check. Run with npm run check:game.
 import assert from 'node:assert/strict';
+import { parseRoomCode, isRoomCode } from '../lib/roomCodes';
 import { initializeGame } from '../lib/gameSetup';
 import {
   playCard,
@@ -183,3 +184,20 @@ assert.equal(
   'http://192.168.1.5:3001',
 );
 console.log('Public socket configuration and local preview endpoints passed.');
+
+for (const input of [
+  'ABCD23',
+  ' ab-cd 23 ',
+  'https://example.com/?room=ABCD23',
+]) {
+  assert.equal(parseRoomCode(input), 'ABCD23');
+  assert.ok(isRoomCode(parseRoomCode(input)));
+}
+for (const input of [
+  'ABCD',
+  'ABCDEFGH',
+  'IIIIII',
+  'https://example.com/no-room',
+]) {
+  assert.equal(isRoomCode(parseRoomCode(input)), false);
+}

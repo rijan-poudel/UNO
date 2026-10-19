@@ -209,6 +209,23 @@ export default function GameBoard({
       : cards;
   }, [localPlayer?.hand, sort]);
   useEffect(() => {
+    const scroller = hand.current;
+    if (!scroller || !inspectedId) return;
+    const reveal = () => {
+      scroller
+        .querySelector<HTMLElement>(`[data-hand-card="${inspectedId}"]`)
+        ?.scrollIntoView({
+          block: "nearest",
+          inline: "center",
+          behavior: "instant",
+        });
+    };
+    reveal();
+    const observer = new ResizeObserver(reveal);
+    observer.observe(scroller);
+    return () => observer.disconnect();
+  }, [inspectedId, sort]);
+  useEffect(() => {
     const timer = setTimeout(() => {
       pendingRef.current = false;
       setPendingAction(false);
@@ -304,7 +321,12 @@ export default function GameBoard({
   const playable = cards.filter((c) => canPlayCard(c, game, localPlayerIndex));
   const top = game.discardPile.at(-1);
   const drawDisabled =
-    !isLocalTurn || drawnThisTurn || !!pendingWild || !!winner || pendingAction;
+    !isLocalTurn ||
+    drawnThisTurn ||
+    !!pendingWild ||
+    !!winner ||
+    pendingAction ||
+    !!(online && !online.connected);
   const activeColor =
     game.activeColor && game.activeColor !== "wild" ? game.activeColor : "red";
   const turnTitle = winner
@@ -328,6 +350,45 @@ export default function GameBoard({
     rememberOrigin(card.id, element);
     act(() => api.selectCard(card));
   };
+  const selectedCard = cards.find((card) => card.id === inspectedId);
+  const canPlaySelected =
+    selectedCard &&
+    playable.some((card) => card.id === selectedCard.id) &&
+    !pendingAction &&
+    !pendingWild &&
+    !winner &&
+    (!online || online.connected);
+  const selectedLabel = selectedCard
+    ? `${selectedCard.color === "wild" ? "" : selectedCard.color + " "}${VALUES[selectedCard.value] ?? selectedCard.value}`
+    : "";
+  const moveHint =
+    online && !online.connected
+      ? "Reconnecting. Your hand is safe."
+      : pendingWild
+        ? "Choose a color to finish your move."
+        : pendingAction
+          ? "Making your move…"
+          : canPlaySelected
+            ? isLocalTurn
+              ? "Ready to play. You can also drag it onto the table."
+              : "Exact match. Play now to jump in."
+            : !isLocalTurn
+              ? "Lift a card to plan your next move."
+              : drawnThisTurn
+                ? playable.length
+                  ? "Play a matching card, or pass to end your turn."
+                  : "No match. Pass to end your turn."
+                : selectedCard
+                  ? game.pendingDraw
+                    ? `That card can’t stack. Choose a draw card or draw ${game.pendingDraw}.`
+                    : "That card doesn’t match. Choose another or draw."
+                  : game.pendingDraw
+                    ? playable.length
+                      ? "Stack a matching draw card, or take the penalty."
+                      : `Draw ${game.pendingDraw} to take the penalty.`
+                    : playable.length
+                      ? "Lift a matching card, then play it."
+                      : "No matching card. Draw to keep the round moving.";
   const canSayUno =
     !winner &&
     localPlayer.hand.length <= 2 &&
@@ -370,7 +431,7 @@ export default function GameBoard({
                 ? "Turn sound off"
                 : "Enable sound"
             }
-            aria-pressed={soundOn}
+            aria-pressed={soundOn && audioStatus === "ready"}
             onPointerDown={() => {
               soundIntent.current =
                 soundOn && audioStatus === "ready" ? "mute" : "enable";
@@ -541,33 +602,41 @@ export default function GameBoard({
                 </span>
               )}
             </div>
-            <div className="hand-actions">
-              {canPass && isLocalTurn && (
-                <button
-                  className="button secondary small"
-                  disabled={pendingAction}
-                  onClick={() => act(api.pass)}
-                >
-                  Pass
-                  <ArrowRight size={16} />
-                </button>
-              )}
-              {canSayUno && (
-                <button
-                  className="button uno-button small uno-ready"
-                  onClick={() => api.sayUno(localPlayerIndex)}
-                >
-                  UNO!
-                </button>
-              )}
-            </div>
           </div>
           <div
             className="hand-scroll"
             ref={hand}
-            tabIndex={0}
             role="region"
-            aria-label="Cards. Scroll sideways to see your full hand."
+            aria-label="Cards. Scroll sideways, or use left and right arrow keys."
+            onKeyDown={(event) => {
+              if (
+                !["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)
+              )
+                return;
+              const buttons = Array.from(
+                event.currentTarget.querySelectorAll<HTMLButtonElement>(
+                  "button.uno-card",
+                ),
+              );
+              const index = buttons.indexOf(event.target as HTMLButtonElement);
+              if (index < 0) return;
+              event.preventDefault();
+              const next =
+                event.key === "Home"
+                  ? 0
+                  : event.key === "End"
+                    ? buttons.length - 1
+                    : (index +
+                        (event.key === "ArrowRight" ? 1 : -1) +
+                        buttons.length) %
+                      buttons.length;
+              buttons[next]?.focus();
+              buttons[next]?.scrollIntoView({
+                block: "nearest",
+                inline: "nearest",
+                behavior: "instant",
+              });
+            }}
           >
             <div
               className={`hand-cards ${cards.length > 10 ? "large-hand" : ""}`}
@@ -596,17 +665,60 @@ export default function GameBoard({
               })}
             </div>
           </div>
-          <div className="hand-footer">
-            <span>
-              {inspectedId && cards.some((c) => c.id === inspectedId)
-                ? playable.some((c) => c.id === inspectedId)
-                  ? "Tap again to play · or drag to the table"
-                  : "Keep this one for your next move"
-                : "Tap to lift a card · drag up to play"}
-            </span>
-            {isLocalTurn && !pendingWild && (
-              <span>{playable.length} playable</span>
-            )}
+          <div className="move-dock">
+            <div className="move-hint" role="status">
+              {moveHint}
+            </div>
+            <div className="move-buttons">
+              {canSayUno && (
+                <button
+                  className="button uno-button uno-ready"
+                  onClick={() => api.sayUno(localPlayerIndex)}
+                >
+                  UNO!
+                </button>
+              )}
+              {(isLocalTurn || canPlaySelected) && !pendingWild && !winner && (
+                <>
+                  {canPlaySelected && (
+                    <button
+                      className="button primary play-selected"
+                      onClick={() => {
+                        const element =
+                          hand.current?.querySelector<HTMLElement>(
+                            `[data-hand-card="${selectedCard.id}"] .uno-card`,
+                          );
+                        if (element) select(selectedCard, element);
+                      }}
+                    >
+                      Play {selectedLabel} <ArrowRight size={18} />
+                    </button>
+                  )}
+                  {isLocalTurn &&
+                    (canPass ? (
+                      <button
+                        className={`button ${canPlaySelected ? "secondary" : "primary"}`}
+                        disabled={
+                          pendingAction || !!(online && !online.connected)
+                        }
+                        onClick={() => act(api.pass)}
+                      >
+                        Pass <ArrowRight size={18} />
+                      </button>
+                    ) : (
+                      <button
+                        className={`button ${canPlaySelected ? "secondary" : "primary"}`}
+                        disabled={drawDisabled}
+                        onClick={() => act(api.drawCard)}
+                      >
+                        {game.pendingDraw
+                          ? `Draw ${game.pendingDraw}`
+                          : "Draw card"}
+                      </button>
+                    ))}
+                </>
+              )}
+            </div>
           </div>
         </section>
       </main>
@@ -642,6 +754,10 @@ export default function GameBoard({
       {menu && (
         <Modal title="Your table." onClose={() => setMenu(false)}>
           <div className="game-menu">
+            <button onClick={() => setMenu(false)}>
+              <ArrowLeft />
+              <span>Back to game</span>
+            </button>
             <button aria-pressed={sort} onClick={() => setSort((s) => !s)}>
               <Layers />
               <span>{sort ? "Keep dealt order" : "Sort hand by color"}</span>

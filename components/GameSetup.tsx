@@ -3,26 +3,14 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { ArrowRight, Minus, Plus } from "lucide-react";
 import type { GameRules } from "../types/rules";
-import RulePresets from "./RulePresets";
 import PlayerAvatar from "./PlayerAvatar";
 import SetupShell from "./SetupShell";
 import { SetupIntro } from "./ui/PageChrome";
-const NAMES = ["You", "Cleo", "Jules", "Robin", "Frankie", "Lou"];
-function getNames(): string[] {
-  try {
-    const stored: unknown = JSON.parse(
-      localStorage.getItem("uno.local.playerNames") ?? "null",
-    );
-    const profile = localStorage.getItem("uno.online.playerName");
-    const names = Array.isArray(stored)
-      ? stored.filter((n): n is string => typeof n === "string").slice(0, 6)
-      : NAMES.slice(0, 3);
-    if (profile) names[0] = profile;
-    return names.length >= 2 ? names : NAMES.slice(0, 3);
-  } catch {
-    return NAMES.slice(0, 3);
-  }
-}
+import {
+  DEFAULT_PLAYER_NAMES as NAMES,
+  getSavedPlayerNames,
+} from "../lib/playerNames";
+import TableRules from "./TableRules";
 export default function GameSetup({
   onStart,
   controls,
@@ -30,6 +18,7 @@ export default function GameSetup({
   startingHandSize = 7,
   rules,
   onRulesChange,
+  onOpenRules,
 }: {
   onStart: (names: string[], bots: boolean[]) => void;
   controls?: ReactNode;
@@ -37,8 +26,9 @@ export default function GameSetup({
   startingHandSize?: number;
   rules: Partial<GameRules>;
   onRulesChange: (rules: Partial<GameRules>) => void;
+  onOpenRules: () => void;
 }) {
-  const [names, setNames] = useState(getNames);
+  const [names, setNames] = useState(getSavedPlayerNames);
   useEffect(() => {
     try {
       localStorage.setItem("uno.local.playerNames", JSON.stringify(names));
@@ -100,32 +90,52 @@ export default function GameSetup({
           </button>
         </div>
       </div>
-      <div className="seat-list">
-        {names.map((name, i) => (
-          <div className="seat-row" key={i}>
-            <PlayerAvatar seed={String(i)} large />
-            <label className="seat-name">
-              <span>{i === 0 ? "Your name" : `Bot ${i}`}</span>
+      <div className="setup-name-field">
+        <label className="field-label" htmlFor="local-player-name">
+          Your name
+        </label>
+        <input
+          id="local-player-name"
+          value={names[0]}
+          maxLength={18}
+          autoComplete="nickname"
+          onChange={(e) =>
+            setNames((n) => n.map((v, i) => (i === 0 ? e.target.value : v)))
+          }
+        />
+      </div>
+      <div className="crew-line" aria-label="Your bot opponents">
+        {names.slice(1).map((name, i) => (
+          <div key={i}>
+            <PlayerAvatar seed={String(i + 1)} />
+            <span>{name || NAMES[i + 1]}</span>
+          </div>
+        ))}
+      </div>
+      <details className="setup-disclosure">
+        <summary>Rename bots</summary>
+        <div className="seat-list">
+          {names.slice(1).map((name, i) => (
+            <label className="bot-name-field" key={i}>
+              Bot {i + 1}
               <input
-                aria-label={i === 0 ? "Your name" : `Bot ${i} name`}
                 value={name}
                 maxLength={18}
                 onChange={(e) =>
                   setNames((n) =>
-                    n.map((v, j) => (j === i ? e.target.value : v)),
+                    n.map((v, j) => (j === i + 1 ? e.target.value : v)),
                   )
                 }
               />
             </label>
-            <span className="seat-type">{i === 0 ? "You" : "Bot"}</span>
-          </div>
-        ))}
-      </div>
-      <section className="setup-rules">
-        <h2>Pick your rules.</h2>
-        <RulePresets rules={rules} onChange={onRulesChange} />
-        <p className="muted">Fine-tune any rule in Settings.</p>
-      </section>
+          ))}
+        </div>
+      </details>
+      <TableRules
+        rules={rules}
+        onChange={onRulesChange}
+        onOpenRules={onOpenRules}
+      />
     </SetupShell>
   );
 }

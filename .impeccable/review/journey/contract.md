@@ -1,0 +1,5 @@
+# Journey redesign
+
+The owner rejected the shipped UX. Keep the original tactile card faces and midnight table, replace the journey and control composition. Quick play starts saved bot settings immediately; setup exposes the human name, crew size, rule presets and hand size, with bot naming secondary. Create and join are distinct entry paths. Room links and six-character codes share one input; friend codes sit behind disclosure. Room hosts choose rules before dealing. A stable hand action dock makes Play, Draw, Pass and UNO explicit only in applicable states. Waiting players may inspect cards; an engine-legal jump-in exposes Play. A selected card stays in view on resize and the Play control names it. Drag and second activation remain shortcuts. Arrow keys browse cards. Sound and motion never gate turns.
+
+Verify desktop and phone setup, joining, six seats and large hands, active/waiting moves, keyboard, reduced motion and existing audio checks. Code-led interaction work; no raster comp.

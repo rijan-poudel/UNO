@@ -35,6 +35,7 @@ colors:
   table-line: "#34455e"
   turn-lime: "#d8ed82"
   arena-dark-ink: "#172130"
+  move-action-ink: "#202b12"
   card-red: "#e73442"
   card-yellow: "#f7c934"
   card-green: "#159768"
@@ -50,6 +51,11 @@ colors:
   action-light-ink: "#fffaf1"
   play-yellow: "#f1c95b"
   play-green: "#c9dcb4"
+  play-green-ink: "#2c3430"
+  play-green-muted: "#4e5d47"
+  play-yellow-muted: "#655425"
+  play-green-hover: "#d9e6c9"
+  play-yellow-hover: "#f7d775"
   avatar-red: "#ef755d"
   avatar-blue: "#8db6ed"
   avatar-yellow: "#e4c455"
@@ -171,6 +177,7 @@ rounded:
   panel: "12px"
   dialog: "16px"
   card: "9px"
+  play-choice-phone: "18px"
   circle: "50%"
 spacing:
   "4": "4px"
@@ -209,7 +216,7 @@ components:
     backgroundColor: "transparent"
     textColor: "{colors.ui-text}"
     rounded: "{rounded.field}"
-    size: "42px"
+    size: "44px"
   field:
     backgroundColor: "{colors.ui-surface}"
     textColor: "{colors.ui-text}"
@@ -222,6 +229,19 @@ components:
     typography: "{typography.play-choice}"
     rounded: "{rounded.play-choice}"
     padding: "14px 19px 14px 14px"
+  play-choice-secondary:
+    backgroundColor: "{colors.play-green}"
+    textColor: "{colors.play-green-ink}"
+    typography: "{typography.play-choice}"
+    rounded: "{rounded.play-choice}"
+    padding: "14px 19px 14px 14px"
+  button-play-selected:
+    backgroundColor: "{colors.turn-lime}"
+    textColor: "{colors.move-action-ink}"
+    typography: "{typography.button}"
+    rounded: "{rounded.control}"
+    padding: "14px 22px"
+    height: "50px"
   dialog:
     backgroundColor: "{colors.ui-surface}"
     textColor: "{colors.ui-text}"
@@ -268,7 +288,7 @@ The launch and settings shell retains warm, theme-aware surfaces and compact car
 - A held fan with immediate inspection, upward drag and bounded scrolling.
 - Situational controls and brief feedback that never delays a turn.
 
-Recorded from the completed source on 2026-10-18. Visual authority is the owner-corrected `.impeccable/tactile-direction.md`; this is a code-led direction with no approved raster comp. Implementation evidence is in `app/layout.tsx`, `app/globals.css`, `app/table.css`, `components/UnoCard.tsx`, `components/HandCard.tsx`, `components/GameBoard.tsx`, `components/home/HomeScreen.tsx`, `hooks/useGamePresentation.ts` and `lib/tableChimes.ts`. Finish captures live in `.impeccable/review/tactile/`.
+Refreshed from the finished journey source on 2026-10-19. Visual authority is `.impeccable/direction.md`, with the owner-authorized journey adaptation in `.impeccable/review/journey/contract.md` superseding the earlier duplicate-Draw prohibition. This is code-led work with no approved raster comp. Evidence includes `app/page.tsx`, `app/globals.css`, `app/table.css`, `components/GameBoard.tsx`, `components/GameSetup.tsx`, `components/TableRules.tsx`, `components/OnlineLobby.tsx`, `components/home/HomeScreen.tsx`, `lib/roomCodes.ts` and `lib/playerNames.ts`, alongside the incumbent card and presentation components. The journey review packet lives in `.impeccable/review/journey/`; current source takes precedence over captures made before the material fixes.
 
 ## Colors
 
@@ -277,8 +297,8 @@ Warm interface paper frames the invitation to play; stable saturated card colors
 ### Primary
 
 - **Coral action:** `ui-accent-red` identifies primary shell actions, selected preferences and the wordmark period. The midnight appearance uses its lighter coral counterpart.
-- **Turn lime:** `turn-lime` marks the live active seat, local turn cue, available draw and arena keyboard focus. It belongs to meaningful game state.
-- **Play yellow and play green:** `play-yellow` and `play-green` distinguish the two large launch choices with dark text.
+- **Turn lime:** `turn-lime` marks the live active seat, local turn cue, available draw, selected-card Play action and arena keyboard focus. The Play label uses `move-action-ink`, the dark green ink paired with lime; retain this final foreground through appearance overrides. It belongs to meaningful game state.
+- **Play yellow and play green:** `play-yellow` and `play-green` distinguish immediate bot play and room creation. Green uses `play-green-ink`; each choice has its own muted supporting ink and lighter hover tone. These are supporting entry controls, not new card colors.
 
 ### Secondary
 
@@ -316,13 +336,13 @@ This is a role-based hierarchy with responsive sizes, not a mathematical modular
 
 ## Layout
 
-The supporting shell uses centered content: the launch reaches 1450px and setup stays within 650px. Desktop launch pairs copy and choices with the native card fan. At 700px and below, the heading, fan and two choices stack; the introductory sentence yields to the visual. Common spacing repeats the frontmatter's compact 4–32px vocabulary rather than a strict single interval.
+The supporting shell uses centered content: the launch reaches 1450px and setup stays within 650px. Desktop launch pairs copy and choices with the native card fan. At 700px and below, the heading, fan and two primary choices stack; secondary setup/join shortcuts follow the primary group, then optional help. The introductory sentence yields to the visual. Primary choices precede shortcuts in keyboard order as well. Common spacing repeats the frontmatter's compact 4–32px vocabulary rather than a strict single interval.
 
 Live play has a sparse header, an oval table with opponents around two physical piles, and the local fan in the foreground. The game container reaches 1440px. Desktop uses a 68px header and 40px side padding; the 800px breakpoint reduces the header to 62px and side padding to 16px; phones use 12px game padding. The table may extend beyond the phone edges while seats, piles and active-color text remain readable.
 
 The active-color swatch and written name sit in normal flow after the turn heading inside one wrapping cue. The cue stays within the table width minus 24px, with a 3px row gap; the heading can wrap long names at any character. This shared placement follows the cue across every viewport and seat count. Phone seats hide decorative avatars and keep names and counts readable; five- and six-seat counts use a compact card icon where needed. The 360px breakpoint further compacts pile and opponent-card sizes. Large desktop viewports and short desktop heights have separate card-scale adjustments.
 
-The hand owns horizontal overflow. It keeps generous upper clearance for lift and focus, with cards at useful physical sizes instead of reducing the entire row. Fan position is normalized and bounded: rotation stays within ±16 degrees and the arc drops at most 34px. Large phone hands reduce overlap and scroll. Safe-area padding protects the footer.
+The hand owns horizontal overflow. It keeps generous upper clearance for lift and focus, with cards at useful physical sizes instead of reducing the entire row. Fan position is normalized and bounded: rotation stays within ±16 degrees and the arc drops at most 34px. Large phone hands reduce overlap and scroll. Selection scrolls its card into view when selected, sorted or resized; the Play action also names that card. Safe-area padding protects the move dock below the hand. The dock places hints beside actions on desktop and stacks them at 540px and below. Short phone viewports compact the arena and opponent backs to keep move controls reachable.
 
 **The Hand Owns Its Width Rule.** Keep overflow inside the hand, preserve corner identity and focus clearance, and bound the fan arc as the card count grows.
 
@@ -350,11 +370,11 @@ Controls, fields, panels and dialogs use the observed rounded vocabulary in fron
 
 ### Buttons
 
-Broad shell actions use the button role, a 50px minimum height, rounded control corners and 14px × 22px padding. Primary actions use coral; secondary actions are outlined and transparent; text actions remain quiet. Compact utilities use a 42px icon button with the field radius. Hover changes surface tone; press feedback is immediate. Global keyboard focus uses a blue outline; arena focus uses lime. Disabled actions reduce opacity, while the physical deck remains visibly present when unavailable.
+Broad shell actions use the button role, a 50px minimum height, rounded control corners and 14px × 22px padding. Primary actions use coral; secondary actions are outlined and transparent; text actions remain quiet. Compact utilities retain the field radius and have a 44px minimum hit area; small buttons also have a 44px minimum height. Hover changes surface tone; press feedback is immediate. Global keyboard focus uses a blue outline; arena focus uses lime. Disabled actions reduce opacity, while the physical deck remains visibly present when unavailable.
 
 ### Inputs / Fields
 
-Native labeled fields use the themed surface, a fine line border, the field radius and a 50px height. Focus strengthens the border and retains the visible outline. Placeholder ink stays muted. Range inputs use the accent color without custom replacement controls.
+Native labeled fields use the themed surface, a fine line border, the field radius and a 50px height. The local human-name label and input form one compact field rather than separate setup-grid rows. Its 8px grid gap and existing 8px label margin produce 16px of visible separation. At 800px and below native inputs and selects use 16px text. Focus strengthens the border and retains the visible outline. Placeholder ink stays muted. Range inputs use the accent color without custom replacement controls.
 
 ### Navigation
 
@@ -364,17 +384,25 @@ Settings use four equal tabs with a fine baseline and a coral selected underline
 
 Use the native dialog primitive for settings, game menu, color choice and results. Dialogs use the themed surface, ambient shadow, bounded viewport height and internal scrolling. Supporting panels and separated rows stay visually subordinate to the cards. Original small card-face player badges identify seats and launch choices; phone seats may hide them for readable names.
 
+### Entry, setup and room choices
+
+The large yellow launch choice deals immediately with the saved local crew and rules. The green choice starts room creation. Quiet secondary links expose bot setup and room joining. Setup shows the human name, two-to-six-seat count and a compact bot crew; bot renaming stays inside a native disclosure. Local setup and room hosts share the same rule-preset and starting-hand controls before dealing, with custom rules as a secondary text action.
+
+Creation and joining are distinct labeled choices. Joining accepts either the six-character room code or an invitation URL in one field, normalizes the code without truncation, and places validation guidance beside it. Persistent friend codes remain inside the separate Friends & invitations disclosure. Room sharing uses named copy-code and invitation-link actions. Bot seats are identified as bots; host controls and the guest waiting message reflect their actual roles.
+
 ### Active seat and turn cue
 
 An opponent's active badge fills lime with dark text; the local active turn cue uses lime text and a small dot. Turn status follows the live state. The named active color and its swatch are static children after the turn heading, using muted ink at 12px. The cue wraps as a group within the available width, and long turn names can wrap rather than conceal color or overflow the page. Pile labels remain beside their physical piles without duplicating this combined status.
 
 ### Held hand and piles
 
-`UnoCard` owns all native faces; `HandCard` owns inspection and gestures; `app/table.css` owns the deck, arena, fan and launch preview. The first tap inspects a card, the second tap on a selected legal card plays it. A legal card can also be dragged upward; releases beyond the 65px lift threshold play. Focus lifts a card, native button activation preserves keyboard access, and a small ivory bottom mark identifies legal cards beyond saturation alone.
+`UnoCard` owns all native faces; `HandCard` owns inspection and gestures; `app/table.css` owns the deck, arena, fan and launch preview. The first tap inspects a card; explicit Play in the dock names the selected legal card. A second activation remains a shortcut. Waiting players can inspect their hands, and a legal exact-match jump-in exposes Play. Arrow keys browse the hand with wrapping; Home and End reach its ends, keeping focused cards in view. A legal card can also be dragged upward; releases beyond the 65px lift threshold play. Focus lifts a card, native button activation preserves keyboard access, and a small ivory bottom mark identifies legal cards beyond saturation alone.
 
 Pointer capture starts on the face. Nonprimary pointers and nonleft clicks are ignored; button loss, pointer cancellation, capture loss, blur, visibility changes and unmount cancel or clean up the gesture. An unsuccessful drag returns quickly. Reduced motion removes travel and drag rotation while retaining a usable selection state. Identity follows the card through sorting and game updates.
 
-Draw from the physical deck; do not add a duplicate persistent draw control. Pass appears only when allowed; UNO appears only when eligible. Sorting and activity remain in the menu. The same native faces form the launch fan, so no separate raster illustration defines card appearance.
+The contextual move dock sits below the hand near the thumb. It exposes named Play for a legal selection and Draw or Pass according to the live action state; penalty draws name their count. The physical draw pile remains usable. UNO appears only when eligible. The hint describes the same decision: exact-match jump-in, play or pass after drawing, pending color/action, penalty draw or reconnect state. Pending and disconnected actions cannot submit another move. Sorting and activity remain in the menu. The same native faces form the launch fan, so no separate raster illustration defines card appearance.
+
+**The Named Move Rule.** Keep the inspected card identifiable through selection and resize, and name it in the Play action. Every dock hint and control follows current legal-action state.
 
 **The Play Comes First Rule.** Motion and sound explain the current action without blocking controls, queuing stale actions or changing turn timing.
 
@@ -391,6 +419,8 @@ Short card texture and immediate contact support plays; special actions add dist
 - **Do** use scoped midnight arena variables while honoring appearance on supporting screens.
 - **Do** retain readable six-seat phone names, visible corner indices and an independently scrolling large hand.
 - **Do** make inspection, legal plays, turn state and situational actions clear with touch and keyboard.
+- **Do** keep the named Play action, selected card and current hint in agreement; retain dark ink on lime.
+- **Do** put secondary entry shortcuts after the primary choices and keep optional bot/friend details in disclosures.
 - **Do** honor reduced motion, mute, audio readiness and interrupted gesture cleanup.
 - **Do** keep presentation responsive to the current published state without delaying play.
 
@@ -398,9 +428,9 @@ Short card texture and immediate contact support plays; special actions add dist
 
 - **Don't** restore clay hero art, Fredoka, a third font family or a parallel component library.
 - **Don't** replace the held fan with a flat shrinking row or let large hands overflow the page.
-- **Don't** add permanent UNO, duplicate Draw or permanent sorting controls to the table.
+- **Don't** show UNO when ineligible or turn sorting into a permanent table control. Keep dock Draw/Pass contextual and preserve the physical deck action.
 - **Don't** use Unicode glyph icons in place of the established SVG icon system.
 - **Don't** give general controls hard offset block shadows; physical deck edges are the intentional exception.
 - **Don't** queue narration, wait for sound or animation, or add a blocking splash.
 
-Not canonized: the build's tiny decorative arena watermark and vestigial sub-11px shell/progress captions are not reusable typography rules; their presence does not establish a legibility floor or authorize new kickers and eyebrows. Superseded green-table variables and old stylesheet declarations are likewise not authority over the final scoped arena.
+Not canonized: the build's tiny decorative arena watermark and vestigial sub-11px shell/progress captions are not reusable typography rules; their presence does not establish a legibility floor or authorize new kickers and eyebrows. Superseded green-table variables and overridden stylesheet declarations are likewise not authority over the final scoped arena. The existing journey detector’s 72 palette/type/radius advisories are not a token inventory: only current entry-control inks/hover tones, the phone choice radius and selected-Play treatment are reconciled here. Decorative one-offs and superseded values remain outside the reusable system; the report is preserved without suppression or a new detector run.

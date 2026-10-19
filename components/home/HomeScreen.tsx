@@ -1,11 +1,8 @@
 // Entry screen: the two ways to play, an actual card fan, and saved friends.
 "use client";
-import { useEffect, useState } from "react";
-import { ArrowRight, Check, Users } from "lucide-react";
-import type {
-  FriendInvite,
-  FriendPresenceState,
-} from "../../types/multiplayer";
+import { useState } from "react";
+import { ArrowRight, Check } from "lucide-react";
+import type { FriendInvite } from "../../types/multiplayer";
 import type { CSSProperties } from "react";
 import UnoCard from "../UnoCard";
 import type { Card } from "../../types/card";
@@ -20,75 +17,15 @@ interface Props {
   onOpenAudioSettings: () => void;
   onOpenProfileSettings?: () => void;
   onComputer: () => void;
+  onQuickPlay: () => void;
+  onJoin: () => void;
   onFriends: () => void;
-  onFriendQuickInvite: (code: string) => Promise<boolean>;
-  onCheckFriendOnline: (
-    codes: string[],
-  ) => Promise<Record<string, FriendPresenceState>>;
   incomingInvites: FriendInvite[];
   onAcceptFriendInvite?: (id: string) => Promise<boolean>;
   onDeclineFriendInvite?: (id: string) => Promise<boolean>;
 }
-interface Friend {
-  friendCode: string;
-  name: string;
-}
-function loadFriends(): Friend[] {
-  try {
-    const value: unknown = JSON.parse(
-      localStorage.getItem("uno.online.friends") ?? "[]",
-    );
-    return Array.isArray(value)
-      ? value
-          .filter(
-            (f): f is Friend =>
-              f &&
-              typeof f.friendCode === "string" &&
-              typeof f.name === "string",
-          )
-          .slice(0, 4)
-      : [];
-  } catch {
-    return [];
-  }
-}
 export default function HomeScreen(props: Props) {
-  const { onCheckFriendOnline } = props;
-  const [friends] = useState(loadFriends);
-  const [presence, setPresence] = useState<Record<string, FriendPresenceState>>(
-    {},
-  );
-  const [code, setCode] = useState("");
-  const [busy, setBusy] = useState(false);
   const [help, setHelp] = useState(false);
-  useEffect(() => {
-    if (!friends.length) return;
-    let disposed = false;
-    const refresh = async () => {
-      try {
-        const statuses = await onCheckFriendOnline(
-          friends.map((f) => f.friendCode),
-        );
-        if (!disposed) setPresence(statuses);
-      } catch {
-        /* Socket errors are shown in the lobby. */
-      }
-    };
-    void refresh();
-    const timer = window.setInterval(refresh, 15000);
-    return () => {
-      disposed = true;
-      clearInterval(timer);
-    };
-  }, [friends, onCheckFriendOnline]);
-  const invite = async (friendCode: string) => {
-    setBusy(true);
-    try {
-      if (await props.onFriendQuickInvite(friendCode)) setCode("");
-    } finally {
-      setBusy(false);
-    }
-  };
   return (
     <div className="home-page">
       <NotificationPanel
@@ -108,7 +45,7 @@ export default function HomeScreen(props: Props) {
             <div className="play-choices">
               <button
                 className="play-choice primary-choice"
-                onClick={props.onComputer}
+                onClick={props.onQuickPlay}
               >
                 <span className="choice-art" aria-hidden="true">
                   <PlayerAvatar seed="bot" />
@@ -116,7 +53,7 @@ export default function HomeScreen(props: Props) {
                 </span>
                 <span>
                   <strong>Play with bots</strong>
-                  <small>Jump straight in</small>
+                  <small>Your saved table, ready to deal</small>
                 </span>
                 <ArrowRight />
               </button>
@@ -129,10 +66,18 @@ export default function HomeScreen(props: Props) {
                   <PlayerAvatar seed="pal" />
                 </span>
                 <span>
-                  <strong>Play with friends</strong>
+                  <strong>Create a room</strong>
                   <small>Your room. Your rules.</small>
                 </span>
                 <ArrowRight />
+              </button>
+            </div>
+            <div className="entry-shortcuts">
+              <button className="text-button" onClick={props.onComputer}>
+                Set up bots <ArrowRight size={16} />
+              </button>
+              <button className="text-button" onClick={props.onJoin}>
+                Join a room <ArrowRight size={16} />
               </button>
             </div>
             <button
@@ -190,72 +135,6 @@ export default function HomeScreen(props: Props) {
               </span>
             ))}
           </div>
-        </section>
-        <section className="home-friends">
-          <div className="friends-intro">
-            <Users size={21} />
-            <div>
-              <h2>Got a friend code?</h2>
-              <p>
-                {friends.length
-                  ? "Your regulars. Invite them back for a round."
-                  : "Invite them to play."}
-              </p>
-            </div>
-          </div>
-          <form
-            className="inline-form"
-            onSubmit={(e) => {
-              e.preventDefault();
-              void invite(code);
-            }}
-          >
-            <label className="sr-only" htmlFor="home-friend-code">
-              Friend code
-            </label>
-            <input
-              id="home-friend-code"
-              value={code}
-              placeholder="Friend code"
-              maxLength={8}
-              autoCapitalize="characters"
-              autoComplete="off"
-              onChange={(e) =>
-                setCode(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ""))
-              }
-            />
-            <button
-              className="button secondary"
-              disabled={code.length < 4 || busy}
-            >
-              {busy ? "Inviting…" : "Invite"}
-              <ArrowRight size={17} />
-            </button>
-          </form>
-          {friends.length > 0 && (
-            <div className="saved-friends">
-              {friends.map((f) => (
-                <button
-                  className="saved-friend"
-                  key={f.friendCode}
-                  disabled={busy}
-                  onClick={() => void invite(f.friendCode)}
-                >
-                  <span className="avatar">{f.name[0]?.toUpperCase()}</span>
-                  <span>
-                    <strong>{f.name}</strong>
-                    <small>
-                      <i
-                        className={`presence-dot ${presence[f.friendCode] ?? "offline"}`}
-                      />
-                      {presence[f.friendCode] ?? "offline"}
-                    </small>
-                  </span>
-                  <ArrowRight size={16} />
-                </button>
-              ))}
-            </div>
-          )}
         </section>
       </main>
       <footer className="home-footer">

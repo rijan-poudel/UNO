@@ -42,3 +42,7 @@ UNO is the existing product name. The owner explicitly authorized replacement of
 - Keep cards and controls usable with touch and keyboard.
 - Audio supports the action and never controls game timing.
 - Keep implementation and project guidance straightforward for future contributors.
+
+## Entry and Turn UX
+
+The owner’s follow-up rejects unresolved friction across the whole journey. Returning bot players should deal immediately from saved settings, with a separate setup path. Creation and joining must be distinct choices; room links and room codes use the same input, while persistent friend codes remain secondary. Hosts need rule controls before dealing. A selected card needs an explicit Play action beside the hand; Draw, Pass, and UNO appear when applicable. Touch dragging and a second card activation remain shortcuts, and keyboard users can browse the hand with arrow keys.

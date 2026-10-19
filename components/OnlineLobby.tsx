@@ -17,9 +17,15 @@ import type {
   FriendPresenceState,
   RoomSnapshot,
 } from "../types/multiplayer";
+import type { GameRules } from "../types/rules";
+import { parseRoomCode, isRoomCode } from "../lib/roomCodes";
+import TableRules from "./TableRules";
 import SetupShell from "./SetupShell";
 import { SegmentedToggle, SetupIntro } from "./ui/PageChrome";
 interface Props {
+  rules: Partial<GameRules>;
+  onRulesChange: (rules: Partial<GameRules>) => void;
+  onOpenRules: () => void;
   connected: boolean;
   room: RoomSnapshot | null;
   playerId: string | null;
@@ -98,7 +104,7 @@ export default function OnlineLobby(props: Props) {
   const [name, setName] = useState(() => read("uno.online.playerName", "You"));
   const [code, setCode] = useState(() => {
     const params = new URLSearchParams(window.location.search);
-    return normalize(params.get("room") ?? read("uno.online.roomCode"));
+    return parseRoomCode(params.get("room") ?? read("uno.online.roomCode"));
   });
   const [panel, setPanel] = useState<"create" | "join">(() =>
     new URLSearchParams(window.location.search).has("room")
@@ -306,15 +312,20 @@ export default function OnlineLobby(props: Props) {
                 <input
                   id="room-code"
                   className="room-code-input"
+                  aria-describedby="room-code-help"
+                  aria-invalid={code.length > 0 && !isRoomCode(code)}
                   value={code}
-                  placeholder="Enter room code"
+                  placeholder="6-letter code or invitation link"
                   autoComplete="off"
                   autoCapitalize="characters"
-                  maxLength={8}
-                  minLength={4}
-                  onChange={(e) => setCode(normalize(e.target.value))}
+                  onChange={(e) => setCode(parseRoomCode(e.target.value))}
                   required
                 />
+                <p id="room-code-help" className="muted">
+                  {code && !isRoomCode(code)
+                    ? "Use the 6-character room code, or paste the full invitation link."
+                    : "Room codes have 6 characters. Friend codes are in Friends & invitations."}
+                </p>
               </>
             )}
             <button
@@ -323,7 +334,7 @@ export default function OnlineLobby(props: Props) {
                 busy ||
                 !connected ||
                 !name.trim() ||
-                (panel === "join" && code.length < 4)
+                (panel === "join" && !isRoomCode(code))
               }
             >
               {busy
@@ -349,10 +360,10 @@ export default function OnlineLobby(props: Props) {
                 onClick={() => void copy(room.roomId, "Room code copied.")}
               >
                 <Copy size={16} />
-                Copy
+                Copy code
               </button>
               <button
-                className="icon-button"
+                className="button secondary small"
                 aria-label="Copy invitation link"
                 onClick={() =>
                   void copy(
@@ -361,7 +372,7 @@ export default function OnlineLobby(props: Props) {
                   )
                 }
               >
-                <Link size={18} />
+                <Link size={18} /> Copy link
               </button>
             </div>
           </div>
@@ -415,8 +426,22 @@ export default function OnlineLobby(props: Props) {
           )}
         </>
       )}
-      <section className="lobby-friends">
-        <h2>Invite a friend</h2>
+      {room && isHost && (
+        <TableRules
+          rules={props.rules}
+          onChange={props.onRulesChange}
+          onOpenRules={props.onOpenRules}
+        />
+      )}
+      {room && !isHost && (
+        <p className="muted">The host chooses this table’s rules.</p>
+      )}
+      <details
+        className="lobby-friends setup-disclosure"
+        key={outgoingInvites.length ? "invited" : "friends"}
+        open={outgoingInvites.length ? true : undefined}
+      >
+        <summary>Friends & invitations</summary>
         <form
           className="inline-form"
           onSubmit={(e) => {
@@ -480,7 +505,7 @@ export default function OnlineLobby(props: Props) {
             <Copy size={14} />
           </button>
         </div>
-      </section>
+      </details>
       {incomingInvites.length > 0 && (
         <section>
           <h2>You’re invited.</h2>

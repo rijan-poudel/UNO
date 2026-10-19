@@ -16,12 +16,13 @@ import HomeScreen from "../components/home/HomeScreen";
 import OnlineLobby from "../components/OnlineLobby";
 import NotificationPanel from "../components/NotificationPanel";
 import SettingsModal from "../components/SettingsModal";
+import { getSavedPlayerNames } from "../lib/playerNames";
 import { toast } from "sonner";
 
 const subscribeToClient = () => () => {};
 const SHARED_RULES_KEY = "uno.shared.rules";
 const PREFERRED_THEME_KEY = "uno.preferred.theme";
-const ONLINE_PREFILL_FRIEND_CODE_KEY = "uno.online.prefill.friendCode";
+
 const ONLINE_PLAYER_NAME_KEY = "uno.online.playerName";
 const MIN_SUPPORTED_MAX_PLAYERS = 6;
 
@@ -308,36 +309,20 @@ export default function Home() {
             return joined;
           }}
           onDeclineFriendInvite={online.declineFriendInvite}
-          onCheckFriendOnline={online.checkFriendOnline}
-          onFriendQuickInvite={async (friendCode) => {
-            let playerName = "Player 1";
-            try {
-              const stored = window.localStorage.getItem(
-                ONLINE_PLAYER_NAME_KEY,
-              );
-              if (stored && stored.trim())
-                playerName = stored.trim().slice(0, 18);
-              window.localStorage.setItem(
-                ONLINE_PREFILL_FRIEND_CODE_KEY,
-                friendCode,
-              );
-            } catch {
-              // Ignore storage issues and still continue.
-            }
-
-            const invited = await online.sendFriendInvite(
-              friendCode,
-              playerName,
+          onQuickPlay={() => {
+            if (online.room) void online.leaveRoom();
+            const names = getSavedPlayerNames();
+            setMode("computer");
+            local.startGame(
+              names,
+              rules,
+              names.map((_, i) => i > 0),
             );
-            if (!invited) {
-              toast.error(online.error ?? "Could not send invite.");
-              return false;
-            }
-
+          }}
+          onJoin={() => {
             setMode("online");
-            setPanel("create");
+            setPanel("join");
             setView("friends");
-            return true;
           }}
         />
         {settingsModal}
@@ -349,6 +334,7 @@ export default function Home() {
         <GameSetup
           rules={rules}
           onRulesChange={setRules}
+          onOpenRules={() => openSettingsAt("controls")}
           startingHandSize={rules.startingHandSize ?? 7}
           controls={topBar}
           onBack={() => setView("home")}
@@ -364,6 +350,9 @@ export default function Home() {
     content = (
       <>
         <OnlineLobby
+          rules={rules}
+          onRulesChange={setRules}
+          onOpenRules={() => openSettingsAt("controls")}
           onPlayBots={() => {
             setMode("computer");
             setView("computer");

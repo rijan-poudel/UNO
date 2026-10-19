@@ -22,7 +22,7 @@ Open [localhost:3000](http://localhost:3000). The frontend and socket server sta
 - House rules for stacking, jump-in, drawing, UNO calls, special cards, and finishing.
 - Immediate card sounds, optional music, optional voice, master mute, and saved volume preferences.
 - Transform-based card travel and hand repositioning, with reduced-motion support.
-- Keyboard shortcuts: **D** draw, **P** pass, **U** call UNO. Cards also work with Tab and Enter/Space. UNO may be declared with two cards before a play or with one card afterward.
+- Keyboard shortcuts: **D** draw, **P** pass, **U** call UNO. Cards also work with Tab and Enter/Space; Left/Right/Home/End browse the hand. UNO may be declared with two cards before a play or with one card afterward.
 
 ## Verify changes
 
@@ -48,7 +48,7 @@ The checks use Node assertions and the installed TypeScript runner; no test fram
 ## Project map
 
 - `app/page.tsx` — view routing, shared preferences, local/online API selection.
-- `components/home/HomeScreen.tsx` — entry screen and saved friends.
+- `components/home/HomeScreen.tsx` — quick bot play and distinct create/join entry.
 - `components/GameSetup.tsx`, `OnlineLobby.tsx` — local seats and online room flow.
 - `components/GameBoard.tsx` — table, hand, available actions, result and help dialogs.
 - `components/UnoCard.tsx` — the shared card face and accessible labels.
@@ -103,7 +103,7 @@ For a phone on the same Wi-Fi, use the network URL printed by `npm run dev`. Bot
 - `agent/` is a separate legacy tool and remains excluded from lint/type checks.
 - The production dependency audit is clean. The lint toolchain still reports an upstream `braces` advisory; npm’s proposed force fix downgrades Next’s ESLint configuration. Do not apply that incompatible downgrade.
 
-The game uses a quiet midnight arena, vivid card faces, a curved hand, Outfit UI type and Barlow Condensed card numerals. Tap to inspect, tap again or drag upward to play. Draw from the deck; Pass and UNO appear only when eligible. Sorting and activity live in the menu. Card feedback uses a preloaded recording with an immediate fallback and bounded gesture unlock; optional music and voice never hold up turns. Wins and streaks are honest device-local history. Choose Classic, Stack party, or Wild table before dealing, then fine-tune individual house rules in Settings. No Mercy, Flip and Flex remain future implementations; these presets do not claim to implement those editions.
+The game uses a quiet midnight arena, vivid card faces, a curved hand, Outfit UI type and Barlow Condensed card numerals. Tap to inspect, then use the named Play action beside your hand. A second activation or upward drag also plays. Draw from the deck or the contextual hand action; Pass and UNO appear only when eligible. Sorting and activity live in the menu. Card feedback uses a preloaded recording with an immediate fallback and bounded gesture unlock; optional music and voice never hold up turns. Wins and streaks are honest device-local history. Choose Classic, Stack party, or Wild table before dealing, then fine-tune individual house rules in Settings. No Mercy, Flip and Flex remain future implementations; these presets do not claim to implement those editions.
 
 ### Persistent multiplayer host
 

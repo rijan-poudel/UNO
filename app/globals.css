@@ -1951,3 +1951,118 @@ input[type="range"] {
   min-height: 40px;
   font-weight: 800;
 }
+
+/* Journey controls: one obvious next step; optional setup stays folded. */
+.entry-shortcuts {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 12px;
+}
+.entry-shortcuts .text-button {
+  min-height: 44px;
+}
+.crew-line {
+  display: flex;
+  gap: 18px;
+  justify-content: center;
+  padding: 24px 0 12px;
+}
+.crew-line > div {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  min-width: 0;
+  flex: 1;
+  max-width: 82px;
+}
+.crew-line span {
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+.setup-disclosure {
+  border-block: 1px solid var(--ui-line);
+  padding: 8px 0;
+}
+.setup-disclosure summary {
+  cursor: pointer;
+  min-height: 44px;
+  align-content: center;
+  font-weight: 600;
+}
+.setup-disclosure summary::marker {
+  color: var(--ui-muted);
+}
+.bot-name-field {
+  display: grid;
+  grid-template-columns: 70px 1fr;
+  align-items: center;
+  gap: 12px;
+  margin: 10px 0;
+  font-size: 14px;
+}
+.starting-hand {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-top: 16px;
+  font-size: 14px;
+}
+.starting-hand select {
+  width: 86px;
+}
+.setup-name-field {
+  display: grid;
+  gap: 8px;
+}
+.setup-name-field input {
+  width: 100%;
+}
+.lobby-friends.setup-disclosure {
+  margin-top: 28px;
+}
+.lobby-friends > form {
+  margin-top: 12px;
+}
+.icon-button {
+  min-width: 44px;
+  min-height: 44px;
+}
+.button.small {
+  min-height: 44px;
+}
+@media (max-width: 800px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 540px) {
+  .room-code-panel {
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+  .room-share-actions {
+    gap: 8px;
+  }
+  .room-share-actions .button {
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 700px) {
+  .entry-shortcuts {
+    order: 3;
+    width: 100%;
+    max-width: 470px;
+    margin-top: 10px;
+  }
+  .home-copy .how-to {
+    order: 5;
+  }
+}
