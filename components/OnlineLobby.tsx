@@ -20,6 +20,11 @@ import type {
 import type { GameRules } from "../types/rules";
 import { parseRoomCode, isRoomCode } from "../lib/roomCodes";
 import TableRules from "./TableRules";
+import {
+  getPlayerName,
+  savePlayerName,
+  subscribePlayerName,
+} from "../lib/playerNames";
 import SetupShell from "./SetupShell";
 import { SegmentedToggle, SetupIntro } from "./ui/PageChrome";
 interface Props {
@@ -101,7 +106,7 @@ export default function OnlineLobby(props: Props) {
     onSyncPresence,
     onCheckFriendOnline,
   } = props;
-  const [name, setName] = useState(() => read("uno.online.playerName", "You"));
+  const [name, setName] = useState(getPlayerName);
   const [code, setCode] = useState(() => {
     const params = new URLSearchParams(window.location.search);
     return parseRoomCode(params.get("room") ?? read("uno.online.roomCode"));
@@ -121,6 +126,7 @@ export default function OnlineLobby(props: Props) {
   const [busy, setBusy] = useState(false);
   const [localError, setLocalError] = useState("");
   const isHost = room?.hostPlayerId === playerId;
+  useEffect(() => subscribePlayerName(() => setName(getPlayerName())), []);
   useEffect(() => {
     const timer = setTimeout(() => {
       if (name.trim()) void onSyncPresence(name.trim());
@@ -301,6 +307,7 @@ export default function OnlineLobby(props: Props) {
               value={name}
               maxLength={18}
               autoComplete="nickname"
+              onBlur={() => setName(savePlayerName(name))}
               onChange={(e) => setName(e.target.value)}
               required
             />

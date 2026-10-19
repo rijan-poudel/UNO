@@ -9,6 +9,9 @@ import { SetupIntro } from "./ui/PageChrome";
 import {
   DEFAULT_PLAYER_NAMES as NAMES,
   getSavedPlayerNames,
+  getPlayerName,
+  savePlayerName,
+  subscribePlayerName,
 } from "../lib/playerNames";
 import TableRules from "./TableRules";
 export default function GameSetup({
@@ -29,6 +32,16 @@ export default function GameSetup({
   onOpenRules: () => void;
 }) {
   const [names, setNames] = useState(getSavedPlayerNames);
+  useEffect(
+    () =>
+      subscribePlayerName(() => {
+        const name = getPlayerName();
+        setNames((current) =>
+          current[0] === name ? current : [name, ...current.slice(1)],
+        );
+      }),
+    [],
+  );
   useEffect(() => {
     try {
       localStorage.setItem("uno.local.playerNames", JSON.stringify(names));
@@ -45,12 +58,13 @@ export default function GameSetup({
           </p>
           <button
             className="button primary wide"
-            onClick={() =>
+            onClick={() => {
+              savePlayerName(names[0]);
               onStart(
                 names.map((n, i) => n.trim() || NAMES[i]),
                 names.map((_, i) => i > 0),
-              )
-            }
+              );
+            }}
           >
             Deal me in
             <ArrowRight size={20} />
@@ -99,6 +113,10 @@ export default function GameSetup({
           value={names[0]}
           maxLength={18}
           autoComplete="nickname"
+          onBlur={() => {
+            const name = savePlayerName(names[0]);
+            setNames((current) => [name, ...current.slice(1)]);
+          }}
           onChange={(e) =>
             setNames((n) => n.map((v, i) => (i === 0 ? e.target.value : v)))
           }

@@ -10,6 +10,7 @@ import {
   Palette,
   Check,
 } from "lucide-react";
+import { getPlayerName, savePlayerName } from "../lib/playerNames";
 import type { GameRules } from "../types/rules";
 import { defaultRules } from "../types/rules";
 import {
@@ -132,13 +133,6 @@ export function Toggle({
     </label>
   );
 }
-function readName() {
-  try {
-    return localStorage.getItem("uno.online.playerName") ?? "You";
-  } catch {
-    return "You";
-  }
-}
 export default function SettingsModal({
   open,
   initialTab = "controls",
@@ -155,18 +149,14 @@ export default function SettingsModal({
   );
   const [audio, setAudio] = useState(getAudioSettings);
   const [music, setMusic] = useState(getMusicContextSettings);
-  const [name, setName] = useState(readName);
+  const [name, setName] = useState(getPlayerName);
   const [saved, setSaved] = useState(false);
   const updateAudio = (partial: Partial<AudioSettings>) => {
     setAudioSettings(partial);
     setAudio(getAudioSettings());
   };
   const saveName = () => {
-    const next = name.trim().slice(0, 18) || "You";
-    try {
-      localStorage.setItem("uno.online.playerName", next);
-      window.dispatchEvent(new CustomEvent("uno:player-name-updated"));
-    } catch {}
+    const next = savePlayerName(name);
     setName(next);
     setSaved(true);
   };
