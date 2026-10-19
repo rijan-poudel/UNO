@@ -691,15 +691,29 @@ body {
   color: #b1bfd2;
   font-size: 13px;
   max-width: 40ch;
+  min-width: 0;
   line-height: 1.5;
 }
 .move-buttons {
   display: flex;
   flex-shrink: 0;
+  max-width: 65%;
   gap: 8px;
 }
 .move-buttons .button {
   min-height: 48px;
+  min-width: 0;
+}
+.move-buttons .button svg {
+  flex-shrink: 0;
+}
+.play-card-label {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.hand-toolbar .uno-button {
+  min-height: 44px;
+  padding: 6px 18px;
 }
 .game-page .button.primary.play-selected {
   background: #d8ed82;
@@ -721,6 +735,7 @@ body {
   .move-buttons {
     justify-content: center;
     width: 100%;
+    max-width: 100%;
   }
   .move-buttons .button {
     flex: 1;
@@ -772,7 +787,7 @@ body {
 }
 @media (min-width: 1100px) and (min-height: 850px) {
   .game-main {
-    grid-template-rows: minmax(430px, 1fr) auto;
+    grid-template-rows: minmax(380px, 1fr) auto;
   }
   .hand-cards {
     height: 225px;
@@ -1122,6 +1137,9 @@ body {
   }
 }
 @media (max-width: 540px) and (max-height: 800px) {
+  .hand-cards {
+    height: 171px;
+  }
   .game-main {
     grid-template-rows: minmax(310px, 1fr) auto;
   }

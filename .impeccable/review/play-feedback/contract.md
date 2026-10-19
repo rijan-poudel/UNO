@@ -1,0 +1,5 @@
+# Draw feedback and near-finish controls
+
+Operate/Experience refinement within the shipped tactile world. Preserve native deck faces, fonts, midnight arena and immediate nonblocking audio. The draw itself is the focal moment: reveal the actual newly added card in a scrolling sorted hand before measuring its existing arrival animation. No new forced selection; initial deal, opponent draw and shuffle do not change horizontal position. Name a single drawn card in the existing move hint. A no-match draw truthfully says it is passing automatically. Move eligible UNO to the hand toolbar so Play and Draw/Pass have at most two phone actions. Long action labels may wrap with full identity preserved. Keyboard shortcuts obey the same waiting, pending, connection and rule constraints as visible controls.
+
+Inspect 320px,390px,688px and1440px with six seats and large hands; local fixture screenshots may seed rare near-finish states explicitly and must be labeled as fixtures. No raster comp or new visual world.

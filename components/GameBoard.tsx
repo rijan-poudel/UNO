@@ -68,6 +68,11 @@ const VALUES: Record<string, string> = {
   shuffle: "Shuffle hands",
   discardAll: "Discard all",
 };
+function cardLabel(card: Card): string {
+  const value =
+    card.value === "wild4" ? "Wild +4" : (VALUES[card.value] ?? card.value);
+  return `${card.color === "wild" ? "" : card.color + " "}${value}`;
+}
 function describeAction(game: GameState) {
   const a = game.lastAction;
   if (a.type === "init") return "Cards dealt. Let’s play.";
@@ -130,7 +135,7 @@ function Opponent({
                 ? "Reconnecting"
                 : player.saidUno && player.hand.length === 1
                   ? "UNO!"
-                  : `${player.hand.length} cards`
+                  : `${player.hand.length} ${player.hand.length === 1 ? "card" : "cards"}`
             }
           >
             {offline ? (
@@ -141,7 +146,10 @@ function Opponent({
               <>
                 <Layers className="count-icon" size={12} aria-hidden="true" />
                 <span>{player.hand.length}</span>
-                <span className="count-word"> cards</span>
+                <span className="count-word">
+                  {" "}
+                  {player.hand.length === 1 ? "card" : "cards"}
+                </span>
               </>
             )}
           </small>
@@ -254,6 +262,18 @@ export default function GameBoard({
       setPendingAction(false);
     }, 1800);
   }
+  const canSayUno = !!(
+    game &&
+    localPlayer &&
+    !game.winnerId &&
+    !pendingWild &&
+    !pendingAction &&
+    (!online || online.connected) &&
+    game.rules.mustDeclareUno &&
+    localPlayer.hand.length >= 1 &&
+    localPlayer.hand.length <= 2 &&
+    !localPlayer.saidUno
+  );
   useEffect(() => {
     function onKey(event: KeyboardEvent) {
       if (
@@ -261,7 +281,12 @@ export default function GameBoard({
         event.ctrlKey ||
         event.altKey ||
         event.metaKey ||
-        document.querySelector("dialog[open]")
+        document.querySelector("dialog[open]") ||
+        !game ||
+        game.winnerId ||
+        pendingWild ||
+        pendingRef.current ||
+        (online && !online.connected)
       )
         return;
       if (
@@ -283,12 +308,7 @@ export default function GameBoard({
         event.preventDefault();
         act(api.pass);
       }
-      if (
-        event.key.toLowerCase() === "u" &&
-        localPlayer &&
-        localPlayer.hand.length <= 2 &&
-        !localPlayer.saidUno
-      ) {
+      if (event.key.toLowerCase() === "u" && canSayUno) {
         event.preventDefault();
         api.sayUno(localPlayerIndex);
       }
@@ -358,9 +378,13 @@ export default function GameBoard({
     !pendingWild &&
     !winner &&
     (!online || online.connected);
-  const selectedLabel = selectedCard
-    ? `${selectedCard.color === "wild" ? "" : selectedCard.color + " "}${VALUES[selectedCard.value] ?? selectedCard.value}`
-    : "";
+  const selectedLabel = selectedCard ? cardLabel(selectedCard) : "";
+  const drawnCard =
+    game.lastAction.type === "draw" &&
+    game.lastAction.playerId === localPlayer.id &&
+    game.lastAction.count === 1
+      ? localPlayer.hand.at(-1)
+      : null;
   const moveHint =
     online && !online.connected
       ? "Reconnecting. Your hand is safe."
@@ -376,8 +400,10 @@ export default function GameBoard({
               ? "Lift a card to plan your next move."
               : drawnThisTurn
                 ? playable.length
-                  ? "Play a matching card, or pass to end your turn."
-                  : "No match. Pass to end your turn."
+                  ? drawnCard
+                    ? `Drew ${cardLabel(drawnCard)}. Play a match or pass.`
+                    : "Play a matching card, or pass to end your turn."
+                  : "No match. Passing…"
                 : selectedCard
                   ? game.pendingDraw
                     ? `That card can’t stack. Choose a draw card or draw ${game.pendingDraw}.`
@@ -389,12 +415,6 @@ export default function GameBoard({
                     : playable.length
                       ? "Lift a matching card, then play it."
                       : "No matching card. Draw to keep the round moving.";
-  const canSayUno =
-    !winner &&
-    localPlayer.hand.length <= 2 &&
-    localPlayer.hand.length >= 1 &&
-    !localPlayer.saidUno &&
-    game.rules.mustDeclareUno;
   return (
     <div className={`game-page ${isLocalTurn ? "local-turn" : ""}`} ref={root}>
       <header className="game-header">
@@ -594,12 +614,24 @@ export default function GameBoard({
           <div className="hand-toolbar">
             <div className="hand-title">
               <strong>{localPlayer.name}</strong>
-              <span>{cards.length} cards</span>
+              <span>
+                {cards.length} {cards.length === 1 ? "card" : "cards"}
+              </span>
               {localPlayer.saidUno && cards.length === 1 && (
                 <span className="uno-called">
                   <Check size={13} />
                   UNO called
                 </span>
+              )}
+            </div>
+            <div className="hand-actions">
+              {canSayUno && (
+                <button
+                  className="button uno-button uno-ready"
+                  onClick={() => api.sayUno(localPlayerIndex)}
+                >
+                  UNO!
+                </button>
               )}
             </div>
           </div>
@@ -670,14 +702,6 @@ export default function GameBoard({
               {moveHint}
             </div>
             <div className="move-buttons">
-              {canSayUno && (
-                <button
-                  className="button uno-button uno-ready"
-                  onClick={() => api.sayUno(localPlayerIndex)}
-                >
-                  UNO!
-                </button>
-              )}
               {(isLocalTurn || canPlaySelected) && !pendingWild && !winner && (
                 <>
                   {canPlaySelected && (
@@ -691,7 +715,10 @@ export default function GameBoard({
                         if (element) select(selectedCard, element);
                       }}
                     >
-                      Play {selectedLabel} <ArrowRight size={18} />
+                      <span className="play-card-label">
+                        Play {selectedLabel}
+                      </span>
+                      <ArrowRight size={18} />
                     </button>
                   )}
                   {isLocalTurn &&

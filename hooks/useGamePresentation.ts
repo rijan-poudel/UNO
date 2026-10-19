@@ -147,6 +147,29 @@ export function useGamePresentation(
       }
       selectedOrigin.current = null;
     }
+    const local = game.players.find((p) => p.id === localPlayerId);
+    const priorIds = new Set(
+      before?.players
+        .find((p) => p.id === localPlayerId)
+        ?.hand.map((c) => c.id),
+    );
+    // Reveal an actual new draw before measuring/animating its arrival.
+    // Initial deals, opponent draws and hand shuffles keep the reader's position.
+    if (
+      before &&
+      local &&
+      game.lastAction.type === "draw" &&
+      game.lastAction.playerId === localPlayerId
+    ) {
+      const added = local.hand.filter((card) => !priorIds.has(card.id));
+      const newest = added.at(-1);
+      if (newest)
+        findCard(newest.id)?.closest("[data-hand-card]")?.scrollIntoView({
+          block: "nearest",
+          inline: "center",
+          behavior: "instant",
+        });
+    }
     const nextRects = new Map<string, DOMRect>();
     board
       .querySelectorAll<HTMLElement>("[data-hand-card]")
@@ -176,12 +199,6 @@ export function useGamePresentation(
         }
       });
     handRects.current = nextRects;
-    const local = game.players.find((p) => p.id === localPlayerId);
-    const priorIds = new Set(
-      before?.players
-        .find((p) => p.id === localPlayerId)
-        ?.hand.map((c) => c.id),
-    );
     if (local && deck)
       local.hand
         .filter((c) => !priorIds.has(c.id))

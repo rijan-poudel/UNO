@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-19T12:46:23.367275+00:00",
+  "generatedAt": "2026-10-19T15:07:17.831730+00:00",
   "title": "Design System: UNO — Tactile table",
   "extensions": {
     "colorMeta": {
@@ -1133,9 +1133,9 @@
       "name": "Contextual move dock",
       "kind": "custom",
       "refersTo": "button-play-selected",
-      "description": "Selected legal-card action names the card; Draw or Pass and eligible UNO follow live state.",
-      "html": "<div class=\"ds-dock\"><p class=\"ds-hint\" role=\"status\">Ready to play. You can also drag it onto the table.</p><div class=\"ds-moves\"><button class=\"ds-move ds-play\">Play red 7 <svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M5 12h14m-6-6 6 6-6 6\"/></svg></button><button class=\"ds-move ds-draw\">Draw card</button></div></div>",
-      "css": ".ds-dock{font-family:var(--font-body,Outfit),sans-serif;display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:80px;padding:6px 12px 18px;background:#111925;color:#f1f4fa}.ds-hint{margin:0;max-width:40ch;color:#b1bfd2;font-size:13px;line-height:1.5}.ds-moves{display:flex;flex-shrink:0;gap:8px}.ds-move{font-family:var(--font-body,Outfit),sans-serif;display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:50px;padding:14px 22px;border:1px solid transparent;border-radius:14px;font-size:14px;font-weight:800;line-height:1.25;cursor:pointer;transition:background 160ms,color 160ms,transform 120ms}.ds-play{background:#d8ed82;color:#202b12;box-shadow:0 4px 10px #f17d8240}.ds-draw{background:transparent;color:#f1f4fa;border-color:#3a4b63}.ds-play:hover{background:#d8ed82}.ds-draw:hover{background:color-mix(in srgb,#f1f4fa 5%,transparent)}.ds-move:focus-visible{outline:2px solid #d8ed82;outline-offset:5px}.ds-move:active{transform:translateY(3px) scale(.985);box-shadow:none}.ds-move:disabled{opacity:.44;cursor:default}@media(max-width:540px){.ds-dock{flex-direction:column;gap:8px;min-height:98px;text-align:center;padding-bottom:14px}.ds-hint{font-size:12px;min-height:18px;max-width:none}.ds-moves{justify-content:center;width:100%}.ds-move{flex:1;max-width:220px;padding-inline:14px}}@media(prefers-reduced-motion:reduce){.ds-move{transition:none}.ds-move:active{transform:none}}"
+      "description": "Eligible UNO belongs to the hand toolbar; at most two dock actions preserve the full selected-card label. Button and U shortcut share availability.",
+      "html": "<div class=\"ds-hand-controls\"><div class=\"ds-hand-toolbar\"><div class=\"ds-hand-title\"><strong>You</strong><span>2 cards</span></div><button class=\"ds-move ds-uno\">UNO!</button></div><div class=\"ds-dock\"><p class=\"ds-hint\" role=\"status\">Ready to play. You can also drag it onto the table.</p><div class=\"ds-moves\"><button class=\"ds-move ds-play\"><span class=\"ds-play-label\">Play green Discard all</span><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M5 12h14m-6-6 6 6-6 6\"/></svg></button><button class=\"ds-move ds-draw\">Draw card</button></div></div></div>",
+      "css": ".ds-dock{font-family:var(--font-body,Outfit),sans-serif;display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:80px;padding:6px 12px 18px;background:#111925;color:#f1f4fa}.ds-hint{margin:0;max-width:40ch;min-width:0;color:#b1bfd2;font-size:13px;line-height:1.5}.ds-moves{display:flex;flex-shrink:0;max-width:65%;gap:8px}.ds-move{font-family:var(--font-body,Outfit),sans-serif;display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:50px;min-width:0;padding:14px 22px;border:1px solid transparent;border-radius:14px;font-size:14px;font-weight:800;line-height:1.25;cursor:pointer;transition:background 160ms,color 160ms,transform 120ms}.ds-play{background:#d8ed82;color:#202b12;box-shadow:0 4px 10px #f17d8240}.ds-draw{background:transparent;color:#f1f4fa;border-color:#3a4b63}.ds-play:hover{background:#d8ed82}.ds-draw:hover{background:color-mix(in srgb,#f1f4fa 5%,transparent)}.ds-move:focus-visible{outline:2px solid #d8ed82;outline-offset:5px}.ds-move:active{transform:translateY(3px) scale(.985);box-shadow:none}.ds-move:disabled{opacity:.44;cursor:default}@media(max-width:540px){.ds-dock{flex-direction:column;gap:8px;min-height:98px;text-align:center;padding-bottom:14px}.ds-hint{font-size:12px;min-height:18px;max-width:none}.ds-moves{justify-content:center;width:100%;max-width:100%}.ds-moves .ds-move{flex:1;max-width:220px;padding-inline:14px}}@media(prefers-reduced-motion:reduce){.ds-move{transition:none}.ds-move:active{transform:none}}.ds-hand-controls{font-family:var(--font-body,Outfit),sans-serif;background:#111925;color:#f1f4fa}.ds-hand-toolbar{position:relative;display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:38px;padding-inline:12px}.ds-hand-title{display:flex;align-items:center;gap:9px;font-size:12px}.ds-hand-title strong{font-weight:500;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ds-hand-title>span{color:#b1bfd2;white-space:nowrap}.ds-uno{min-height:44px;padding:6px 18px;background:#f7c934;color:#332810;font-size:18px;font-weight:800;font-style:italic;box-shadow:0 5px 15px #060b1633}.ds-uno:hover{background:#f7c934}.ds-play-label{min-width:0;overflow-wrap:anywhere}.ds-move svg{flex-shrink:0}@media(max-width:540px){.ds-hand-title{font-size:11px;gap:6px}.ds-hand-title strong{max-width:100px}}"
     },
     {
       "name": "Text field",
@@ -1219,7 +1219,7 @@
       },
       {
         "name": "The Named Move Rule",
-        "body": "Keep the inspected card identifiable through selection and resize, and name it in the Play action. Every dock hint and control follows current legal-action state.",
+        "body": "Keep the inspected card identifiable through selection and resize, and name it fully in the Play action, wrapping when needed. Reveal an actual new local draw without forcing selection. Every hand action, shortcut and dock hint follows current legal-action state.",
         "section": "components"
       },
       {
@@ -1234,7 +1234,9 @@
       "Do use scoped midnight arena variables while honoring appearance on supporting screens.",
       "Do retain readable six-seat phone names, visible corner indices and an independently scrolling large hand.",
       "Do make inspection, legal plays, turn state and situational actions clear with touch and keyboard.",
-      "Do keep the named Play action, selected card and current hint in agreement; retain dark ink on lime.",
+      "Do keep the full named Play action, selected card and current hint in agreement; retain dark ink on lime.",
+      "Do reveal actual new local draws without selecting them and preserve horizontal position on unrelated updates.",
+      "Do keep eligible UNO at hand level and limit the bottom dock to named Play and Draw or Pass; give button and keyboard the same availability rules.",
       "Do put secondary entry shortcuts after the primary choices and keep optional bot/friend details in disclosures.",
       "Do honor reduced motion, mute, audio readiness and interrupted gesture cleanup.",
       "Do keep presentation responsive to the current published state without delaying play."
