@@ -90,7 +90,12 @@ for (const extraRules of [
     assert.ok(game.winnerId, 'Every simulated round finishes within the cap');
   }
 }
-const initial = initializeGame(['One', 'Two'], {}, [false, false]);
+// Isolate color validation from random opening draw penalties.
+const initial = initializeGame(
+  ['One', 'Two'],
+  { allowStartingActionCard: false },
+  [false, false],
+);
 const wild = {
   id: 'validation-wild',
   color: 'wild' as const,
@@ -102,6 +107,10 @@ const pending = {
     i === initial.currentPlayerIndex ? { ...p, hand: [wild] } : p,
   ),
 };
+assert.ok(
+  canPlayCard(wild, pending, pending.currentPlayerIndex),
+  'Color validation fixture must allow the wild to be played',
+);
 assert.throws(
   () =>
     playCard(
