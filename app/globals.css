@@ -1785,35 +1785,135 @@ input[type="range"] {
   }
 }
 .player-progress {
+  display: grid;
+  gap: 10px;
+  margin-top: 20px;
+  font-size: 12px;
+  max-width: 440px;
+}
+.progress-record {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 16px;
-  margin-top: 20px;
-  font-size: 12px;
-  font-weight: 800;
+  gap: 7px 14px;
 }
-.player-progress > span {
+.progress-record > span {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
+  font-weight: 600;
 }
-.player-progress svg {
+.progress-record small {
+  color: var(--ui-muted);
+  font-size: 11px;
+}
+.progress-record svg {
   color: var(--ui-accent-red);
 }
-.player-progress small {
-  font-size: 10px;
+.milestone-collection summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  cursor: pointer;
   color: var(--ui-muted);
-  font-weight: 500;
+  list-style: none;
+  width: fit-content;
+}
+.milestone-collection summary::-webkit-details-marker {
+  display: none;
+}
+.milestone-collection summary > svg {
+  transition: transform 150ms var(--ease-out);
+}
+.milestone-collection[open] summary > svg {
+  transform: rotate(180deg);
+}
+.milestone-collection summary:focus-visible {
+  outline: 2px solid var(--ui-accent-red);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+.collection-fan {
+  width: 57px;
+  height: 34px;
+  position: relative;
+  flex-shrink: 0;
+}
+.collection-fan i {
+  position: absolute;
+  top: 4px;
+  left: calc(var(--stamp-i) * 11px);
+  width: 22px;
+  height: 29px;
+  border: 1px solid var(--ui-line);
+  border-radius: 3px;
+  background: var(--ui-surface);
+  transform: rotate(calc(-12deg + var(--stamp-i) * 8deg));
+}
+.collection-fan i.collected {
+  background: #f7c934;
+  border-color: #8b600b;
+}
+.milestone-stamps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 7px;
+  padding-block: 8px;
+}
+.milestone-stamp {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 7px;
+  padding: 12px 5px 9px;
+  border: 1px solid var(--ui-line);
+  border-radius: 6px;
+  color: var(--ui-muted);
+  text-align: center;
+}
+.milestone-stamp > svg {
+  flex-shrink: 0;
+}
+.milestone-stamp strong {
+  font-size: 12px;
+  line-height: 1.2;
+  min-height: 29px;
+  font-weight: 600;
+}
+.milestone-stamp > span {
+  display: grid;
+  place-items: center;
+  height: 16px;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.milestone-stamp small {
+  font-size: 10px;
+  line-height: 1.4;
+}
+.milestone-stamp.earned {
+  background: #f7c934;
+  border-color: transparent;
+  color: #332810;
 }
 .winner-modal .player-progress {
-  justify-content: center;
-  margin: 0 0 25px;
+  margin: 0;
+  max-width: none;
 }
 @media (max-width: 700px) {
   .home-copy > .player-progress {
     order: 3;
     margin-top: 20px;
+  }
+}
+@media (max-width: 380px) {
+  .milestone-stamps {
+    gap: 5px;
+  }
+  .milestone-stamp strong {
+    font-size: 11px;
   }
 }
 

@@ -1,0 +1,89 @@
+import Link from "next/link";
+// LOCAL UI PREVIEW ONLY. Copy to app/reward-preview/page.tsx; remove before build.
+// Uses a real engine terminal snapshot and pure collection view; never recordRound.
+import { initializeGame } from "@/lib/gameSetup";
+import { playCard } from "@/lib/gameActions";
+import { ProgressCollection } from "@/components/PlayerProgress";
+import RoundSummary from "@/components/RoundSummary";
+import Modal from "@/components/Modal";
+import { VictoryBurst } from "@/components/GameFeedback";
+import type { Card } from "@/types/card";
+
+function buildPreviewGame(loss: boolean) {
+  const base = initializeGame(
+    ["Preview", "Alexandria Longlastname", "Jules", "Robin", "Frankie", "Lou"],
+    { maxPlayers: 6, allowStartingActionCard: false },
+  );
+  let pool = [
+    ...base.drawPile,
+    ...base.discardPile,
+    ...base.players.flatMap((p) => p.hand),
+  ];
+  function take(predicate: (card: Card) => boolean) {
+    const card = pool.find(predicate);
+    if (!card) throw new Error("Preview card unavailable");
+    pool = pool.filter((c) => c.id !== card.id);
+    return card;
+  }
+  const top = take((c) => c.color === "green" && c.value === "2");
+  const winCard = take((c) => c.color === "green" && c.value === "5");
+  const winnerIndex = loss ? 1 : 0;
+  const players = base.players.map((player, i) => ({
+    ...player,
+    hand:
+      i === winnerIndex
+        ? [winCard]
+        : Array.from({ length: i === 5 ? 12 : 3 + i }, () => take(() => true)),
+  }));
+  const prepared = {
+    ...base,
+    players,
+    drawPile: pool,
+    discardPile: [top],
+    activeColor: "green" as const,
+    currentPlayerIndex: winnerIndex,
+    pendingDraw: 0,
+    pendingDrawType: null,
+  };
+  const game = playCard(prepared, winnerIndex, winCard.id);
+  return { game, players };
+}
+export default async function Preview({
+  searchParams,
+}: {
+  searchParams: Promise<{ loss?: string }>;
+}) {
+  const loss = (await searchParams).loss === "1";
+  const { game, players } = buildPreviewGame(loss);
+  const progress = {
+    rounds: 10,
+    wins: 3,
+    streak: loss ? 0 : 3,
+    bestStreak: 3,
+    recent: [],
+  };
+  return (
+    <div className="game-page" style={{ minHeight: "100dvh" }}>
+      <p style={{ padding: 16 }}>Local preview. No history is saved.</p>
+      <Modal
+        title={loss ? "Alexandria Longlastname wins." : "You win."}
+        className="winner-modal"
+      >
+        {!loss && <VictoryBurst />}
+        <RoundSummary game={game} localPlayerId={players[0].id} />
+        <ProgressCollection progress={progress} />
+        <div className="dialog-actions round-actions">
+          <Link
+            className="button primary"
+            href={loss ? "/reward-preview" : "/reward-preview?loss=1"}
+          >
+            One more round
+          </Link>
+          <Link className="button secondary" href="/">
+            Back to home
+          </Link>
+        </div>
+      </Modal>
+    </div>
+  );
+}

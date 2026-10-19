@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-19T17:50:18.454623+00:00",
+  "generatedAt": "2026-10-19T18:16:52.276511+00:00",
   "title": "Design System: UNO — Tactile table",
   "extensions": {
     "colorMeta": {
@@ -1103,6 +1103,11 @@
         "name": "victory",
         "value": "1300ms",
         "purpose": "Bounded completion burst."
+      },
+      {
+        "name": "last-card-settle",
+        "value": "240ms cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "One bounded last-card marker stamp; static under reduced motion. Never gates a turn."
       }
     ],
     "breakpoints": [
@@ -1205,7 +1210,7 @@
       "name": "Active seat and turn cue",
       "kind": "chip",
       "refersTo": "opponent-badge-active",
-      "description": "Truthful active-seat badge and a wrapping turn cue containing the named active color.",
+      "description": "Truthful active-seat badge and a wrapping turn cue containing the named active color. A last-card marker attaches inside the opponent hand; an eligible missed call exposes a 56 × 44px Catch target with the full player name. Penalty numerals belong on the actual deck.",
       "html": "<div class=\"ds-status\"><span class=\"ds-seat\"><span><strong>Alex</strong><small>4 cards</small></span><i aria-hidden=\"true\"></i></span><div class=\"ds-cue\"><span class=\"ds-cue-dot\" aria-hidden=\"true\"></span><h1>Alex’s turn</h1><span class=\"ds-active-color\" aria-label=\"Active color: red\"><i aria-hidden=\"true\"></i><span>red</span></span></div></div>",
       "css": ".ds-seat{font-family:var(--font-body,Outfit),sans-serif;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:7px 10px;max-width:140px;border-radius:12px;background:#d8ed82;color:#172130}.ds-seat strong{display:block;font-size:12px;font-weight:500}.ds-seat small{display:block;font-size:11px;color:#3f5023}.ds-seat i{width:5px;height:5px;border-radius:50%;background:#3f5023}.ds-status{position:relative;min-height:120px;padding:12px;background:#101c1c;font-family:var(--font-body,Outfit),sans-serif}.ds-cue{position:absolute;bottom:2px;left:50%;transform:translateX(-50%);min-height:42px;display:flex;align-items:center;justify-content:center;gap:9px;text-align:center;width:max-content;max-width:calc(100% - 24px);flex-wrap:wrap;row-gap:3px;padding-block:4px;color:#b1bfd2}.ds-cue h1{margin:0;min-width:0;overflow-wrap:anywhere;font-size:18px;font-weight:500;letter-spacing:-.02em;line-height:1.5}.ds-cue-dot{width:6px;height:6px;border-radius:50%;background:currentColor}.ds-active-color{display:inline-flex;align-items:center;gap:7px;margin-left:7px;font-size:12px;font-weight:400;color:#b1bfd2;text-transform:capitalize;white-space:nowrap}.ds-active-color i{width:10px;height:10px;border-radius:50%;background:#ff727a;border:1px solid #ffffff70}"
     },
@@ -1223,6 +1228,14 @@
       "description": "Generated baize and padded leather with soft-light grading and a native responsive rail.",
       "html": "<div class=\"ds-table\" role=\"img\" aria-label=\"Deep green baize inside a dark leather rail\"></div>",
       "css": ".ds-table{position:relative;min-height:220px;border-radius:150px;background:#172a28 url(\"/textures/padded-leather.jpg\") center/340px;background-blend-mode:soft-light;box-shadow:inset 0 2px 3px #b9d3c036,0 18px 38px #020a0966}.ds-table::before{content:\"\";position:absolute;inset:13px;border-radius:inherit;background:#245b49 url(\"/textures/green-baize.jpg\") center/560px;background-blend-mode:soft-light;box-shadow:inset 0 5px 12px #061e2160}.ds-table::after{content:\"\";position:absolute;inset:26px;border:1px solid #c6d7bd38;border-radius:inherit}@media(max-width:540px){.ds-table{border-radius:130px;min-height:220px}}@media(max-width:540px){.ds-table::before{inset:9px}.ds-table::after{inset:20px}}"
+    },
+    {
+      "name": "Earned round and milestone collection",
+      "kind": "custom",
+      "refersTo": "milestone-stamp-earned",
+      "description": "Illustrative one-round/one-win terminal facts and native optional disclosure. Production uses actual seat order, completed device history and existing rematch handlers; this specimen writes no history.",
+      "html": "<div class=\"ds-earned-round\"><div class=\"ds-finish-heading\"><span>At the finish</span><small>Cards left</small></div><div class=\"ds-finish-row\"><span>You</span><strong>0</strong></div><div class=\"ds-finish-row\"><span>Alex</span><strong>4</strong></div><div class=\"ds-progress-record\"><span>1 round</span><span>1 win</span><small>On this device</small></div><details class=\"ds-collection\"><summary><span class=\"ds-collection-fan\" aria-hidden=\"true\"><i></i><i></i><i></i><i></i></span><span>1 of 4 milestones</span><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"m6 9 6 6 6-6\"/></svg></summary><div class=\"ds-milestones\"><div class=\"ds-milestone ds-earned\"><svg width=\"25\" height=\"25\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M8 3h8v5a4 4 0 0 1-8 0V3ZM8 5H5v3a4 4 0 0 0 4 4m7-7h3v3a4 4 0 0 1-4 4m-3 0v7m-4 2h8\"/></svg><strong>First win</strong><span><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-label=\"Collected\"><path d=\"m5 12 4 4L19 6\"/></svg></span><small>Win a round</small></div><div class=\"ds-milestone\"><svg width=\"25\" height=\"25\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M8 3h8v5a4 4 0 0 1-8 0V3ZM8 5H5v3a4 4 0 0 0 4 4m7-7h3v3a4 4 0 0 1-4 4m-3 0v7m-4 2h8\"/></svg><strong>Hat trick</strong><span>1/3</span><small>Win 3 rounds</small></div><div class=\"ds-milestone\"><svg width=\"25\" height=\"25\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M8 3h8v5a4 4 0 0 1-8 0V3ZM8 5H5v3a4 4 0 0 0 4 4m7-7h3v3a4 4 0 0 1-4 4m-3 0v7m-4 2h8\"/></svg><strong>Table regular</strong><span>1/10</span><small>Finish 10 rounds</small></div><div class=\"ds-milestone\"><svg width=\"25\" height=\"25\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M8 3h8v5a4 4 0 0 1-8 0V3ZM8 5H5v3a4 4 0 0 0 4 4m7-7h3v3a4 4 0 0 1-4 4m-3 0v7m-4 2h8\"/></svg><strong>On fire</strong><span>1/3</span><small>Win 3 in a row</small></div></div></details></div>",
+      "css": ".ds-earned-round{font-family:var(--font-body,Outfit),sans-serif;color:var(--ui-text,#2c2c32);background:var(--ui-surface,#fffcf5);max-width:440px}.ds-finish-heading{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding-bottom:6px;font-size:14px;font-weight:500}.ds-finish-heading small{font-size:11px;color:var(--ui-muted,#706b65)}.ds-finish-row{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:43px;padding:6px 8px;border-bottom:1px solid var(--ui-line,#e3dbce);font-size:13px}.ds-finish-row strong{font-size:17px;font-weight:600;font-variant-numeric:tabular-nums}.ds-progress-record{display:flex;align-items:center;flex-wrap:wrap;gap:7px 14px;margin-top:20px;font-size:12px;font-weight:600}.ds-progress-record small{color:var(--ui-muted,#706b65);font-size:11px;font-weight:400}.ds-collection summary{display:flex;align-items:center;gap:10px;min-height:44px;width:fit-content;cursor:pointer;color:var(--ui-muted,#706b65);font-size:12px;list-style:none}.ds-collection summary::-webkit-details-marker{display:none}.ds-collection summary:focus-visible{outline:2px solid var(--ui-accent-red,#c74531);outline-offset:4px;border-radius:4px}.ds-collection summary>svg{transition:transform 150ms var(--ease-out,cubic-bezier(.2,.8,.2,1))}.ds-collection[open] summary>svg{transform:rotate(180deg)}.ds-collection-fan{position:relative;width:57px;height:34px;flex-shrink:0}.ds-collection-fan i{position:absolute;top:4px;width:22px;height:29px;border:1px solid var(--ui-line,#e3dbce);border-radius:3px;background:var(--ui-surface,#fffcf5)}.ds-collection-fan i:nth-child(1){left:0;transform:rotate(-12deg);background:#f7c934;border-color:#8b600b}.ds-collection-fan i:nth-child(2){left:11px;transform:rotate(-4deg)}.ds-collection-fan i:nth-child(3){left:22px;transform:rotate(4deg)}.ds-collection-fan i:nth-child(4){left:33px;transform:rotate(12deg)}.ds-milestones{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;padding-block:8px}.ds-milestone{display:flex;flex-direction:column;align-items:center;gap:7px;padding:12px 5px 9px;border:1px solid var(--ui-line,#e3dbce);border-radius:6px;color:var(--ui-muted,#706b65);text-align:center}.ds-milestone>svg{flex-shrink:0}.ds-milestone strong{font-size:12px;line-height:1.2;min-height:29px;font-weight:600}.ds-milestone>span{display:grid;place-items:center;height:16px;font-size:12px;font-variant-numeric:tabular-nums}.ds-milestone small{font-size:10px;line-height:1.4}.ds-milestone.ds-earned{background:#f7c934;border-color:transparent;color:#332810}@media(max-width:380px){.ds-milestones{gap:5px}.ds-milestone strong{font-size:11px}}@media(prefers-reduced-motion:reduce){.ds-collection summary>svg{transition:none}}"
     }
   ],
   "narrative": {
@@ -1233,7 +1246,8 @@
       "Outfit interface lettering paired with Barlow Condensed card numerals.",
       "Warm themed supporting surfaces and a fixed baize-and-leather live table.",
       "First-activation legal play, nonmatching-card inspection and deliberate upward release.",
-      "Bounded hand scrolling, contextual controls and paper/contact feedback that never delays a turn."
+      "Bounded hand scrolling, contextual controls and paper/contact feedback that never delays a turn.",
+      "Real round outcomes and optional device-local milestone cards."
     ],
     "rules": [
       {
@@ -1257,6 +1271,11 @@
         "section": "elevation"
       },
       {
+        "name": "The Earned History Rule",
+        "body": "Show rewards only from validated completed rounds. Keep best-streak collectibles earned after a loss, keep current streak separate, and present terminal hand counts without inferred points or finishing ranks.",
+        "section": "components"
+      },
+      {
         "name": "The Direct Move Rule",
         "body": "Play a legal face on its first activation. Keep nonmatching inspection and the full named fallback for a pre-inspected card that becomes legal. Reveal actual new local draws without forcing selection; every gesture, shortcut and hint follows current legal-action state.",
         "section": "components"
@@ -1278,7 +1297,9 @@
       "Do keep Draw on the deck, eligible UNO at hand level, and the dock limited to contextual Pass and the pre-inspected-card Play fallback; give button and keyboard the same availability rules.",
       "Do put secondary entry shortcuts after the primary choices and keep optional bot/friend details in disclosures.",
       "Do honor reduced motion, mute, audio readiness and interrupted gesture cleanup.",
-      "Do keep presentation responsive to the current published state without delaying play."
+      "Do keep presentation responsive to the current published state without delaying play.",
+      "Do derive optional milestone cards from completed device-local rounds and keep result actions reachable inside the native dialog.",
+      "Do attach pressure cues to their actual opponent hand or penalty deck and retain full accessible names."
     ],
     "donts": [
       "Don't restore clay hero art, Fredoka, a third font family or a parallel component library.",
@@ -1286,7 +1307,8 @@
       "Don't show UNO when ineligible, duplicate Draw in the dock or turn sorting into a permanent table control.",
       "Don't use Unicode glyph icons in place of the established SVG icon system.",
       "Don't give general controls hard offset block shadows; physical deck edges are the intentional exception.",
-      "Don't queue narration, wait for sound or animation, or add a blocking splash."
+      "Don't queue narration, wait for sound or animation, or add a blocking splash.",
+      "Don't infer points or finishing ranks from cards left, grant rewards per click, or claim a milestone is new without before/after evidence."
     ]
   }
 }

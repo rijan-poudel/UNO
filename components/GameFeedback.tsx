@@ -1,6 +1,6 @@
 // Brief action signals complement the cards without blocking the next move.
 "use client";
-import { Ban, ChevronsLeftRight, Shuffle } from "lucide-react";
+import { Ban, Repeat2, Shuffle } from "lucide-react";
 import type { GameState } from "../types/game";
 export default function GameFeedback({ game }: { game: GameState }) {
   const action = game.lastAction;
@@ -14,7 +14,7 @@ export default function GameFeedback({ game }: { game: GameState }) {
           : null;
   const visual =
     value === "reverse" ? (
-      <ChevronsLeftRight />
+      <Repeat2 />
     ) : value === "skip" ? (
       <Ban />
     ) : value === "shuffle" ? (
@@ -28,7 +28,11 @@ export default function GameFeedback({ game }: { game: GameState }) {
     ) : value === "caught" ? (
       "+2"
     ) : value === "discardAll" ? (
-      "ALL!"
+      action.type === "play" ? (
+        `−${1 + (action.discardAllCount ?? 0)}`
+      ) : (
+        "ALL!"
+      )
     ) : value === "wild" ? (
       <span className="wild-burst">
         <i />

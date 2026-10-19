@@ -31,6 +31,7 @@ import { canPlayCard } from "../lib/gameRules";
 import { getAudioSettings, setAudioSettings } from "../lib/audioSettings";
 import { useGamePresentation } from "../hooks/useGamePresentation";
 import PlayerProgress from "./PlayerProgress";
+import RoundSummary from "./RoundSummary";
 import PlayerAvatar from "./PlayerAvatar";
 import GameFeedback, { VictoryBurst } from "./GameFeedback";
 import UnoCard from "./UnoCard";
@@ -104,7 +105,7 @@ function Opponent({
 }) {
   return (
     <div
-      className={`opponent ${position} ${active ? "active-seat" : ""}`}
+      className={`opponent ${position} ${active ? "active-seat" : ""} ${player.hand.length === 1 ? "last-card-seat" : ""}`}
       data-seat={player.id}
     >
       <div className="opponent-hand" aria-hidden="true">
@@ -125,6 +126,9 @@ function Opponent({
             />
           </span>
         ))}
+        {player.hand.length === 1 && (
+          <b className="last-card-stamp">{player.saidUno ? "UNO" : "1"}</b>
+        )}
       </div>
       <div className="opponent-label">
         <PlayerAvatar seed={player.id} />
@@ -161,8 +165,12 @@ function Opponent({
         />
       </div>
       {canCatch && (
-        <button className="catch-button" onClick={onCatch}>
-          Catch missed UNO
+        <button
+          className="catch-button"
+          aria-label={`Catch ${player.name}’s missed UNO`}
+          onClick={onCatch}
+        >
+          Catch!
         </button>
       )}
     </div>
@@ -563,6 +571,9 @@ export default function GameBoard({
               canCatch={
                 (!online || isLocalTurn) &&
                 !winner &&
+                !pendingWild &&
+                !pendingAction &&
+                (!online || online.connected) &&
                 !player.saidUno &&
                 player.hand.length === 1 &&
                 game.rules.mustDeclareUno
@@ -574,7 +585,7 @@ export default function GameBoard({
             <div className="pile-zone">
               <button
                 data-draw-pile
-                className="draw-pile"
+                className={`draw-pile ${game.pendingDraw ? "penalty-deck" : ""}`}
                 disabled={drawDisabled}
                 aria-label={
                   game.pendingDraw
@@ -589,6 +600,11 @@ export default function GameBoard({
                   sizeMultiplier={1.25}
                 />
                 <span className="deck-count">{game.drawPile.length}</span>
+                {game.pendingDraw > 0 && (
+                  <span className="draw-penalty" aria-hidden="true">
+                    +{game.pendingDraw}
+                  </span>
+                )}
               </button>
               <span
                 className={`pile-label ${!drawDisabled ? "draw-available" : ""}`}
@@ -903,25 +919,15 @@ export default function GameBoard({
       )}
       {winner && !exit && (
         <Modal
-          title={winner.id === localPlayer.id ? "You did that!" : "Rematch?"}
+          title={
+            winner.id === localPlayer.id ? "You win." : `${winner.name} wins.`
+          }
           className="winner-modal"
         >
-          <VictoryBurst />
-          <div className="winner-result">
-            <PlayerAvatar seed={winner.id} large />
-            <Trophy size={48} strokeWidth={1.5} />
-            <h3>{winner.name} wins.</h3>
-            <p>
-              {winner.id === localPlayer.id
-                ? "Zero cards. All the glory."
-                : "The next round could be yours."}
-            </p>
-          </div>
+          {winner.id === localPlayer.id && <VictoryBurst />}
+          <RoundSummary game={game} localPlayerId={localPlayer.id} />
           <PlayerProgress />
-          <div className="dialog-actions">
-            <button className="button secondary" onClick={onReset}>
-              Back to home
-            </button>
+          <div className="dialog-actions round-actions">
             {!online || online.room?.hostPlayerId === online.playerId ? (
               <button className="button primary" onClick={onDealAgain}>
                 One more round
@@ -940,6 +946,9 @@ export default function GameBoard({
                 <Check size={17} />
               </button>
             )}
+            <button className="button secondary" onClick={onReset}>
+              Back to home
+            </button>
           </div>
           {online && online.room?.hostPlayerId !== online.playerId && (
             <p className="muted">The host will start the next round.</p>

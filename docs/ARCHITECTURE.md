@@ -67,3 +67,11 @@ Card sounds combine an immediate paper swipe with a short landing tap scheduled 
 `HandCard` plays a legal card on one activation and inspects a nonmatching card. Pointer pickup primes audio synchronously and produces short paper feedback. Vertical drags clone the actual face; `lib/cardGesture.ts` determines deliberate upward release versus scrolling/cancel. Its small assertion check runs as part of `check:game`. `onDragChange` exposes landing feedback to `GameBoard`, while the immutable engine remains the only source of legal actions. The physical draw pile is the Draw control; the bottom dock holds contextual Pass and an explicit Play fallback for a card inspected before its turn. The discard retains two prior faces under the current card.
 
 Review evidence in `.impeccable/review/direct-play/` uses the earlier loopback-only preview fixture, never a deployed multiplayer service. Native browser assertions and screenshots have separate scope from physical speaker quality.
+
+### Earned table moments
+
+`getProgressMilestones` derives four collectible milestones from existing device-local completed-round history. It uses best streak for the three-in-a-row collectible, so losing a later round does not remove an earned milestone. No new storage schema, XP, official point scoring or reward event queue is introduced. `PlayerProgress` reads the external store; its exported pure `ProgressCollection` view accepts a validated record for isolated previews without writing history.
+
+`RoundSummary` renders the terminal winner and each player's actual cards left. Winner first and then seat order is presentation, not inferred finishing ranks. The native result dialog scrolls for six seats or expanded milestones; its real rematch/home actions remain reachable. The GameBoard routes online readiness and rematches as before. Opponent one-card markers belong to the physical hand, the compact Catch action has a full accessible name, and the deck displays the real pending draw count. A successful catch or resolved draw removes the corresponding state feedback.
+
+Review fixtures in `.impeccable/review/table-rewards/` include a temporary server-rendered preview page. It renders terminal engine data and illustrative progress through pure UI; it never records a sample result. The preview route is removed before production builds and is not deployed.

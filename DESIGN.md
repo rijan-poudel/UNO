@@ -264,6 +264,22 @@ components:
     rounded: "{rounded.inset}"
     width: "33px"
     height: "41px"
+  catch-button:
+    backgroundColor: "{colors.card-yellow}"
+    textColor: "{colors.card-yellow-ink}"
+    rounded: "{rounded.inset}"
+    padding: "5px 8px"
+    width: "56px"
+    height: "44px"
+  milestone-stamp:
+    textColor: "{colors.ui-muted}"
+    rounded: "{rounded.card}"
+    padding: "12px 5px 9px"
+  milestone-stamp-earned:
+    backgroundColor: "{colors.card-yellow}"
+    textColor: "{colors.card-yellow-ink}"
+    rounded: "{rounded.card}"
+    padding: "12px 5px 9px"
   uno-card:
     backgroundColor: "{colors.card-red}"
     textColor: "{colors.card-paper}"
@@ -289,8 +305,11 @@ The launch and settings shell retains warm, theme-aware surfaces and compact car
 - Warm themed supporting surfaces and a fixed baize-and-leather live table.
 - First-activation legal play, nonmatching-card inspection and deliberate upward release.
 - Bounded hand scrolling, contextual controls and paper/contact feedback that never delays a turn.
+- Real round outcomes and optional device-local milestone cards.
 
 Refreshed from the finished implementation on 2026-10-19. The owner-directed replacement in `.impeccable/review/direct-play/contract.md` and `.impeccable/direction.md` supersedes the previous midnight table and inspect-first flow; launch/settings remain incumbent. Evidence is `app/table.css`, `components/UnoCard.tsx`, `components/HandCard.tsx`, `components/GameBoard.tsx`, `hooks/useGamePresentation.ts`, `lib/cardGesture.ts` and `lib/tableChimes.ts`, alongside unchanged shell primitives. This is code-led work with no approved raster comp. The fresh full material review is `finish-review-rebuild.md` in that review packet; `verdict.md` confirms the sole rail-shadow fix resolved. Six valid captures at 320, 390 and 1440px are seeded local fixtures, not public matches. Reduced-motion behavior is evidenced by source guards, not an emulated capture; screenshots and audio scheduling assertions do not certify physical speaker quality.
+
+The earned-moments extension was recorded from `components/PlayerProgress.tsx`, `components/RoundSummary.tsx`, `components/GameBoard.tsx`, `components/GameFeedback.tsx`, `lib/playerProgress.ts` and the progress/earned-moments stylesheet blocks on 2026-10-20. Its contract, verification and ship review live in `.impeccable/review/table-rewards/`. Eleven 320/390/1440px captures cover synthetic local result/pressure states and a home capture using actual device history (one round, zero wins). The pure collection preview did not write history; its temporary route was removed before production. This extension retains the materials, deck, fonts and sound already recorded here.
 
 ## Colors
 
@@ -304,7 +323,7 @@ Warm interface paper frames the invitation to play; stable saturated card colors
 
 ### Secondary
 
-- **Card spectrum:** `card-red`, `card-yellow`, `card-green`, `card-blue` and `card-wild` belong to the deck. Yellow keeps its vivid shell and dark corner ink; its center rank uses `card-yellow-value` over ivory (5.46:1 contrast). Other center ranks retain the face color; other corner indices use ivory.
+- **Card spectrum:** `card-red`, `card-yellow`, `card-green`, `card-blue` and `card-wild` belong to the deck. Yellow keeps its vivid shell and dark corner ink; its center rank uses `card-yellow-value` over ivory (5.46:1 contrast). Other center ranks retain the face color; other corner indices use ivory. The same yellow and dark yellow ink identify collected milestone cards and last-card/catch state; unearned collection cards retain themed muted ink and line borders.
 - **Active-color spectrum:** the brighter `active-*` swatches accompany a written color name on the dark arena; color alone never carries this state.
 - **Player palette:** the six `avatar-*` colors identify small original card-face badges. These remain supporting identity marks rather than a separate illustration system.
 
@@ -332,6 +351,8 @@ Warm interface paper frames the invitation to play; stable saturated card colors
 - **Wordmark:** the compact shell mark uses its frontmatter role, with the wordmark-phone variant on phones; the arena reduces it to 34px, then 30px on phones.
 - **Card typography:** card-value, card-index and card-action sizes describe the unscaled 82 × 122px face. They scale together with the entire card through its multiplier; these are card graphics, not extra interface text levels.
 
+Milestone names and progress values use compact Outfit labels; the terminal count column uses 17px tabular numerals with weight 600. Last-card and deck-penalty numerals reuse the condensed italic card face. These extend the existing roles rather than introducing a reward font or a new display hierarchy.
+
 **The Deck Lettering Rule.** Use Outfit for UI, headings and the card-back wordmark; reserve Barlow Condensed for indexed card faces. Preserve italic numerals and the shared face proportions when scaling.
 
 This is a role-based hierarchy with responsive sizes, not a mathematical modular scale. The documented display, headline, dialog, body, label and card roles intentionally describe the built system; incidental tiny decorative text does not establish a reusable type token.
@@ -345,6 +366,8 @@ Live play has a sparse header, a broad rounded baize mat inside a leather rail, 
 The active-color swatch and written name sit in normal flow after the turn heading inside one wrapping cue. The cue stays within the table width minus 24px, with a 3px row gap; the heading can wrap long names at any character. This shared placement follows the cue across every viewport and seat count. Phone seats hide decorative avatars and keep names and counts readable; five- and six-seat counts use a compact card icon where needed. The 360px breakpoint further compacts pile and opponent-card sizes. Large desktop viewports and short desktop heights have separate card-scale adjustments.
 
 The hand owns horizontal overflow. It keeps generous upper clearance for lift and focus, with cards at useful physical sizes instead of reducing the entire row. Fan position is normalized and bounded: rotation stays within ±16 degrees and the arc drops at most 34px. Phone cards overlap by 36px, reducing to 30px at 360px and below for ordinary hands; large hands retain 36px overlap and scroll. This leaves useful center tap targets instead of relying on exposed corner slivers. Selection scrolls its card into view when selected, sorted or resized; the Play action also names that card. Safe-area padding protects the move dock below the hand. The dock places hints beside actions on desktop and stacks them at 540px and below. It contains contextual Pass and, only when a previously inspected card becomes legal, the full named Play fallback. Draw belongs exclusively to the physical deck, including penalty draws. The action group is bounded to 65% of the desktop dock and uses the full phone width; button text can wrap, retaining complete card identity and a fixed-size arrow. Eligible UNO sits separately beside the hand title in the toolbar, with a 44px minimum height. Short phone viewports compact the arena and opponent backs and reserve a 171px hand row; the large desktop arena row has a 380px minimum. At 1100px wide and 850px high or larger, the hand strip is 260px tall and the card multiplier is 1.65, preserving the outer fan corners above the dock. These adjustments keep controls reachable without shrinking the card faces into a miniature row.
+
+The optional collection follows the primary play choices on phone home layouts. Its four mini cards stay in a four-column grid, with 7px gaps reduced to 5px at 380px and below; the summary has a 44px minimum target. The progress block is bounded to 440px on home and fills the result dialog. Results scroll inside the native modal; their action group sticks at bottom zero within the dialog, with its own themed background and no negative bottom margin. At 540px and below the result actions stack at full width. Long winner and player names wrap rather than push counts or rematch outside the bounds.
 
 **The Hand Owns Its Width Rule.** Keep overflow inside the hand, preserve corner identity and focus clearance, and bound the fan arc as the card count grows.
 
@@ -368,6 +391,8 @@ The mat renders `public/textures/green-baize.jpg` at a 560px repeat scale over i
 ## Shapes
 
 The native face is a tightly rounded rectangle (6px base radius) with ivory edging and a cream diagonal ellipse (116% width, 64% height, rotated −34 degrees). Its base dimensions, radius and index geometry scale as one unit. Wilds use the same silhouette with a four-color circular symbol; action faces use shared SVG symbols or large draw values. The back uses a green-black base, a red diagonal ellipse, faint diagonal stripes and an ivory Outfit UNO mark. Reverse uses the shared Repeat2 SVG; wild draw four retains a subdued four-color mark behind its large draw value.
+
+Milestone collectibles reuse the tight card corner and flat geometric icon language. Their small four-card disclosure fan inherits the deck's overlap; it is supporting progress, not another photographic material.
 
 Controls, fields, panels and dialogs use the observed rounded vocabulary in frontmatter. Launch choices have broader corners, reducing to 18px on phones. Circular color swatches and count badges communicate state. The table's broad responsive rail and the hand's curved overlap carry the large forms; do not transfer card rotation to ordinary information containers.
 
@@ -398,6 +423,22 @@ Creation and joining are distinct labeled choices. Joining accepts either the si
 ### Active seat and turn cue
 
 An opponent's active badge fills lime with dark text; the local active turn cue uses lime text and a small dot. Turn status follows the live state. The named active color and its swatch are static children after the turn heading, using muted ink at 12px. The cue wraps as a group within the available width, and long turn names can wrap rather than conceal color or overflow the page. Pile labels remain beside their physical piles without duplicating this combined status.
+
+### Earned pressure and action signals
+
+A one-card opponent gets one yellow numeral/UNO marker attached inside the opponent hand, clear of seat labels and the physical deck. It settles once in 240ms; reduced motion removes that animation and preserves the static marker. The label still carries the actual count or called-UNO state for assistive technology. An eligible missed call exposes a compact 56 × 44px Catch control with the full accessible name “Catch [player]’s missed UNO”; it disappears when the state is resolved. Pending actions, color choice and disconnection prevent unavailable catches.
+
+A real pending draw overlays its count on the physical deck and dims the back wordmark; the deck's accessible name retains the complete penalty count. Never manufacture pressure from a decorative value. The brief reverse action graphic uses the same Repeat2 icon as the deck. Discard-all feedback displays the negative total actually removed, including the played card (`1 + discardAllCount`), rather than an invented score. Existing feedback stays bounded and reduced motion suppresses its spatial burst. Sound is unchanged.
+
+### Completed round and milestone collection
+
+The native result dialog uses the winner's existing card backs, player identity and trophy, then a terminal “Cards left” list. The winner comes first; all other rows retain their seat order. Counts are actual remaining hands, with a tabular count column and a distinct winner cue. They do not establish points or finishing ranks. The local player keeps a textual identity cue. The existing local/host “One more round,” online guest readiness and “Back to home” handlers remain the real actions; the scrollable dialog keeps them reachable when the collection is expanded.
+
+`PlayerProgress` reads validated device history and delegates to the exported pure `ProgressCollection`; no progress UI is shown before the first completed round. The compact record names rounds, wins and the device scope. Current streak appears only when greater than one. A native details/summary disclosure shows the earned count and optional four-card collection: **First win** (one win), **Hat trick** (three wins), **Table regular** (ten completed rounds), and **On fire** (best streak of three). Progress fractions cap at their goals. Collected cards use deck yellow, dark ink and a check; unearned cards use themed muted ink, a line border and their fraction. Their icons use the established SVG system.
+
+The collection derives from the existing idempotent completed-round record; it introduces no separate reward storage. Best streak keeps On fire earned after later losses, while the record's current streak reflects the current run. Rendering illustrative data through the pure collection must not mount result recording or write synthetic history.
+
+**The Earned History Rule.** Show rewards only from validated completed rounds. Keep best-streak collectibles earned after a loss, keep current streak separate, and present terminal hand counts without inferred points or finishing ranks.
 
 ### Held hand and piles
 
@@ -432,6 +473,8 @@ Pickup produces immediate short paper texture; ordinary plays, draws and action 
 - **Do** put secondary entry shortcuts after the primary choices and keep optional bot/friend details in disclosures.
 - **Do** honor reduced motion, mute, audio readiness and interrupted gesture cleanup.
 - **Do** keep presentation responsive to the current published state without delaying play.
+- **Do** derive optional milestone cards from completed device-local rounds and keep result actions reachable inside the native dialog.
+- **Do** attach pressure cues to their actual opponent hand or penalty deck and retain full accessible names.
 
 ### Don't:
 
@@ -441,5 +484,6 @@ Pickup produces immediate short paper texture; ordinary plays, draws and action 
 - **Don't** use Unicode glyph icons in place of the established SVG icon system.
 - **Don't** give general controls hard offset block shadows; physical deck edges are the intentional exception.
 - **Don't** queue narration, wait for sound or animation, or add a blocking splash.
+- **Don't** infer points or finishing ranks from cards left, grant rewards per click, or claim a milestone is new without before/after evidence.
 
-Not canonized: vestigial sub-11px shell/progress captions and the unused tiny table-watermark styling do not establish a legibility floor or authorize new kickers and eyebrows. Superseded midnight-table declarations, old inspect-first guidance and the removed hard rail shadow are not reusable rules. Detector advisories are review evidence, not a token inventory. Physical speaker balance and reduced-motion browser rendering remain unverified; neither is legitimized as a system value.
+Not canonized: vestigial sub-11px shell/progress captions and the unused tiny table-watermark styling do not establish a legibility floor or authorize new kickers and eyebrows. Superseded midnight-table declarations, old inspect-first guidance and the removed hard rail shadow are not reusable rules. The new 10px milestone descriptions and local-player annotations are also not a reusable typography floor. Detector advisories, including the earned-moments report’s 83 findings, are review evidence rather than new tokens. Physical speaker balance and reduced-motion browser rendering remain unverified; neither is legitimized as a system value.

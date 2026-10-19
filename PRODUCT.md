@@ -46,3 +46,7 @@ UNO is the existing product name. The owner explicitly authorized replacement of
 ## Entry and Turn UX
 
 The owner’s follow-up rejects unresolved friction across the whole journey. Returning bot players should deal immediately from saved settings, with a separate setup path. Creation and joining must be distinct choices; room links and room codes use the same input, while persistent friend codes remain secondary. Hosts need rule controls before dealing. The owner’s October 19 correction rejects the low-interaction table. A legal card plays on its first tap or keyboard activation; upward drag and flick are equal direct paths. Nonmatching cards remain inspectable. Draw lives on the physical deck; Pass and UNO appear when applicable. A pre-inspected card may retain an explicit Play fallback when it becomes legal. Keyboard users browse the hand with arrow keys.
+
+## Earned Play
+
+The owner asks to gamify the interface while keeping direct play central. Near-finish opponents, real draw stacks, the completed-round scorecard and optional milestone collection carry that energy. Milestones reward actual device-local completed rounds and wins; they do not grant XP for clicks, introduce daily pressure, infer official points or represent account-wide standing. A collected best-streak milestone remains collected after later losses. Home keeps the play choices ahead of collection details on phones.

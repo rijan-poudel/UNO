@@ -18,7 +18,11 @@ import {
   callOutUno,
 } from '../lib/gameActions';
 import { RULE_PRESETS, matchesPreset } from '../lib/rulePresets';
-import { parseProgress, addRoundResult } from '../lib/playerProgress';
+import {
+  parseProgress,
+  addRoundResult,
+  getProgressMilestones,
+} from '../lib/playerProgress';
 import { resolveSocketEndpoint } from '../lib/socketConnection';
 import { canPlayCard } from '../lib/gameRules';
 import { getBotMove } from '../lib/botSupport';
@@ -156,6 +160,35 @@ assert.equal(loss.bestStreak, 2);
 assert.deepEqual(parseProgress(JSON.stringify(loss)), loss);
 assert.equal(parseProgress('{"rounds":1,"wins":9}').rounds, 0);
 assert.equal(parseProgress('broken').wins, 0);
+assert.equal(
+  getProgressMilestones(fresh).some((m) => m.earned),
+  false,
+);
+assert.equal(
+  getProgressMilestones(firstWin).find((m) => m.id === 'first-win')?.earned,
+  true,
+);
+const thirdWin = addRoundResult(secondWin, 'round-d', true);
+const afterStreak = addRoundResult(thirdWin, 'round-e', false);
+assert.equal(
+  getProgressMilestones(afterStreak).find((m) => m.id === 'three-streak')
+    ?.earned,
+  true,
+  'best streak remains collected after a loss',
+);
+assert.equal(
+  getProgressMilestones({ ...afterStreak, rounds: 10 }).find(
+    (m) => m.id === 'ten-rounds',
+  )?.earned,
+  true,
+);
+assert.equal(
+  getProgressMilestones({ ...afterStreak, wins: 20 }).find(
+    (m) => m.id === 'three-wins',
+  )?.current,
+  3,
+  'display progress stops at the real goal',
+);
 for (const preset of RULE_PRESETS) {
   assert.ok(
     matchesPreset(

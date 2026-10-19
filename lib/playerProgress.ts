@@ -93,3 +93,41 @@ export function subscribeProgress(listener: () => void): () => void {
     window.removeEventListener('storage', listener);
   };
 }
+
+// Collectibles are derived from completed-round history; no separate reward ledger.
+export function getProgressMilestones(progress: PlayerProgress) {
+  return [
+    {
+      id: 'first-win',
+      title: 'First win',
+      description: 'Win a round',
+      current: progress.wins,
+      target: 1,
+    },
+    {
+      id: 'three-wins',
+      title: 'Hat trick',
+      description: 'Win 3 rounds',
+      current: progress.wins,
+      target: 3,
+    },
+    {
+      id: 'ten-rounds',
+      title: 'Table regular',
+      description: 'Finish 10 rounds',
+      current: progress.rounds,
+      target: 10,
+    },
+    {
+      id: 'three-streak',
+      title: 'On fire',
+      description: 'Win 3 in a row',
+      current: progress.bestStreak,
+      target: 3,
+    },
+  ].map((milestone) => ({
+    ...milestone,
+    current: Math.min(milestone.current, milestone.target),
+    earned: milestone.current >= milestone.target,
+  }));
+}
