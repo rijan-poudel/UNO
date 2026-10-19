@@ -1,6 +1,7 @@
 // One low-latency audio context; card texture is generated once, never fetched on tap.
 import { getAudioSettings } from './audioSettings';
 export type TableChime =
+  | 'pickup'
   | 'cardPlay'
   | 'draw'
   | 'draw2'
@@ -119,8 +120,13 @@ export function primeTableAudioFromUserGesture(): void {
     notifyStatus();
   }
 }
-function cardTexture(ctx: AudioContext, volume: number, draw: boolean): void {
-  if (recordedCard) {
+function cardTexture(
+  ctx: AudioContext,
+  volume: number,
+  draw: boolean,
+  pickup = false,
+): void {
+  if (recordedCard && !pickup) {
     const source = ctx.createBufferSource();
     const gain = ctx.createGain();
     source.buffer = recordedCard;
@@ -150,9 +156,9 @@ function cardTexture(ctx: AudioContext, volume: number, draw: boolean): void {
   const filter = ctx.createBiquadFilter();
   const gain = ctx.createGain();
   source.buffer = paper;
-  source.playbackRate.value = draw ? 0.8 : 1.25;
+  source.playbackRate.value = pickup ? 1.7 : draw ? 0.8 : 1.25;
   filter.type = 'bandpass';
-  filter.frequency.value = draw ? 1500 : 2300;
+  filter.frequency.value = pickup ? 3100 : draw ? 1500 : 2300;
   filter.Q.value = 0.6;
   gain.gain.value = volume * 0.85;
   source.connect(filter).connect(gain).connect(ctx.destination);
@@ -243,21 +249,23 @@ function renderChime(ctx: AudioContext, event: TableChime): void {
   try {
     const settings = getAudioSettings();
     const volume = settings.sfxVolume;
+    if (event === 'pickup') {
+      cardTexture(ctx, volume * 0.52, false, true);
+      return;
+    }
     if (
       ['cardPlay', 'draw', 'deal', 'shuffleMotion', 'shuffle'].includes(event)
     ) {
       cardTexture(ctx, volume, event === 'draw');
       if (event === 'cardPlay') landing(ctx, volume);
-      if (event === 'deal')
-        [0, 0.055, 0.11].forEach((delay) =>
-          tone(ctx, 185 + delay * 300, ctx.currentTime + delay, volume * 0.35),
-        );
+      if (event === 'deal') landing(ctx, volume * 0.6);
       return;
     }
     if (!['uno', 'win', 'lose', 'callOut'].includes(event)) {
       cardTexture(ctx, volume * 0.8, false);
       landing(ctx, volume);
     }
+    if (!['uno', 'win', 'lose', 'callOut'].includes(event)) return;
     const notes: Partial<Record<TableChime, number[]>> = {
       skip: [430, 330],
       reverse: [392, 523, 392],

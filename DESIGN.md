@@ -1,6 +1,6 @@
 ---
 name: "UNO — Tactile table"
-description: "Vivid held cards, a quiet midnight arena, and immediate play."
+description: "Vivid held cards over real baize and leather, with immediate direct play."
 colors:
   ui-bg: "#fff8ec"
   ui-surface: "#fffcf5"
@@ -25,14 +25,15 @@ colors:
   sunset-text: "#51372f"
   sunset-muted: "#795c4f"
   sunset-line: "#dfc4b4"
-  arena-bg: "#111925"
-  arena-surface: "#1c293a"
+  arena-bg: "#101c1c"
+  arena-surface: "#1c302d"
   arena-text: "#f1f4fa"
   arena-muted: "#b1bfd2"
   arena-line: "#3a4b63"
   arena-accent-red: "#f17d82"
-  table-felt: "#1b293b"
-  table-line: "#34455e"
+  table-felt: "#245b49"
+  table-rail: "#172a28"
+  seat-surface: "#152926"
   turn-lime: "#d8ed82"
   arena-dark-ink: "#172130"
   move-action-ink: "#202b12"
@@ -43,7 +44,8 @@ colors:
   card-wild: "#242837"
   card-paper: "#fffdf5"
   card-yellow-ink: "#332810"
-  card-back: "#202938"
+  card-yellow-value: "#8b600b"
+  card-back: "#172b2b"
   active-red: "#ff727a"
   active-blue: "#79b5ff"
   active-green: "#5adeaa"
@@ -176,7 +178,7 @@ rounded:
   play-choice: "21px"
   panel: "12px"
   dialog: "16px"
-  card: "9px"
+  card: "6px"
   play-choice-phone: "18px"
   circle: "50%"
 spacing:
@@ -248,7 +250,7 @@ components:
     rounded: "{rounded.dialog}"
     padding: "28px"
   opponent-badge:
-    backgroundColor: "{colors.arena-bg}"
+    backgroundColor: "{colors.seat-surface}"
     textColor: "{colors.arena-text}"
     rounded: "{rounded.panel}"
     padding: "7px 10px"
@@ -274,25 +276,25 @@ components:
 
 ## Overview
 
-**Creative North Star: "The held-card table"**
+**Creative North Star: "The after-hours card table"**
 
-UNO feels like a hand of real cards over a quiet modern playing arena. Vivid faces, ivory stock, condensed italic numerals and a curved foreground fan carry the energy. Outfit lettering gives navigation and game information one clear voice.
+UNO feels like a held hand of real cards over a shared after-hours table. Deep green baize, a dark padded leather rail, vivid faces and ivory stock establish the material world. Cards are the controls: a legal face plays on its first activation; the foreground fan makes pickup and deliberate upward release tangible.
 
-The launch and settings shell retains warm, theme-aware surfaces and compact card-face player identities. Live play uses a fixed midnight palette with lime turn feedback, independent of the selected appearance. The launch illustration is a fan of the same authored deck used in play; the owner-rejected clay/Fredoka world is superseded.
+The launch and settings shell retains warm, theme-aware surfaces and compact card-face player identities. Live play uses a fixed green-black material palette with lime turn feedback, independent of the selected appearance. The launch illustration is a fan of the same native deck used in play. Outfit UI and Barlow Condensed card lettering remain the two pinned families.
 
 **Key Characteristics:**
 
 - One shared native card face across launch, hand, piles and motion.
 - Outfit interface lettering paired with Barlow Condensed card numerals.
-- Warm themed supporting surfaces and a fixed midnight live arena.
-- A held fan with immediate inspection, upward drag and bounded scrolling.
-- Situational controls and brief feedback that never delays a turn.
+- Warm themed supporting surfaces and a fixed baize-and-leather live table.
+- First-activation legal play, nonmatching-card inspection and deliberate upward release.
+- Bounded hand scrolling, contextual controls and paper/contact feedback that never delays a turn.
 
-Refreshed from the finished journey source on 2026-10-19. Visual authority is `.impeccable/direction.md`, with the owner-authorized journey adaptation in `.impeccable/review/journey/contract.md` superseding the earlier duplicate-Draw prohibition. This is code-led work with no approved raster comp. Evidence includes `app/page.tsx`, `app/globals.css`, `app/table.css`, `components/GameBoard.tsx`, `components/GameSetup.tsx`, `components/TableRules.tsx`, `components/OnlineLobby.tsx`, `components/home/HomeScreen.tsx`, `lib/roomCodes.ts` and `lib/playerNames.ts`, alongside the incumbent card and presentation components. The journey review packet lives in `.impeccable/review/journey/`. The subsequent draw-feedback refinement is recorded from `components/GameBoard.tsx`, `hooks/useGamePresentation.ts` and `app/table.css`, under `.impeccable/review/play-feedback/contract.md`. Its ten near-finish/after-draw captures at 320, 390, 688, 1280 and 1440px are explicitly seeded local fixtures, not public matches. Current source takes precedence over captures made before the material fixes; static captures do not certify physical sound quality or motion timing.
+Refreshed from the finished implementation on 2026-10-19. The owner-directed replacement in `.impeccable/review/direct-play/contract.md` and `.impeccable/direction.md` supersedes the previous midnight table and inspect-first flow; launch/settings remain incumbent. Evidence is `app/table.css`, `components/UnoCard.tsx`, `components/HandCard.tsx`, `components/GameBoard.tsx`, `hooks/useGamePresentation.ts`, `lib/cardGesture.ts` and `lib/tableChimes.ts`, alongside unchanged shell primitives. This is code-led work with no approved raster comp. The fresh full material review is `finish-review-rebuild.md` in that review packet; `verdict.md` confirms the sole rail-shadow fix resolved. Six valid captures at 320, 390 and 1440px are seeded local fixtures, not public matches. Reduced-motion behavior is evidenced by source guards, not an emulated capture; screenshots and audio scheduling assertions do not certify physical speaker quality.
 
 ## Colors
 
-Warm interface paper frames the invitation to play; stable saturated card colors and a subdued midnight arena make the hand the focal point.
+Warm interface paper frames the invitation to play; stable saturated card colors stand over deep green baize and dark leather during play.
 
 ### Primary
 
@@ -302,17 +304,17 @@ Warm interface paper frames the invitation to play; stable saturated card colors
 
 ### Secondary
 
-- **Card spectrum:** `card-red`, `card-yellow`, `card-green`, `card-blue` and `card-wild` belong to the deck. The yellow face uses dark corner ink; other faces use ivory corner ink. The ivory ellipse holds a large value in the face color.
+- **Card spectrum:** `card-red`, `card-yellow`, `card-green`, `card-blue` and `card-wild` belong to the deck. Yellow keeps its vivid shell and dark corner ink; its center rank uses `card-yellow-value` over ivory (5.46:1 contrast). Other center ranks retain the face color; other corner indices use ivory.
 - **Active-color spectrum:** the brighter `active-*` swatches accompany a written color name on the dark arena; color alone never carries this state.
 - **Player palette:** the six `avatar-*` colors identify small original card-face badges. These remain supporting identity marks rather than a separate illustration system.
 
 ### Neutral
 
 - **Warm paper and ink:** `ui-bg`, `ui-surface`, `ui-text`, `ui-muted` and `ui-line` form the supporting shell. Paper, midnight, forest and sunset appearances change these root variables.
-- **Midnight arena:** `arena-bg`, `arena-surface`, `arena-text`, `arena-muted` and `arena-line` override interface roles inside the game page. `table-felt` and `table-line` give the oval its quiet material boundary.
-- **Ivory stock and dark back:** `card-paper`, `card-back` and `arena-dark-ink` anchor card material and the lime-backed UNO mark.
+- **After-hours table:** `arena-bg`, `arena-surface`, `arena-text`, `arena-muted` and `arena-line` override interface roles inside live play. `table-felt` and `table-rail` grade the real material rasters; `seat-surface` keeps inactive badges quiet. These are material base colors, not substitutes for the texture assets.
+- **Ivory stock and dark back:** `card-paper`, green-black `card-back` and `arena-dark-ink` anchor the deck and dark ink on lime. The back carries a red diagonal mark and ivory Outfit lettering.
 
-**The Two Surfaces Rule.** Honor root appearance variables on supporting screens; scope the fixed midnight palette to live play. Card colors and ivory stock stay stable across both.
+**The Two Surfaces Rule.** Honor root appearance variables on supporting screens; scope the fixed baize-and-leather palette to live play. Card colors and ivory stock stay stable across both.
 
 ## Typography
 
@@ -338,22 +340,25 @@ This is a role-based hierarchy with responsive sizes, not a mathematical modular
 
 The supporting shell uses centered content: the launch reaches 1450px and setup stays within 650px. Desktop launch pairs copy and choices with the native card fan. At 700px and below, the heading, fan and two primary choices stack; secondary setup/join shortcuts follow the primary group, then optional help. The introductory sentence yields to the visual. Primary choices precede shortcuts in keyboard order as well. Common spacing repeats the frontmatter's compact 4–32px vocabulary rather than a strict single interval.
 
-Live play has a sparse header, an oval table with opponents around two physical piles, and the local fan in the foreground. The game container reaches 1440px. Desktop uses a 68px header and 40px side padding; the 800px breakpoint reduces the header to 62px and side padding to 16px; phones use 12px game padding. The table may extend beyond the phone edges while seats, piles and active-color text remain readable.
+Live play has a sparse header, a broad rounded baize mat inside a leather rail, opponents around two physical piles, and the local fan in the foreground. The game container reaches 1440px. Desktop uses a 68px header and 40px side padding; the 800px breakpoint reduces the header to 62px and side padding to 16px; phones use 12px game padding. The rail extends beyond the phone edges while seats, piles and active-color text remain readable.
 
 The active-color swatch and written name sit in normal flow after the turn heading inside one wrapping cue. The cue stays within the table width minus 24px, with a 3px row gap; the heading can wrap long names at any character. This shared placement follows the cue across every viewport and seat count. Phone seats hide decorative avatars and keep names and counts readable; five- and six-seat counts use a compact card icon where needed. The 360px breakpoint further compacts pile and opponent-card sizes. Large desktop viewports and short desktop heights have separate card-scale adjustments.
 
-The hand owns horizontal overflow. It keeps generous upper clearance for lift and focus, with cards at useful physical sizes instead of reducing the entire row. Fan position is normalized and bounded: rotation stays within ±16 degrees and the arc drops at most 34px. Large phone hands reduce overlap and scroll. Selection scrolls its card into view when selected, sorted or resized; the Play action also names that card. Safe-area padding protects the move dock below the hand. The dock places hints beside actions on desktop and stacks them at 540px and below. It contains at most two actions: named Play and Draw or Pass. The action group is bounded to 65% of the desktop dock and uses the full phone width; button text can wrap, retaining complete card identity and a fixed-size arrow. Eligible UNO sits separately beside the hand title in the toolbar, with a 44px minimum height. Short phone viewports compact the arena and opponent backs and reserve a 171px hand row; the large desktop arena row has a 380px minimum. These adjustments keep controls reachable without shrinking the card faces into a miniature row.
+The hand owns horizontal overflow. It keeps generous upper clearance for lift and focus, with cards at useful physical sizes instead of reducing the entire row. Fan position is normalized and bounded: rotation stays within ±16 degrees and the arc drops at most 34px. Phone cards overlap by 36px, reducing to 30px at 360px and below for ordinary hands; large hands retain 36px overlap and scroll. This leaves useful center tap targets instead of relying on exposed corner slivers. Selection scrolls its card into view when selected, sorted or resized; the Play action also names that card. Safe-area padding protects the move dock below the hand. The dock places hints beside actions on desktop and stacks them at 540px and below. It contains contextual Pass and, only when a previously inspected card becomes legal, the full named Play fallback. Draw belongs exclusively to the physical deck, including penalty draws. The action group is bounded to 65% of the desktop dock and uses the full phone width; button text can wrap, retaining complete card identity and a fixed-size arrow. Eligible UNO sits separately beside the hand title in the toolbar, with a 44px minimum height. Short phone viewports compact the arena and opponent backs and reserve a 171px hand row; the large desktop arena row has a 380px minimum. At 1100px wide and 850px high or larger, the hand strip is 260px tall and the card multiplier is 1.65, preserving the outer fan corners above the dock. These adjustments keep controls reachable without shrinking the card faces into a miniature row.
 
 **The Hand Owns Its Width Rule.** Keep overflow inside the hand, preserve corner identity and focus clearance, and bound the fan arc as the card count grows.
 
 ## Elevation & Depth
 
-Soft cast shadows, an inset oval and real card overlap establish physical depth. Controls receive modest lift; cards deepen as they rise, are inspected or travel. The deck's narrow hard edges depict a physical stack. They are native to this card world and do not establish block shadows for general controls.
+Real baize fibers, padded leather grain, soft cast shadows, an inset mat and actual card overlap establish physical depth. Controls receive modest lift; cards deepen as they rise, are inspected or travel. The deck's narrow hard edges depict a physical stack. They are native to this card world and do not establish block shadows for general controls.
+
+The mat renders `public/textures/green-baize.jpg` at a 560px repeat scale over its material base; the rail renders `public/textures/padded-leather.jpg` at 340px. Both use soft-light blending and native rounded clipping. Their exact generation prompts are preserved beside the JPEGs as `.prompt.txt` files, with embedded provenance in the assets. Preserve those materials and provenance when extending the table; a crossed CSS grid is not the felt material.
 
 ### Shadow Vocabulary
 
 - **Supporting surface:** `--ui-shadow` supplies the ambient dialog shadow and varies with appearance.
-- **Card at rest:** `0 5px 10px #070c1659` makes an ordinary face physical.
+- **Card at rest:** `inset 0 1px 1px #ffffff60, 0 5px 10px #03090870` gives native stock a small edge highlight and soft lift.
+- **Leather rail:** `inset 0 2px 3px #b9d3c036, 0 18px 38px #020a0966` supplies padded, soft depth; the mat uses `inset 0 5px 12px #061e2160`.
 - **Held fan:** `-4px 7px 11px #060c1759` separates overlapping cards; inspection deepens to `0 14px 25px #060c1780`.
 - **Draw stack:** `1px 3px 0 #cad2db, 3px 6px 0 #67768a, 4px 13px 15px #080f1e80` distinguishes a usable deck from one face.
 - **Launch choice:** `0 6px 14px #2c2c3228` adds soft lift to the broad play controls.
@@ -362,9 +367,9 @@ Soft cast shadows, an inset oval and real card overlap establish physical depth.
 
 ## Shapes
 
-The native face is a rounded rectangle with ivory edging and a filled, rotated ivory ellipse. Its base dimensions, radius and index geometry scale as one unit. Wilds use the same silhouette with a four-color circular symbol; action faces use shared SVG symbols or large draw values. The back uses a lime ellipse and Outfit UNO mark.
+The native face is a tightly rounded rectangle (6px base radius) with ivory edging and a cream diagonal ellipse (116% width, 64% height, rotated −34 degrees). Its base dimensions, radius and index geometry scale as one unit. Wilds use the same silhouette with a four-color circular symbol; action faces use shared SVG symbols or large draw values. The back uses a green-black base, a red diagonal ellipse, faint diagonal stripes and an ivory Outfit UNO mark. Reverse uses the shared Repeat2 SVG; wild draw four retains a subdued four-color mark behind its large draw value.
 
-Controls, fields, panels and dialogs use the observed rounded vocabulary in frontmatter. Launch choices have broader corners, reducing to 18px on phones. Circular color swatches and count badges communicate state. The table's oval boundary and the hand's curved overlap carry the large forms; do not transfer card rotation to ordinary information containers.
+Controls, fields, panels and dialogs use the observed rounded vocabulary in frontmatter. Launch choices have broader corners, reducing to 18px on phones. Circular color swatches and count badges communicate state. The table's broad responsive rail and the hand's curved overlap carry the large forms; do not transfer card rotation to ordinary information containers.
 
 ## Components
 
@@ -396,13 +401,13 @@ An opponent's active badge fills lime with dark text; the local active turn cue 
 
 ### Held hand and piles
 
-`UnoCard` owns all native faces; `HandCard` owns inspection and gestures; `app/table.css` owns the deck, arena, fan and launch preview. The first tap inspects a card; explicit Play in the dock names the selected legal card. A second activation remains a shortcut. Waiting players can inspect their hands, and a legal exact-match jump-in exposes Play. Arrow keys browse the hand with wrapping; Home and End reach its ends, keeping focused cards in view. A legal card can also be dragged upward; releases beyond the 65px lift threshold play. Focus lifts a card, native button activation preserves keyboard access, and a small ivory bottom mark identifies legal cards beyond saturation alone.
+`UnoCard` owns all native faces; `HandCard` owns inspection and gestures; `app/table.css` owns the deck, arena, fan and launch preview. The first tap or native keyboard activation plays a legal card immediately. A nonmatching card remains inspectable; explicit named Play is a fallback if that inspected card later becomes legal. Waiting players can inspect their hands; a legal exact-match jump-in follows the same direct-play availability. Arrow keys browse the hand with wrapping; Home and End reach its ends, keeping focused cards in view. A legal card can also be dragged upward. Readiness and release use the same `canReleaseCard` predicate: `dy < -65` and `abs(dy) > abs(dx) * 0.8`, with finite coordinates. The table says “Slide up to play” during lift and “Release to play” only when that exact predicate passes. Focus lifts a card, native button activation preserves keyboard access, and a small ivory bottom mark identifies legal cards beyond saturation alone.
 
 Pointer capture starts on the face. Nonprimary pointers and nonleft clicks are ignored; button loss, pointer cancellation, capture loss, blur, visibility changes and unmount cancel or clean up the gesture. An unsuccessful drag returns quickly. Reduced motion removes travel and drag rotation while retaining a usable selection state. Identity follows the card through sorting and game updates.
 
-The contextual move dock sits below the hand near the thumb. It exposes named Play for a legal selection and Draw or Pass according to the live action state; penalty draws name their count. The physical draw pile remains usable. Eligible UNO appears in the hand toolbar, not in the bottom dock. The toolbar button and U shortcut share one availability predicate: an active round, no pending color choice or action, a connected online session, enabled UNO declarations, one or two cards, and no declaration already made. The hint describes the same decision: exact-match jump-in, play or pass after drawing, pending color/action, penalty draw or reconnect state. A single local draw names its card in the existing hint when play or pass is available; a no-match draw says “No match. Passing…” to reflect automatic passing. Pending and disconnected actions cannot submit another move. Sorting and activity remain in the menu. The same native faces form the launch fan, so no separate raster illustration defines card appearance.
+The contextual move dock sits below the hand near the thumb. It exposes Pass when available and named Play for a pre-inspected card that becomes legal. The physical deck is the sole Draw control; its accessible name and adjacent label name penalty counts. Eligible UNO appears in the hand toolbar, not in the bottom dock. The toolbar button and U shortcut share one availability predicate: an active round, no pending color choice or action, a connected online session, enabled UNO declarations, one or two cards, and no declaration already made. The hint describes the same decision: exact-match jump-in, play or pass after drawing, pending color/action, penalty draw or reconnect state. A single local draw names its card in the existing hint when play or pass is available; a no-match draw says “No match. Passing…” to reflect automatic passing. Pending and disconnected actions cannot submit another move. Sorting and activity remain in the menu. The same native faces form the launch fan, so no separate raster illustration defines card appearance.
 
-**The Named Move Rule.** Keep the inspected card identifiable through selection and resize, and name it fully in the Play action, wrapping when needed. Reveal an actual new local draw without forcing selection. Every hand action, shortcut and dock hint follows current legal-action state.
+**The Direct Move Rule.** Play a legal face on its first activation. Keep nonmatching inspection and the full named fallback for a pre-inspected card that becomes legal. Reveal actual new local draws without forcing selection; every gesture, shortcut and hint follows current legal-action state.
 
 **The Play Comes First Rule.** Motion and sound explain the current action without blocking controls, queuing stale actions or changing turn timing.
 
@@ -410,7 +415,7 @@ An actual newly added local draw is scrolled into view before hand rectangles an
 
 Card plays travel in 280ms, draws in 260ms and hand reflow in 180ms. Hand inspection settles in 170ms and unsuccessful drag return in 180ms. Reduced motion removes flights and nonessential reactions. These durations are presentation values, never scheduling rules for the engine.
 
-Short card texture and immediate contact support plays; special actions add distinct brief signatures. `public/audio/card-play.wav` carries `card-play.source.json` provenance, with an immediate synthesized fallback while it loads. Gesture unlock exposes honest audio readiness. Only the latest action younger than 160ms may follow an in-progress unlock; old actions expire. Mute, disabled card sounds, zero volume and hidden pages suppress or stop feedback. Music and speech are not default turn feedback.
+Pickup produces immediate short paper texture; ordinary plays, draws and action cards use paper/contact rather than melody. Pitched signatures are reserved for UNO, call-outs and results. `public/audio/card-play.wav` carries `card-play.source.json` provenance, with an immediate synthesized fallback while it loads. Pickup and every direct action through the shared action wrapper prime audio synchronously in the originating gesture; UNO also primes explicitly. Gesture unlock exposes honest audio readiness. Physical speaker quality has not been certified by a listening check. Only the latest action younger than 160ms may follow an in-progress unlock; old actions expire. Mute, disabled card sounds, zero volume and hidden pages suppress or stop feedback. Music and speech are not default turn feedback.
 
 ## Do's and Don'ts
 
@@ -418,12 +423,12 @@ Short card texture and immediate contact support plays; special actions add dist
 
 - **Do** use the same authored face for launch, hand, piles and card motion.
 - **Do** preserve stable deck colors and the written active-color label.
-- **Do** use scoped midnight arena variables while honoring appearance on supporting screens.
+- **Do** use the scoped baize-and-leather table palette while honoring appearance on supporting screens.
 - **Do** retain readable six-seat phone names, visible corner indices and an independently scrolling large hand.
-- **Do** make inspection, legal plays, turn state and situational actions clear with touch and keyboard.
+- **Do** play legal cards on first activation and keep nonmatching inspection, turn state and situational actions clear with touch and keyboard.
 - **Do** keep the full named Play action, selected card and current hint in agreement; retain dark ink on lime.
 - **Do** reveal actual new local draws without selecting them and preserve horizontal position on unrelated updates.
-- **Do** keep eligible UNO at hand level and limit the bottom dock to named Play and Draw or Pass; give button and keyboard the same availability rules.
+- **Do** keep Draw on the deck, eligible UNO at hand level, and the dock limited to contextual Pass and the pre-inspected-card Play fallback; give button and keyboard the same availability rules.
 - **Do** put secondary entry shortcuts after the primary choices and keep optional bot/friend details in disclosures.
 - **Do** honor reduced motion, mute, audio readiness and interrupted gesture cleanup.
 - **Do** keep presentation responsive to the current published state without delaying play.
@@ -432,9 +437,9 @@ Short card texture and immediate contact support plays; special actions add dist
 
 - **Don't** restore clay hero art, Fredoka, a third font family or a parallel component library.
 - **Don't** replace the held fan with a flat shrinking row or let large hands overflow the page.
-- **Don't** show UNO when ineligible or turn sorting into a permanent table control. Keep dock Draw/Pass contextual and preserve the physical deck action.
+- **Don't** show UNO when ineligible, duplicate Draw in the dock or turn sorting into a permanent table control.
 - **Don't** use Unicode glyph icons in place of the established SVG icon system.
 - **Don't** give general controls hard offset block shadows; physical deck edges are the intentional exception.
 - **Don't** queue narration, wait for sound or animation, or add a blocking splash.
 
-Not canonized: the build's tiny decorative arena watermark and vestigial sub-11px shell/progress captions are not reusable typography rules; their presence does not establish a legibility floor or authorize new kickers and eyebrows. Superseded green-table variables and overridden stylesheet declarations are likewise not authority over the final scoped arena. The existing journey detector’s 72 palette/type/radius advisories are not a token inventory: only current entry-control inks/hover tones, the phone choice radius and selected-Play treatment are reconciled here. The later play-feedback detector carries eleven advisory documentation findings, likewise not new reusable palette, type or radius tokens. Decorative one-offs and superseded values remain outside the reusable system; both reports are preserved without suppression or a new detector run.
+Not canonized: vestigial sub-11px shell/progress captions and the unused tiny table-watermark styling do not establish a legibility floor or authorize new kickers and eyebrows. Superseded midnight-table declarations, old inspect-first guidance and the removed hard rail shadow are not reusable rules. Detector advisories are review evidence, not a token inventory. Physical speaker balance and reduced-motion browser rendering remain unverified; neither is legitimized as a system value.

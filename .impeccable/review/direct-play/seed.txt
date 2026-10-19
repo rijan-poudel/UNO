@@ -1,0 +1,129 @@
+DIRECTION CONCEPT SEED (key: 73660c59; mode: experience; source: api; approved pool: c3b204a1eed6; 306/564 human-approved; rerun with --scope direction --mode experience --from 73660c59 --candidate-count 7 to reproduce this roll against this catalog revision)
+ASSIGNED INDEX: 6
+  After ordering the grounded directions by resonance, build candidate
+  6 of your own grounded list; the assignment never points at a
+  challenger. The assignment is the roll, not a suggestion: your top-ranked
+  direction is what every run would ship, so the script decides which grounded
+  direction gets built. Each direction joins a durable visual system to a
+  concrete expression for the requested first surface, decided as one. It must
+  survive the current task plus navigation, quiet and dense content,
+  interaction and state, and a substantially different future surface. In an
+  attended run, present the assigned direction fully committed and offer
+  re-roll. You may add ONE card for your top-ranked grounded candidate when
+  it is not the assigned direction, kicker IMPECCABLE’S PICK, with an honest risk line
+  naming its familiarity; one pick card, never a ranked lineup, and the pick
+  never takes the lead position. When the assignment IS your top candidate,
+  there is no pick card. Re-roll yourself only
+  on named factual grounds, when the assignment cannot carry the product's
+  truth or task; taste is never grounds.
+  The assignment exists to refuse the model's ranking rut, never to outrank
+  the user or the brief. Never expose assignment metadata in user-facing labels.
+CHALLENGERS:
+  1. a nixie-tube laboratory counter, where stacked digits glow orange inside glass envelopes and every count arrives as visible plasma
+     SOURCE ID: signals-instruments-nixie-laboratory-counter
+     CREATIVE SPARK: Inside each glass tube ten metal numerals nest; the lit one hovers orange, and a count change is a tiny change of physical depth.
+     SYSTEM GRAMMAR:
+       - Palette/material: neon orange digit glow inside clear glass envelopes, blackened steel chassis as ground, hairline anode mesh gray; the lit digit is the only warm accent
+       - Type/composition: stacked metal numerals of one engineered digit form, each tube a fixed decimal place; labels sit as engraved caps on the panel below the banks
+       - Topology/navigation: quantities are the interface; each metric owns a tube bank with fixed digit positions.
+       - Controls/state: value changes cross-fade between physical digit layers; overflow and reset are visible mechanical events.
+       - Responsive/motion: banks drop to essential digits on phones; digit transitions are single cross-fades under
+     WEB LEVERAGE: Layered DOM digits with depth-true cross-fades render tube physics in pure CSS.
+     QUALITY BAR: board https://impeccable.style/worlds/cards/signals-instruments-nixie-laboratory-counter.webp · hero https://impeccable.style/worlds/cards/signals-instruments-nixie-laboratory-counter-hero.webp
+  2. an algorave floor, where projected live code edits the music mid-dance and every thrown bracket changes what a hundred bodies do next
+     SOURCE ID: medium-native-algorave-source-floor
+     CREATIVE SPARK: The coder deletes half a line and the kick drops out; the crowd howls, the line comes back wrong on purpose, and the room lifts.
+     SYSTEM GRAMMAR:
+       - Palette/material: phosphor green and magenta syntax on projector black, the code buffer as ground; the pattern about to change flashes amber before it sounds
+       - Type/composition: monospaced terminal type at stage scale with hard line breaks as musical bars, the composition one code buffer whose cursor line is the downbeat
+       - Topology/navigation: the source is the stage; sections of code map to audible layers you can follow live.
+       - Controls/state: edits apply on the next cycle boundary; upcoming changes are visible before they sound.
+       - Responsive/motion: code and visuals share one clock; small screens follow a single highlighted pattern lane.
+     WEB LEVERAGE: Web Audio scheduling ties editable patterns to a shared clock with live evaluation in the page.
+     QUALITY BAR: board https://impeccable.style/worlds/cards/medium-native-algorave-source-floor.webp · hero https://impeccable.style/worlds/cards/medium-native-algorave-source-floor-hero.webp
+  3. a backyard loteria night, a deck of numbered icon cards in flat carnival color, each image named and numbered in the same breath, players marking their tablas with dried beans while the caller sings riddles instead of names
+     SOURCE ID: vernacular-ephemera-loteria-tabla-night
+     CREATIVE SPARK: the caller sings the riddle before the name, and half the table laughs and reaches for beans while you scan your tabla for the mermaid, one row short of shouting
+     SYSTEM GRAMMAR:
+       - Palette/material: sun yellow, rose, and turquoise flat fields behind each icon, heavy black contour ink, carnival red card borders, a dried bean's brown as the mark of progress
+       - Type/composition: one icon per card, centered, named beneath in spaced caps with its number, tablas as four-by-four grids of the same icons, no image ever cropped
+       - Topology/navigation: the deck is the sequence and the tabla is the map; the caller's drawn card is always the current item, and your grid fills in whatever order fate deals
+       - Controls/state: a called card flips face-up for everyone, placing a bean commits a match, a completed row shouts itself, and unclaimed matches sit as quiet regret between rounds
+       - Responsive/motion: tablas stay square and shrink whole on phones with the called card pinned above; motion is a card flip and a bean drop
+     WEB LEVERAGE: multiplayer card calls sync over websocket while each tabla remains a keyboard-operable grid with live-region announcements
+     QUALITY BAR: board https://impeccable.style/worlds/cards/vernacular-ephemera-loteria-tabla-night.webp · hero https://impeccable.style/worlds/cards/vernacular-ephemera-loteria-tabla-night-hero.webp
+  4. a Japanese contemporary high-density site, where tiny type, boxed modules, and utility-red accents pack far more onto one screen than a Western grid would dare
+     SOURCE ID: japanese-high-density-web
+     CREATIVE SPARK: Dozens of boxed modules tile a single scroll, each ruled with hairlines and headed by a small red tab; prices, badges, and nav rails crowd in at tiny sizes, and nothing wastes a pixel of the packed grid.
+     SYSTEM GRAMMAR:
+       - Palette/material: bright white ground, dense black text, a signal utility-red for tabs and prices, cool grays for module borders and fills
+       - Type/composition: a compact gothic sans at small sizes with tight leading; a mosaic of ruled rectangular modules, each with its own small header tab, packed edge to edge.
+       - Topology/navigation: Move by scanning the dense module mosaic, by a persistent multi-row nav rail, and by expandable category accordions in a left rail.
+       - Controls/state: Hovering a module raises its border and reveals secondary actions; tabs switch content in place; badges mark new, sale, and limited states.
+       - Responsive/motion: motion is minimal and functional, and reduced-motion keeps only instant state swaps.
+     WEB LEVERAGE: Build the module mosaic as a dense CSS grid with named template areas and a strict hairline border system, so hundreds of small blocks tile without the whitespace inflation of a default SaaS grid.
+     QUALITY BAR: board https://impeccable.style/worlds/cards/japanese-high-density-web.webp · hero https://impeccable.style/worlds/cards/japanese-high-density-web-hero.webp
+  5. an overhead canopy of translucent indigo, madder, and saffron silk crossing a sunlit courtyard, where independently tensioned banners overlap into passing color chords and sudden clear sky
+     SOURCE ID: generative-art-computational-color-chord-counterpoint
+     CREATIVE SPARK: A wind lifts the indigo span above the saffron; violet races across the paving, a madder band joins for one deep brown chord, and then the courtyard flashes white again.
+     SYSTEM GRAMMAR:
+       - Palette/material: translucent indigo, madder, and saffron silk over sun-white paving, overlap violets and browns as computed chord states, clear sky white as rest
+       - Type/composition: light wide-tracked sans labels pinned at each banner's tensioned edge, the composition horizontal silk lanes crossing one bright open field
+       - Topology/navigation: Move among individual banner voices, their crossing zones, the courtyard ground, and moments when several colors coincide.
+       - Controls/state: Tension, release, solo, and align bands with separate, approaching, overlapping, dissonant, and clear states labeled beyond color.
+       - Responsive/motion: Recompose the canopy as synchronized translucent lanes on compact screens and provide patterned stills for
+     WEB LEVERAGE: Synchronized state channels can be soloed or combined in real time, making overlap a task-bearing joint state that remains scrubbable, comparable, and noncolor-coded.
+     QUALITY BAR: board https://impeccable.style/worlds/cards/generative-art-computational-color-chord-counterpoint.webp · hero https://impeccable.style/worlds/cards/generative-art-computational-color-chord-counterpoint-hero.webp
+  6. an indoor weather sun, a monofrequency semicircle doubled to a full disc by a mirrored ceiling, mist haze filling a vast hall where crowds lie inside their own silhouettes
+     SOURCE ID: light-shadow-caustics-indoor-weather-sun
+     CREATIVE SPARK: You lie on the concrete floor of a vast hall, haze thick with amber; far above, the mirrored ceiling shows your tiny silhouette waving back beside a hundred strangers, and the half sun on the wall completes itself into a disc.
+     SYSTEM GRAMMAR:
+       - Palette/material: monofrequency sodium amber flattening every color, hazed amber as ground, silhouette black for body ink, the mirror's doubled sun as the accent
+       - Type/composition: silhouette-black grotesk set low against a long horizon line, one vast horizontal band, captions small and scattered like lying figures
+       - Topology/navigation: one hall with a half sun at its far wall, the mirrored ceiling doubling everything; you navigate by walking the long axis toward the light
+       - Controls/state: your pointer is a silhouette, hover deepens a figure to full black, selection appears twice, once on the floor and once in the ceiling mirror
+       - Responsive/motion: the semicircle scales with the wall and its mirror half collapses first on short screens; motion is drifting mist
+     WEB LEVERAGE: backdrop-filter haze over a css scaleY(-1) reflection building the mirrored ceiling, blend mode flattening all color to amber duotone
+     QUALITY BAR: board https://impeccable.style/worlds/cards/light-shadow-caustics-indoor-weather-sun.webp · hero https://impeccable.style/worlds/cards/light-shadow-caustics-indoor-weather-sun-hero.webp
+Fuse each challenger before judging it: the challenger supplies the form
+  and its system grammar, the product supplies every fact, and clarity wins
+  conflicts. Weigh the fused result against the assigned direction on exactly
+  two axes, audience identification and product clarity. Losing to strong
+  grounded material is a valid outcome; beating a thin or tool-monoculture
+  list is the point. A fused challenger that wins both axes becomes the build.
+  Close the weighing with a verdict per challenger, decided before any
+  borrowing is considered: wins (beats the assigned direction on both axes),
+  competitive (holds one axis), or declined (loses both). A declined
+  challenger is not spent: name the one discipline of its system the assigned
+  direction lacks, and raise the assigned direction to match before
+  presenting it. A donation transfers ambition and system discipline, never
+  the challenger's clothes; one world owns the page. Write each raise as its
+  own named line on the presented direction, and carry every verdict, kept
+  line, and raise into the decision page payload.
+When you can view images, open the QUALITY BAR board and hero for any
+challenger you weigh seriously and for the world you build. They exist as a
+craft bar, the finish level and commitment the build is expected to reach,
+never as a mockup to copy; your surface serves this product, not that render.
+PRODUCT.md and explicit incumbent brand commitments constrain every direction.
+The seed never chooses exact colors, fonts, tokens, or a user preference, and
+it never permits the world and first surface to be selected independently.
+The CREATIVE SPARK is a complete visual system, not a theme or decorative
+reference. Translate every supplied system rule into the product: palette and
+material, type and composition, topology, controls and states, and adaptation.
+Keep the source's visible character, scale, rhythm, and interaction instead of
+reducing vivid grammar to generic nouns. When the source is already a credible
+interface language, commit to it across navigation, content, controls, and
+states. Otherwise keep a literal carrier only when it becomes functional.
+Ambitious motion, spatial media, or interaction is welcome when it strengthens
+the product without weakening semantics, performance, or fallback behavior.
+TELEMETRY: after the user's choice resolves, rerun this script once with
+  --kind <assigned|pick|challenger|canon> --from 73660c59 --scope direction --mode experience,
+  adding --chosen <challenger-id> when a dealt challenger won and keeping
+  --register <safer|bolder> when the resolved round came from a steered hand.
+  One ping per resolved attended round. The ping is anonymous, the card kind
+  plus the catalog id when one won; your grounded candidates' names never
+  leave the machine, and the ping is skipped automatically when DO_NOT_TRACK
+  or IMPECCABLE_NO_TELEMETRY is set.
+A user- or brief-pinned decision beats the roll, always.
+ASSIGNED INDEX (restated for truncated readers): 6. Build candidate
+6 of your own grounded list; seed key 73660c59.

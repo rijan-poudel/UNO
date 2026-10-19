@@ -89,6 +89,18 @@ export function useGamePresentation(
     const oldTop = before?.discardPile.at(-1);
     const playAction = game.lastAction.type === "play" ? game.lastAction : null;
     if (before && top && top.id !== oldTop?.id && discard && !reduced) {
+      const felt = board.querySelector<HTMLElement>(".table-boundary");
+      if (felt)
+        track(
+          felt.animate(
+            [
+              { transform: "translateY(0)" },
+              { transform: "translateY(2px)", offset: 0.65 },
+              { transform: "translateY(0)" },
+            ],
+            { duration: 240, easing: "ease-out" },
+          ),
+        );
       const actor =
         playAction?.playerId ?? before.players[before.currentPlayerIndex]?.id;
       const from =
@@ -139,10 +151,7 @@ export function useGamePresentation(
             ghosts.current.delete(ghost);
           });
         track(
-          discard.animate(
-            [{ opacity: 0 }, { opacity: 0, offset: 0.85 }, { opacity: 1 }],
-            { duration: 280 },
-          ),
+          discard.animate([{ opacity: 0 }, { opacity: 0 }], { duration: 280 }),
         );
       }
       selectedOrigin.current = null;

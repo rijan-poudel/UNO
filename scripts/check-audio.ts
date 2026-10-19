@@ -171,6 +171,31 @@ async function main() {
     before + 2,
     'only latest action follows unlock, never a backlog',
   );
+  const beforePickup = audible;
+  playTableChime('pickup');
+  assert.equal(
+    audible,
+    beforePickup + 1,
+    'pickup is immediate texture, without a tonal cue',
+  );
+  const beforeSpecial = audible;
+  playTableChime('reverse');
+  assert.equal(
+    audible,
+    beforeSpecial + 2,
+    'special card uses paper and contact instead of a melody',
+  );
+  const beforeColdDraw = audible;
+  Context.instance.state = 'suspended';
+  primeTableAudioFromUserGesture();
+  playTableChime('draw');
+  resume();
+  await flush();
+  assert.equal(
+    audible,
+    beforeColdDraw + 1,
+    'first draw survives cold-context gesture unlock',
+  );
   const stoppedBeforeMute = stopped;
   muted = true;
   windowEvents.dispatchEvent(new Event('uno:audio-settings'));

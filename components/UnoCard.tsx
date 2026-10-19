@@ -2,7 +2,7 @@
 "use client";
 
 import type { CSSProperties } from "react";
-import { Ban, ChevronsLeftRight, Layers, Shuffle } from "lucide-react";
+import { Ban, Repeat2, Layers, Shuffle } from "lucide-react";
 import type { Card } from "../types/card";
 
 interface UnoCardProps {
@@ -33,7 +33,7 @@ const SYMBOLS: Record<string, string> = {
 
 function CardSymbol({ value }: { value: string }) {
   if (value === "skip") return <Ban aria-hidden="true" />;
-  if (value === "reverse") return <ChevronsLeftRight aria-hidden="true" />;
+  if (value === "reverse") return <Repeat2 aria-hidden="true" />;
   if (value === "shuffle") return <Shuffle aria-hidden="true" />;
   if (value === "discardAll") return <Layers aria-hidden="true" />;
   if (value === "wild")
@@ -62,9 +62,17 @@ export default function UnoCard({
     : `${card.color === "wild" ? "" : `${card.color} `}${LABELS[card.value] ?? card.value}`;
   const style = { "--card-scale": sizeMultiplier } as CSSProperties;
   const content = faceDown ? (
-    <div className="card-back-mark" aria-hidden="true">
-      uno<span>.</span>
-    </div>
+    <>
+      <span className="card-back-stripes" aria-hidden="true">
+        <i />
+        <i />
+        <i />
+        <i />
+      </span>
+      <div className="card-back-mark" aria-hidden="true">
+        uno<span>.</span>
+      </div>
+    </>
   ) : (
     <>
       <span className="card-index top">
@@ -74,6 +82,14 @@ export default function UnoCard({
       <span
         className={`card-value ${card.value.length > 1 ? "card-action-value" : ""}`}
       >
+        {card.value === "wild4" && (
+          <span className="four-color-mark" aria-hidden="true">
+            <i />
+            <i />
+            <i />
+            <i />
+          </span>
+        )}
         <CardSymbol value={card.value} />
       </span>
       <span className="card-index bottom">

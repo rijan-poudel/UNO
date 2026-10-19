@@ -61,3 +61,9 @@ Card sounds combine an immediate paper swipe with a short landing tap scheduled 
 ## Public connection configuration
 
 `lib/socketConnection.ts` resolves a neighboring port only for development and local port-3000 previews. Public deployments need an explicit `NEXT_PUBLIC_SOCKET_URL`. Missing/invalid configuration and connection failures produce an honest unavailable state with a local-bot recovery action. A successful connection clears the error. `Dockerfile.socket` packages the persistent service; Vercel serves the frontend separately. Hosting credentials and a public backend URL are operational prerequisites, not something the UI can invent.
+
+### Direct table interaction (October 19)
+
+`HandCard` plays a legal card on one activation and inspects a nonmatching card. Pointer pickup primes audio synchronously and produces short paper feedback. Vertical drags clone the actual face; `lib/cardGesture.ts` determines deliberate upward release versus scrolling/cancel. Its small assertion check runs as part of `check:game`. `onDragChange` exposes landing feedback to `GameBoard`, while the immutable engine remains the only source of legal actions. The physical draw pile is the Draw control; the bottom dock holds contextual Pass and an explicit Play fallback for a card inspected before its turn. The discard retains two prior faces under the current card.
+
+Review evidence in `.impeccable/review/direct-play/` uses the earlier loopback-only preview fixture, never a deployed multiplayer service. Native browser assertions and screenshots have separate scope from physical speaker quality.

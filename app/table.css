@@ -1,5 +1,5 @@
-/* Tactile table — cards are the foreground; the arena stays quiet.
-   Contract: .impeccable/tactile-direction.md. No presentation gates a turn. */
+/* After-hours table — physical cards, baize and direct play.
+   Contract: .impeccable/review/direct-play/contract.md. No presentation gates a turn. */
 body {
   --font-display: var(--font-body);
 }
@@ -18,11 +18,13 @@ body {
   vertical-align: top;
   padding: 0;
   border: calc(3px * var(--card-scale, 1)) solid #fffdf5;
-  border-radius: calc(9px * var(--card-scale, 1));
+  border-radius: calc(6px * var(--card-scale, 1));
   background: var(--card-color);
   color: var(--card-ink);
   font-family: var(--font-card), sans-serif;
-  box-shadow: 0 5px 10px #070c1659;
+  box-shadow:
+    inset 0 1px 1px #ffffff60,
+    0 5px 10px #03090870;
   user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none;
@@ -45,13 +47,13 @@ body {
 }
 .card-orbit {
   position: absolute;
-  width: 86%;
-  height: 73%;
-  left: 7%;
-  top: 14%;
+  width: 116%;
+  height: 64%;
+  left: -8%;
+  top: 18%;
   background: #fffdf5;
   border-radius: 50%;
-  transform: rotate(30deg);
+  transform: rotate(-34deg);
 }
 .card-index {
   position: absolute;
@@ -128,16 +130,16 @@ body {
   background: #159768;
 }
 .card-back {
-  background: #202938;
-  color: #172130;
+  background: #172b2b;
+  color: #fffdf5;
 }
 .card-back::before {
   content: "";
   position: absolute;
-  inset: 13% 10%;
+  inset: 24% -12%;
   border-radius: 50%;
-  transform: rotate(30deg);
-  background: #d8ed82;
+  transform: rotate(-34deg);
+  background: #e73442;
 }
 .card-back-mark {
   position: absolute;
@@ -150,6 +152,7 @@ body {
   font-style: italic;
   letter-spacing: -0.04em;
   transform: rotate(-24deg);
+  text-shadow: 0 2px 1px #65111a80;
 }
 .card-back-mark span {
   display: contents;
@@ -157,8 +160,8 @@ body {
 
 /* ── An uninterrupted playing arena ── */
 .game-page {
-  --ui-bg: #111925;
-  --ui-surface: #1c293a;
+  --ui-bg: #101c1c;
+  --ui-surface: #1c302d;
   --ui-text: #f1f4fa;
   --ui-muted: #b1bfd2;
   --ui-line: #3a4b63;
@@ -167,7 +170,7 @@ body {
   --ui-table-muted: #b1bfd2;
   --turn-accent: #d8ed82;
   min-height: 100dvh;
-  background: #111925;
+  background: radial-gradient(ellipse at 50% 25%, #23332e 0, #101c1c 70%);
   color: var(--ui-text);
   color-scheme: dark;
   overflow: clip;
@@ -246,21 +249,59 @@ body {
 }
 .table-boundary {
   position: absolute;
-  inset: 52px 5% 18px;
-  border: 1px solid #34455e;
-  border-radius: 50%;
-  background: #1b293b;
+  inset: 48px 5% 18px;
+  border: 0;
+  border-radius: 150px;
+  background: #172a28 url("/textures/padded-leather.jpg") center / 340px;
+  background-blend-mode: soft-light;
   box-shadow:
-    inset 0 -22px 45px #101b2a44,
-    0 18px 40px #080e1940;
+    inset 0 2px 3px #b9d3c036,
+    0 18px 38px #020a0966;
   pointer-events: none;
+}
+.table-boundary::before {
+  content: "";
+  position: absolute;
+  inset: 13px;
+  border-radius: inherit;
+  background: #245b49 url("/textures/green-baize.jpg") center / 560px;
+  background-blend-mode: soft-light;
+  box-shadow: inset 0 5px 12px #061e2160;
 }
 .table-boundary::after {
   content: "";
   position: absolute;
-  inset: 14px;
-  border: 1px solid #35496280;
+  inset: 26px;
+  border: 1px solid #c6d7bd38;
   border-radius: inherit;
+}
+.card-landing {
+  position: absolute;
+  inset: 92px 18% 70px;
+  border: 1px dashed transparent;
+  border-radius: 80px;
+  display: grid;
+  align-items: end;
+  justify-items: center;
+  padding-bottom: 16px;
+  pointer-events: none;
+  color: #eff5ca;
+  font-size: 13px;
+  transition:
+    border-color 140ms,
+    background-color 140ms;
+}
+.receiving-card .card-landing {
+  border-color: #e5f3b9b0;
+  background: #e5f3b912;
+}
+.card-landing span {
+  background: #173d31;
+  border-radius: 6px;
+  padding: 3px 9px;
+}
+.card-landing span:empty {
+  display: none;
 }
 .table-watermark {
   position: absolute;
@@ -351,7 +392,7 @@ body {
   font-weight: 600;
 }
 .discard-pile {
-  transform: rotate(9deg);
+  transform: rotate(7deg);
 }
 .discard-pile .uno-card {
   box-shadow: 0 9px 17px #080f1e80;
@@ -494,7 +535,7 @@ body {
   max-width: 140px;
   border-radius: 12px;
   color: #f1f4fa;
-  background: #111925;
+  background: #152926;
 }
 .opponent-label .player-avatar {
   width: 28px;
@@ -684,7 +725,7 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  min-height: 80px;
+  min-height: 56px;
   padding: 6px 0 max(18px, env(safe-area-inset-bottom));
 }
 .move-hint {
@@ -723,7 +764,7 @@ body {
   .move-dock {
     flex-direction: column;
     gap: 8px;
-    min-height: 98px;
+    min-height: 48px;
     text-align: center;
     padding-bottom: max(14px, env(safe-area-inset-bottom));
   }
@@ -736,6 +777,9 @@ body {
     justify-content: center;
     width: 100%;
     max-width: 100%;
+  }
+  .move-buttons:empty {
+    display: none;
   }
   .move-buttons .button {
     flex: 1;
@@ -790,7 +834,7 @@ body {
     grid-template-rows: minmax(380px, 1fr) auto;
   }
   .hand-cards {
-    height: 225px;
+    height: 260px;
   }
   .hand-card .uno-card {
     --card-scale: 1.65 !important;
@@ -870,10 +914,19 @@ body {
     grid-template-rows: minmax(350px, 1fr) auto;
   }
   .table-boundary {
-    inset: 62px -55px 16px;
+    inset: 62px -42px 16px;
+    border-width: 9px;
+    border-radius: 130px;
+  }
+  .card-landing {
+    inset: 102px 9% 66px;
+    padding-bottom: 6px;
+  }
+  .table-boundary::before {
+    inset: 9px;
   }
   .table-boundary::after {
-    inset: 12px;
+    inset: 20px;
   }
   .table-watermark {
     top: 35%;
@@ -981,20 +1034,20 @@ body {
   }
   .hand-scroll {
     margin-inline: -12px;
-    padding: 38px 42px 14px;
+    padding: 38px 18px 14px;
   }
   .hand-cards {
     height: 175px;
-    padding: 0 14px;
+    padding: 0 6px;
   }
   .hand-card {
-    margin-left: -60px;
+    margin-left: -36px;
   }
   .hand-card .uno-card {
     --card-scale: 1.14 !important;
   }
   .large-hand .hand-card {
-    margin-left: -44px;
+    margin-left: -36px;
   }
   .large-hand .hand-card:first-child {
     margin-left: 0;
@@ -1020,7 +1073,7 @@ body {
     grid-template-rows: minmax(340px, 1fr) auto;
   }
   .hand-card {
-    margin-left: -49px;
+    margin-left: -30px;
   }
   .table-center {
     gap: 19px;
@@ -1166,4 +1219,121 @@ body {
   .seats-6 .seat-right {
     top: 28%;
   }
+}
+
+/* Authored deck details and physical discard history. */
+.card-back-stripes {
+  position: absolute;
+  inset: 6% 10%;
+  display: flex;
+  gap: 4%;
+  transform: rotate(-34deg);
+}
+.card-back-stripes i {
+  width: 4%;
+  height: 100%;
+  background: #fffdf514;
+}
+.four-color-mark {
+  position: absolute;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: 44%;
+  height: 48%;
+  transform: rotate(12deg);
+  opacity: 0.22;
+}
+.four-color-mark i:nth-child(1) {
+  background: #e73442;
+}
+.four-color-mark i:nth-child(2) {
+  background: #2474df;
+}
+.four-color-mark i:nth-child(3) {
+  background: #f7c934;
+}
+.four-color-mark i:nth-child(4) {
+  background: #159768;
+}
+.card-wild .card-value:has(.four-color-mark) {
+  color: #172b2b;
+  text-shadow:
+    1px 1px #fffdf5,
+    -1px -1px #fffdf5;
+}
+.discard-stack {
+  position: relative;
+}
+.discard-pile {
+  position: relative;
+  z-index: 1;
+}
+.discard-history {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.discard-history > span {
+  position: absolute;
+  inset: 0;
+  transform: translate(
+      calc(-7px + var(--stack-i) * 10px),
+      calc(3px + var(--stack-i) * 2px)
+    )
+    rotate(calc(-13deg + var(--stack-i) * 11deg));
+}
+.hand-card.legal-card .uno-card {
+  cursor: grab;
+}
+.hand-card.legal-card .uno-card:active {
+  cursor: grabbing;
+}
+.legal-card .uno-card::after {
+  inset: auto 25% 5px;
+  height: 4px;
+  background: #fffdf5;
+  box-shadow: 0 1px 3px #061e2150;
+}
+.game-page .game-feedback {
+  top: 25%;
+  animation-duration: 650ms;
+}
+.game-page .game-feedback > span {
+  background: #f4efd7;
+  border: 0;
+  color: #173d31;
+  border-radius: 8px;
+  min-width: 64px;
+  height: 56px;
+  font-family: var(--font-card);
+  font-size: 38px;
+  font-style: italic;
+  box-shadow: 0 8px 16px #061e2150;
+}
+.game-page .game-feedback svg {
+  width: 34px;
+  height: 34px;
+}
+.game-page .feedback-uno > span {
+  background: #f7c934;
+}
+@media (hover: hover) and (pointer: fine) {
+  .hand-card:hover {
+    transform: translateY(-34px) rotate(-2deg) scale(1.07);
+  }
+  .draw-pile:not(:disabled):active {
+    transform: translateY(2px) rotate(-7deg) scale(0.98);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .card-landing {
+    transition: none;
+  }
+  .hand-card:hover {
+    transform: translateY(var(--fan-drop)) rotate(var(--fan-angle));
+  }
+}
+
+.card-yellow .card-value {
+  color: #8b600b;
 }

@@ -1,4 +1,4 @@
-// A held card: tap to inspect, tap again or drag upward to play.
+// A held card: tap to play, or lift and flick toward the table.
 "use client";
 import {
   useEffect,
@@ -8,6 +8,11 @@ import {
 } from "react";
 import type { Card } from "../types/card";
 import UnoCard from "./UnoCard";
+import {
+  playTableChime,
+  primeTableAudioFromUserGesture,
+} from "../lib/tableChimes";
+import { canReleaseCard } from "../lib/cardGesture";
 
 interface Props {
   card: Card;
@@ -17,6 +22,7 @@ interface Props {
   selected: boolean;
   onInspect: () => void;
   onPlay: (element: HTMLElement) => void;
+  onDragChange: (state: "lifting" | "ready" | null) => void;
 }
 export default function HandCard({
   card,
@@ -26,6 +32,7 @@ export default function HandCard({
   selected,
   onInspect,
   onPlay,
+  onDragChange,
 }: Props) {
   const root = useRef<HTMLDivElement>(null);
   const gesture = useRef<{
@@ -45,6 +52,7 @@ export default function HandCard({
       if (element) element.style.opacity = "";
       gesture.current = null;
       wrapper?.classList.remove("dragging-card");
+      if (wrapper) onDragChange(null);
     };
     const onVisibility = () => {
       if (document.hidden) interrupt();
@@ -56,7 +64,7 @@ export default function HandCard({
       document.removeEventListener("visibilitychange", onVisibility);
       interrupt();
     };
-  }, [playable]);
+  }, [playable, onDragChange]);
   // Bound the spread for large hands; extra cards scroll instead of shrinking.
   const position =
     count < 2 ? 0 : (index - (count - 1) / 2) / Math.max(3, (count - 1) / 2);
@@ -71,7 +79,13 @@ export default function HandCard({
     if (start.dragging) {
       suppressClick.current = true;
       const lifted = ghost.current;
-      if (!cancelled && playable && event.clientY - start.y < -65 && lifted) {
+      onDragChange(null);
+      if (
+        !cancelled &&
+        playable &&
+        canReleaseCard(event.clientX - start.x, event.clientY - start.y) &&
+        lifted
+      ) {
         onPlay(lifted);
         lifted.remove();
         ghost.current = null;
@@ -117,7 +131,9 @@ export default function HandCard({
         } as CSSProperties
       }
       onPointerDown={(event) => {
-        if (!event.isPrimary || event.button !== 0) return;
+        if (!event.isPrimary || event.button !== 0 || gesture.current) return;
+        primeTableAudioFromUserGesture();
+        playTableChime("pickup");
         suppressClick.current = false;
         ghost.current?.remove();
         ghost.current = null;
@@ -144,6 +160,7 @@ export default function HandCard({
         const dy = event.clientY - start.y;
         if (!start.dragging && dy < -10 && Math.abs(dy) > Math.abs(dx)) {
           start.dragging = true;
+          onDragChange("lifting");
           event.currentTarget.classList.add("dragging-card");
           const element = face();
           if (element) {
@@ -174,6 +191,7 @@ export default function HandCard({
           }
         }
         if (start.dragging) {
+          onDragChange(canReleaseCard(dx, dy) ? "ready" : "lifting");
           const element = ghost.current;
           if (element) {
             const reduced = window.matchMedia(
@@ -193,14 +211,14 @@ export default function HandCard({
         sizeMultiplier={1.45}
         isPlayable={playable}
         isSelected={selected}
-        ariaLabel={`${selected && playable ? "Play" : "Inspect"} ${card.color === "wild" ? "" : card.color + " "}${({ skip: "skip", reverse: "reverse", draw2: "draw two", wild4: "wild draw four", wild: "wild", shuffle: "shuffle hands", discardAll: "discard all" } as Record<string, string>)[card.value] ?? card.value}${playable ? "" : ", not playable now"}`}
+        ariaLabel={`${playable ? "Play" : "Inspect"} ${card.color === "wild" ? "" : card.color + " "}${({ skip: "skip", reverse: "reverse", draw2: "draw two", wild4: "wild draw four", wild: "wild", shuffle: "shuffle hands", discardAll: "discard all" } as Record<string, string>)[card.value] ?? card.value}${playable ? "" : ", not playable now"}`}
         onClick={() => {
           if (suppressClick.current) {
             suppressClick.current = false;
             return;
           }
           const element = face();
-          if (selected && playable && element) onPlay(element);
+          if (playable && element) onPlay(element);
           else onInspect();
         }}
       />

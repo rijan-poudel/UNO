@@ -1,6 +1,7 @@
 // Card-table layout. The engine owns turns; presentation never blocks an action.
 "use client";
 import {
+  useCallback,
   useEffect,
   useMemo,
   useRef,
@@ -190,6 +191,13 @@ export default function GameBoard({
   const [help, setHelp] = useState(false);
   const [history, setHistory] = useState(false);
   const [sort, setSort] = useState(true);
+  const [draggingCard, setDraggingCard] = useState<"lifting" | "ready" | null>(
+    null,
+  );
+  const onDragChange = useCallback(
+    (state: "lifting" | "ready" | null) => setDraggingCard(state),
+    [],
+  );
   const [soundOn, setSoundOn] = useState(() => {
     const audio = getAudioSettings();
     return !audio.muted && audio.chimesEnabled && audio.sfxVolume > 0;
@@ -253,6 +261,7 @@ export default function GameBoard({
   }, []);
   function act(action: () => void) {
     if (pendingRef.current) return;
+    primeTableAudioFromUserGesture();
     pendingRef.current = true;
     setPendingAction(true);
     action();
@@ -310,6 +319,7 @@ export default function GameBoard({
       }
       if (event.key.toLowerCase() === "u" && canSayUno) {
         event.preventDefault();
+        primeTableAudioFromUserGesture();
         api.sayUno(localPlayerIndex);
       }
     }
@@ -397,7 +407,7 @@ export default function GameBoard({
               ? "Ready to play. You can also drag it onto the table."
               : "Exact match. Play now to jump in."
             : !isLocalTurn
-              ? "Lift a card to plan your next move."
+              ? "Browse your hand while they play."
               : drawnThisTurn
                 ? playable.length
                   ? drawnCard
@@ -413,7 +423,7 @@ export default function GameBoard({
                       ? "Stack a matching draw card, or take the penalty."
                       : `Draw ${game.pendingDraw} to take the penalty.`
                     : playable.length
-                      ? "Lift a matching card, then play it."
+                      ? "Tap a match, or flick it onto the table."
                       : "No matching card. Draw to keep the round moving.";
   return (
     <div className={`game-page ${isLocalTurn ? "local-turn" : ""}`} ref={root}>
@@ -479,7 +489,11 @@ export default function GameBoard({
               }
             }}
           >
-            {soundOn ? <Volume2 size={19} /> : <VolumeX size={19} />}
+            {soundOn && audioStatus === "ready" ? (
+              <Volume2 size={19} />
+            ) : (
+              <VolumeX size={19} />
+            )}
             <span className="sound-label">
               {soundOn && audioStatus === "ready" ? "Sound on" : "Enable sound"}
             </span>
@@ -506,10 +520,19 @@ export default function GameBoard({
       )}
       <main className="game-main">
         <section
-          className={`playing-table color-${activeColor} seats-${game.players.length}`}
+          className={`playing-table color-${activeColor} seats-${game.players.length} ${draggingCard ? "receiving-card" : ""}`}
           aria-label="Playing table"
         >
           <div className="table-boundary" aria-hidden="true" />
+          <div className="card-landing" aria-hidden="true">
+            <span>
+              {draggingCard === "ready"
+                ? "Release to play"
+                : draggingCard
+                  ? "Slide up to play"
+                  : ""}
+            </span>
+          </div>
           <GameFeedback game={game} />
           <div
             className="table-direction"
@@ -544,7 +567,7 @@ export default function GameBoard({
                 player.hand.length === 1 &&
                 game.rules.mustDeclareUno
               }
-              onCatch={() => api.callOut(localPlayerIndex, index)}
+              onCatch={() => act(() => api.callOut(localPlayerIndex, index))}
             />
           ))}
           <div className="table-center">
@@ -578,8 +601,20 @@ export default function GameBoard({
               </span>
             </div>
             <div className="pile-zone">
-              <div data-discard-pile className="discard-pile" key={top?.id}>
-                {top && <UnoCard card={top} sizeMultiplier={1.25} />}
+              <div className="discard-stack">
+                <div className="discard-history" aria-hidden="true">
+                  {game.discardPile.slice(-3, -1).map((card, index) => (
+                    <span
+                      key={card.id}
+                      style={{ "--stack-i": index } as CSSProperties}
+                    >
+                      <UnoCard card={card} sizeMultiplier={1.25} />
+                    </span>
+                  ))}
+                </div>
+                <div data-discard-pile className="discard-pile">
+                  {top && <UnoCard card={top} sizeMultiplier={1.25} />}
+                </div>
               </div>
               <span className="pile-label">Last played</span>
             </div>
@@ -628,7 +663,10 @@ export default function GameBoard({
               {canSayUno && (
                 <button
                   className="button uno-button uno-ready"
-                  onClick={() => api.sayUno(localPlayerIndex)}
+                  onClick={() => {
+                    primeTableAudioFromUserGesture();
+                    api.sayUno(localPlayerIndex);
+                  }}
                 >
                   UNO!
                 </button>
@@ -692,6 +730,7 @@ export default function GameBoard({
                       setInspectedId((id) => (id === card.id ? null : card.id))
                     }
                     onPlay={(element) => select(card, element)}
+                    onDragChange={onDragChange}
                   />
                 );
               })}
@@ -732,17 +771,7 @@ export default function GameBoard({
                       >
                         Pass <ArrowRight size={18} />
                       </button>
-                    ) : (
-                      <button
-                        className={`button ${canPlaySelected ? "secondary" : "primary"}`}
-                        disabled={drawDisabled}
-                        onClick={() => act(api.drawCard)}
-                      >
-                        {game.pendingDraw
-                          ? `Draw ${game.pendingDraw}`
-                          : "Draw card"}
-                      </button>
-                    ))}
+                    ) : null)}
                 </>
               )}
             </div>
@@ -837,8 +866,8 @@ export default function GameBoard({
         <Modal title="A good hand starts here." onClose={() => setHelp(false)}>
           <div className="help-rules">
             <p>
-              <strong>Match it.</strong> Play a card with the same color or
-              value as the top card. Wild cards let you choose the next color.
+              <strong>Match it.</strong> Tap a card with the same color or value
+              as the top card. Wild cards let you choose the next color.
             </p>
             <p>
               <strong>Draw it.</strong> If you can’t play, draw a card. Play a

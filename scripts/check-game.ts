@@ -1,3 +1,4 @@
+import './check-gesture';
 // Framework-free engine smoke check. Run with npm run check:game.
 import assert from 'node:assert/strict';
 import {
