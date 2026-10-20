@@ -233,6 +233,41 @@ assert.equal(
   }),
   'http://192.168.1.5:3001',
 );
+for (const hostname of [
+  'localhost',
+  'api.localhost',
+  '127.0.0.1',
+  '[::1]',
+  '0.0.0.0',
+  '192.168.1.5',
+  '10.0.0.5',
+  '172.16.0.5',
+  'server.local',
+]) {
+  assert.equal(
+    resolveSocketEndpoint(`http://${hostname}:3001`, publicLocation),
+    null,
+    'a public game must not connect to a visitor-local server',
+  );
+}
+assert.equal(
+  resolveSocketEndpoint('http://localhost:3001', {
+    protocol: 'http:',
+    hostname: 'localhost',
+    port: '3000',
+  }),
+  'http://localhost:3001/',
+);
+assert.equal(
+  resolveSocketEndpoint(undefined, { ...publicLocation, port: '3000' }),
+  null,
+  'a public hostname is not a local preview merely because of its port',
+);
+assert.equal(
+  resolveSocketEndpoint('https://localhost.example.com', publicLocation),
+  'https://localhost.example.com/',
+  'public hostnames are not confused with loopback names',
+);
 console.log('Public socket configuration and local preview endpoints passed.');
 
 for (const input of [

@@ -50,3 +50,7 @@ Four P1 and eight P2 findings addressed; no known P0 in this scoped review.
 ## Shipping boundary
 
 No promise that every possible UX issue is eliminated. Confirm the supported desktop, narrow portrait and sideways-phone compositions together; fix only material findings from that pass. The public multiplayer service was reachable: created room K8PPGC, added a bot, dealt, and played yellow 3. This exposed the leave race above. Deployment success alone is not used as proof of multiplayer; leaving is checked again on the published fix.
+
+## Remaining operational finding
+
+**P1 — Public multiplayer health is not independently established.** A published-page connection depended on starting this computer’s local socket service. The owner confirms an existing Vercel URL setting, but current credentials cannot access that workspace and browser settings require login. Do not replace the configured host without inspecting it. The resolver now rejects explicit loopback/private LAN endpoints on public hostnames. Existing setup/container instructions remain; correcting or validating the deployed endpoint requires access to the current Vercel project. This is open, separate from the twelve completed UI/client-lifecycle findings.

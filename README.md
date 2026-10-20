@@ -107,7 +107,7 @@ The game uses a quiet midnight arena, vivid card faces, a curved hand, Outfit UI
 
 ### Persistent multiplayer host
 
-The public frontend needs `NEXT_PUBLIC_SOCKET_URL` set to its separate Socket.IO host. Without it, online rooms show an unavailable state and offer local bot play; public visitors are never sent to an unserved port on the frontend domain. Local development and port-3000 previews still resolve the local server automatically.
+The public frontend needs `NEXT_PUBLIC_SOCKET_URL` set to its separate Socket.IO host. Without it, online rooms show an unavailable state and offer local bot play; public visitors are never sent to an unserved port on the frontend domain. Explicit loopback/private-LAN socket addresses are also rejected on public hostnames; a developer’s running local server is not a public multiplayer deployment. Local development and port-3000 previews still resolve the local server automatically.
 
 `Dockerfile.socket` packages the persistent service for a container host:
 
