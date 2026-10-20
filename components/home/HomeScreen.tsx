@@ -4,7 +4,6 @@ import { useState } from "react";
 import Image from "next/image";
 import { ArrowRight, ChevronDown } from "lucide-react";
 import type { FriendInvite } from "../../types/multiplayer";
-import cardClubArt from "../../public/artwork/card-club.webp";
 import NotificationPanel from "../NotificationPanel";
 import PlayerProgress from "../PlayerProgress";
 
@@ -43,7 +42,9 @@ export default function HomeScreen(props: Props) {
         </div>
         <figure className="launch-scene">
           <Image
-            src={cardClubArt}
+            src="/artwork/card-club.webp"
+            width={1672}
+            height={941}
             alt="A blue rabbit plays a reverse card while a red panda laughs and a crocodile guards its last card around their card-club table."
             sizes="(max-width: 700px) 100vw, (max-width: 1250px) 880px, 960px"
             unoptimized
