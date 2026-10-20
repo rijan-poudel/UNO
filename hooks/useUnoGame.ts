@@ -191,7 +191,7 @@ function reducer(state: UnoUIState, action: UIAction): UnoUIState {
 
 // ── Public hook ───────────────────────────────────────────────────────────────
 
-export function useUnoGame() {
+export function useUnoGame(paused = false) {
   const [localPlayerIndex, setLocalPlayerIndex] = useState<number>(0);
 
   const [state, dispatch] = useReducer(reducer, {
@@ -206,9 +206,11 @@ export function useUnoGame() {
 
   // Ref to always access latest game state in async callbacks
   const gameRef = useRef<GameState | null>(game);
+  const pausedRef = useRef(paused);
   useLayoutEffect(() => {
     gameRef.current = game;
-  }, [game]);
+    pausedRef.current = paused;
+  }, [game, paused]);
 
   // ── Start ─────────────────────────────────────────────────────────────────
 
@@ -331,7 +333,7 @@ export function useUnoGame() {
   // Uses a delay so the UI can animate before the bot moves.
 
   useEffect(() => {
-    if (!game || game.winnerId) return;
+    if (paused || !game || game.winnerId) return;
     const currentPlayer = game.players[game.currentPlayerIndex];
     if (!currentPlayer.isBot) return;
 
@@ -346,7 +348,7 @@ export function useUnoGame() {
       try {
         // Read from ref to get the latest state, avoiding stale closure
         const currentGame = gameRef.current;
-        if (!currentGame || currentGame.winnerId) return;
+        if (pausedRef.current || !currentGame || currentGame.winnerId) return;
         const current = currentGame.players[currentGame.currentPlayerIndex];
         if (!current.isBot) return;
 
@@ -404,7 +406,7 @@ export function useUnoGame() {
 
     return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [game?.currentPlayerIndex, game?.turnCount, game?.winnerId]);
+  }, [game?.currentPlayerIndex, game?.turnCount, game?.winnerId, paused]);
 
   // ── Derived values ────────────────────────────────────────────────────────
 
@@ -433,7 +435,7 @@ export function useUnoGame() {
   // After a voluntary draw, auto-pass after a short delay if the drawn card
   // still leaves no playable option.
   useEffect(() => {
-    if (!game || game.winnerId) return;
+    if (paused || !game || game.winnerId) return;
     if (game.currentPlayerIndex !== localPlayerIndex) return;
 
     const player = game.players[localPlayerIndex];
@@ -448,6 +450,7 @@ export function useUnoGame() {
 
     const timer = window.setTimeout(() => {
       try {
+        if (pausedRef.current) return;
         const next = passTurn(game, localPlayerIndex);
         dispatch({ type: 'PLAY', game: next });
       } catch (e) {
@@ -456,7 +459,7 @@ export function useUnoGame() {
     }, coordinatedAutoPassDelay);
 
     return () => window.clearTimeout(timer);
-  }, [game, localPlayerIndex, drawnThisTurn]);
+  }, [game, localPlayerIndex, drawnThisTurn, paused]);
 
   return {
     game,

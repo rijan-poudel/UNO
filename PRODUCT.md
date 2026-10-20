@@ -54,3 +54,7 @@ The owner’s follow-up rejects unresolved friction across the whole journey. Re
 ## Earned Play
 
 The owner asks to gamify the interface while keeping direct play central. Near-finish opponents, real draw stacks, the completed-round scorecard and optional milestone collection carry that energy. Milestones reward actual device-local completed rounds and wins; they do not grant XP for clicks, introduce daily pressure, infer official points or represent account-wide standing. A collected best-streak milestone remains collected after later losses. Home keeps the play choices ahead of collection details on phones.
+
+## Phone orientation
+
+The owner requires landscape-only gameplay on phones. Home and setup remain usable in portrait; entering or rotating a match upright shows clear rotate guidance and a leave action. Local bot rounds pause until landscape returns. Online prompts state that the shared round continues. Keep the match within the available viewport, with horizontal large-hand scrolling and no document scrolling. Verify at568×320 and844×390, six seats,20cards and keyboard focus; portrait verifies the orientation gate rather than a second gameplay layout.

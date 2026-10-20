@@ -3,6 +3,7 @@ import { Outfit, Barlow_Condensed } from "next/font/google";
 import { Toaster } from "sonner";
 import "./globals.css";
 import "./table.css";
+import "./arena.css";
 import "./home.css";
 
 const bodyFont = Outfit({
@@ -56,6 +57,19 @@ export default function RootLayout({
           verdict. FINISH: unreviewed and undocumented is unfinished; this build
           ends with the finish review, the verdict, DESIGN.md, and every
           shipping raster carrying its provenance
+        </span>
+        <span hidden data-design-contract="shared-table-viewport">
+          THESIS: One shared table includes the local hand, contained in the
+          window. OWN-WORLD: Native vivid cards on green baize and a dark
+          leather rail; Outfit and Barlow Condensed. STORY: See whose turn it
+          is, tap or flick a match, draw directly from the deck. FIRST VIEWPORT:
+          Opponents occupy the perimeter, clear of central piles; the hand fills
+          the lower table with lift clearance and contextual controls. FORM:
+          Owner-pinned tactile game arena, adapting the existing table. Home
+          uses flat transparent character art, not a framed cinematic scene.
+          FINISH: unreviewed and undocumented is unfinished; this build ends
+          with the finish review, the verdict, DESIGN.md, and every shipping
+          raster carrying its provenance
         </span>
         <span hidden data-design-contract="tactile-table">
           Held cards, situational controls, audible immediate feedback. See

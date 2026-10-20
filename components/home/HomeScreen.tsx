@@ -42,11 +42,11 @@ export default function HomeScreen(props: Props) {
         </div>
         <figure className="launch-scene">
           <Image
-            src="/artwork/card-club.webp"
-            width={1672}
-            height={941}
-            alt="A blue rabbit plays a reverse card while a red panda laughs and a crocodile guards its last card around their card-club table."
-            sizes="(max-width: 700px) 100vw, (max-width: 1250px) 880px, 960px"
+            src="/artwork/card-night-flat.webp"
+            width={1729}
+            height={910}
+            alt="A laughing red panda slaps down a reverse card while a blue rabbit and green crocodile hold their cards around the table."
+            sizes="(max-width: 700px) 100vw, (max-width: 1250px) 740px, 820px"
             unoptimized
             preload
           />

@@ -7,6 +7,7 @@ import {
   type ReactNode,
 } from "react";
 import type { GameRules } from "../types/rules";
+import { usePhonePortrait } from "../hooks/usePhonePortrait";
 import { useUnoGame } from "../hooks/useUnoGame";
 import { useUnoOnlineGame } from "../hooks/useUnoOnlineGame";
 import { useAudioManager } from "../hooks/useAudioManager";
@@ -122,7 +123,8 @@ export default function Home() {
   );
   const { playMusic, setMusicContext } = useAudioManager();
 
-  const local = useUnoGame();
+  const phonePortrait = usePhonePortrait();
+  const local = useUnoGame(phonePortrait);
   const online = useUnoOnlineGame();
   const api = mode === "computer" ? local : online;
 

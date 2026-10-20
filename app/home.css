@@ -58,9 +58,9 @@
 .launch-scene {
   position: relative;
   flex: 0 0 auto;
-  width: min(960px, 100vw);
+  width: min(820px, 96vw);
   height: auto;
-  aspect-ratio: 1672 / 941;
+  aspect-ratio: 1729 / 910;
   margin: 8px 0 0;
 }
 .launch-scene img {
@@ -69,19 +69,11 @@
   height: 100%;
   object-fit: contain;
 }
-.launch-scene::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  /* Only the room boundary fades into the ink; the game moment stays intact. */
-  background: linear-gradient(0deg, #102d35 0%, transparent 18%);
-}
 .launch-play {
   position: relative;
   z-index: 1;
   width: min(560px, 100%);
-  margin-top: -64px;
+  margin-top: -8px;
 }
 .launch-action {
   display: flex;
@@ -260,7 +252,7 @@
 }
 @media (min-width: 701px) and (max-width: 1250px) {
   .launch-scene {
-    width: min(880px, 100vw);
+    width: min(740px, 94vw);
   }
 }
 @media (max-width: 700px) {
@@ -279,16 +271,16 @@
     padding: 12px 20px 0;
   }
   .launch-scene {
-    height: 280px;
+    height: 230px;
     aspect-ratio: auto;
     margin-top: 16px;
   }
   .launch-scene img {
-    object-fit: cover;
-    object-position: 50% 68%;
+    object-fit: contain;
+    object-position: center;
   }
   .launch-play {
-    margin-top: -44px;
+    margin-top: 0;
   }
   .launch-action-main {
     min-height: 62px;
@@ -315,14 +307,14 @@
     font-size: 36px;
   }
   .launch-scene {
-    height: 230px;
+    height: 184px;
     margin-top: 12px;
   }
   .launch-main {
     padding-inline: 16px;
   }
   .launch-play {
-    margin-top: -36px;
+    margin-top: 0;
   }
   .launch-action-main {
     min-height: 58px;

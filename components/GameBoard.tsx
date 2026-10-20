@@ -16,6 +16,8 @@ import {
   Copy,
   HelpCircle,
   Menu,
+  Smartphone,
+  RotateCw,
   Layers,
   Settings,
   Trophy,
@@ -33,6 +35,7 @@ import {
   type PlayerExpression,
 } from "../lib/playerExpression";
 import { getAudioSettings, setAudioSettings } from "../lib/audioSettings";
+import { usePhonePortrait } from "../hooks/usePhonePortrait";
 import { useGamePresentation } from "../hooks/useGamePresentation";
 import PlayerProgress from "./PlayerProgress";
 import RoundSummary from "./RoundSummary";
@@ -58,6 +61,19 @@ interface Props {
   onDealAgain: () => void;
   onOpenSettings: (tab?: "profile" | "controls" | "audio") => void;
 }
+// Reveal in the hand’s horizontal scrollport without scrolling the document.
+function revealHandCard(scroller: HTMLElement, card: HTMLElement) {
+  const area = scroller.getBoundingClientRect();
+  const face = card.getBoundingClientRect();
+  const delta =
+    face.left < area.left + 18
+      ? face.left - area.left - 18
+      : face.right > area.right - 18
+        ? face.right - area.right + 18
+        : 0;
+  if (delta) scroller.scrollBy({ left: delta, behavior: "instant" });
+}
+
 const COLORS: Record<string, number> = {
   red: 0,
   yellow: 1,
@@ -201,6 +217,7 @@ export default function GameBoard({
     drawnThisTurn,
     canPass,
   } = api;
+  const phonePortrait = usePhonePortrait();
   const root = useRef<HTMLDivElement>(null);
   const hand = useRef<HTMLDivElement>(null);
   const [exit, setExit] = useState(false);
@@ -243,15 +260,19 @@ export default function GameBoard({
   }, [localPlayer?.hand, sort]);
   useEffect(() => {
     const scroller = hand.current;
-    if (!scroller || !inspectedId) return;
+    if (!scroller) return;
     const reveal = () => {
-      scroller
-        .querySelector<HTMLElement>(`[data-hand-card="${inspectedId}"]`)
-        ?.scrollIntoView({
-          block: "nearest",
-          inline: "center",
-          behavior: "instant",
-        });
+      const focused = document.activeElement;
+      const inspected = inspectedId
+        ? scroller.querySelector<HTMLElement>(
+            `[data-hand-card="${inspectedId}"] .uno-card`,
+          )
+        : null;
+      const element =
+        focused instanceof HTMLElement && scroller.contains(focused)
+          ? focused
+          : inspected;
+      if (element) revealHandCard(scroller, element);
     };
     reveal();
     const observer = new ResizeObserver(reveal);
@@ -302,6 +323,7 @@ export default function GameBoard({
   );
   useEffect(() => {
     function onKey(event: KeyboardEvent) {
+      if (phonePortrait) return;
       if (
         event.repeat ||
         event.ctrlKey ||
@@ -443,7 +465,36 @@ export default function GameBoard({
                       ? "Tap a match, or flick it onto the table."
                       : "No matching card. Draw to keep the round moving.";
   return (
-    <div className={`game-page ${isLocalTurn ? "local-turn" : ""}`} ref={root}>
+    <div
+      className={`game-page seats-${game.players.length} ${phonePortrait ? "needs-landscape" : ""} ${isLocalTurn ? "local-turn" : ""}`}
+      ref={root}
+    >
+      {phonePortrait && (
+        <section
+          className="rotate-phone"
+          aria-label="Landscape play"
+          role="status"
+        >
+          <div className="rotate-phone-art" aria-hidden="true">
+            <Smartphone size={76} strokeWidth={1.5} />
+            <RotateCw size={32} />
+          </div>
+          <h1>
+            Turn your phone.
+            <br />
+            Take your seat.
+          </h1>
+          <p>We play sideways. More room for your cards.</p>
+          <small>
+            {online
+              ? "Your online round continues while you rotate."
+              : "Your round is paused until you’re ready."}
+          </small>
+          <button className="button secondary" onClick={() => setExit(true)}>
+            Leave table
+          </button>
+        </section>
+      )}
       <header className="game-header">
         <button
           className="brand-button"
@@ -535,12 +586,12 @@ export default function GameBoard({
           {online.error}
         </div>
       )}
-      <main className="game-main">
+      <main className="game-main" data-design-contract="shared-table-viewport">
+        <div className="table-boundary" aria-hidden="true" />
         <section
           className={`playing-table color-${activeColor} seats-${game.players.length} ${draggingCard ? "receiving-card" : ""}`}
           aria-label="Playing table"
         >
-          <div className="table-boundary" aria-hidden="true" />
           <div className="card-landing" aria-hidden="true">
             <span>
               {draggingCard === "ready"
@@ -551,21 +602,6 @@ export default function GameBoard({
             </span>
           </div>
           <GameFeedback game={game} />
-          <div
-            className="table-direction"
-            aria-label={
-              game.direction === 1 ? "Clockwise play" : "Counterclockwise play"
-            }
-          >
-            {game.direction === 1 ? (
-              <ArrowRight size={16} />
-            ) : (
-              <ArrowLeft size={16} />
-            )}
-            <span>
-              {game.direction === 1 ? "Clockwise" : "Counterclockwise"}
-            </span>
-          </div>
           {opponents.map(({ player, index }, i) => (
             <Opponent
               key={player.id}
@@ -669,36 +705,25 @@ export default function GameBoard({
         </section>
         <section
           className={`hand-section ${isLocalTurn ? "your-turn" : ""}`}
-          aria-label="Your hand"
+          aria-label={`Your hand, ${cards.length} ${cards.length === 1 ? "card" : "cards"}`}
           data-seat={localPlayer.id}
         >
-          <div className="hand-toolbar">
-            <div className="hand-title">
-              <strong>{localPlayer.name}</strong>
-              <span>
-                {cards.length} {cards.length === 1 ? "card" : "cards"}
-              </span>
-              {localPlayer.saidUno && cards.length === 1 && (
-                <span className="uno-called">
-                  <Check size={13} />
-                  UNO called
-                </span>
-              )}
-            </div>
-            <div className="hand-actions">
-              {canSayUno && (
-                <button
-                  className="button uno-button uno-ready"
-                  onClick={() => {
-                    primeTableAudioFromUserGesture();
-                    api.sayUno(localPlayerIndex);
-                  }}
-                >
-                  UNO!
-                </button>
-              )}
-            </div>
-          </div>
+          {canSayUno && (
+            <button
+              className="button uno-button uno-ready hand-uno"
+              onClick={() => {
+                primeTableAudioFromUserGesture();
+                api.sayUno(localPlayerIndex);
+              }}
+            >
+              UNO!
+            </button>
+          )}
+          {localPlayer.saidUno && cards.length === 1 && (
+            <span className="uno-called hand-uno" role="status">
+              <Check size={13} /> UNO called
+            </span>
+          )}
           <div
             className="hand-scroll"
             ref={hand}
@@ -726,12 +751,11 @@ export default function GameBoard({
                         (event.key === "ArrowRight" ? 1 : -1) +
                         buttons.length) %
                       buttons.length;
-              buttons[next]?.focus();
-              buttons[next]?.scrollIntoView({
-                block: "nearest",
-                inline: "nearest",
-                behavior: "instant",
-              });
+              const target = buttons[next];
+              if (target) {
+                target.focus({ preventScroll: true });
+                revealHandCard(event.currentTarget, target);
+              }
             }}
           >
             <div
@@ -804,7 +828,7 @@ export default function GameBoard({
           </div>
         </section>
       </main>
-      {pendingWild && (
+      {pendingWild && !phonePortrait && (
         <ColorPicker
           playerName={localPlayer.name}
           onSelect={(color) => act(() => api.confirmWildColor(color))}
@@ -835,6 +859,19 @@ export default function GameBoard({
       )}
       {menu && (
         <Modal title="Your table." onClose={() => setMenu(false)}>
+          <p className="game-turn-order">
+            Turn order:{" "}
+            {game.direction === 1 ? "clockwise" : "counterclockwise"}. Next:{" "}
+            {
+              game.players[
+                (game.currentPlayerIndex +
+                  game.direction +
+                  game.players.length) %
+                  game.players.length
+              ].name
+            }
+            .
+          </p>
           <div className="game-menu">
             <button onClick={() => setMenu(false)}>
               <ArrowLeft />
