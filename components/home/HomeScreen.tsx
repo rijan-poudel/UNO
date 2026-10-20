@@ -48,7 +48,7 @@ export default function HomeScreen(props: Props) {
                 onClick={props.onQuickPlay}
               >
                 <span className="choice-art" aria-hidden="true">
-                  <PlayerAvatar seed="bot" />
+                  <PlayerAvatar seed="bot" expression="happy" />
                   <span className="mini-card">7</span>
                 </span>
                 <span>
@@ -62,8 +62,8 @@ export default function HomeScreen(props: Props) {
                 onClick={props.onFriends}
               >
                 <span className="choice-art" aria-hidden="true">
-                  <PlayerAvatar seed="friend" />
-                  <PlayerAvatar seed="pal" />
+                  <PlayerAvatar seed="friend" expression="happy" />
+                  <PlayerAvatar seed="pal" expression="celebrate" />
                 </span>
                 <span>
                   <strong>Create a room</strong>
@@ -106,8 +106,14 @@ export default function HomeScreen(props: Props) {
           <div
             className="home-art"
             role="img"
-            aria-label="A fan of red, blue, wild, green and yellow cards from your next game"
+            aria-label="Two smiling card characters sharing a fan of red, blue, wild, green and yellow cards"
           >
+            <div className="home-card-friend friend-left" aria-hidden="true">
+              <PlayerAvatar seed="friend" large expression="happy" />
+            </div>
+            <div className="home-card-friend friend-right" aria-hidden="true">
+              <PlayerAvatar seed="pal" large expression="celebrate" />
+            </div>
             {(
               [
                 { color: "red", value: "7" },

@@ -28,6 +28,10 @@ import type { useUnoOnlineGame } from "../hooks/useUnoOnlineGame";
 import type { Card } from "../types/card";
 import type { GameState, Player } from "../types/game";
 import { canPlayCard } from "../lib/gameRules";
+import {
+  getPlayerExpression,
+  type PlayerExpression,
+} from "../lib/playerExpression";
 import { getAudioSettings, setAudioSettings } from "../lib/audioSettings";
 import { useGamePresentation } from "../hooks/useGamePresentation";
 import PlayerProgress from "./PlayerProgress";
@@ -91,6 +95,7 @@ function describeAction(game: GameState) {
 function Opponent({
   player,
   active,
+  expression,
   position,
   offline,
   canCatch,
@@ -98,6 +103,7 @@ function Opponent({
 }: {
   player: Player;
   active: boolean;
+  expression: PlayerExpression;
   position: string;
   offline: boolean;
   canCatch: boolean;
@@ -131,7 +137,10 @@ function Opponent({
         )}
       </div>
       <div className="opponent-label">
-        <PlayerAvatar seed={player.id} />
+        <PlayerAvatar
+          seed={player.id}
+          expression={offline ? "neutral" : expression}
+        />
         <span>
           <strong>{player.name}</strong>
           <small
@@ -562,6 +571,7 @@ export default function GameBoard({
               key={player.id}
               player={player}
               active={game.currentPlayerIndex === index}
+              expression={getPlayerExpression(game, player.id)}
               position={positions[i]}
               offline={
                 !player.isBot &&

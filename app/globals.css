@@ -1258,14 +1258,24 @@ input[type="range"] {
   font-weight: 800;
   border-radius: 14px;
 }
-.button.primary {
-  box-shadow: 0 4px 10px
-    color-mix(in srgb, var(--ui-accent-red) 25%, transparent);
+.button.primary,
+.play-choice,
+.color-choice {
+  box-shadow:
+    inset 0 -4px 0 #15292626,
+    0 5px 9px #15292620;
+  transition:
+    transform 120ms var(--ease-out),
+    box-shadow 120ms var(--ease-out),
+    background 160ms;
 }
 .button:active:not(:disabled),
-.play-choice:active {
-  transform: translateY(3px) scale(0.985);
-  box-shadow: none;
+.play-choice:active:not(:disabled),
+.color-choice:active:not(:disabled) {
+  transform: translateY(3px);
+  box-shadow:
+    inset 0 -1px 0 #15292626,
+    0 1px 3px #15292620;
 }
 .wordmark {
   letter-spacing: -0.04em;
@@ -1322,7 +1332,9 @@ input[type="range"] {
   min-height: 94px;
   background: #c9dcb4;
   color: #2c3430;
-  box-shadow: 0 6px 14px #2c2c3228;
+  box-shadow:
+    inset 0 -5px 0 #15292626,
+    0 6px 14px #2c2c3228;
 }
 .play-choice > span:not(.choice-art) {
   flex: 1;
@@ -1330,7 +1342,7 @@ input[type="range"] {
 .play-choice strong {
   font-family: var(--font-display);
   font-size: 23px;
-  font-weight: 550;
+  font-weight: 700;
   line-height: 1.2;
 }
 .play-choice small {
@@ -1411,12 +1423,13 @@ input[type="range"] {
   top: 33%;
   left: 22%;
   right: 22%;
+  height: 16%;
   display: flex;
   justify-content: space-between;
 }
 .avatar-eyes i {
-  width: 4px;
-  height: 6px;
+  width: 24%;
+  height: 100%;
   border-radius: 50%;
   background: #323139;
 }
@@ -1424,14 +1437,79 @@ input[type="range"] {
   position: absolute;
   left: 35%;
   top: 56%;
-  width: 10px;
-  height: 6px;
+  width: 32%;
+  height: 15%;
   border: 2px solid #323139;
   border-top: 0;
   border-radius: 0 0 10px 10px;
 }
 .avatar-smile.cheeky {
   transform: rotate(-16deg);
+}
+.player-avatar[data-expression="thinking"] .avatar-eyes {
+  transform: translateX(8%);
+}
+.player-avatar[data-expression="thinking"] .avatar-eyes i:first-child {
+  transform: translateY(-25%);
+}
+.player-avatar[data-expression="thinking"] .avatar-smile {
+  width: 23%;
+  left: 44%;
+  height: 7%;
+  transform: rotate(-12deg);
+}
+.player-avatar[data-expression="happy"] .avatar-smile,
+.player-avatar[data-expression="celebrate"] .avatar-smile {
+  width: 40%;
+  height: 23%;
+  left: 30%;
+  top: 54%;
+  background: #323139;
+  transform: none;
+}
+.player-avatar[data-expression="surprised"] .avatar-smile {
+  width: 21%;
+  height: 23%;
+  left: 40%;
+  top: 57%;
+  border-radius: 50%;
+  border-top: 2px solid #323139;
+  transform: none;
+}
+.player-avatar[data-expression="surprised"] .avatar-eyes {
+  top: 25%;
+  height: 23%;
+}
+.player-avatar[data-expression="celebrate"] .avatar-eyes i {
+  background: none;
+  border: 2px solid #323139;
+  border-bottom: 0;
+  border-radius: 50% 50% 0 0;
+  transform: translateY(-10%);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .opponent-label .player-avatar:not([data-expression="neutral"]) {
+    animation: player-react 260ms var(--ease-out) both;
+  }
+  @keyframes player-react {
+    0% {
+      transform: rotate(-5deg) scale(0.9);
+    }
+    55% {
+      transform: rotate(3deg) scale(1.08);
+    }
+    100% {
+      transform: rotate(-5deg) scale(1);
+    }
+  }
+}
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .play-choice:hover .choice-art .player-avatar {
+    transform: translateY(-3px) rotate(5deg);
+  }
+  .choice-art .player-avatar {
+    transition: transform 180ms var(--ease-out);
+  }
 }
 .seat-row {
   gap: 22px;

@@ -219,10 +219,10 @@ export default function HandCard({
           }
           const element = face();
           element?.focus({ preventScroll: true });
+          primeTableAudioFromUserGesture();
+          playTableChime("pickup");
           if (playable && element) onPlay(element);
           else {
-            primeTableAudioFromUserGesture();
-            playTableChime("pickup");
             onInspect();
           }
         }}

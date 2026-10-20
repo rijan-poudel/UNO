@@ -28,6 +28,80 @@ import { resolveSocketEndpoint } from '../lib/socketConnection';
 import { canPlayCard } from '../lib/gameRules';
 import { getBotMove } from '../lib/botSupport';
 import type { CardColor } from '../types/card';
+import { getPlayerExpression } from '../lib/playerExpression';
+
+{
+  const game = initializeGame(['You', 'Cleo', 'Jules'], {
+    allowStartingActionCard: false,
+  });
+  const [you, cleo, jules] = game.players;
+  const original = JSON.stringify(game);
+  const state = { ...game, currentPlayerIndex: 0 };
+  assert.equal(getPlayerExpression(state, you.id), 'thinking');
+  assert.equal(
+    getPlayerExpression({ ...state, pendingDraw: 4 }, you.id),
+    'surprised',
+  );
+  assert.equal(
+    getPlayerExpression(
+      { ...state, lastAction: { type: 'draw', playerId: cleo.id, count: 4 } },
+      cleo.id,
+    ),
+    'surprised',
+  );
+  assert.equal(
+    getPlayerExpression(
+      { ...state, lastAction: { type: 'draw', playerId: cleo.id, count: 1 } },
+      cleo.id,
+    ),
+    'neutral',
+  );
+  assert.equal(
+    getPlayerExpression(
+      {
+        ...state,
+        lastAction: {
+          type: 'callOut',
+          callerId: you.id,
+          targetId: cleo.id,
+          penalty: 2,
+        },
+      },
+      cleo.id,
+    ),
+    'surprised',
+  );
+  assert.equal(
+    getPlayerExpression(
+      {
+        ...state,
+        lastAction: { type: 'play', playerId: cleo.id, card: cleo.hand[0] },
+      },
+      cleo.id,
+    ),
+    'happy',
+  );
+  assert.equal(
+    getPlayerExpression(
+      { ...state, lastAction: { type: 'declareUno', playerId: jules.id } },
+      jules.id,
+    ),
+    'happy',
+  );
+  assert.equal(
+    getPlayerExpression({ ...state, winnerId: cleo.id }, cleo.id),
+    'celebrate',
+  );
+  assert.equal(
+    getPlayerExpression({ ...state, winnerId: cleo.id }, you.id),
+    'neutral',
+  );
+  assert.equal(
+    JSON.stringify(game),
+    original,
+    'Presentation leaves the engine untouched',
+  );
+}
 
 for (const extraRules of [
   ...RULE_PRESETS.map((p) => p.rules),

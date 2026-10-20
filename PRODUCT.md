@@ -34,6 +34,8 @@ Support a broad family of UNO variants, including No Mercy, Flip, Flex, and comm
 
 UNO is the existing product name. The owner explicitly authorized replacement of the entire visual interface, interaction design, motion, and sound experience. The prior appearance is an anti-reference. The owner explicitly requested playful graphics over text-heavy presentation, a different font, and fewer navigation icons. Their October 18 correction rejects the toy-like clay/Fredoka treatment, flat card row, irrelevant persistent buttons, and inaudible feedback. The priority is a modern game arena with a hand that feels held, legible vivid card faces, context-sensitive actions, and sound that reliably starts. Their October 19 correction rejects the low-interaction table and delegates another replacement: direct card play over a material-led after-hours table, with paper/contact feedback instead of melodies on ordinary moves.
 
+The owner’s October 20 reference is Duolingo: expressive original characters, satisfying pressed controls and encouraging reactions tied to real play. Carry that emotional quality into the existing native-card world; preserve Outfit/Barlow and avoid copied mascots, noisy navigation or a return to the rejected clay treatment.
+
 ## Product Principles
 
 - Graphics lead; words clarify actions rather than fill the screen.

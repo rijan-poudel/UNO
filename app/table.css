@@ -976,6 +976,12 @@ body {
     max-width: 94px;
   }
   .opponent-label .player-avatar {
+    display: inline-flex;
+    width: 22px;
+    height: 27px;
+    border-radius: 6px;
+  }
+  .opponent-label .turn-marker {
     display: none;
   }
   .opponent-label strong {
@@ -1140,6 +1146,25 @@ body {
     rotate(calc(var(--preview-i) * 14deg));
   transform-origin: 50% 120%;
 }
+.home-card-friend {
+  position: absolute;
+  top: 7%;
+}
+.home-card-friend .player-avatar.large {
+  width: 88px;
+  height: 108px;
+  border-radius: 18px;
+  border-width: 3px;
+}
+.home-card-friend.friend-left {
+  left: 22%;
+  transform: rotate(-13deg);
+}
+.home-card-friend.friend-right {
+  right: 18%;
+  top: 3%;
+  transform: rotate(15deg);
+}
 .home-deck-card .uno-card {
   box-shadow: -8px 18px 26px #1c293b30;
 }
@@ -1167,6 +1192,21 @@ body {
   }
   .home-deck-card .uno-card {
     --card-scale: 1.25 !important;
+  }
+  .home-card-friend {
+    top: 4%;
+  }
+  .home-card-friend.friend-left {
+    left: 18%;
+  }
+  .home-card-friend.friend-right {
+    right: 15%;
+    top: 2%;
+  }
+  .home-card-friend .player-avatar.large {
+    width: 55px;
+    height: 68px;
+    border-radius: 12px;
   }
 }
 @media (max-width: 360px) {
@@ -1636,7 +1676,10 @@ body {
     gap: 4px;
   }
   .opponent-label .player-avatar {
-    display: none;
+    display: inline-flex;
+    width: 19px;
+    height: 24px;
+    border-radius: 5px;
   }
   .opponent-label strong {
     max-width: 54px;

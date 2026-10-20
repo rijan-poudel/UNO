@@ -35,7 +35,7 @@ export default function RoundSummary({
             sizeMultiplier={0.66}
           />
         </span>
-        <PlayerAvatar seed={winner.id} large />
+        <PlayerAvatar seed={winner.id} large expression="celebrate" />
         <Trophy className="winner-crown" size={27} />
       </div>
       <div className="round-scorecard">

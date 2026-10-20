@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-19T20:42:24Z",
+  "generatedAt": "2026-10-20T11:09:30Z",
   "title": "Design System: UNO — Tactile table",
   "extensions": {
     "colorMeta": {
@@ -1049,8 +1049,8 @@
       },
       {
         "name": "launch-choice",
-        "value": "0 6px 14px #2c2c3228",
-        "purpose": "Soft supporting action lift."
+        "value": "inset 0 -5px 0 #15292626, 0 6px 14px #2c2c3228",
+        "purpose": "Inset tactile edge and soft lift for broad play choices."
       },
       {
         "name": "leather-rail",
@@ -1061,6 +1061,16 @@
         "name": "baize-inset",
         "value": "inset 0 5px 12px #061e2160",
         "purpose": "Mat rests inside the real leather rail."
+      },
+      {
+        "name": "primary-control",
+        "value": "inset 0 -4px 0 #15292626, 0 5px 9px #15292620",
+        "purpose": "Primary actions and native color choices at rest."
+      },
+      {
+        "name": "control-pressed",
+        "value": "inset 0 -1px 0 #15292626, 0 1px 3px #15292620",
+        "purpose": "Compressed inset and soft contact depth on activation."
       }
     ],
     "motion": [
@@ -1113,6 +1123,21 @@
         "name": "reduced-action-feedback",
         "value": "900ms opacity only",
         "purpose": "Retain a meaningful action cue under reduced motion without spatial movement."
+      },
+      {
+        "name": "player-expression",
+        "value": "260ms cubic-bezier(0.2, 0.8, 0.2, 1)",
+        "purpose": "One opponent reaction per expression change, including consecutive non-neutral states; expression-keyed decorative subtree prevents replay on unrelated snapshots. Spatial animation only with no reduced-motion preference."
+      },
+      {
+        "name": "control-press",
+        "value": "120ms cubic-bezier(0.2, 0.8, 0.2, 1)",
+        "purpose": "Compress primary, launch and color-choice inset surfaces at activation; native controls remain immediate."
+      },
+      {
+        "name": "entry-character-hover",
+        "value": "180ms cubic-bezier(0.2, 0.8, 0.2, 1)",
+        "purpose": "Small character lift only for hover-capable fine pointers with no reduced-motion preference."
       }
     ],
     "breakpoints": [
@@ -1169,7 +1194,7 @@
       "refersTo": "button-primary",
       "description": "Theme-aware supporting action.",
       "html": "<button class=\"ds-primary\">Deal cards</button>",
-      "css": ".ds-primary{font-family:var(--font-body,Outfit),sans-serif;display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:50px;padding:14px 22px;border:1px solid transparent;border-radius:14px;font-size:14px;font-weight:800;line-height:1.25;cursor:pointer;transition:background 160ms,color 160ms,transform 120ms var(--ease-out,cubic-bezier(.2,.8,.2,1));background:var(--ui-accent-red,#c74531);color:var(--ui-bg,#fff8ec);box-shadow:0 4px 10px color-mix(in srgb,var(--ui-accent-red,#c74531) 25%,transparent);}.ds-primary:focus-visible{outline:3px solid var(--ui-accent-blue,#3265a0);outline-offset:4px}.ds-primary:active{transform:translateY(3px) scale(.985);box-shadow:none}@media(hover:hover){.ds-primary:hover{background:color-mix(in srgb,var(--ui-accent-red,#c74531) 85%,var(--ui-text,#2c2c32));}}@media(prefers-reduced-motion:reduce){.ds-primary{transition:none}.ds-primary:active{transform:none}}:host-context(:root:not([data-theme=\"midnight\"])) .ds-primary{color:#fffaf1}"
+      "css": ".ds-primary{font-family:var(--font-body,Outfit),sans-serif;display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:50px;padding:14px 22px;border:1px solid transparent;border-radius:14px;font-size:14px;font-weight:800;line-height:1.25;cursor:pointer;transition:background 160ms,color 160ms,transform 120ms var(--ease-out,cubic-bezier(.2,.8,.2,1));background:var(--ui-accent-red,#c74531);color:var(--ui-bg,#fff8ec);box-shadow:inset 0 -4px 0 #15292626,0 5px 9px #15292620;}.ds-primary:focus-visible{outline:3px solid var(--ui-accent-blue,#3265a0);outline-offset:4px}.ds-primary:active:not(:disabled){transform:translateY(3px);box-shadow:inset 0 -1px 0 #15292626,0 1px 3px #15292620}@media(hover:hover){.ds-primary:hover{background:color-mix(in srgb,var(--ui-accent-red,#c74531) 85%,var(--ui-text,#2c2c32));}}@media(prefers-reduced-motion:reduce){.ds-primary{transition:none}.ds-primary:active:not(:disabled){transform:none}}:host-context(:root:not([data-theme=\"midnight\"])) .ds-primary{color:#fffaf1}"
     },
     {
       "name": "Secondary button",
@@ -1215,9 +1240,9 @@
       "name": "Play choice",
       "kind": "button",
       "refersTo": "play-choice-primary",
-      "description": "Immediate bot play with saved settings; room creation is a separate green choice.",
+      "description": "Immediate bot play with saved settings; room creation is a separate green choice. Original happy card characters share the native deck grammar; press compresses the inset edge.",
       "html": "<button class=\"ds-choice\"><span><strong>Play with bots</strong><small>Your saved table, ready to deal</small></span><svg width=\"21\" height=\"21\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M5 12h14m-6-6 6 6-6 6\"/></svg></button>",
-      "css": ".ds-choice{font-family:var(--font-body,Outfit),sans-serif;display:flex;align-items:center;justify-content:space-between;gap:15px;text-align:left;min-height:94px;padding:14px 19px 14px 14px;border:2px solid #2c2c32;border-radius:21px;background:#f1c95b;color:#2c2c32;box-shadow:0 6px 14px #2c2c3228;cursor:pointer;transition:background 160ms,transform 160ms}.ds-choice strong{display:block;font-size:23px;font-weight:550;line-height:1.2}.ds-choice small{display:block;margin-top:4px;color:#655425;font-size:13px;font-weight:700}.ds-choice:focus-visible{outline:3px solid var(--ui-accent-blue,#3265a0);outline-offset:4px}.ds-choice:active{transform:translateY(3px) scale(.985);box-shadow:none}@media(hover:hover){.ds-choice:hover{background:#f7d775;transform:translateY(-3px) rotate(-.4deg)}}@media(prefers-reduced-motion:reduce){.ds-choice{transition:none}.ds-choice:hover,.ds-choice:active{transform:none}}"
+      "css": ".ds-choice{font-family:var(--font-body,Outfit),sans-serif;display:flex;align-items:center;justify-content:space-between;gap:15px;text-align:left;min-height:94px;padding:14px 19px 14px 14px;border:2px solid #2c2c32;border-radius:21px;background:#f1c95b;color:#2c2c32;box-shadow:inset 0 -5px 0 #15292626,0 6px 14px #2c2c3228;cursor:pointer;transition:background 160ms,transform 160ms}.ds-choice strong{display:block;font-size:23px;font-weight:700;line-height:1.2}.ds-choice small{display:block;margin-top:4px;color:#655425;font-size:13px;font-weight:700}.ds-choice:focus-visible{outline:3px solid var(--ui-accent-blue,#3265a0);outline-offset:4px}.ds-choice:active:not(:disabled){transform:translateY(3px);box-shadow:inset 0 -1px 0 #15292626,0 1px 3px #15292620}@media(hover:hover){.ds-choice:hover{background:#f7d775;transform:translateY(-3px) rotate(-.4deg)}}@media(prefers-reduced-motion:reduce){.ds-choice{transition:none}.ds-choice:hover,.ds-choice:active:not(:disabled){transform:none}}"
     },
     {
       "name": "Active seat and turn cue",
@@ -1249,18 +1274,27 @@
       "description": "Illustrative one-round/one-win terminal facts and native optional disclosure. Production uses actual seat order, completed device history and existing rematch handlers; this specimen writes no history.",
       "html": "<div class=\"ds-earned-round\"><div class=\"ds-finish-heading\"><span>At the finish</span><small>Cards left</small></div><div class=\"ds-finish-row\"><span>You</span><strong>0</strong></div><div class=\"ds-finish-row\"><span>Alex</span><strong>4</strong></div><div class=\"ds-progress-record\"><span>1 round</span><span>1 win</span><small>On this device</small></div><details class=\"ds-collection\"><summary><span class=\"ds-collection-fan\" aria-hidden=\"true\"><i></i><i></i><i></i><i></i></span><span>1 of 4 milestones</span><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"m6 9 6 6 6-6\"/></svg></summary><div class=\"ds-milestones\"><div class=\"ds-milestone ds-earned\"><svg width=\"25\" height=\"25\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M8 3h8v5a4 4 0 0 1-8 0V3ZM8 5H5v3a4 4 0 0 0 4 4m7-7h3v3a4 4 0 0 1-4 4m-3 0v7m-4 2h8\"/></svg><strong>First win</strong><span><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-label=\"Collected\"><path d=\"m5 12 4 4L19 6\"/></svg></span><small>Win a round</small></div><div class=\"ds-milestone\"><svg width=\"25\" height=\"25\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M8 3h8v5a4 4 0 0 1-8 0V3ZM8 5H5v3a4 4 0 0 0 4 4m7-7h3v3a4 4 0 0 1-4 4m-3 0v7m-4 2h8\"/></svg><strong>Hat trick</strong><span>1/3</span><small>Win 3 rounds</small></div><div class=\"ds-milestone\"><svg width=\"25\" height=\"25\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M8 3h8v5a4 4 0 0 1-8 0V3ZM8 5H5v3a4 4 0 0 0 4 4m7-7h3v3a4 4 0 0 1-4 4m-3 0v7m-4 2h8\"/></svg><strong>Table regular</strong><span>1/10</span><small>Finish 10 rounds</small></div><div class=\"ds-milestone\"><svg width=\"25\" height=\"25\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M8 3h8v5a4 4 0 0 1-8 0V3ZM8 5H5v3a4 4 0 0 0 4 4m7-7h3v3a4 4 0 0 1-4 4m-3 0v7m-4 2h8\"/></svg><strong>On fire</strong><span>1/3</span><small>Win 3 in a row</small></div></div></details></div>",
       "css": ".ds-earned-round{font-family:var(--font-body,Outfit),sans-serif;color:var(--ui-text,#2c2c32);background:var(--ui-surface,#fffcf5);max-width:440px}.ds-finish-heading{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding-bottom:6px;font-size:14px;font-weight:500}.ds-finish-heading small{font-size:11px;color:var(--ui-muted,#706b65)}.ds-finish-row{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:43px;padding:6px 8px;border-bottom:1px solid var(--ui-line,#e3dbce);font-size:13px}.ds-finish-row strong{font-size:17px;font-weight:600;font-variant-numeric:tabular-nums}.ds-progress-record{display:flex;align-items:center;flex-wrap:wrap;gap:7px 14px;margin-top:20px;font-size:12px;font-weight:600}.ds-progress-record small{color:var(--ui-muted,#706b65);font-size:11px;font-weight:400}.ds-collection summary{display:flex;align-items:center;gap:10px;min-height:44px;width:fit-content;cursor:pointer;color:var(--ui-muted,#706b65);font-size:12px;list-style:none}.ds-collection summary::-webkit-details-marker{display:none}.ds-collection summary:focus-visible{outline:2px solid var(--ui-accent-red,#c74531);outline-offset:4px;border-radius:4px}.ds-collection summary>svg{transition:transform 150ms var(--ease-out,cubic-bezier(.2,.8,.2,1))}.ds-collection[open] summary>svg{transform:rotate(180deg)}.ds-collection-fan{position:relative;width:57px;height:34px;flex-shrink:0}.ds-collection-fan i{position:absolute;top:4px;width:22px;height:29px;border:1px solid var(--ui-line,#e3dbce);border-radius:3px;background:var(--ui-surface,#fffcf5)}.ds-collection-fan i:nth-child(1){left:0;transform:rotate(-12deg);background:#f7c934;border-color:#8b600b}.ds-collection-fan i:nth-child(2){left:11px;transform:rotate(-4deg)}.ds-collection-fan i:nth-child(3){left:22px;transform:rotate(4deg)}.ds-collection-fan i:nth-child(4){left:33px;transform:rotate(12deg)}.ds-milestones{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;padding-block:8px}.ds-milestone{display:flex;flex-direction:column;align-items:center;gap:7px;padding:12px 5px 9px;border:1px solid var(--ui-line,#e3dbce);border-radius:6px;color:var(--ui-muted,#706b65);text-align:center}.ds-milestone>svg{flex-shrink:0}.ds-milestone strong{font-size:12px;line-height:1.2;min-height:29px;font-weight:600}.ds-milestone>span{display:grid;place-items:center;height:16px;font-size:12px;font-variant-numeric:tabular-nums}.ds-milestone small{font-size:10px;line-height:1.4}.ds-milestone.ds-earned{background:#f7c934;border-color:transparent;color:#332810}@media(max-width:380px){.ds-milestones{gap:5px}.ds-milestone strong{font-size:11px}}@media(prefers-reduced-motion:reduce){.ds-collection summary>svg{transition:none}}"
+    },
+    {
+      "name": "Original player expressions",
+      "kind": "custom",
+      "refersTo": "player-character",
+      "description": "Decorative snapshot-derived face, expression-keyed in React so only actual expression changes restart the one-shot. Production names and counts remain accessible siblings. Static happy specimen.",
+      "html": "<span class=\"ds-avatar\" data-expression=\"happy\" aria-hidden=\"true\"><span class=\"ds-eyes\"><i></i><i></i></span><span class=\"ds-smile\"></span></span>",
+      "css": ".ds-avatar{--avatar-color:#ef755d;position:relative;display:inline-flex;width:33px;height:41px;flex-shrink:0;background:var(--avatar-color);border:2px solid #323139;border-radius:8px;box-shadow:1px 3px 6px #32313938;transform:rotate(-8deg)}.ds-eyes{position:absolute;top:33%;left:22%;right:22%;height:16%;display:flex;justify-content:space-between}.ds-eyes i{width:24%;height:100%;border-radius:50%;background:#323139}.ds-smile{position:absolute;left:35%;top:56%;width:32%;height:15%;border:2px solid #323139;border-top:0;border-radius:0 0 10px 10px}.ds-avatar[data-expression=\"thinking\"] .ds-eyes{transform:translateX(8%)}.ds-avatar[data-expression=\"thinking\"] .ds-eyes i:first-child{transform:translateY(-25%)}.ds-avatar[data-expression=\"thinking\"] .ds-smile{width:23%;left:44%;height:7%;transform:rotate(-12deg)}.ds-avatar[data-expression=\"happy\"] .ds-smile,.ds-avatar[data-expression=\"celebrate\"] .ds-smile{width:40%;height:23%;left:30%;top:54%;background:#323139}.ds-avatar[data-expression=\"surprised\"] .ds-smile{width:21%;height:23%;left:40%;top:57%;border-radius:50%;border-top:2px solid #323139}.ds-avatar[data-expression=\"surprised\"] .ds-eyes{top:25%;height:23%}.ds-avatar[data-expression=\"celebrate\"] .ds-eyes i{background:none;border:2px solid #323139;border-bottom:0;border-radius:50% 50% 0 0;transform:translateY(-10%)}@media(prefers-reduced-motion:no-preference){.ds-avatar:not([data-expression=\"neutral\"]){animation:ds-player-react 260ms var(--ease-out,cubic-bezier(.2,.8,.2,1)) both}@keyframes ds-player-react{0%{transform:rotate(-5deg) scale(.9)}55%{transform:rotate(3deg) scale(1.08)}100%{transform:rotate(-5deg) scale(1)}}}"
     }
   ],
   "narrative": {
     "northStar": "The after-hours card table",
-    "overview": "UNO feels like a held hand of real cards over a shared after-hours table. Deep green baize, a dark padded leather rail, vivid faces and ivory stock establish the material world. Cards are the controls: a legal face plays on its first activation; the foreground fan makes pickup and deliberate upward release tangible.\n\nThe launch and settings shell retains warm, theme-aware surfaces and compact card-face player identities. Live play uses a fixed green-black material palette with lime turn feedback, independent of the selected appearance. The launch illustration is a fan of the same native deck used in play. Outfit UI and Barlow Condensed card lettering remain the two pinned families.",
+    "overview": "UNO feels like a held hand of real cards over a shared after-hours table. Deep green baize, a dark padded leather rail, vivid faces and ivory stock establish the material world. Cards are the controls: a legal face plays on its first activation; the foreground fan makes pickup and deliberate upward release tangible.\n\nThe launch and settings shell retains warm, theme-aware surfaces and compact card-face player identities. Live play uses a fixed green-black material palette with lime turn feedback, independent of the selected appearance. The launch illustration is a fan of the same native deck used in play. Outfit UI and Barlow Condensed card lettering remain the two pinned families. Original card characters bring encouragement through expressive faces and tactile pressed surfaces, carrying the owner’s Duolingo-inspired emotional quality within this native-card world.",
     "keyCharacteristics": [
       "One shared native card face across launch, hand, piles and motion.",
       "Outfit interface lettering paired with Barlow Condensed card numerals.",
       "Warm themed supporting surfaces and a fixed baize-and-leather live table.",
       "First-activation legal play, nonmatching-card inspection and deliberate upward release.",
       "Bounded hand scrolling, contextual controls and paper/contact feedback that never delays a turn.",
-      "Real round outcomes and optional device-local milestone cards."
+      "Real round outcomes and optional device-local milestone cards.",
+      "Original card characters with truthful expressions, bounded reactions and pressed control surfaces."
     ],
     "rules": [
       {
@@ -1282,6 +1316,11 @@
         "name": "The Paper Lift Rule",
         "body": "A moving or inspected card changes its own depth and reveals its face. Keep unrelated chrome quiet and reserve hard stacked edges for actual piles.",
         "section": "elevation"
+      },
+      {
+        "name": "The Honest Expression Rule",
+        "body": "Derive player reactions from published game facts, restart the decorative one-shot only when expression changes, and preserve readable state without spatial animation under reduced motion.",
+        "section": "components"
       },
       {
         "name": "The Earned History Rule",
@@ -1313,7 +1352,8 @@
       "Do keep presentation responsive to the current published state without delaying play.",
       "Do derive optional milestone cards from completed device-local rounds and keep result actions reachable inside the native dialog.",
       "Do attach pressure cues to their actual opponent hand or penalty deck and retain full accessible names.",
-      "Do retain keyboard focus through card removal and dialog cancellation, keep landscape hands alongside the table, and preserve action feedback under reduced motion."
+      "Do use original expressive card characters, preserve compact phone identities, and restart their bounded reaction only on a real expression change.",
+      "Do acknowledge actual card activation with immediate pickup while keeping horizontal scroll silent."
     ],
     "donts": [
       "Don't restore clay hero art, Fredoka, a third font family or a parallel component library.",
@@ -1322,6 +1362,7 @@
       "Don't use Unicode glyph icons in place of the established SVG icon system.",
       "Don't give general controls hard offset block shadows; physical deck edges are the intentional exception.",
       "Don't queue narration, wait for sound or animation, or add a blocking splash.",
+      "Don't copy a reference mascot, add idle character loops or replay reactions on unrelated snapshots.",
       "Don't infer points or finishing ranks from cards left, grant rewards per click, or claim a milestone is new without before/after evidence."
     ]
   }
