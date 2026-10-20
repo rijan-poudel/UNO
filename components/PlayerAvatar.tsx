@@ -2,12 +2,12 @@
 import type { CSSProperties } from "react";
 import type { PlayerExpression } from "../lib/playerExpression";
 const COLORS = [
-  "#ef755d",
-  "#8db6ed",
-  "#e4c455",
-  "#a8c991",
-  "#c5afe5",
-  "#edae86",
+  "#ff6942",
+  "#4892ff",
+  "#ffcf18",
+  "#43ce7d",
+  "#a67aff",
+  "#ffae36",
 ];
 export default function PlayerAvatar({
   seed,

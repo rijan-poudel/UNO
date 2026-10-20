@@ -4,6 +4,7 @@
 import type { CSSProperties } from "react";
 import { Ban, Repeat2, Layers, Shuffle } from "lucide-react";
 import type { Card } from "../types/card";
+import styles from "./UnoCard.module.css";
 
 interface UnoCardProps {
   card: Card;
@@ -82,22 +83,23 @@ export default function UnoCard({
       <span
         className={`card-value ${card.value.length > 1 ? "card-action-value" : ""}`}
       >
-        {card.value === "wild4" && (
-          <span className="four-color-mark" aria-hidden="true">
+        {card.value === "wild4" ? (
+          <span className={styles.drawFour} aria-hidden="true">
             <i />
             <i />
             <i />
             <i />
           </span>
+        ) : (
+          <CardSymbol value={card.value} />
         )}
-        <CardSymbol value={card.value} />
       </span>
       <span className="card-index bottom">
         <CardSymbol value={card.value} />
       </span>
     </>
   );
-  const className = `uno-card ${faceDown ? "card-back" : `card-${card.color}`} ${isPlayable ? "playable" : ""} ${isSelected ? "selected" : ""}`;
+  const className = `uno-card ${styles.face} ${faceDown ? "card-back" : `card-${card.color}`} ${isPlayable ? "playable" : ""} ${isSelected ? "selected" : ""}`;
   return onClick ? (
     <button
       type="button"
@@ -108,10 +110,12 @@ export default function UnoCard({
       aria-pressed={isSelected}
     >
       {content}
+      <span className={styles.finish} aria-hidden="true" />
     </button>
   ) : (
     <div className={className} style={style} role="img" aria-label={label}>
       {content}
+      <span className={styles.finish} aria-hidden="true" />
     </div>
   );
 }

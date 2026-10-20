@@ -30,40 +30,50 @@ colors:
   arena-text: "#f1f4fa"
   arena-muted: "#b1bfd2"
   arena-line: "#3a4b63"
-  arena-accent-red: "#f17d82"
-  table-felt: "#245b49"
-  table-rail: "#172a28"
-  seat-surface: "#152926"
-  turn-lime: "#d8ed82"
-  arena-dark-ink: "#172130"
-  move-action-ink: "#202b12"
-  card-red: "#e73442"
-  card-yellow: "#f7c934"
-  card-green: "#159768"
-  card-blue: "#2474df"
-  card-wild: "#242837"
-  card-paper: "#fffdf5"
-  card-yellow-ink: "#332810"
-  card-yellow-value: "#8b600b"
-  card-back: "#172b2b"
+  arena-accent-red: "#ff5268"
+  table-felt: "#047c53"
+  table-rail: "#101a31"
+  seat-surface: "#102138"
+  arena-dark-ink: "#211c00"
+  move-action-ink: "#392700"
+  card-red: "#df0735"
+  card-yellow: "#ffce00"
+  card-green: "#00bc68"
+  card-blue: "#075bee"
+  card-wild: "#101d3a"
+  card-paper: "#ffffff"
+  card-yellow-ink: "#482f00"
+  card-yellow-value: "#805100"
+  card-back: "#101d3a"
   active-red: "#ff727a"
   active-blue: "#79b5ff"
   active-green: "#5adeaa"
   active-yellow: "#f7d86a"
   action-light-ink: "#fffaf1"
-  avatar-red: "#ef755d"
-  avatar-blue: "#8db6ed"
-  avatar-yellow: "#e4c455"
-  avatar-green: "#a8c991"
-  avatar-lilac: "#c5afe5"
-  avatar-peach: "#edae86"
-  launch-bg: "#102d35"
+  avatar-red: "#ff6942"
+  avatar-blue: "#4892ff"
+  avatar-yellow: "#ffcf18"
+  avatar-green: "#43ce7d"
+  avatar-lilac: "#a67aff"
+  avatar-peach: "#ffae36"
+  launch-bg: "#0b2038"
   launch-paper: "#f9f2df"
-  launch-ink: "#17333a"
+  launch-ink: "#392700"
   launch-yellow: "#ffd64a"
-  launch-surface: "#153a42"
+  launch-surface: "#132e4f"
   launch-muted: "#d5e3dd"
   launch-quiet: "#a9c2c1"
+  turn-yellow: "#ffe329"
+  action-yellow: "#ffd000"
+  card-green-ink: "#00321e"
+  card-green-value: "#00894a"
+  launch-create-blue: "#1757df"
+  launch-join-red: "#e71c3b"
+  milestone-yellow: "#f7c934"
+  milestone-ink: "#332810"
+  milestone-border: "#8b600b"
+  choice-blue: "#095be5"
+  choice-green: "#008749"
 typography:
   display:
     fontFamily: "Outfit, sans-serif"
@@ -192,19 +202,12 @@ spacing:
   "32": "32px"
 components:
   launch-primary:
-    backgroundColor: "{colors.launch-yellow}"
+    backgroundColor: "{colors.action-yellow}"
     textColor: "{colors.launch-ink}"
     typography: "{typography.launch-primary}"
     rounded: "{rounded.launch-action}"
     padding: "14px 20px 16px"
     height: "64px"
-  launch-secondary:
-    backgroundColor: "{colors.launch-paper}"
-    textColor: "{colors.launch-ink}"
-    typography: "{typography.launch-secondary}"
-    rounded: "{rounded.launch-action}"
-    padding: "14px 20px 16px"
-    height: "54px"
   button-primary:
     backgroundColor: "{colors.ui-accent-red}"
     textColor: "{colors.action-light-ink}"
@@ -236,7 +239,7 @@ components:
     padding: "12px 15px"
     height: "50px"
   button-play-selected:
-    backgroundColor: "{colors.turn-lime}"
+    backgroundColor: "{colors.action-yellow}"
     textColor: "{colors.move-action-ink}"
     typography: "{typography.button}"
     rounded: "{rounded.control}"
@@ -253,7 +256,7 @@ components:
     rounded: "{rounded.seat}"
     padding: "5px 8px"
   opponent-badge-active:
-    backgroundColor: "{colors.turn-lime}"
+    backgroundColor: "{colors.turn-yellow}"
     textColor: "{colors.arena-dark-ink}"
     rounded: "{rounded.seat}"
     padding: "5px 8px"
@@ -263,8 +266,8 @@ components:
     width: "33px"
     height: "41px"
   catch-button:
-    backgroundColor: "{colors.card-yellow}"
-    textColor: "{colors.card-yellow-ink}"
+    backgroundColor: "{colors.action-yellow}"
+    textColor: "{colors.move-action-ink}"
     rounded: "{rounded.inset}"
     padding: "5px 8px"
     width: "56px"
@@ -274,8 +277,8 @@ components:
     rounded: "{rounded.card}"
     padding: "12px 5px 9px"
   milestone-stamp-earned:
-    backgroundColor: "{colors.card-yellow}"
-    textColor: "{colors.card-yellow-ink}"
+    backgroundColor: "{colors.milestone-yellow}"
+    textColor: "{colors.milestone-ink}"
     rounded: "{rounded.card}"
     padding: "12px 5px 9px"
   uno-card:
@@ -284,6 +287,24 @@ components:
     rounded: "{rounded.card}"
     width: "82px"
     height: "122px"
+  launch-create:
+    backgroundColor: "{colors.launch-create-blue}"
+    textColor: "{colors.card-paper}"
+    typography: "{typography.launch-secondary}"
+    rounded: "{rounded.launch-action}"
+    padding: "14px 20px 16px"
+    height: "54px"
+  launch-join:
+    backgroundColor: "{colors.launch-join-red}"
+    textColor: "{colors.card-paper}"
+    typography: "{typography.launch-secondary}"
+    rounded: "{rounded.launch-action}"
+    padding: "14px 20px 16px"
+    height: "54px"
+  color-choice-red:
+    backgroundColor: "{colors.launch-join-red}"
+    textColor: "{colors.card-paper}"
+    rounded: "{rounded.launch-action}"
 ---
 
 # Design System: UNO — Card club and tactile table
@@ -292,16 +313,16 @@ components:
 
 **Creative North Star: "The after-hours card table"**
 
-UNO feels like a held hand of real cards on one shared after-hours table contained in the viewport. Deep green baize, a dark padded leather rail, vivid faces and ivory stock establish the material world. Cards are the controls: a legal face plays on its first activation; the foreground fan makes pickup and deliberate upward release tangible.
+UNO feels like a held hand of real cards on one shared after-hours table contained in the viewport. Rich green baize, a navy padded leather rail, saturated printed faces and pure white stock establish the material world. Cards are the controls: a legal face plays on its first activation; the foreground fan makes pickup and deliberate upward release tangible.
 
-Home is a centered illustrated after-hours card club: a flat, transparent cut-out of an original rabbit, red panda and crocodile sits directly on deep teal, with yellow Play in the foreground and ivory room actions beside one another. Settings and setup retain theme-aware supporting surfaces. Live play retains its fixed green-black baize/leather palette and lime turn feedback. Outfit UI and Barlow Condensed card lettering remain the two pinned families. Small native card characters continue to express live player state; the home scene has its own authored narrative rather than floating card-face stickers.
+Home is a centered illustrated after-hours card club: a flat, transparent cut-out of an original rabbit, red panda and crocodile sits directly on navy, with yellow Play in the foreground and full-color blue Create and crimson Join actions beside one another. Settings and setup retain theme-aware supporting surfaces. Live play retains its fixed baize/leather materials with a navy rail and bright yellow turn feedback. Outfit UI and Barlow Condensed card lettering remain the two pinned families. Small native card characters continue to express live player state; the home scene has its own authored narrative rather than floating card-face stickers.
 
 **Key Characteristics:**
 
 - A centered flat illustrated card-club welcome with complete silhouettes and visibly primary Play.
 - One shared native card face across the live hand, piles and motion.
 - Outfit interface lettering paired with Barlow Condensed card numerals.
-- Fixed deep teal home, warm themed settings/setup and a fixed baize-and-leather live table.
+- Fixed navy home, warm themed settings/setup and a fixed rich-green baize-and-navy-leather live table.
 - First-activation legal play, nonmatching-card inspection and deliberate upward release.
 - One viewport-contained felt, bounded horizontal hand scrolling, contextual controls and paper/contact feedback that never delays a turn.
 - Real round outcomes and optional device-local milestone cards.
@@ -317,32 +338,34 @@ The playful-feedback extension was recorded from `components/PlayerAvatar.tsx`, 
 
 The historical centered-home replacement in `.impeccable/review/centered-home/` superseded the earlier side-column controls, plain cream field, floating card-face stickers, decorative 7 and broad rounded choice tiles. Its cinematic scene and cropped phone presentation are themselves superseded by the shared-table correction.
 
-The current owner-directed shared-table correction was recorded on 2026-10-20 from `app/arena.css`, `app/table.css`, `app/home.css`, `components/GameBoard.tsx`, `components/home/HomeScreen.tsx`, `hooks/usePhonePortrait.ts`, `hooks/useUnoGame.ts` and the flat artwork. `app/arena.css` loads after the material stylesheet and owns current board geometry. The contract in `.impeccable/review/shared-table/contract.md` supersedes every earlier viewport and home-art verdict. This is a code-led extension of inherited seed `2e1e4271`, without an approved UI comp. Its verification records 17 opened captures covering home, the supplied 845 × 765 viewport, lifted/focused faces, six-seat large hands, two short landscape sizes, portrait guidance, menu and wild choice. The finish review passed visual corrections and requested this persistence update; this document does not assign the pending final verdict. Browser emulation establishes geometry and keyboard/mouse behavior, not real touch hardware or subjective speaker quality.
+The foundational owner-directed shared-table correction was recorded on 2026-10-20 from `app/arena.css`, `app/table.css`, `app/home.css`, `components/GameBoard.tsx`, `components/home/HomeScreen.tsx`, `hooks/usePhonePortrait.ts`, `hooks/useUnoGame.ts` and the flat artwork. `app/arena.css` loads after the material stylesheet and owns current board geometry. The contract in `.impeccable/review/shared-table/contract.md` supersedes every earlier viewport and home-art verdict. This is a code-led extension of inherited seed `2e1e4271`, without an approved UI comp. Its verification records 17 opened captures covering home, the supplied 845 × 765 viewport, lifted/focused faces, six-seat large hands, two short landscape sizes, portrait guidance, menu and wild choice. The finish review passed visual corrections and requested this persistence update; this document does not assign the pending final verdict. Browser emulation establishes geometry and keyboard/mouse behavior, not real touch hardware or subjective speaker quality.
+
+The vivid material extension is recorded from `components/UnoCard.module.css`, `components/UnoCard.tsx`, `components/PlayerAvatar.tsx`, `app/arena.css` and `app/home.css` on 2026-10-20. Its owner-directed contract, verification and material review are in `.impeccable/review/vivid-depth/`. It preserves inherited seed `2e1e4271`, table topology, home artwork, fonts, direct play and phone orientation behavior. The review accepted the material direction and requested short-landscape pile clearance plus this persistence refresh. The final source compacts identities and exposes pile tops/counts below 361px landscape height; the final opened 568 × 320 and 844 × 390 follow-up captures record the corrected clearance with root horizontal scroll held at zero. The final verdict belongs to that packet and is not assigned here. The packet reports passing lint, strict types, game/audio/multiplayer assertions, production build, small-index/control contrast and existing raster provenance checks. Its browser evidence is scoped to rendering and mouse/keyboard behavior; reduced motion and coarse-pointer behavior are source guards, not physical-device certification or an audit of all UI. Earlier teal home, ivory room actions, muted deck inks and lime feedback remain historical evidence and are superseded for these surfaces. Supporting theme and progress colors remain where their source still uses them.
 
 ## Colors
 
-Deep teal and ivory frame the illustrated invitation; yellow makes Play immediate. Theme-aware paper supports setup and settings, while stable saturated card colors stand over baize and leather in play.
+Navy and ivory frame the illustrated invitation; yellow makes Play immediate. Theme-aware paper supports setup and settings, while stable saturated card colors stand over baize and leather in play.
 
 ### Primary
 
 - **Coral action:** `ui-accent-red` identifies primary shell actions, selected preferences and the wordmark period. The midnight appearance uses its lighter coral counterpart.
-- **Turn lime:** `turn-lime` marks the live active seat, local turn cue, available draw, selected-card Play action and arena keyboard focus. The Play label uses `move-action-ink`, the dark green ink paired with lime; retain this final foreground through appearance overrides. It belongs to meaningful game state.
-- **Club play yellow:** `launch-yellow` identifies the primary home Play control, wordmark period, home focus and collected cards in the progress disclosure fan. `launch-paper` fills both room actions; all three actions use `launch-ink`.
+- **Turn yellow:** `turn-yellow` marks the live active seat, local turn cue, available draw and arena keyboard focus. `action-yellow` fills contextual Play, UNO and Catch controls with `move-action-ink`; retain this dark ink through appearance overrides. Both yellows belong to meaningful game state.
+- **Club actions:** `action-yellow` fills primary home Play with `launch-ink`. `launch-create-blue` and `launch-join-red` distinguish Create and Join with white lettering. `launch-yellow` remains the lighter wordmark/focus and collection-fan highlight; `launch-paper` remains title lettering and the focus outline against yellow Play.
 
 ### Secondary
 
-- **Card spectrum:** `card-red`, `card-yellow`, `card-green`, `card-blue` and `card-wild` belong to the deck. Yellow keeps its vivid shell and dark corner ink; its center rank uses `card-yellow-value` over ivory (5.46:1 contrast). Other center ranks retain the face color; other corner indices use ivory. The same yellow and dark yellow ink identify collected milestone cards and last-card/catch state; unearned collection cards retain themed muted ink and line borders.
+- **Card spectrum:** `card-red`, `card-yellow`, `card-green`, `card-blue` and `card-wild` belong to the deck. Green and yellow keep vivid shells with separate dark `card-green-ink` / `card-yellow-ink` corner indices and `card-green-value` / `card-yellow-value` center ranks on white. Red and blue indices remain white; their large center ranks retain the face color. The Wild+4 center depicts four full-color physical cards while its corner indices remain +4. `milestone-yellow`, `milestone-ink` and `milestone-border` preserve the existing earned collection colors on supporting surfaces; home earned cards use its blue action fill. Unearned cards retain scoped muted ink and line borders. Native color choices use crimson, `choice-blue`, `choice-green` and `action-yellow` with contrasting labels.
 - **Active-color spectrum:** the brighter `active-*` swatches accompany a written color name on the dark arena; color alone never carries this state.
 - **Player palette:** the six `avatar-*` colors identify small original card-face badges. These remain supporting identity marks rather than a separate illustration system.
 
 ### Neutral
 
-- **Club ink and ivory:** `launch-bg` is the home field; `launch-paper` is its title and action stock. `launch-surface` supports home utilities and collection cards; `launch-muted` and `launch-quiet` carry secondary copy. These scoped home colors remain fixed across appearance choices.
+- **Club navy and ivory:** `launch-bg` is the home field; `launch-paper` is its title lettering. `launch-surface` supports home utilities and collection cards; `launch-muted` and `launch-quiet` carry secondary copy. These scoped home colors remain fixed across appearance choices.
 - **Warm paper and ink:** `ui-bg`, `ui-surface`, `ui-text`, `ui-muted` and `ui-line` form the supporting shell. Paper, midnight, forest and sunset appearances change these root variables.
-- **After-hours table:** `arena-bg`, `arena-surface`, `arena-text`, `arena-muted` and `arena-line` override interface roles inside live play. `table-felt` and `table-rail` grade the real material rasters; `seat-surface` keeps inactive badges quiet. These are material base colors, not substitutes for the texture assets.
-- **Ivory stock and dark back:** `card-paper`, green-black `card-back` and `arena-dark-ink` anchor the deck and dark ink on lime. The back carries a red diagonal mark and ivory Outfit lettering.
+- **After-hours table:** `arena-bg`, `arena-surface`, `arena-text`, `arena-muted` and `arena-line` override interface roles inside live play. `table-felt` and `table-rail` grade the real material rasters; `seat-surface` keeps inactive badges quiet. These are material base colors, not substitutes for the texture assets. `arena-bg` remains the inherited interface-variable fallback; the actual outer page is a navy radial gradient.
+- **White stock and dark back:** `card-paper`, navy `card-back` and `arena-dark-ink` anchor the deck and dark text on the active yellow seat. The back carries a crimson diagonal mark and white Outfit lettering.
 
-**The Scoped Worlds Rule.** Keep home in its fixed teal/ivory/yellow club palette, honor appearance variables in settings and setup, and scope baize/leather with lime to live play. The native deck remains stable across appearances.
+**The Scoped Worlds Rule.** Keep home in its fixed navy/ivory/full-color club palette, honor appearance variables in settings and setup, and scope rich baize/navy leather with yellow feedback to live play. The native deck remains stable across appearances.
 
 ## Typography
 
@@ -356,7 +379,7 @@ Deep teal and ivory frame the illustrated invitation; yellow makes Play immediat
 - **Display:** the frontmatter display role leads home, reducing to 42px at 700px and below and 36px at 360px and below. Its centered subtitle is 17px desktop and 15px phone.
 - **Headline:** the fluid headline role introduces setup. Dialog titles use the separate dialog-title role and its phone variant. Setup headlines reduce to 35px on phones.
 - **Home action and turn:** launch-primary lettering reduces to 22px on phones; launch-secondary reduces to 16px at 700px and 15px at 360px. Quiet home text actions use 14px/600. The turn cue uses the 17px role, reducing to the 15px short-height role at 680px and below; it is game status.
-- **Body and label:** body, muted body, form labels, buttons and table labels use the compact roles in frontmatter. Seat names remain 12px on phones; supporting table counts and pile labels use 11px where space is constrained.
+- **Body and label:** body, muted body, form labels, buttons and table labels use the compact roles in frontmatter. Seat names remain 12px on phones except for the shortest-landscape identity treatment in Layout; supporting table counts and pile labels use 11px where space is constrained.
 - **Wordmark:** the compact shell mark uses its frontmatter role, with the wordmark-phone variant on phones; the arena reduces it to 34px, then 30px on phones.
 - **Card typography:** card-value, card-index and card-action sizes describe the unscaled 82 × 122px face. They scale together with the entire card through its multiplier; these are card graphics, not extra interface text levels.
 
@@ -370,47 +393,51 @@ This is a role-based hierarchy with responsive sizes, not a mathematical modular
 
 Home is one centered column with heading, flat transparent scene, Play, paired Create/Join actions, secondary Set up bots/How to play, optional honest progress and footer. The header is 64px high, bounded to 1440px with 40px desktop side padding; main padding is 8px 24px 0. The scene retains its intrinsic 1729:910 aspect ratio with `object-fit: contain`: width is `min(820px, 96vw)`, reducing to `min(740px, 94vw)` at 701–1250px. The action group is bounded to 560px and follows the scene with an 8px overlap. Play has a 64px minimum height; equal room columns have a 12px gap and 54px minimum height. Image loading never gates these real HTML controls.
 
-At 700px and below main padding is 12px 20px 0, the scene is 230px high and contains the whole illustration, and the action group has no negative overlap. Play is at least 62px high and the room gap becomes 10px. At 360px and below main side padding is 16px, the scene is 184px high and Play at least 58px. Preserve full ears, arms and table edges at every width. Transparent pixels integrate the artwork directly with teal; no boxed scenery or fade patch is part of this composition. Setup remains bounded to 650px. Common spacing repeats the compact 4–32px vocabulary rather than a strict single interval.
+At 700px and below main padding is 12px 20px 0, the scene is 230px high and contains the whole illustration, and the action group has no negative overlap. Play is at least 62px high and the room gap becomes 10px. At 360px and below main side padding is 16px, the scene is 184px high and Play at least 58px. Preserve full ears, arms and table edges at every width. Transparent pixels integrate the artwork directly with navy; no boxed scenery or fade patch is part of this composition. Setup remains bounded to 650px. Common spacing repeats the compact 4–32px vocabulary rather than a strict single interval.
 
-Live play is one viewport-contained physical surface. The root is a `100dvh` flex column with hidden page overflow; its header is 60px and does not shrink. `game-main` is a zero-minimum flex child, bounded to 1440px, with one `minmax(0, 1fr)` column and rows `minmax(0, 1fr) 280px`. Its absolute table boundary sits directly inside `game-main`, behind both opponents/piles and the local hand, so one felt extends under the fan. Main padding is 8px 24px with bottom safe-area protection. The rail uses 100px corners, 12px felt inset and 24px seam inset. Perimeter seats keep independent lanes clear of the draw and discard piles; contextual Catch remains attached to its opponent.
+Live play is one viewport-contained physical surface. The root is a `100dvh` flex column with clipped page overflow (`overflow: clip`); its header is 60px and does not shrink. `game-main` is a zero-minimum flex child, bounded to 1440px, with one `minmax(0, 1fr)` column and rows `minmax(0, 1fr) 280px`. Its absolute table boundary sits directly inside `game-main`, behind both opponents/piles and the local hand, so one felt extends under the fan. Main padding is 8px 24px with bottom safe-area protection. The rail uses 100px corners, 12px felt inset and 24px seam inset. Perimeter seats keep independent lanes clear of the draw and discard piles; contextual Catch remains attached to its opponent.
 
 The compact turn cue joins the turn heading and named active color. It sits between the piles and hand in ordinary-height play; short landscape moves it left of the central piles. Direction and next-player information live as written information in the game menu. There is no standalone direction arrow or visible You/card-count toolbar; the hand region retains its complete accessible count. Compact opponent avatars and deliberate name ellipsis retain full accessible names.
 
-The hand owns horizontal overflow. Its section uses `minmax(0, 1fr) 44px` for the scrollport and contextual dock. The scrollport reserves 52px above and 24px below the fan at ordinary desktop height. Cards overlap by 34px and use a 1.28 multiplier; viewports at least 850px high and 701px wide use a 310px hand row and 1.45 multiplier. Focus, inspection and fine-pointer hover lift the entire face within that reserved clearance and put it above adjacent cards; hover wins over a neighboring focused card, while dragging owns the highest card layer. Normalized fan geometry stays bounded as the hand grows. Keyboard focus uses `preventScroll` and the hand reveal helper adjusts horizontal position only, with an 18px visibility margin; selection and resize preserve the same bounded scroll behavior. Newly drawn cards reveal without forcing selection. Sorting and unrelated updates must not move the document.
+The hand owns horizontal overflow. Its section uses `minmax(0, 1fr) 44px` for the scrollport and contextual dock. The scrollport reserves 52px above and 24px below the fan at ordinary desktop height. Cards overlap by 34px and use a 1.28 multiplier; viewports at least 850px high and 701px wide use a 310px hand row and 1.45 multiplier. Focus, inspection and fine-pointer hover lift the entire face within that reserved clearance and put it above adjacent cards; hover wins over a neighboring focused card, while dragging owns the highest card layer. Normalized fan geometry stays bounded as the hand grows. Keyboard focus uses `preventScroll` and the hand reveal helper adjusts horizontal position only, with an 18px visibility margin; selection and resize preserve the same bounded scroll behavior. Newly drawn cards reveal without forcing selection. Sorting and unrelated updates must not move the document. Root clipping avoids an ancestor scroll container during keyboard reveal; native horizontal `overflow: auto` remains owned by the hand.
 
 The dock stays in the shared felt beneath the hand, with hints and contextual Pass or the full named Play fallback. It uses a compact row with 44px actions at ordinary heights. Draw belongs exclusively to the physical deck. Eligible UNO floats at the hand’s upper-right edge with a 44px target and no permanent toolbar; called UNO remains a contextual status. Sorting and activity remain in the menu. At 700px and below the header is 52px and side padding 12px; height-based rules then adapt the hand and piles to available space without introducing page scrolling.
 
 Phone gameplay is landscape only. `(orientation: portrait) and (max-width: 700px)` is the shared gate: gameplay/header/reconnect/error regions leave layout and accessibility while rotate guidance and Leave table remain available. Local `useUnoGame(paused)` cancels scheduled bot and auto-pass work, guards live callbacks and resumes on landscape; online guidance explicitly says the round continues while rotating. Home and setup remain portrait-friendly.
 
-Short landscape (`max-height: 460px` and `min-width: 541px`) retains one full-width shared table under a 44px header, with all five compact opponent labels in distinct top lanes, piles centered, status to the left and local cards below. Opponent back fans are hidden to preserve playable area. The hand row is 190px, the hand multiplier 0.94 and pile multiplier 0.68; the hand scrollport reserves 28px above and 10px below. At 360px high and below the row is 164px, with 0.78 hand and 0.57 pile multipliers. Large hands continue to scroll horizontally; the dock reserves a compact 28px row. This is a stacked shared surface, superseding the former side-by-side table/hand layout. The verification packet records six-seat 12- and 20-card captures at 844 × 390 and 568 × 320, including final-card focus/reveal without page movement.
+Short landscape (`max-height: 460px` and `min-width: 541px`) retains one full-width shared table under a 44px header, with all five compact opponent labels in distinct top lanes, piles centered, status to the left and local cards below. Opponent back fans are hidden to preserve playable area. The hand row is 190px, the hand multiplier 0.94 and pile multiplier 0.68; the hand scrollport reserves 28px above and 10px below. At 360px high and below the row is 164px, with 0.78 hand and 0.57 pile multipliers. Opponent identities become 28px one-line badges: avatars hide, names and counts sit inline, and an SVG cards icon replaces the visible count word. Pile labels become visually hidden while retaining their semantics; the deck-count chip sits 4px from the top and the left turn cue moves to 15% from the bottom. This preserves center-seat/pile clearance without taking hand space. Large hands continue to scroll horizontally; the dock reserves a compact 28px row. This is a stacked shared surface, superseding the former side-by-side table/hand layout. The verification packet records six-seat 12- and 20-card captures at 844 × 390 and 568 × 320, including final-card focus/reveal without page movement.
 
 The optional collection follows the primary play choices on phone home layouts. Its four mini cards stay in a four-column grid, with 7px gaps reduced to 5px at 380px and below; the summary has a 44px minimum target. The progress block shares the home action group’s 560px bound and fills the result dialog. Results scroll inside the native modal; their action group sticks at bottom zero within the dialog, with its own themed background and no negative bottom margin. At 540px and below the result actions stack at full width. Long winner and player names wrap rather than push counts or rematch outside the bounds.
 
-Compact opponent labels keep their card-face avatar visible; five- and six-seat phone badges use a 21 × 28px face. Redundant turn dots disappear on phones so the player name and actual count keep their space; active color and the written turn cue remain authoritative. Long names retain deliberate ellipsis with the full name in the accessible tree.
+Compact opponent labels keep their card-face avatar visible except in the shortest landscape rule above; five- and six-seat phone badges otherwise use a 21 × 28px face. Redundant turn dots disappear on phones so the player name and actual count keep their space; active color and the written turn cue remain authoritative. Long names retain deliberate ellipsis with the full name in the accessible tree.
 
 **The Hand Owns Its Width Rule.** Keep overflow inside the hand, preserve corner identity and focus clearance, and bound the fan arc as the card count grows.
 
 ## Elevation & Depth
 
-Real baize fibers, padded leather grain, soft cast shadows, an inset mat and actual card overlap establish physical depth. Controls receive modest lift; cards deepen as they rise, are inspected or travel. The deck's narrow hard edges depict a physical stack. They are native to this card world and do not establish block shadows for general controls.
+Real baize fibers, navy leather grain, soft directional shadows, an inset mat and actual card overlap establish physical depth. The shared face adds a thin white laminate edge and short stock layers; held and inspected cards deepen as they rise. These narrow physical edges are native to cards and piles rather than a block-shadow style for content containers. Controls use bevel highlights, inset pressed lips and soft contact depth.
 
 The mat renders `public/textures/green-baize.jpg` at a 560px repeat scale over its material base; the rail renders `public/textures/padded-leather.jpg` at 340px. Both use soft-light blending and native rounded clipping. Their exact generation prompts are preserved beside the JPEGs as `.prompt.txt` files, with embedded provenance in the assets. Preserve those materials and provenance when extending the table; a crossed CSS grid is not the felt material.
 
 ### Shadow Vocabulary
 
 - **Supporting surface:** `--ui-shadow` supplies the ambient dialog shadow and varies with appearance.
-- **Card at rest:** `inset 0 1px 1px #ffffff60, 0 5px 10px #03090870` gives native stock a small edge highlight and soft lift.
-- **Leather rail:** `inset 0 2px 3px #b9d3c036, 0 18px 38px #020a0966` supplies padded, soft depth; the mat uses `inset 0 5px 12px #061e2160`.
-- **Held fan:** `-4px 7px 11px #060c1759` separates overlapping cards; inspection deepens to `0 14px 25px #060c1780`.
-- **Draw stack:** `1px 3px 0 #cad2db, 3px 6px 0 #67768a, 4px 13px 15px #080f1e80` distinguishes a usable deck from one face.
-- **Pressed control surface:** shared primary buttons and color choices use `inset 0 -4px 0 #15292626, 0 5px 9px #15292620`, compressing to `inset 0 -1px 0 #15292626, 0 1px 3px #15292620`.
-- **Club actions:** Play uses `inset 0 -4px 0 #bc8d22, 0 6px 16px #04191d70`; room actions use `inset 0 -3px 0 #d0c7ae, 0 4px 10px #04191d50`. Press compresses the inset to 1px with `0 1px 4px #04191d50` contact depth. These are inset contact and soft cast depth, not offset block shadows.
+- **Laminated face at rest:** `inset 0 1px 2px #ffffffb0, inset 0 -1px 1px #17234145, 0 1px 1px #c4ccdf, 0 3px 1px #68748e, 0 8px 12px #02071880` supplies thin white stock layers and contact depth.
+- **Leather rail:** `inset 0 2px 3px #b5d2ff50, inset 0 -6px 10px #020617a0, 0 6px 2px #020718, 0 16px 24px #02071890` supplies the padded rim and short material edge; the mat uses `inset 0 5px 14px #00271980`.
+- **Raised face:** `inset 0 1px 2px #ffffffb0, 0 1px 1px #c4ccdf, 0 3px 1px #68748e, -3px 15px 20px #02071899` separates a hovered, focused or inspected card from its neighbors.
+- **Draw stack:** `inset 0 1px 2px #ffffffb0, 1px 3px 1px #d5dcec, 3px 6px 1px #7d8ba8, 4px 10px 1px #35435e, 4px 16px 15px #02071899` distinguishes a usable deck from one face.
+- **Supporting pressed control surface:** shared supporting-screen primary buttons use `inset 0 -4px 0 #15292626, 0 5px 9px #15292620`, compressing to `inset 0 -1px 0 #15292626, 0 1px 3px #15292620`.
+- **Club actions:** Play uses `inset 0 2px 2px #ffffff70, inset 0 -4px 2px #bd7600, 0 6px 16px #04191d70`; room actions use `inset 0 1px 2px #ffffff60, inset 0 -3px 2px var(--action-edge, #06339c), 0 5px 10px #02071870`, with a crimson edge for Join. Press compresses the inset to 1px with `0 1px 4px #04191d50` contact depth. Native color choices use `inset 0 2px 2px #ffffff40, inset 0 -4px 3px #00000028, 0 5px 10px #02071820`. These are inset contact and soft cast depth.
 
-**The Paper Lift Rule.** A moving or inspected card changes its own depth and reveals its face. Keep unrelated chrome quiet and reserve hard stacked edges for actual piles.
+**The Paper Lift Rule.** A moving or inspected card changes its own depth and reveals its face. Keep unrelated chrome quiet and reserve short stock layers for physical cards, piles and the table rail.
+
+The shared face tilts through CSS only at fine-pointer hover with no reduced-motion preference: perspective 650px, rotateX 5 degrees and rotateY −5 degrees, settling over 130ms. A bounded 180ms laminate highlight crosses the face once per hover transition. Active contact immediately resets tilt and removes the moving sheen before gesture geometry is captured. Touch/coarse pointers keep static material depth; reduced motion removes face/sheen transitions and their hover movement. The face module remains attached to clones in the motion layer. There is no pointer-tracking render loop or idle animation.
+
+**The Contact Before Flight Rule.** Settle hover tilt on contact before capturing drag or flight geometry; preserve readable static color, edge and focus when spatial motion is disabled.
 
 ## Shapes
 
-The native face is a tightly rounded rectangle (6px base radius) with ivory edging and a cream diagonal ellipse (116% width, 64% height, rotated −34 degrees). Its base dimensions, radius and index geometry scale as one unit. Wilds use the same silhouette with a four-color circular symbol; action faces use shared SVG symbols or large draw values. The back uses a green-black base, a red diagonal ellipse, faint diagonal stripes and an ivory Outfit UNO mark. Reverse uses the shared Repeat2 SVG; wild draw four retains a subdued four-color mark behind its large draw value.
+The native face is a tightly rounded rectangle (6px base radius) with white edging and a white diagonal ellipse (116% width, 64% height, rotated −34 degrees). Its base dimensions, radius and index geometry scale as one unit. Wilds use the same silhouette with a four-color circular symbol; action faces use shared SVG symbols or large draw values. The back uses a navy base, a crimson diagonal ellipse, faint diagonal stripes and a white Outfit UNO mark. Reverse uses the shared Repeat2 SVG. Wild draw four centers a fan of four saturated, white-edged small cards; +4 remains in both corner indices and its accessible label remains “Wild draw four.”
 
 Milestone collectibles reuse the tight card corner and flat geometric icon language. Their small four-card disclosure fan inherits the deck's overlap; it is supporting progress, not another photographic material.
 
@@ -420,7 +447,7 @@ Controls, fields, panels and dialogs use the observed rounded vocabulary in fron
 
 ### Buttons
 
-Broad shell actions use the button role, a 50px minimum height, rounded control corners and 14px × 22px padding. Supporting-screen primary actions use coral; live-arena primary actions use the existing turn-lime and dark-green ink in every shell appearance. Secondary actions are outlined and transparent; text actions remain quiet. Compact utilities retain the field radius and have a 44px minimum hit area; small buttons also have a 44px minimum height. Hover changes surface tone; press feedback is immediate. Shared primary actions and native color choices compress their inset edge and soft shadow with a 3px downward response and a 120ms easing. Home actions instead use 130ms transitions with `cubic-bezier(0.16, 1, 0.3, 1)` for transform, a 2px hover lift only on fine hover pointers, and a 2px press. Home reduced-motion guards remove transitions and travel while retaining visible surface feedback. Home focus is a 3px yellow outline offset by 5px, switching to ivory on yellow Play; native dialogs retain their own focus styling. Global keyboard focus uses a blue outline; arena focus uses lime. Disabled actions reduce opacity, while the physical deck remains visibly present when unavailable.
+Broad shell actions use the button role, a 50px minimum height, rounded control corners and 14px × 22px padding. Supporting-screen primary actions use coral; the contextual live Play action uses action yellow and dark ink in every shell appearance. Secondary actions are outlined and transparent; text actions remain quiet. Compact utilities retain the field radius and have a 44px minimum hit area; small buttons also have a 44px minimum height. Hover changes surface tone; press feedback is immediate. Shared primary actions and native color choices compress their inset edge and soft shadow with a 3px downward response and a 120ms easing. Home actions instead use 130ms transitions with `cubic-bezier(0.16, 1, 0.3, 1)` for transform, a 2px hover lift only on fine hover pointers, and a 2px press. Home reduced-motion guards remove transitions and travel while retaining visible surface feedback. Home focus is a 3px yellow outline offset by 5px, switching to ivory on yellow Play; native dialogs retain their own focus styling. Global keyboard focus uses a blue outline; arena focus uses yellow. Disabled actions reduce opacity, while the physical deck remains visibly present when unavailable.
 
 ### Inputs / Fields
 
@@ -432,11 +459,11 @@ Settings use four equal tabs with a fine baseline and a coral selected underline
 
 ### Cards / Containers
 
-Use the native dialog primitive for settings, game menu, color choice and results. Dialogs use the themed surface, ambient shadow, bounded viewport height and internal scrolling. Supporting panels and separated rows stay visually subordinate to the cards. Original small card-face player badges identify seats and results; compact phone seats retain reduced badges beside readable names.
+Use the native dialog primitive for settings, game menu, color choice and results. Dialogs use the themed surface, ambient shadow, bounded viewport height and internal scrolling. Supporting panels and separated rows stay visually subordinate to the cards. Original small card-face player badges identify seats and results; compact phone seats retain reduced badges beside readable names except for the shortest-landscape one-line identity treatment.
 
 ### Entry, setup and room choices
 
-The full-width yellow Play action deals immediately with the saved local crew and rules. Equal ivory Create a room and Join a room actions follow together. Quiet Set up bots and How to play actions come next; help expands inline through an `aria-expanded` button without hiding the main choices. Header settings and invitations retain the native components. Honest progress follows the action group and remains absent before a completed round. Setup shows the human name, two-to-six-seat count and a compact bot crew; bot renaming stays inside a native disclosure. Local setup and room hosts share the same rule-preset and starting-hand controls before dealing, with custom rules as a secondary text action.
+The full-width yellow Play action deals immediately with the saved local crew and rules. Equal blue Create a room and crimson Join a room actions follow together, both with white labels. Quiet Set up bots and How to play actions come next; help expands inline through an `aria-expanded` button without hiding the main choices. Header settings and invitations retain the native components. Honest progress follows the action group and remains absent before a completed round. Setup shows the human name, two-to-six-seat count and a compact bot crew; bot renaming stays inside a native disclosure. Local setup and room hosts share the same rule-preset and starting-hand controls before dealing, with custom rules as a secondary text action.
 
 Creation and joining are distinct labeled choices. Joining accepts either the six-character room code or an invitation URL in one field, normalizes the code without truncation, and places validation guidance beside it. Persistent friend codes remain inside the separate Friends & invitations disclosure. Room sharing uses named copy-code and invitation-link actions. Bot seats are identified as bots; host controls and the guest waiting message reflect their actual roles.
 
@@ -458,7 +485,7 @@ A non-neutral opponent face reacts once over 260ms using the shared easing, only
 
 ### Active seat and turn cue
 
-An opponent's active badge fills lime with dark text; the local active turn cue uses lime text and a small dot. Turn status follows the live state. The named active color and its swatch are static children after the turn heading, using muted ink at 12px. The cue wraps as a group within the available width, and long turn names can wrap rather than conceal color or overflow the page. Pile labels remain beside their physical piles without duplicating this combined status.
+An opponent's active badge fills bright yellow with dark text; the local active turn cue uses yellow text and a small dot. Turn status follows the live state. The named active color and its swatch are static children after the turn heading, using muted ink at 12px. The cue wraps as a group within the available width, and long turn names can wrap rather than conceal color or overflow the page. Pile labels remain beside their physical piles without duplicating this combined status; the shortest landscape rule visually hides those names while retaining their semantics.
 
 ### Earned pressure and action signals
 
@@ -470,7 +497,7 @@ A real pending draw overlays its count on the physical deck and dims the back wo
 
 The native result dialog uses the winner's existing card backs, player identity and trophy, then a terminal “Cards left” list. The winner comes first; all other rows retain their seat order. Counts are actual remaining hands, with a tabular count column and a distinct winner cue. They do not establish points or finishing ranks. The local player keeps a textual identity cue. The existing local/host “One more round,” online guest readiness and “Back to home” handlers remain the real actions; online rematch controls are unavailable while disconnected; the scrollable dialog keeps them reachable when the collection is expanded.
 
-`PlayerProgress` reads validated device history and delegates to the exported pure `ProgressCollection`; no progress UI is shown before the first completed round. The compact record names rounds, wins and the device scope. Current streak appears only when greater than one. A native details/summary disclosure shows the earned count and optional four-card collection: **First win** (one win), **Hat trick** (three wins), **Table regular** (ten completed rounds), and **On fire** (best streak of three). Progress fractions cap at their goals. Collected cards use deck yellow, dark ink and a check; unearned cards use themed muted ink, a line border and their fraction. Their icons use the established SVG system.
+`PlayerProgress` reads validated device history and delegates to the exported pure `ProgressCollection`; no progress UI is shown before the first completed round. The compact record names rounds, wins and the device scope. Current streak appears only when greater than one. A native details/summary disclosure shows the earned count and optional four-card collection: **First win** (one win), **Hat trick** (three wins), **Table regular** (ten completed rounds), and **On fire** (best streak of three). Progress fractions cap at their goals. Collected cards use the retained supporting milestone yellow, dark ink and a check; home scopes earned cards to blue and white. Unearned cards use themed muted ink, a line border and their fraction. Their icons use the established SVG system.
 
 The collection derives from the existing idempotent completed-round record; it introduces no separate reward storage. Best streak keeps On fire earned after later losses, while the record's current streak reflects the current run. Rendering illustrative data through the pure collection must not mount result recording or write synthetic history.
 
@@ -478,7 +505,7 @@ The collection derives from the existing idempotent completed-round record; it i
 
 ### Held hand and piles
 
-`UnoCard` owns all native faces; `HandCard` owns inspection and gestures; `app/table.css` owns native cards and table materials; the later-imported `app/arena.css` owns current live geometry and hand clearance; `app/home.css` owns the separate title screen. The first tap or native keyboard activation plays a legal card immediately. A nonmatching card remains inspectable; explicit named Play is a fallback if that inspected card later becomes legal. Waiting players can inspect their hands; a legal exact-match jump-in follows the same direct-play availability. Cancelled dialogs return focus to their opener. A locally played focused card hands keyboard focus to a surviving neighbor without stealing focus from another dialog/control. Arrow keys browse the hand with wrapping; Home and End reach its ends, keeping focused cards in view. A legal card can also be dragged upward. Readiness and release use the same `canReleaseCard` predicate: `dy < -65` and `abs(dy) > abs(dx) * 0.8`, with finite coordinates. The table says “Slide up to play” during lift and “Release to play” only when that exact predicate passes. Focus lifts a card, native button activation preserves keyboard access, and a small ivory bottom mark identifies legal cards beyond saturation alone.
+`UnoCard` and its scoped `UnoCard.module.css` own the shared native face finish, white stock, print inks, Wild+4 fan and guarded CSS tilt/sheen; `HandCard` owns inspection and gestures; `app/table.css` owns base card geometry and table materials; the later-imported `app/arena.css` owns current live geometry and hand clearance; `app/home.css` owns the separate title screen. The first tap or native keyboard activation plays a legal card immediately. A nonmatching card remains inspectable; explicit named Play is a fallback if that inspected card later becomes legal. Waiting players can inspect their hands; a legal exact-match jump-in follows the same direct-play availability. Cancelled dialogs return focus to their opener. A locally played focused card hands keyboard focus to a surviving neighbor without stealing focus from another dialog/control. Arrow keys browse the hand with wrapping; Home and End reach its ends, keeping focused cards in view. A legal card can also be dragged upward. Readiness and release use the same `canReleaseCard` predicate: `dy < -65` and `abs(dy) > abs(dx) * 0.8`, with finite coordinates. The table says “Slide up to play” during lift and “Release to play” only when that exact predicate passes. Focus lifts a card, native button activation preserves keyboard access, and a small ivory bottom mark identifies legal cards beyond saturation alone.
 
 Pointer capture starts on the face. Nonprimary pointers and nonleft clicks are ignored; button loss, pointer cancellation, capture loss, blur, visibility changes and unmount cancel or clean up the gesture. An unsuccessful drag returns quickly. Reduced motion removes travel and drag rotation while retaining a usable selection state. Identity follows the card through sorting and game updates.
 
@@ -500,16 +527,16 @@ Pointer-down primes audio silently. Actual tap or keyboard activation produces a
 
 - **Do** use the same authored native face for the hand, piles and card motion.
 - **Do** keep home Play central, Create/Join paired, sharper 6px action corners and complete flat transparent silhouettes with their prompt provenance.
-- **Do** preserve stable deck colors and the written active-color label.
+- **Do** preserve vivid deck colors, white faces, distinct dark green/yellow index and center inks, and the written active-color label.
 - **Do** retain the fixed home club palette, scoped baize-and-leather table and theme-aware settings/setup.
 - **Do** keep one viewport-contained felt beneath opponents, piles and local cards, with lift/focus clearance and independent horizontal large-hand scrolling.
 - **Do** retain distinct six-seat landscape identities and the portrait rotate gate, local pause and online-continuation disclosure.
 - **Do** play legal cards on first activation and keep nonmatching inspection, turn state and situational actions clear with touch and keyboard.
-- **Do** keep the full named Play action, selected card and current hint in agreement; retain dark ink on lime.
+- **Do** keep the full named Play action, selected card and current hint in agreement; retain dark ink on yellow.
 - **Do** reveal actual new local draws without selecting them and preserve horizontal position on unrelated updates.
 - **Do** keep Draw on the deck, eligible UNO at hand level, and the dock limited to contextual Pass and the pre-inspected-card Play fallback; give button and keyboard the same availability rules.
 - **Do** put Set up bots and How to play after Play/Create/Join, and keep optional bot/friend details in disclosures.
-- **Do** honor reduced motion, mute, audio readiness and interrupted gesture cleanup.
+- **Do** keep face tilt and sheen within fine-pointer/no-reduced-motion guards, settle on contact before gesture capture, and honor mute, audio readiness and interrupted gesture cleanup.
 - **Do** keep presentation responsive to the current published state without delaying play.
 - **Do** derive optional milestone cards from completed device-local rounds and keep result actions reachable inside the native dialog.
 - **Do** attach pressure cues to their actual opponent hand or penalty deck and retain full accessible names.
@@ -525,9 +552,11 @@ Pointer-down primes audio silently. Actual tap or keyboard activation produces a
 - **Don't** crop the flat home silhouettes or restore cinematic scenery and a boxed or patched background.
 - **Don't** show UNO when ineligible, duplicate Draw in the dock or turn sorting into a permanent table control.
 - **Don't** use Unicode glyph icons in place of the established SVG icon system.
-- **Don't** give general controls hard offset block shadows; physical deck edges are the intentional exception.
+- **Don't** give information containers decorative block shadows; thin stock edges, the leather rail and pressed control bevels remain native to this physical world.
 - **Don't** queue narration, wait for sound or animation, or add a blocking splash.
 - **Don't** copy a reference mascot, add idle character loops or replay reactions on unrelated snapshots.
 - **Don't** infer points or finishing ranks from cards left, grant rewards per click, or claim a milestone is new without before/after evidence.
 
 Not canonized: obsolete `.home-*`/`.primary-choice` rules still present in shared CSS, including the old 21px/18px choices and native-fan launch treatment, are dormant historical code rather than current home authority. Earlier home review verdicts and cropped pre-correction scene captures do not establish current geometry. Vestigial sub-11px shell/progress captions and the unused tiny table-watermark styling do not establish a legibility floor or authorize new kickers and eyebrows. Superseded midnight-table declarations, old inspect-first guidance and the removed hard rail shadow are not reusable rules. The new 10px milestone descriptions and local-player annotations are also not a reusable typography floor. Detector advisories, including the earned-moments report’s 83 findings, are review evidence rather than new tokens. The playful-feedback ramp/palette detector advisories are not new tokens, and compact sub-11px counts or pile labels do not establish a reusable type floor. The shared-table detector’s small landscape labels and inherited palette/rail advisories do not establish new tokens or a reusable legibility floor; functional pressed-button inset lips remain native to the confirmed tactile world. Physical speaker balance and real-device touch remain unverified; none is legitimized as a system value.
+
+The vivid-depth detector’s 59 material/palette advisories are review evidence rather than permission to add new tokens. Superseded muted card inks, teal home, ivory room buttons and lime live feedback are not current authority. The shortest landscape’s 10px counts and hidden visual pile labels are a bounded space treatment, not a general type-size or labeling rule; no claim of an all-UI accessibility audit is made.

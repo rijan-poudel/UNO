@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-20T17:20:23.699129+00:00",
-  "title": "Design System: UNO \u2014 Card club and tactile table",
+  "generatedAt": "2026-10-20T17:53:02.557Z",
+  "title": "Design System: UNO — Card club and tactile table",
   "extensions": {
     "colorMeta": {
       "ui-bg": {
@@ -427,181 +427,226 @@
       "arena-accent-red": {
         "role": "primary",
         "displayName": "Arena Accent Red",
-        "canonical": "#f17d82",
+        "canonical": "#ff5268",
         "tonalRamp": [
-          "oklch(15% 0.1425 18.58)",
-          "oklch(26% 0.1425 18.58)",
-          "oklch(38% 0.1425 18.58)",
-          "oklch(49% 0.1425 18.58)",
-          "oklch(61% 0.1425 18.58)",
-          "oklch(72% 0.1425 18.58)",
-          "oklch(84% 0.1425 18.58)",
-          "oklch(95% 0.1425 18.58)"
+          "oklch(15% 0.2080 17.45)",
+          "oklch(26% 0.2080 17.45)",
+          "oklch(38% 0.2080 17.45)",
+          "oklch(49% 0.2080 17.45)",
+          "oklch(61% 0.2080 17.45)",
+          "oklch(72% 0.2080 17.45)",
+          "oklch(84% 0.2080 17.45)",
+          "oklch(95% 0.2080 17.45)"
         ]
       },
       "table-felt": {
         "role": "neutral",
-        "displayName": "Table Felt",
-        "canonical": "#245b49",
+        "displayName": "Rich green baize",
+        "canonical": "#047c53",
         "tonalRamp": [
-          "oklch(15% 0.0659 168.84)",
-          "oklch(26% 0.0659 168.84)",
-          "oklch(38% 0.0659 168.84)",
-          "oklch(49% 0.0659 168.84)",
-          "oklch(61% 0.0659 168.84)",
-          "oklch(72% 0.0659 168.84)",
-          "oklch(84% 0.0659 168.84)",
-          "oklch(95% 0.0659 168.84)"
+          "oklch(15% 0.1137 161.37)",
+          "oklch(26% 0.1137 161.37)",
+          "oklch(38% 0.1137 161.37)",
+          "oklch(49% 0.1137 161.37)",
+          "oklch(61% 0.1137 161.37)",
+          "oklch(72% 0.1137 161.37)",
+          "oklch(84% 0.1137 161.37)",
+          "oklch(95% 0.1137 161.37)"
         ]
       },
-      "turn-lime": {
-        "role": "primary",
-        "displayName": "Turn Lime",
-        "canonical": "#d8ed82",
+      "table-rail": {
+        "role": "neutral",
+        "displayName": "Navy padded leather",
+        "canonical": "#101a31",
         "tonalRamp": [
-          "oklch(15% 0.1345 118.28)",
-          "oklch(26% 0.1345 118.28)",
-          "oklch(38% 0.1345 118.28)",
-          "oklch(49% 0.1345 118.28)",
-          "oklch(61% 0.1345 118.28)",
-          "oklch(72% 0.1345 118.28)",
-          "oklch(84% 0.1345 118.28)",
-          "oklch(95% 0.1345 118.28)"
+          "oklch(15% 0.0475 265.03)",
+          "oklch(26% 0.0475 265.03)",
+          "oklch(38% 0.0475 265.03)",
+          "oklch(49% 0.0475 265.03)",
+          "oklch(61% 0.0475 265.03)",
+          "oklch(72% 0.0475 265.03)",
+          "oklch(84% 0.0475 265.03)",
+          "oklch(95% 0.0475 265.03)"
+        ]
+      },
+      "seat-surface": {
+        "role": "neutral",
+        "displayName": "Seat Surface",
+        "canonical": "#102138",
+        "tonalRamp": [
+          "oklch(15% 0.0497 256.41)",
+          "oklch(26% 0.0497 256.41)",
+          "oklch(38% 0.0497 256.41)",
+          "oklch(49% 0.0497 256.41)",
+          "oklch(61% 0.0497 256.41)",
+          "oklch(72% 0.0497 256.41)",
+          "oklch(84% 0.0497 256.41)",
+          "oklch(95% 0.0497 256.41)"
         ]
       },
       "arena-dark-ink": {
         "role": "neutral",
         "displayName": "Arena Dark Ink",
-        "canonical": "#172130",
+        "canonical": "#211c00",
         "tonalRamp": [
-          "oklch(15% 0.0322 258.30)",
-          "oklch(26% 0.0322 258.30)",
-          "oklch(38% 0.0322 258.30)",
-          "oklch(49% 0.0322 258.30)",
-          "oklch(61% 0.0322 258.30)",
-          "oklch(72% 0.0322 258.30)",
-          "oklch(84% 0.0322 258.30)",
-          "oklch(95% 0.0322 258.30)"
+          "oklch(15% 0.0469 100.02)",
+          "oklch(26% 0.0469 100.02)",
+          "oklch(38% 0.0469 100.02)",
+          "oklch(49% 0.0469 100.02)",
+          "oklch(61% 0.0469 100.02)",
+          "oklch(72% 0.0469 100.02)",
+          "oklch(84% 0.0469 100.02)",
+          "oklch(95% 0.0469 100.02)"
+        ]
+      },
+      "move-action-ink": {
+        "role": "neutral",
+        "displayName": "Move action ink",
+        "canonical": "#392700",
+        "tonalRamp": [
+          "oklch(15% 0.0591 81.97)",
+          "oklch(26% 0.0591 81.97)",
+          "oklch(38% 0.0591 81.97)",
+          "oklch(49% 0.0591 81.97)",
+          "oklch(61% 0.0591 81.97)",
+          "oklch(72% 0.0591 81.97)",
+          "oklch(84% 0.0591 81.97)",
+          "oklch(95% 0.0591 81.97)"
         ]
       },
       "card-red": {
         "role": "secondary",
-        "displayName": "Card Red",
-        "canonical": "#e73442",
+        "displayName": "Printed crimson",
+        "canonical": "#df0735",
         "tonalRamp": [
-          "oklch(15% 0.2133 22.67)",
-          "oklch(26% 0.2133 22.67)",
-          "oklch(38% 0.2133 22.67)",
-          "oklch(49% 0.2133 22.67)",
-          "oklch(61% 0.2133 22.67)",
-          "oklch(72% 0.2133 22.67)",
-          "oklch(84% 0.2133 22.67)",
-          "oklch(95% 0.2133 22.67)"
+          "oklch(15% 0.2282 21.58)",
+          "oklch(26% 0.2282 21.58)",
+          "oklch(38% 0.2282 21.58)",
+          "oklch(49% 0.2282 21.58)",
+          "oklch(61% 0.2282 21.58)",
+          "oklch(72% 0.2282 21.58)",
+          "oklch(84% 0.2282 21.58)",
+          "oklch(95% 0.2282 21.58)"
         ]
       },
       "card-yellow": {
         "role": "secondary",
-        "displayName": "Card Yellow",
-        "canonical": "#f7c934",
+        "displayName": "Golden card shell",
+        "canonical": "#ffce00",
         "tonalRamp": [
-          "oklch(15% 0.1610 90.32)",
-          "oklch(26% 0.1610 90.32)",
-          "oklch(38% 0.1610 90.32)",
-          "oklch(49% 0.1610 90.32)",
-          "oklch(61% 0.1610 90.32)",
-          "oklch(72% 0.1610 90.32)",
-          "oklch(84% 0.1610 90.32)",
-          "oklch(95% 0.1610 90.32)"
+          "oklch(15% 0.1777 91.31)",
+          "oklch(26% 0.1777 91.31)",
+          "oklch(38% 0.1777 91.31)",
+          "oklch(49% 0.1777 91.31)",
+          "oklch(61% 0.1777 91.31)",
+          "oklch(72% 0.1777 91.31)",
+          "oklch(84% 0.1777 91.31)",
+          "oklch(95% 0.1777 91.31)"
         ]
       },
       "card-green": {
         "role": "secondary",
-        "displayName": "Card Green",
-        "canonical": "#159768",
+        "displayName": "Emerald card shell",
+        "canonical": "#00bc68",
         "tonalRamp": [
-          "oklch(15% 0.1271 161.79)",
-          "oklch(26% 0.1271 161.79)",
-          "oklch(38% 0.1271 161.79)",
-          "oklch(49% 0.1271 161.79)",
-          "oklch(61% 0.1271 161.79)",
-          "oklch(72% 0.1271 161.79)",
-          "oklch(84% 0.1271 161.79)",
-          "oklch(95% 0.1271 161.79)"
+          "oklch(15% 0.1764 153.89)",
+          "oklch(26% 0.1764 153.89)",
+          "oklch(38% 0.1764 153.89)",
+          "oklch(49% 0.1764 153.89)",
+          "oklch(61% 0.1764 153.89)",
+          "oklch(72% 0.1764 153.89)",
+          "oklch(84% 0.1764 153.89)",
+          "oklch(95% 0.1764 153.89)"
         ]
       },
       "card-blue": {
         "role": "secondary",
-        "displayName": "Card Blue",
-        "canonical": "#2474df",
+        "displayName": "Electric card blue",
+        "canonical": "#075bee",
         "tonalRamp": [
-          "oklch(15% 0.1801 257.51)",
-          "oklch(26% 0.1801 257.51)",
-          "oklch(38% 0.1801 257.51)",
-          "oklch(49% 0.1801 257.51)",
-          "oklch(61% 0.1801 257.51)",
-          "oklch(72% 0.1801 257.51)",
-          "oklch(84% 0.1801 257.51)",
-          "oklch(95% 0.1801 257.51)"
+          "oklch(15% 0.2322 261.67)",
+          "oklch(26% 0.2322 261.67)",
+          "oklch(38% 0.2322 261.67)",
+          "oklch(49% 0.2322 261.67)",
+          "oklch(61% 0.2322 261.67)",
+          "oklch(72% 0.2322 261.67)",
+          "oklch(84% 0.2322 261.67)",
+          "oklch(95% 0.2322 261.67)"
         ]
       },
       "card-wild": {
         "role": "secondary",
         "displayName": "Card Wild",
-        "canonical": "#242837",
+        "canonical": "#101d3a",
         "tonalRamp": [
-          "oklch(15% 0.0283 272.87)",
-          "oklch(26% 0.0283 272.87)",
-          "oklch(38% 0.0283 272.87)",
-          "oklch(49% 0.0283 272.87)",
-          "oklch(61% 0.0283 272.87)",
-          "oklch(72% 0.0283 272.87)",
-          "oklch(84% 0.0283 272.87)",
-          "oklch(95% 0.0283 272.87)"
+          "oklch(15% 0.0587 264.23)",
+          "oklch(26% 0.0587 264.23)",
+          "oklch(38% 0.0587 264.23)",
+          "oklch(49% 0.0587 264.23)",
+          "oklch(61% 0.0587 264.23)",
+          "oklch(72% 0.0587 264.23)",
+          "oklch(84% 0.0587 264.23)",
+          "oklch(95% 0.0587 264.23)"
         ]
       },
       "card-paper": {
         "role": "neutral",
-        "displayName": "Card Paper",
-        "canonical": "#fffdf5",
+        "displayName": "Pure white stock",
+        "canonical": "#ffffff",
         "tonalRamp": [
-          "oklch(15% 0.0107 95.16)",
-          "oklch(26% 0.0107 95.16)",
-          "oklch(38% 0.0107 95.16)",
-          "oklch(49% 0.0107 95.16)",
-          "oklch(61% 0.0107 95.16)",
-          "oklch(72% 0.0107 95.16)",
-          "oklch(84% 0.0107 95.16)",
-          "oklch(95% 0.0107 95.16)"
+          "oklch(15% 0.0000 89.88)",
+          "oklch(26% 0.0000 89.88)",
+          "oklch(38% 0.0000 89.88)",
+          "oklch(49% 0.0000 89.88)",
+          "oklch(61% 0.0000 89.88)",
+          "oklch(72% 0.0000 89.88)",
+          "oklch(84% 0.0000 89.88)",
+          "oklch(95% 0.0000 89.88)"
         ]
       },
       "card-yellow-ink": {
         "role": "neutral",
-        "displayName": "Card Yellow Ink",
-        "canonical": "#332810",
+        "displayName": "Small gold index ink",
+        "canonical": "#482f00",
         "tonalRamp": [
-          "oklch(15% 0.0412 84.99)",
-          "oklch(26% 0.0412 84.99)",
-          "oklch(38% 0.0412 84.99)",
-          "oklch(49% 0.0412 84.99)",
-          "oklch(61% 0.0412 84.99)",
-          "oklch(72% 0.0412 84.99)",
-          "oklch(84% 0.0412 84.99)",
-          "oklch(95% 0.0412 84.99)"
+          "oklch(15% 0.0684 76.82)",
+          "oklch(26% 0.0684 76.82)",
+          "oklch(38% 0.0684 76.82)",
+          "oklch(49% 0.0684 76.82)",
+          "oklch(61% 0.0684 76.82)",
+          "oklch(72% 0.0684 76.82)",
+          "oklch(84% 0.0684 76.82)",
+          "oklch(95% 0.0684 76.82)"
+        ]
+      },
+      "card-yellow-value": {
+        "role": "neutral",
+        "displayName": "Gold center rank ink",
+        "canonical": "#805100",
+        "tonalRamp": [
+          "oklch(15% 0.1025 71.17)",
+          "oklch(26% 0.1025 71.17)",
+          "oklch(38% 0.1025 71.17)",
+          "oklch(49% 0.1025 71.17)",
+          "oklch(61% 0.1025 71.17)",
+          "oklch(72% 0.1025 71.17)",
+          "oklch(84% 0.1025 71.17)",
+          "oklch(95% 0.1025 71.17)"
         ]
       },
       "card-back": {
         "role": "neutral",
         "displayName": "Card Back",
-        "canonical": "#172b2b",
+        "canonical": "#101d3a",
         "tonalRamp": [
-          "oklch(15% 0.0259 195.74)",
-          "oklch(26% 0.0259 195.74)",
-          "oklch(38% 0.0259 195.74)",
-          "oklch(49% 0.0259 195.74)",
-          "oklch(61% 0.0259 195.74)",
-          "oklch(72% 0.0259 195.74)",
-          "oklch(84% 0.0259 195.74)",
-          "oklch(95% 0.0259 195.74)"
+          "oklch(15% 0.0587 264.23)",
+          "oklch(26% 0.0587 264.23)",
+          "oklch(38% 0.0587 264.23)",
+          "oklch(49% 0.0587 264.23)",
+          "oklch(61% 0.0587 264.23)",
+          "oklch(72% 0.0587 264.23)",
+          "oklch(84% 0.0587 264.23)",
+          "oklch(95% 0.0587 264.23)"
         ]
       },
       "active-red": {
@@ -682,141 +727,321 @@
       "avatar-red": {
         "role": "secondary",
         "displayName": "Avatar Red",
-        "canonical": "#ef755d",
+        "canonical": "#ff6942",
         "tonalRamp": [
-          "oklch(15% 0.1556 32.59)",
-          "oklch(26% 0.1556 32.59)",
-          "oklch(38% 0.1556 32.59)",
-          "oklch(49% 0.1556 32.59)",
-          "oklch(61% 0.1556 32.59)",
-          "oklch(72% 0.1556 32.59)",
-          "oklch(84% 0.1556 32.59)",
-          "oklch(95% 0.1556 32.59)"
+          "oklch(15% 0.1912 35.56)",
+          "oklch(26% 0.1912 35.56)",
+          "oklch(38% 0.1912 35.56)",
+          "oklch(49% 0.1912 35.56)",
+          "oklch(61% 0.1912 35.56)",
+          "oklch(72% 0.1912 35.56)",
+          "oklch(84% 0.1912 35.56)",
+          "oklch(95% 0.1912 35.56)"
         ]
       },
       "avatar-blue": {
         "role": "secondary",
         "displayName": "Avatar Blue",
-        "canonical": "#8db6ed",
+        "canonical": "#4892ff",
         "tonalRamp": [
-          "oklch(15% 0.0910 255.93)",
-          "oklch(26% 0.0910 255.93)",
-          "oklch(38% 0.0910 255.93)",
-          "oklch(49% 0.0910 255.93)",
-          "oklch(61% 0.0910 255.93)",
-          "oklch(72% 0.0910 255.93)",
-          "oklch(84% 0.0910 255.93)",
-          "oklch(95% 0.0910 255.93)"
+          "oklch(15% 0.1779 258.21)",
+          "oklch(26% 0.1779 258.21)",
+          "oklch(38% 0.1779 258.21)",
+          "oklch(49% 0.1779 258.21)",
+          "oklch(61% 0.1779 258.21)",
+          "oklch(72% 0.1779 258.21)",
+          "oklch(84% 0.1779 258.21)",
+          "oklch(95% 0.1779 258.21)"
         ]
       },
       "avatar-yellow": {
         "role": "secondary",
         "displayName": "Avatar Yellow",
-        "canonical": "#e4c455",
+        "canonical": "#ffcf18",
         "tonalRamp": [
-          "oklch(15% 0.1338 93.14)",
-          "oklch(26% 0.1338 93.14)",
-          "oklch(38% 0.1338 93.14)",
-          "oklch(49% 0.1338 93.14)",
-          "oklch(61% 0.1338 93.14)",
-          "oklch(72% 0.1338 93.14)",
-          "oklch(84% 0.1338 93.14)",
-          "oklch(95% 0.1338 93.14)"
+          "oklch(15% 0.1747 91.35)",
+          "oklch(26% 0.1747 91.35)",
+          "oklch(38% 0.1747 91.35)",
+          "oklch(49% 0.1747 91.35)",
+          "oklch(61% 0.1747 91.35)",
+          "oklch(72% 0.1747 91.35)",
+          "oklch(84% 0.1747 91.35)",
+          "oklch(95% 0.1747 91.35)"
         ]
       },
       "avatar-green": {
         "role": "secondary",
         "displayName": "Avatar Green",
-        "canonical": "#a8c991",
+        "canonical": "#43ce7d",
         "tonalRamp": [
-          "oklch(15% 0.0843 132.86)",
-          "oklch(26% 0.0843 132.86)",
-          "oklch(38% 0.0843 132.86)",
-          "oklch(49% 0.0843 132.86)",
-          "oklch(61% 0.0843 132.86)",
-          "oklch(72% 0.0843 132.86)",
-          "oklch(84% 0.0843 132.86)",
-          "oklch(95% 0.0843 132.86)"
+          "oklch(15% 0.1664 153.60)",
+          "oklch(26% 0.1664 153.60)",
+          "oklch(38% 0.1664 153.60)",
+          "oklch(49% 0.1664 153.60)",
+          "oklch(61% 0.1664 153.60)",
+          "oklch(72% 0.1664 153.60)",
+          "oklch(84% 0.1664 153.60)",
+          "oklch(95% 0.1664 153.60)"
         ]
       },
       "avatar-lilac": {
         "role": "secondary",
         "displayName": "Avatar Lilac",
-        "canonical": "#c5afe5",
+        "canonical": "#a67aff",
         "tonalRamp": [
-          "oklch(15% 0.0788 303.24)",
-          "oklch(26% 0.0788 303.24)",
-          "oklch(38% 0.0788 303.24)",
-          "oklch(49% 0.0788 303.24)",
-          "oklch(61% 0.0788 303.24)",
-          "oklch(72% 0.0788 303.24)",
-          "oklch(84% 0.0788 303.24)",
-          "oklch(95% 0.0788 303.24)"
+          "oklch(15% 0.1906 296.25)",
+          "oklch(26% 0.1906 296.25)",
+          "oklch(38% 0.1906 296.25)",
+          "oklch(49% 0.1906 296.25)",
+          "oklch(61% 0.1906 296.25)",
+          "oklch(72% 0.1906 296.25)",
+          "oklch(84% 0.1906 296.25)",
+          "oklch(95% 0.1906 296.25)"
         ]
       },
       "avatar-peach": {
         "role": "secondary",
         "displayName": "Avatar Peach",
-        "canonical": "#edae86",
+        "canonical": "#ffae36",
         "tonalRamp": [
-          "oklch(15% 0.0914 53.42)",
-          "oklch(26% 0.0914 53.42)",
-          "oklch(38% 0.0914 53.42)",
-          "oklch(49% 0.0914 53.42)",
-          "oklch(61% 0.0914 53.42)",
-          "oklch(72% 0.0914 53.42)",
-          "oklch(84% 0.0914 53.42)",
-          "oklch(95% 0.0914 53.42)"
+          "oklch(15% 0.1572 71.72)",
+          "oklch(26% 0.1572 71.72)",
+          "oklch(38% 0.1572 71.72)",
+          "oklch(49% 0.1572 71.72)",
+          "oklch(61% 0.1572 71.72)",
+          "oklch(72% 0.1572 71.72)",
+          "oklch(84% 0.1572 71.72)",
+          "oklch(95% 0.1572 71.72)"
         ]
       },
-      "move-action-ink": {
+      "launch-bg": {
         "role": "neutral",
-        "displayName": "Move action ink",
-        "canonical": "#202b12",
+        "displayName": "Card club navy",
+        "canonical": "#0b2038",
         "tonalRamp": [
-          "oklch(15% 0.0452 128.57)",
-          "oklch(26% 0.0452 128.57)",
-          "oklch(38% 0.0452 128.57)",
-          "oklch(49% 0.0452 128.57)",
-          "oklch(61% 0.0452 128.57)",
-          "oklch(72% 0.0452 128.57)",
-          "oklch(84% 0.0452 128.57)",
-          "oklch(95% 0.0452 128.57)"
+          "oklch(15% 0.0535 253.50)",
+          "oklch(26% 0.0535 253.50)",
+          "oklch(38% 0.0535 253.50)",
+          "oklch(49% 0.0535 253.50)",
+          "oklch(61% 0.0535 253.50)",
+          "oklch(72% 0.0535 253.50)",
+          "oklch(84% 0.0535 253.50)",
+          "oklch(95% 0.0535 253.50)"
         ]
       },
-      "table-rail": {
+      "launch-paper": {
         "role": "neutral",
-        "displayName": "Table Rail",
-        "canonical": "#172a28",
+        "displayName": "Club ivory",
+        "canonical": "#f9f2df",
         "tonalRamp": [
-          "oklch(15% 0.0252 187.34)",
-          "oklch(26% 0.0252 187.34)",
-          "oklch(38% 0.0252 187.34)",
-          "oklch(49% 0.0252 187.34)",
-          "oklch(61% 0.0252 187.34)",
-          "oklch(72% 0.0252 187.34)",
-          "oklch(84% 0.0252 187.34)",
-          "oklch(95% 0.0252 187.34)"
+          "oklch(15% 0.0261 90.10)",
+          "oklch(26% 0.0261 90.10)",
+          "oklch(38% 0.0261 90.10)",
+          "oklch(49% 0.0261 90.10)",
+          "oklch(61% 0.0261 90.10)",
+          "oklch(72% 0.0261 90.10)",
+          "oklch(84% 0.0261 90.10)",
+          "oklch(95% 0.0261 90.10)"
         ]
       },
-      "seat-surface": {
+      "launch-ink": {
         "role": "neutral",
-        "displayName": "Seat Surface",
-        "canonical": "#152926",
+        "displayName": "Club action ink",
+        "canonical": "#392700",
         "tonalRamp": [
-          "oklch(15% 0.0267 183.66)",
-          "oklch(26% 0.0267 183.66)",
-          "oklch(38% 0.0267 183.66)",
-          "oklch(49% 0.0267 183.66)",
-          "oklch(61% 0.0267 183.66)",
-          "oklch(72% 0.0267 183.66)",
-          "oklch(84% 0.0267 183.66)",
-          "oklch(95% 0.0267 183.66)"
+          "oklch(15% 0.0591 81.97)",
+          "oklch(26% 0.0591 81.97)",
+          "oklch(38% 0.0591 81.97)",
+          "oklch(49% 0.0591 81.97)",
+          "oklch(61% 0.0591 81.97)",
+          "oklch(72% 0.0591 81.97)",
+          "oklch(84% 0.0591 81.97)",
+          "oklch(95% 0.0591 81.97)"
         ]
       },
-      "card-yellow-value": {
+      "launch-yellow": {
+        "role": "primary",
+        "displayName": "Club play yellow",
+        "canonical": "#ffd64a",
+        "tonalRamp": [
+          "oklch(15% 0.1576 92.18)",
+          "oklch(26% 0.1576 92.18)",
+          "oklch(38% 0.1576 92.18)",
+          "oklch(49% 0.1576 92.18)",
+          "oklch(61% 0.1576 92.18)",
+          "oklch(72% 0.1576 92.18)",
+          "oklch(84% 0.1576 92.18)",
+          "oklch(95% 0.1576 92.18)"
+        ]
+      },
+      "launch-surface": {
         "role": "neutral",
-        "displayName": "Card Yellow Value",
+        "displayName": "Club utility surface",
+        "canonical": "#132e4f",
+        "tonalRamp": [
+          "oklch(15% 0.0686 254.82)",
+          "oklch(26% 0.0686 254.82)",
+          "oklch(38% 0.0686 254.82)",
+          "oklch(49% 0.0686 254.82)",
+          "oklch(61% 0.0686 254.82)",
+          "oklch(72% 0.0686 254.82)",
+          "oklch(84% 0.0686 254.82)",
+          "oklch(95% 0.0686 254.82)"
+        ]
+      },
+      "launch-muted": {
+        "role": "neutral",
+        "displayName": "Club secondary copy",
+        "canonical": "#d5e3dd",
+        "tonalRamp": [
+          "oklch(15% 0.0170 168.46)",
+          "oklch(26% 0.0170 168.46)",
+          "oklch(38% 0.0170 168.46)",
+          "oklch(49% 0.0170 168.46)",
+          "oklch(61% 0.0170 168.46)",
+          "oklch(72% 0.0170 168.46)",
+          "oklch(84% 0.0170 168.46)",
+          "oklch(95% 0.0170 168.46)"
+        ]
+      },
+      "launch-quiet": {
+        "role": "neutral",
+        "displayName": "Club quiet copy",
+        "canonical": "#a9c2c1",
+        "tonalRamp": [
+          "oklch(15% 0.0272 193.67)",
+          "oklch(26% 0.0272 193.67)",
+          "oklch(38% 0.0272 193.67)",
+          "oklch(49% 0.0272 193.67)",
+          "oklch(61% 0.0272 193.67)",
+          "oklch(72% 0.0272 193.67)",
+          "oklch(84% 0.0272 193.67)",
+          "oklch(95% 0.0272 193.67)"
+        ]
+      },
+      "turn-yellow": {
+        "role": "primary",
+        "displayName": "Bright turn yellow",
+        "canonical": "#ffe329",
+        "tonalRamp": [
+          "oklch(15% 0.1817 99.72)",
+          "oklch(26% 0.1817 99.72)",
+          "oklch(38% 0.1817 99.72)",
+          "oklch(49% 0.1817 99.72)",
+          "oklch(61% 0.1817 99.72)",
+          "oklch(72% 0.1817 99.72)",
+          "oklch(84% 0.1817 99.72)",
+          "oklch(95% 0.1817 99.72)"
+        ]
+      },
+      "action-yellow": {
+        "role": "primary",
+        "displayName": "Pressed action yellow",
+        "canonical": "#ffd000",
+        "tonalRamp": [
+          "oklch(15% 0.1786 92.23)",
+          "oklch(26% 0.1786 92.23)",
+          "oklch(38% 0.1786 92.23)",
+          "oklch(49% 0.1786 92.23)",
+          "oklch(61% 0.1786 92.23)",
+          "oklch(72% 0.1786 92.23)",
+          "oklch(84% 0.1786 92.23)",
+          "oklch(95% 0.1786 92.23)"
+        ]
+      },
+      "card-green-ink": {
+        "role": "secondary",
+        "displayName": "Small emerald index ink",
+        "canonical": "#00321e",
+        "tonalRamp": [
+          "oklch(15% 0.0629 160.40)",
+          "oklch(26% 0.0629 160.40)",
+          "oklch(38% 0.0629 160.40)",
+          "oklch(49% 0.0629 160.40)",
+          "oklch(61% 0.0629 160.40)",
+          "oklch(72% 0.0629 160.40)",
+          "oklch(84% 0.0629 160.40)",
+          "oklch(95% 0.0629 160.40)"
+        ]
+      },
+      "card-green-value": {
+        "role": "secondary",
+        "displayName": "Emerald center rank ink",
+        "canonical": "#00894a",
+        "tonalRamp": [
+          "oklch(15% 0.1399 153.82)",
+          "oklch(26% 0.1399 153.82)",
+          "oklch(38% 0.1399 153.82)",
+          "oklch(49% 0.1399 153.82)",
+          "oklch(61% 0.1399 153.82)",
+          "oklch(72% 0.1399 153.82)",
+          "oklch(84% 0.1399 153.82)",
+          "oklch(95% 0.1399 153.82)"
+        ]
+      },
+      "launch-create-blue": {
+        "role": "primary",
+        "displayName": "Create blue",
+        "canonical": "#1757df",
+        "tonalRamp": [
+          "oklch(15% 0.2166 262.60)",
+          "oklch(26% 0.2166 262.60)",
+          "oklch(38% 0.2166 262.60)",
+          "oklch(49% 0.2166 262.60)",
+          "oklch(61% 0.2166 262.60)",
+          "oklch(72% 0.2166 262.60)",
+          "oklch(84% 0.2166 262.60)",
+          "oklch(95% 0.2166 262.60)"
+        ]
+      },
+      "launch-join-red": {
+        "role": "primary",
+        "displayName": "Join crimson",
+        "canonical": "#e71c3b",
+        "tonalRamp": [
+          "oklch(15% 0.2279 21.77)",
+          "oklch(26% 0.2279 21.77)",
+          "oklch(38% 0.2279 21.77)",
+          "oklch(49% 0.2279 21.77)",
+          "oklch(61% 0.2279 21.77)",
+          "oklch(72% 0.2279 21.77)",
+          "oklch(84% 0.2279 21.77)",
+          "oklch(95% 0.2279 21.77)"
+        ]
+      },
+      "milestone-yellow": {
+        "role": "primary",
+        "displayName": "Supporting earned-card yellow",
+        "canonical": "#f7c934",
+        "tonalRamp": [
+          "oklch(15% 0.1610 90.32)",
+          "oklch(26% 0.1610 90.32)",
+          "oklch(38% 0.1610 90.32)",
+          "oklch(49% 0.1610 90.32)",
+          "oklch(61% 0.1610 90.32)",
+          "oklch(72% 0.1610 90.32)",
+          "oklch(84% 0.1610 90.32)",
+          "oklch(95% 0.1610 90.32)"
+        ]
+      },
+      "milestone-ink": {
+        "role": "neutral",
+        "displayName": "Supporting earned-card ink",
+        "canonical": "#332810",
+        "tonalRamp": [
+          "oklch(15% 0.0412 84.99)",
+          "oklch(26% 0.0412 84.99)",
+          "oklch(38% 0.0412 84.99)",
+          "oklch(49% 0.0412 84.99)",
+          "oklch(61% 0.0412 84.99)",
+          "oklch(72% 0.0412 84.99)",
+          "oklch(84% 0.0412 84.99)",
+          "oklch(95% 0.0412 84.99)"
+        ]
+      },
+      "milestone-border": {
+        "role": "neutral",
+        "displayName": "Supporting earned-card border",
         "canonical": "#8b600b",
         "tonalRamp": [
           "oklch(15% 0.1055 77.02)",
@@ -829,102 +1054,34 @@
           "oklch(95% 0.1055 77.02)"
         ]
       },
-      "launch-bg": {
-        "displayName": "Club teal",
-        "role": "neutral",
+      "choice-blue": {
+        "role": "secondary",
+        "displayName": "Labeled choice blue",
+        "canonical": "#095be5",
         "tonalRamp": [
-          "oklch(15.00% 0.0374 218.58)",
-          "oklch(26.43% 0.0374 218.58)",
-          "oklch(37.86% 0.0374 218.58)",
-          "oklch(49.29% 0.0374 218.58)",
-          "oklch(60.71% 0.0374 218.58)",
-          "oklch(72.14% 0.0374 218.58)",
-          "oklch(83.57% 0.0374 218.58)",
-          "oklch(95.00% 0.0374 218.58)"
+          "oklch(15% 0.2210 261.27)",
+          "oklch(26% 0.2210 261.27)",
+          "oklch(38% 0.2210 261.27)",
+          "oklch(49% 0.2210 261.27)",
+          "oklch(61% 0.2210 261.27)",
+          "oklch(72% 0.2210 261.27)",
+          "oklch(84% 0.2210 261.27)",
+          "oklch(95% 0.2210 261.27)"
         ]
       },
-      "launch-paper": {
-        "displayName": "Club ivory",
-        "role": "neutral",
+      "choice-green": {
+        "role": "secondary",
+        "displayName": "Labeled choice green",
+        "canonical": "#008749",
         "tonalRamp": [
-          "oklch(15.00% 0.0261 90.10)",
-          "oklch(26.43% 0.0261 90.10)",
-          "oklch(37.86% 0.0261 90.10)",
-          "oklch(49.29% 0.0261 90.10)",
-          "oklch(60.71% 0.0261 90.10)",
-          "oklch(72.14% 0.0261 90.10)",
-          "oklch(83.57% 0.0261 90.10)",
-          "oklch(95.00% 0.0261 90.10)"
-        ]
-      },
-      "launch-ink": {
-        "displayName": "Club action ink",
-        "role": "neutral",
-        "tonalRamp": [
-          "oklch(15.00% 0.0361 216.03)",
-          "oklch(26.43% 0.0361 216.03)",
-          "oklch(37.86% 0.0361 216.03)",
-          "oklch(49.29% 0.0361 216.03)",
-          "oklch(60.71% 0.0361 216.03)",
-          "oklch(72.14% 0.0361 216.03)",
-          "oklch(83.57% 0.0361 216.03)",
-          "oklch(95.00% 0.0361 216.03)"
-        ]
-      },
-      "launch-yellow": {
-        "displayName": "Club play yellow",
-        "role": "primary",
-        "tonalRamp": [
-          "oklch(15.00% 0.1576 92.18)",
-          "oklch(26.43% 0.1576 92.18)",
-          "oklch(37.86% 0.1576 92.18)",
-          "oklch(49.29% 0.1576 92.18)",
-          "oklch(60.71% 0.1576 92.18)",
-          "oklch(72.14% 0.1576 92.18)",
-          "oklch(83.57% 0.1576 92.18)",
-          "oklch(95.00% 0.1576 92.18)"
-        ]
-      },
-      "launch-surface": {
-        "displayName": "Club utility surface",
-        "role": "neutral",
-        "tonalRamp": [
-          "oklch(15.00% 0.0440 214.14)",
-          "oklch(26.43% 0.0440 214.14)",
-          "oklch(37.86% 0.0440 214.14)",
-          "oklch(49.29% 0.0440 214.14)",
-          "oklch(60.71% 0.0440 214.14)",
-          "oklch(72.14% 0.0440 214.14)",
-          "oklch(83.57% 0.0440 214.14)",
-          "oklch(95.00% 0.0440 214.14)"
-        ]
-      },
-      "launch-muted": {
-        "displayName": "Club secondary copy",
-        "role": "neutral",
-        "tonalRamp": [
-          "oklch(15.00% 0.0170 168.46)",
-          "oklch(26.43% 0.0170 168.46)",
-          "oklch(37.86% 0.0170 168.46)",
-          "oklch(49.29% 0.0170 168.46)",
-          "oklch(60.71% 0.0170 168.46)",
-          "oklch(72.14% 0.0170 168.46)",
-          "oklch(83.57% 0.0170 168.46)",
-          "oklch(95.00% 0.0170 168.46)"
-        ]
-      },
-      "launch-quiet": {
-        "displayName": "Club quiet copy",
-        "role": "neutral",
-        "tonalRamp": [
-          "oklch(15.00% 0.0272 193.67)",
-          "oklch(26.43% 0.0272 193.67)",
-          "oklch(37.86% 0.0272 193.67)",
-          "oklch(49.29% 0.0272 193.67)",
-          "oklch(60.71% 0.0272 193.67)",
-          "oklch(72.14% 0.0272 193.67)",
-          "oklch(83.57% 0.0272 193.67)",
-          "oklch(95.00% 0.0272 193.67)"
+          "oklch(15% 0.1383 153.88)",
+          "oklch(26% 0.1383 153.88)",
+          "oklch(38% 0.1383 153.88)",
+          "oklch(49% 0.1383 153.88)",
+          "oklch(61% 0.1383 153.88)",
+          "oklch(72% 0.1383 153.88)",
+          "oklch(84% 0.1383 153.88)",
+          "oklch(95% 0.1383 153.88)"
         ]
       }
     },
@@ -1018,38 +1175,33 @@
       },
       {
         "name": "card",
-        "value": "inset 0 1px 1px #ffffff60, 0 5px 10px #03090870",
-        "purpose": "Native face at rest."
-      },
-      {
-        "name": "held",
-        "value": "-4px 7px 11px #060c1759",
-        "purpose": "Fan overlap."
+        "value": "inset 0 1px 2px #ffffffb0, inset 0 -1px 1px #17234145, 0 1px 1px #c4ccdf, 0 3px 1px #68748e, 0 8px 12px #02071880",
+        "purpose": "Thin laminate and stock layers shared by face and cloned motion cards."
       },
       {
         "name": "inspected",
-        "value": "0 14px 25px #060c1780",
-        "purpose": "Raised inspected face."
+        "value": "inset 0 1px 2px #ffffffb0, 0 1px 1px #c4ccdf, 0 3px 1px #68748e, -3px 15px 20px #02071899",
+        "purpose": "Directional elevation for hovered, focused and inspected hand faces."
       },
       {
         "name": "draw-stack",
-        "value": "1px 3px 0 #cad2db, 3px 6px 0 #67768a, 4px 13px 15px #080f1e80",
-        "purpose": "Physical deck edges."
+        "value": "inset 0 1px 2px #ffffffb0, 1px 3px 1px #d5dcec, 3px 6px 1px #7d8ba8, 4px 10px 1px #35435e, 4px 16px 15px #02071899",
+        "purpose": "Physical deck layers."
       },
       {
         "name": "leather-rail",
-        "value": "inset 0 2px 3px #b9d3c036, 0 18px 38px #020a0966",
-        "purpose": "Soft padded leather edge, without a hard offset step."
+        "value": "inset 0 2px 3px #b5d2ff50, inset 0 -6px 10px #020617a0, 0 6px 2px #020718, 0 16px 24px #02071890",
+        "purpose": "Padded navy rim with a short material edge and soft cast depth."
       },
       {
         "name": "baize-inset",
-        "value": "inset 0 5px 12px #061e2160",
-        "purpose": "Mat rests inside the real leather rail."
+        "value": "inset 0 5px 14px #00271980",
+        "purpose": "Rich felt resting inside the leather rail."
       },
       {
         "name": "primary-control",
         "value": "inset 0 -4px 0 #15292626, 0 5px 9px #15292620",
-        "purpose": "Primary actions and native color choices at rest."
+        "purpose": "Inherited primary action elevation on supporting screens."
       },
       {
         "name": "control-pressed",
@@ -1058,18 +1210,23 @@
       },
       {
         "name": "launch-primary",
-        "value": "inset 0 -4px 0 #bc8d22, 0 6px 16px #04191d70",
-        "purpose": "Home Play inset edge and soft lift."
+        "value": "inset 0 2px 2px #ffffff70, inset 0 -4px 2px #bd7600, 0 6px 16px #04191d70",
+        "purpose": "Yellow Play bevel and soft lift."
       },
       {
         "name": "launch-secondary",
-        "value": "inset 0 -3px 0 #d0c7ae, 0 4px 10px #04191d50",
-        "purpose": "Paired room controls."
+        "value": "inset 0 1px 2px #ffffff60, inset 0 -3px 2px var(--action-edge, #06339c), 0 5px 10px #02071870",
+        "purpose": "Blue Create and crimson Join, whose edge is #9a0c24."
       },
       {
         "name": "launch-pressed",
-        "value": "inset 0 -1px 0 #bc8d22, 0 1px 4px #04191d50",
-        "purpose": "Play contact depth; room inset uses #b6ad95."
+        "value": "inset 0 -1px 1px #bd7600, 0 1px 4px #04191d50",
+        "purpose": "Play contact depth; room controls use their own blue/crimson edge."
+      },
+      {
+        "name": "color-choice",
+        "value": "inset 0 2px 2px #ffffff40, inset 0 -4px 3px #00000028, 0 5px 10px #02071820",
+        "purpose": "Vivid native color-choice surfaces."
       }
     ],
     "motion": [
@@ -1090,12 +1247,12 @@
       },
       {
         "name": "play-flight",
-        "value": "190\u2013262ms cubic-bezier(.16,1,.3,1)",
+        "value": "190–262ms cubic-bezier(.16,1,.3,1)",
         "purpose": "Actual source center, width and composed rotation to the real endpoint; interrupts on a new snapshot."
       },
       {
         "name": "draw-flight",
-        "value": "190\u2013262ms cubic-bezier(.16,1,.3,1)",
+        "value": "190–262ms cubic-bezier(.16,1,.3,1)",
         "purpose": "Actual source center, width and composed rotation to the real endpoint; interrupts on a new snapshot."
       },
       {
@@ -1137,6 +1294,16 @@
         "name": "launch-press",
         "value": "130ms cubic-bezier(0.16, 1, 0.3, 1)",
         "purpose": "Home 2px hover lift and press feedback; reduced motion removes transitions and travel."
+      },
+      {
+        "name": "face-hover-tilt",
+        "value": "130ms cubic-bezier(0.16, 1, 0.3, 1); perspective(650px) rotateX(5deg) rotateY(-5deg)",
+        "purpose": "CSS only; fine hover pointer and no reduced-motion preference. Active contact settles immediately before source-pose capture."
+      },
+      {
+        "name": "laminate-glint",
+        "value": "180ms cubic-bezier(0.16, 1, 0.3, 1); opacity 130ms",
+        "purpose": "Bounded highlight from translateX(-35%) to translateX(18%) on hover; no loop or pointer tracking. Same fine-pointer/no-reduced-motion guard; active removes sheen."
       }
     ],
     "breakpoints": [
@@ -1209,7 +1376,7 @@
       "refersTo": "button-play-selected",
       "description": "Compact contextual actions within the shared felt; eligible UNO floats above the hand without a title/count toolbar. Draw remains on the physical deck.",
       "html": "<div class=\"ds-hand-controls\"><button class=\"ds-move ds-uno\">UNO!</button><div class=\"ds-dock\"><p class=\"ds-hint\" role=\"status\">Ready to play. You can also drag it onto the table.</p><div class=\"ds-moves\"><button class=\"ds-move ds-play\"><span>Play green Discard all</span><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M5 12h14m-6-6 6 6-6 6\"/></svg></button></div></div></div>",
-      "css": ".ds-hand-controls{position:relative;padding-top:56px;background:#245b49;color:#f1f4fa;font-family:var(--font-body,Outfit),sans-serif}.ds-dock{display:flex;align-items:center;justify-content:center;gap:12px;padding:0 20px;min-height:44px}.ds-hint{margin:0;max-width:55ch;min-width:0;color:#d4e4db;font-size:12px;line-height:1.3;text-align:center}.ds-moves{display:flex;max-width:60%;gap:8px}.ds-move{font-family:inherit;display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:44px;min-width:0;padding:7px 14px;border:1px solid transparent;border-radius:14px;font-size:14px;font-weight:800;line-height:1.25;cursor:pointer;transition:transform 120ms cubic-bezier(.2,.8,.2,1),box-shadow 120ms}.ds-play{background:#d8ed82;color:#202b12;box-shadow:inset 0 -4px 0 #15292626,0 5px 9px #15292620}.ds-uno{position:absolute;right:18px;top:0;background:#f7c934;color:#332810}.ds-move:hover{filter:brightness(1.07)}.ds-move:focus-visible{outline:2px solid #d8ed82;outline-offset:4px}.ds-move:active{transform:translateY(3px);box-shadow:inset 0 -1px 0 #15292626,0 1px 3px #15292620}@media(prefers-reduced-motion:reduce){.ds-move{transition:none}.ds-move:active{transform:none}}"
+      "css": ".ds-hand-controls{position:relative;padding-top:56px;background:#047c53;color:#f1f4fa;font-family:var(--font-body,Outfit),sans-serif}.ds-dock{display:flex;align-items:center;justify-content:center;gap:12px;padding:0 20px;min-height:44px}.ds-hint{margin:0;max-width:55ch;min-width:0;color:#d4e4db;font-size:12px;line-height:1.3;text-align:center}.ds-moves{display:flex;max-width:60%;gap:8px}.ds-move{font-family:inherit;display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:44px;min-width:0;padding:7px 14px;border:1px solid transparent;border-radius:14px;font-size:14px;font-weight:800;line-height:1.25;cursor:pointer;transition:transform 120ms cubic-bezier(.2,.8,.2,1),box-shadow 120ms}.ds-play{background:#ffd000;color:#392700;box-shadow:inset 0 -3px 2px #bd7600,0 4px 8px #02071860}.ds-uno{position:absolute;right:18px;top:0;background:#ffd000;color:#392700}.ds-move:hover{filter:brightness(1.07)}.ds-move:focus-visible{outline:2px solid #ffe329;outline-offset:4px}.ds-move:active{transform:translateY(3px);box-shadow:inset 0 -1px 0 #15292626,0 1px 3px #15292620}@media(prefers-reduced-motion:reduce){.ds-move{transition:none}.ds-move:active{transform:none}}"
     },
     {
       "name": "Text field",
@@ -1233,38 +1400,46 @@
       "refersTo": "launch-primary",
       "description": "Centered primary action starts saved bot play immediately.",
       "html": "<button class=\"ds-launch ds-launch-main\">Play with bots <svg width=\"23\" height=\"23\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M5 12h14m-6-6 6 6-6 6\"/></svg></button>",
-      "css": ".ds-launch{display:flex;align-items:center;justify-content:center;gap:14px;width:100%;min-height:54px;padding:14px 20px 16px;border:0;border-radius:6px;background:#f9f2df;color:#17333a;box-shadow:inset 0 -3px 0 #d0c7ae,0 4px 10px #04191d50;font-family:var(--font-body,Outfit),sans-serif;font-size:18px;font-weight:700;line-height:1.25;cursor:pointer;transition:transform 130ms cubic-bezier(.16,1,.3,1),background 130ms,box-shadow 130ms}.ds-launch:focus-visible{outline:3px solid #ffd64a;outline-offset:5px}.ds-launch:active:not(:disabled){transform:translateY(2px);box-shadow:inset 0 -1px 0 #b6ad95,0 1px 4px #04191d50}.ds-launch:disabled{opacity:.5;cursor:default}.ds-launch-main{min-height:64px;background:#ffd64a;box-shadow:inset 0 -4px 0 #bc8d22,0 6px 16px #04191d70;font-size:24px;font-weight:800}.ds-launch-main:focus-visible{outline-color:#f9f2df}.ds-launch-main:active:not(:disabled){box-shadow:inset 0 -1px 0 #bc8d22,0 1px 4px #04191d50}@media(hover:hover) and (pointer:fine){.ds-launch:hover:not(:disabled){transform:translateY(-2px);background:#fff9ea}.ds-launch-main:hover:not(:disabled){background:#ffe36c}.ds-launch:active:not(:disabled){transform:translateY(2px)}}@media(prefers-reduced-motion:reduce){.ds-launch{transition:none}.ds-launch:hover,.ds-launch:active:not(:disabled){transform:none}}"
+      "css": ".ds-launch{display:flex;align-items:center;justify-content:center;gap:14px;width:100%;min-height:54px;padding:14px 20px 16px;border:0;border-radius:6px;background:var(--action-fill,#1757df);color:var(--action-ink,#ffffff);box-shadow:inset 0 1px 2px #ffffff60,inset 0 -3px 2px var(--action-edge,#06339c),0 5px 10px #02071870;font-family:var(--font-body,Outfit),sans-serif;font-size:18px;font-weight:700;line-height:1.25;cursor:pointer;transition:transform 130ms cubic-bezier(.16,1,.3,1),background 130ms,box-shadow 130ms}.ds-launch:focus-visible{outline:3px solid #ffd64a;outline-offset:5px}.ds-launch:active:not(:disabled){transform:translateY(2px);box-shadow:inset 0 -1px 1px var(--action-edge,#06339c),0 1px 4px #04191d50}.ds-launch:disabled{opacity:.5;cursor:default}@media(hover:hover) and (pointer:fine){.ds-launch:hover:not(:disabled){transform:translateY(-2px);background:var(--action-hover,#2167f0)}.ds-launch:active:not(:disabled){transform:translateY(2px)}}@media(prefers-reduced-motion:reduce){.ds-launch{transition:none}.ds-launch:hover,.ds-launch:active:not(:disabled){transform:none}}.ds-launch-main{--action-fill:#ffd000;--action-ink:#392700;--action-edge:#bd7600;min-height:64px;box-shadow:inset 0 2px 2px #ffffff70,inset 0 -4px 2px #bd7600,0 6px 16px #04191d70;font-size:24px;font-weight:800}.ds-launch-main:focus-visible{outline-color:#f9f2df}.ds-launch-main:active:not(:disabled){box-shadow:inset 0 -1px 1px #bd7600,0 1px 4px #04191d50}@media(hover:hover) and (pointer:fine){.ds-launch-main:hover:not(:disabled){background:#ffdf26}}"
     },
     {
-      "name": "Home room actions",
+      "name": "Home Create",
       "kind": "button",
-      "refersTo": "launch-secondary",
-      "description": "Equal secondary actions follow the full-width Play control.",
-      "html": "<div class=\"ds-launch-online\"><button class=\"ds-launch\">Create a room</button><button class=\"ds-launch\">Join a room</button></div>",
-      "css": ".ds-launch-online{display:grid;grid-template-columns:1fr 1fr;gap:12px}.ds-launch{display:flex;align-items:center;justify-content:center;gap:14px;width:100%;min-height:54px;padding:14px 20px 16px;border:0;border-radius:6px;background:#f9f2df;color:#17333a;box-shadow:inset 0 -3px 0 #d0c7ae,0 4px 10px #04191d50;font-family:var(--font-body,Outfit),sans-serif;font-size:18px;font-weight:700;line-height:1.25;cursor:pointer;transition:transform 130ms cubic-bezier(.16,1,.3,1),background 130ms,box-shadow 130ms}.ds-launch:focus-visible{outline:3px solid #ffd64a;outline-offset:5px}.ds-launch:active:not(:disabled){transform:translateY(2px);box-shadow:inset 0 -1px 0 #b6ad95,0 1px 4px #04191d50}.ds-launch:disabled{opacity:.5;cursor:default}@media(hover:hover) and (pointer:fine){.ds-launch:hover:not(:disabled){transform:translateY(-2px);background:#fff9ea}.ds-launch-main:hover:not(:disabled){background:#ffe36c}.ds-launch:active:not(:disabled){transform:translateY(2px)}}@media(prefers-reduced-motion:reduce){.ds-launch{transition:none}.ds-launch:hover,.ds-launch:active:not(:disabled){transform:none}}"
+      "refersTo": "launch-create",
+      "description": "Blue room creation action, equal in size to Join, following centered Play.",
+      "html": "<button class=\"ds-launch\">Create a room</button>",
+      "css": ".ds-launch{display:flex;align-items:center;justify-content:center;gap:14px;width:100%;min-height:54px;padding:14px 20px 16px;border:0;border-radius:6px;background:var(--action-fill,#1757df);color:var(--action-ink,#ffffff);box-shadow:inset 0 1px 2px #ffffff60,inset 0 -3px 2px var(--action-edge,#06339c),0 5px 10px #02071870;font-family:var(--font-body,Outfit),sans-serif;font-size:18px;font-weight:700;line-height:1.25;cursor:pointer;transition:transform 130ms cubic-bezier(.16,1,.3,1),background 130ms,box-shadow 130ms}.ds-launch:focus-visible{outline:3px solid #ffd64a;outline-offset:5px}.ds-launch:active:not(:disabled){transform:translateY(2px);box-shadow:inset 0 -1px 1px var(--action-edge,#06339c),0 1px 4px #04191d50}.ds-launch:disabled{opacity:.5;cursor:default}@media(hover:hover) and (pointer:fine){.ds-launch:hover:not(:disabled){transform:translateY(-2px);background:var(--action-hover,#2167f0)}.ds-launch:active:not(:disabled){transform:translateY(2px)}}@media(prefers-reduced-motion:reduce){.ds-launch{transition:none}.ds-launch:hover,.ds-launch:active:not(:disabled){transform:none}}"
+    },
+    {
+      "name": "Home Join",
+      "kind": "button",
+      "refersTo": "launch-join",
+      "description": "Crimson room joining action, equal in size to Create.",
+      "html": "<button class=\"ds-launch ds-join\">Join a room</button>",
+      "css": ".ds-launch{display:flex;align-items:center;justify-content:center;gap:14px;width:100%;min-height:54px;padding:14px 20px 16px;border:0;border-radius:6px;background:var(--action-fill,#1757df);color:var(--action-ink,#ffffff);box-shadow:inset 0 1px 2px #ffffff60,inset 0 -3px 2px var(--action-edge,#06339c),0 5px 10px #02071870;font-family:var(--font-body,Outfit),sans-serif;font-size:18px;font-weight:700;line-height:1.25;cursor:pointer;transition:transform 130ms cubic-bezier(.16,1,.3,1),background 130ms,box-shadow 130ms}.ds-launch:focus-visible{outline:3px solid #ffd64a;outline-offset:5px}.ds-launch:active:not(:disabled){transform:translateY(2px);box-shadow:inset 0 -1px 1px var(--action-edge,#06339c),0 1px 4px #04191d50}.ds-launch:disabled{opacity:.5;cursor:default}@media(hover:hover) and (pointer:fine){.ds-launch:hover:not(:disabled){transform:translateY(-2px);background:var(--action-hover,#2167f0)}.ds-launch:active:not(:disabled){transform:translateY(2px)}}@media(prefers-reduced-motion:reduce){.ds-launch{transition:none}.ds-launch:hover,.ds-launch:active:not(:disabled){transform:none}}.ds-join{--action-fill:#e71c3b;--action-edge:#9a0c24;--action-hover:#da0d31}"
     },
     {
       "name": "Active seat and turn cue",
       "kind": "chip",
       "refersTo": "opponent-badge-active",
-      "description": "Compact lime active-seat identity and named active color. Perimeter lanes clear the center decks; short landscape places status left of piles. Direction and next player are written in the game menu.",
-      "html": "<div class=\"ds-status\"><span class=\"ds-seat\"><span><strong>Alex</strong><small>4 cards</small></span><i aria-hidden=\"true\"></i></span><div class=\"ds-cue\"><span class=\"ds-cue-dot\" aria-hidden=\"true\"></span><h1>Alex\u2019s turn</h1><span class=\"ds-active-color\" aria-label=\"Active color: red\"><i aria-hidden=\"true\"></i><span>red</span></span></div></div>",
-      "css": ".ds-seat{font-family:var(--font-body,Outfit),sans-serif;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:5px 8px;max-width:112px;border-radius:7px;background:#d8ed82;color:#172130}.ds-seat strong{display:block;font-size:12px;font-weight:500}.ds-seat small{display:block;font-size:11px;color:#3f5023}.ds-seat i{width:5px;height:5px;border-radius:50%;background:#3f5023}.ds-status{position:relative;min-height:120px;padding:12px;background:#101c1c;font-family:var(--font-body,Outfit),sans-serif}.ds-cue{position:absolute;bottom:-4px;left:50%;transform:translateX(-50%);min-height:32px;display:flex;align-items:center;justify-content:center;gap:9px;text-align:center;width:max-content;max-width:calc(100% - 24px);flex-wrap:nowrap;padding:0 8px;color:#b1bfd2}.ds-cue h1{margin:0;min-width:0;overflow-wrap:anywhere;font-size:17px;font-weight:500;letter-spacing:-.02em;line-height:1.5}.ds-cue-dot{width:6px;height:6px;border-radius:50%;background:currentColor}.ds-active-color{display:inline-flex;align-items:center;gap:7px;margin-left:7px;font-size:12px;font-weight:400;color:#b1bfd2;text-transform:capitalize;white-space:nowrap}.ds-active-color i{width:10px;height:10px;border-radius:50%;background:#ff727a;border:1px solid #ffffff70}"
+      "description": "Bright yellow active identity and written active color. Below 361px landscape height, 28px identities hide avatars and use inline SVG card counts; semantic pile labels remain available.",
+      "html": "<div class=\"ds-status\"><span class=\"ds-seat\"><span><strong>Alex</strong><small><svg class=\"ds-count-icon\" width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z\"/><path d=\"M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12\"/><path d=\"M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17\"/></svg><span>4</span><span class=\"ds-count-word\"> cards</span></small></span><i aria-hidden=\"true\"></i></span><div class=\"ds-cue\"><span class=\"ds-cue-dot\" aria-hidden=\"true\"></span><h1>Alex’s turn</h1><span class=\"ds-active-color\" aria-label=\"Active color: red\"><i aria-hidden=\"true\"></i><span>red</span></span></div></div>",
+      "css": ".ds-seat{font-family:var(--font-body,Outfit),sans-serif;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:5px 8px;max-width:112px;border-radius:7px;background:#ffe329;color:#211c00}.ds-seat strong{display:block;font-size:12px;font-weight:500}.ds-seat small{display:block;font-size:11px;color:#514100}.ds-seat i{width:5px;height:5px;border-radius:50%;background:#514100}.ds-status{position:relative;min-height:120px;padding:12px;background:#101a31;font-family:var(--font-body,Outfit),sans-serif}.ds-cue{position:absolute;bottom:-4px;left:50%;transform:translateX(-50%);min-height:32px;display:flex;align-items:center;justify-content:center;gap:9px;text-align:center;width:max-content;max-width:calc(100% - 24px);flex-wrap:nowrap;padding:0 8px;color:#b1bfd2}.ds-cue h1{margin:0;min-width:0;overflow-wrap:anywhere;font-size:17px;font-weight:500;letter-spacing:-.02em;line-height:1.5}.ds-cue-dot{width:6px;height:6px;border-radius:50%;background:currentColor}.ds-active-color{display:inline-flex;align-items:center;gap:7px;margin-left:7px;font-size:12px;font-weight:400;color:#b1bfd2;text-transform:capitalize;white-space:nowrap}.ds-active-color i{width:10px;height:10px;border-radius:50%;background:#ff727a;border:1px solid #ffffff70}@media(max-height:360px) and (min-width:541px){.ds-seat{min-height:28px;padding:4px 8px}.ds-seat>span{display:flex;align-items:center;gap:5px}.ds-seat strong{max-width:48px;font-size:11px}.ds-seat small{font-size:10px;flex-shrink:0}}.ds-count-icon{display:none}@media(max-height:360px) and (min-width:541px){.ds-seat small{display:inline-flex;align-items:center;gap:3px}.ds-count-word{display:none}.ds-count-icon{display:block}}"
     },
     {
       "name": "UNO card",
       "kind": "card",
       "refersTo": "uno-card",
-      "description": "Shared ivory-edged face with a cream diagonal ellipse and tightly rounded scaled corners. Legal faces play on first activation; this static specimen shows native deck art.",
-      "html": "<div class=\"ds-card\" role=\"img\" aria-label=\"Red nine\"><span class=\"ds-index ds-top\">9</span><span class=\"ds-orbit\"></span><span class=\"ds-value\">9</span><span class=\"ds-index ds-bottom\">9</span></div>",
-      "css": ".ds-card{box-sizing:border-box;position:relative;isolation:isolate;display:inline-block;width:82px;height:122px;overflow:hidden;border:3px solid #fffdf5;border-radius:6px;background:#e73442;color:#fffdf5;font-family:var(--font-card,\"Barlow Condensed\"),sans-serif;box-shadow:inset 0 1px 1px #ffffff60,0 5px 10px #03090870;user-select:none}.ds-orbit{position:absolute;width:116%;height:64%;left:-8%;top:18%;background:#fffdf5;border-radius:50%;transform:rotate(-34deg)}.ds-index{position:absolute;z-index:2;display:grid;place-items:center;min-width:19px;height:22px;font-size:19px;font-weight:800;font-style:italic;line-height:1}.ds-top{top:3px;left:3px}.ds-bottom{bottom:3px;right:3px;transform:rotate(180deg)}.ds-value{position:absolute;inset:16% 0;display:flex;align-items:center;justify-content:center;color:#e73442;font-size:70px;font-weight:800;font-style:italic;letter-spacing:-.03em;line-height:1;transform:rotate(-10deg)}"
+      "description": "White laminated native face and full-color Wild+4 fan. Shared scoped finish travels with flight clones. Fine-pointer hover tilts the face; active contact settles before gesture geometry. Reduced motion preserves static material.",
+      "html": "<div class=\"ds-cards\"><button type=\"button\" class=\"ds-card\" aria-label=\"Play red nine\"><span class=\"ds-index ds-top\">9</span><span class=\"ds-orbit\" aria-hidden=\"true\"></span><span class=\"ds-value\">9</span><span class=\"ds-index ds-bottom\">9</span><span class=\"ds-finish\" aria-hidden=\"true\"></span></button><div class=\"ds-card ds-wild\" role=\"img\" aria-label=\"Wild draw four\"><span class=\"ds-index ds-top\">+4</span><span class=\"ds-orbit\" aria-hidden=\"true\"></span><span class=\"ds-value\"><span class=\"ds-four\" aria-hidden=\"true\"><i></i><i></i><i></i><i></i></span></span><span class=\"ds-index ds-bottom\">+4</span><span class=\"ds-finish\" aria-hidden=\"true\"></span></div></div>",
+      "css": ".ds-cards{display:flex;gap:18px;padding:20px}.ds-card{box-sizing:border-box;--card-color:#df0735;--card-ink:#ffffff;--card-value-ink:var(--card-color);position:relative;isolation:isolate;display:inline-block;width:82px;height:122px;overflow:hidden;padding:0;border:3px solid #ffffff;border-radius:6px;background:linear-gradient(145deg,#ffffff12,transparent 45%,#00000012),var(--card-color);color:var(--card-ink);font-family:var(--font-card,\"Barlow Condensed\"),sans-serif;box-shadow:inset 0 1px 2px #ffffffb0,inset 0 -1px 1px #17234145,0 1px 1px #c4ccdf,0 3px 1px #68748e,0 8px 12px #02071880;backface-visibility:hidden;transform:perspective(650px) rotateX(0deg) rotateY(0deg);transition:transform 130ms cubic-bezier(.16,1,.3,1);user-select:none}.ds-card:focus-visible{outline:2px solid #ffe329;outline-offset:4px}.ds-wild{--card-color:#101d3a}.ds-orbit{position:absolute;width:116%;height:64%;left:-8%;top:18%;background:#ffffff;border-radius:50%;transform:rotate(-34deg);box-shadow:0 1px 3px #06123024}.ds-index{position:absolute;z-index:2;display:grid;place-items:center;min-width:19px;height:22px;font-size:19px;font-weight:800;font-style:italic;line-height:1;color:var(--card-ink)}.ds-top{top:3px;left:3px}.ds-bottom{bottom:3px;right:3px;transform:rotate(180deg)}.ds-value{position:absolute;inset:16% 0;display:flex;align-items:center;justify-content:center;color:var(--card-value-ink);font-size:70px;font-weight:800;font-style:italic;letter-spacing:-.03em;line-height:1;transform:rotate(-10deg)}.ds-finish{position:absolute;inset:18% 0;z-index:4;border-radius:inherit;pointer-events:none;background:linear-gradient(115deg,transparent 32%,#ffffff35 50%,transparent 68%);transform:translateX(-35%);opacity:0;transition:transform 180ms cubic-bezier(.16,1,.3,1),opacity 130ms}.ds-four{position:relative;width:76%;height:66%;transform:rotate(8deg)}.ds-four i{box-sizing:border-box;position:absolute;top:8%;left:2%;width:42%;height:77%;border:2px solid #ffffff;border-radius:3px;box-shadow:-1px 3px 4px #06123050;transform:rotate(-22deg);transform-origin:50% 100%;background:#df0735}.ds-four i:nth-child(2){left:20%;top:2%;transform:rotate(-8deg);background:#075bee}.ds-four i:nth-child(3){left:38%;top:4%;transform:rotate(8deg);background:#ffce00}.ds-four i:nth-child(4){left:56%;top:12%;transform:rotate(22deg);background:#00bc68}@media(hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference){.ds-card:hover{transform:perspective(650px) rotateX(5deg) rotateY(-5deg)}.ds-card:hover .ds-finish{transform:translateX(18%);opacity:1}.ds-card:active{transform:perspective(650px) rotateX(0deg) rotateY(0deg);transition:none}.ds-card:active .ds-finish{opacity:0;transition:none}}@media(prefers-reduced-motion:reduce){.ds-card,.ds-finish{transition:none}}"
     },
     {
       "name": "Material table",
       "kind": "custom",
-      "description": "One baize and padded-leather boundary behind opponents, piles and the local hand; arena.css owns geometry after table.css.",
-      "html": "<div class=\"ds-table\" role=\"img\" aria-label=\"Deep green baize inside a dark leather rail\"></div>",
-      "css": ".ds-table{position:relative;min-height:220px;border-radius:100px;background:#172a28 url(\"/textures/padded-leather.jpg\") center/340px;background-blend-mode:soft-light;box-shadow:inset 0 2px 3px #b9d3c036,0 18px 38px #020a0966}.ds-table::before{content:\"\";position:absolute;inset:12px;border-radius:inherit;background:#245b49 url(\"/textures/green-baize.jpg\") center/560px;background-blend-mode:soft-light;box-shadow:inset 0 5px 12px #061e2160}.ds-table::after{content:\"\";position:absolute;inset:24px;border:1px solid #c6d7bd38;border-radius:inherit}@media(max-height:460px) and (min-width:541px){.ds-table{border-radius:55px}}"
+      "description": "Existing baize/leather rasters graded rich green and navy. One boundary remains behind all play, with root overflow:clip and native horizontal hand scrolling.",
+      "html": "<div class=\"ds-table\" role=\"img\" aria-label=\"Rich green baize inside a navy leather rail\"></div>",
+      "css": ".ds-table{position:relative;min-height:220px;border-radius:100px;background:#101a31 url(\"/textures/padded-leather.jpg\") center/340px;background-blend-mode:soft-light;box-shadow:inset 0 2px 3px #b5d2ff50,inset 0 -6px 10px #020617a0,0 6px 2px #020718,0 16px 24px #02071890}.ds-table::before{content:\"\";position:absolute;inset:12px;border-radius:inherit;background:#047c53 url(\"/textures/green-baize.jpg\") center/560px;background-blend-mode:soft-light;box-shadow:inset 0 5px 14px #00271980}.ds-table::after{content:\"\";position:absolute;inset:24px;border:1px solid #94e8ba50;border-radius:inherit}@media(max-height:460px) and (min-width:541px){.ds-table{border-radius:55px}}"
     },
     {
       "name": "Earned round and milestone collection",
@@ -1280,17 +1455,25 @@
       "refersTo": "player-character",
       "description": "Small native card characters express published player state in seat badges and results; reactions restart only on expression change. Home uses a separate flat transparent narrative scene.",
       "html": "<span class=\"ds-avatar\" data-expression=\"happy\" aria-hidden=\"true\"><span class=\"ds-eyes\"><i></i><i></i></span><span class=\"ds-smile\"></span></span>",
-      "css": ".ds-avatar{--avatar-color:#ef755d;position:relative;display:inline-flex;width:33px;height:41px;flex-shrink:0;background:var(--avatar-color);border:2px solid #323139;border-radius:8px;box-shadow:1px 3px 6px #32313938;transform:rotate(-8deg)}.ds-eyes{position:absolute;top:33%;left:22%;right:22%;height:16%;display:flex;justify-content:space-between}.ds-eyes i{width:24%;height:100%;border-radius:50%;background:#323139}.ds-smile{position:absolute;left:35%;top:56%;width:32%;height:15%;border:2px solid #323139;border-top:0;border-radius:0 0 10px 10px}.ds-avatar[data-expression=\"thinking\"] .ds-eyes{transform:translateX(8%)}.ds-avatar[data-expression=\"thinking\"] .ds-eyes i:first-child{transform:translateY(-25%)}.ds-avatar[data-expression=\"thinking\"] .ds-smile{width:23%;left:44%;height:7%;transform:rotate(-12deg)}.ds-avatar[data-expression=\"happy\"] .ds-smile,.ds-avatar[data-expression=\"celebrate\"] .ds-smile{width:40%;height:23%;left:30%;top:54%;background:#323139}.ds-avatar[data-expression=\"surprised\"] .ds-smile{width:21%;height:23%;left:40%;top:57%;border-radius:50%;border-top:2px solid #323139}.ds-avatar[data-expression=\"surprised\"] .ds-eyes{top:25%;height:23%}.ds-avatar[data-expression=\"celebrate\"] .ds-eyes i{background:none;border:2px solid #323139;border-bottom:0;border-radius:50% 50% 0 0;transform:translateY(-10%)}@media(prefers-reduced-motion:no-preference){.ds-avatar:not([data-expression=\"neutral\"]){animation:ds-player-react 260ms var(--ease-out,cubic-bezier(.2,.8,.2,1)) both}@keyframes ds-player-react{0%{transform:rotate(-5deg) scale(.9)}55%{transform:rotate(3deg) scale(1.08)}100%{transform:rotate(-5deg) scale(1)}}}"
+      "css": ".ds-avatar{--avatar-color:#ff6942;position:relative;display:inline-flex;width:33px;height:41px;flex-shrink:0;background:var(--avatar-color);border:2px solid #323139;border-radius:8px;box-shadow:inset 0 1px 1px #ffffffa0,0 3px 3px #02071870;transform:rotate(-8deg)}.ds-eyes{position:absolute;top:33%;left:22%;right:22%;height:16%;display:flex;justify-content:space-between}.ds-eyes i{width:24%;height:100%;border-radius:50%;background:#323139}.ds-smile{position:absolute;left:35%;top:56%;width:32%;height:15%;border:2px solid #323139;border-top:0;border-radius:0 0 10px 10px}.ds-avatar[data-expression=\"thinking\"] .ds-eyes{transform:translateX(8%)}.ds-avatar[data-expression=\"thinking\"] .ds-eyes i:first-child{transform:translateY(-25%)}.ds-avatar[data-expression=\"thinking\"] .ds-smile{width:23%;left:44%;height:7%;transform:rotate(-12deg)}.ds-avatar[data-expression=\"happy\"] .ds-smile,.ds-avatar[data-expression=\"celebrate\"] .ds-smile{width:40%;height:23%;left:30%;top:54%;background:#323139}.ds-avatar[data-expression=\"surprised\"] .ds-smile{width:21%;height:23%;left:40%;top:57%;border-radius:50%;border-top:2px solid #323139}.ds-avatar[data-expression=\"surprised\"] .ds-eyes{top:25%;height:23%}.ds-avatar[data-expression=\"celebrate\"] .ds-eyes i{background:none;border:2px solid #323139;border-bottom:0;border-radius:50% 50% 0 0;transform:translateY(-10%)}@media(prefers-reduced-motion:no-preference){.ds-avatar:not([data-expression=\"neutral\"]){animation:ds-player-react 260ms var(--ease-out,cubic-bezier(.2,.8,.2,1)) both}@keyframes ds-player-react{0%{transform:rotate(-5deg) scale(.9)}55%{transform:rotate(3deg) scale(1.08)}100%{transform:rotate(-5deg) scale(1)}}}"
+    },
+    {
+      "name": "Native wild color choices",
+      "kind": "button",
+      "refersTo": "color-choice-red",
+      "description": "Four named vivid native choices preserve explicit color labels and contrasting white/dark inks.",
+      "html": "<div class=\"ds-choices\"><button class=\"ds-choice ds-red\">Red</button><button class=\"ds-choice ds-blue\">Blue</button><button class=\"ds-choice ds-green\">Green</button><button class=\"ds-choice ds-yellow\">Yellow</button></div>",
+      "css": ".ds-choices{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.ds-choice{min-height:88px;border:0;display:flex;align-items:center;justify-content:center;gap:10px;text-transform:capitalize;border-radius:6px;font-family:var(--font-body,Outfit),sans-serif;font-size:15px;font-weight:600;cursor:pointer;box-shadow:inset 0 2px 2px #ffffff40,inset 0 -4px 3px #00000028,0 5px 10px #02071820;transition:transform 120ms cubic-bezier(.2,.8,.2,1),box-shadow 120ms}.ds-red{background:#e71c3b;color:#ffffff}.ds-blue{background:#095be5;color:#ffffff}.ds-green{background:#008749;color:#ffffff}.ds-yellow{background:#ffd000;color:#392700}.ds-choice:focus-visible{outline:2px solid var(--ui-accent-blue,#3265a0);outline-offset:4px}.ds-choice:active{transform:translateY(3px);box-shadow:inset 0 -1px 0 #15292626,0 1px 3px #15292620}"
     }
   ],
   "narrative": {
     "northStar": "The after-hours card table",
-    "overview": "UNO feels like a held hand of real cards on one shared after-hours table contained in the viewport. Deep green baize, a dark padded leather rail, vivid faces and ivory stock establish the material world. Cards are the controls: a legal face plays on its first activation; the foreground fan makes pickup and deliberate upward release tangible.\n\nHome is a centered illustrated after-hours card club: a flat, transparent cut-out of an original rabbit, red panda and crocodile sits directly on deep teal, with yellow Play in the foreground and ivory room actions beside one another. Settings and setup retain theme-aware supporting surfaces. Live play retains its fixed green-black baize/leather palette and lime turn feedback. Outfit UI and Barlow Condensed card lettering remain the two pinned families. Small native card characters continue to express live player state; the home scene has its own authored narrative rather than floating card-face stickers.",
+    "overview": "UNO feels like a held hand of real cards on one shared after-hours table contained in the viewport. Rich green baize, a navy padded leather rail, saturated printed faces and pure white stock establish the material world. Cards are the controls: a legal face plays on its first activation; the foreground fan makes pickup and deliberate upward release tangible.\n\nHome is a centered illustrated after-hours card club: a flat, transparent cut-out of an original rabbit, red panda and crocodile sits directly on navy, with yellow Play in the foreground and full-color blue Create and crimson Join actions beside one another. Settings and setup retain theme-aware supporting surfaces. Live play retains its fixed baize/leather materials with a navy rail and bright yellow turn feedback. Outfit UI and Barlow Condensed card lettering remain the two pinned families. Small native card characters continue to express live player state; the home scene has its own authored narrative rather than floating card-face stickers.",
     "keyCharacteristics": [
       "A centered flat illustrated card-club welcome with complete silhouettes and visibly primary Play.",
       "One shared native card face across the live hand, piles and motion.",
       "Outfit interface lettering paired with Barlow Condensed card numerals.",
-      "Fixed deep teal home, warm themed settings/setup and a fixed baize-and-leather live table.",
+      "Fixed navy home, warm themed settings/setup and a fixed rich-green baize-and-navy-leather live table.",
       "First-activation legal play, nonmatching-card inspection and deliberate upward release.",
       "One viewport-contained felt, bounded horizontal hand scrolling, contextual controls and paper/contact feedback that never delays a turn.",
       "Real round outcomes and optional device-local milestone cards.",
@@ -1299,7 +1482,7 @@
     "rules": [
       {
         "name": "The Scoped Worlds Rule",
-        "body": "Keep home in its fixed teal/ivory/yellow club palette, honor appearance variables in settings and setup, and scope baize/leather with lime to live play. The native deck remains stable across appearances.",
+        "body": "Keep home in its fixed navy/ivory/full-color club palette, honor appearance variables in settings and setup, and scope rich baize/navy leather with yellow feedback to live play. The native deck remains stable across appearances.",
         "section": "colors"
       },
       {
@@ -1314,12 +1497,17 @@
       },
       {
         "name": "The Paper Lift Rule",
-        "body": "A moving or inspected card changes its own depth and reveals its face. Keep unrelated chrome quiet and reserve hard stacked edges for actual piles.",
+        "body": "A moving or inspected card changes its own depth and reveals its face. Keep unrelated chrome quiet and reserve short stock layers for physical cards, piles and the table rail.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Contact Before Flight Rule",
+        "body": "Settle hover tilt on contact before capturing drag or flight geometry; preserve readable static color, edge and focus when spatial motion is disabled.",
         "section": "elevation"
       },
       {
         "name": "The Central Play Rule",
-        "body": "Keep Play on the home\u2019s center axis ahead of room actions and secondary help; preserve the complete flat transparent scene and real, immediately available controls.",
+        "body": "Keep Play on the home’s center axis ahead of room actions and secondary help; preserve the complete flat transparent scene and real, immediately available controls.",
         "section": "components"
       },
       {
@@ -1346,16 +1534,16 @@
     "dos": [
       "Do use the same authored native face for the hand, piles and card motion.",
       "Do keep home Play central, Create/Join paired, sharper 6px action corners and complete flat transparent silhouettes with their prompt provenance.",
-      "Do preserve stable deck colors and the written active-color label.",
+      "Do preserve vivid deck colors, white faces, distinct dark green/yellow index and center inks, and the written active-color label.",
       "Do retain the fixed home club palette, scoped baize-and-leather table and theme-aware settings/setup.",
       "Do keep one viewport-contained felt beneath opponents, piles and local cards, with lift/focus clearance and independent horizontal large-hand scrolling.",
       "Do retain distinct six-seat landscape identities and the portrait rotate gate, local pause and online-continuation disclosure.",
       "Do play legal cards on first activation and keep nonmatching inspection, turn state and situational actions clear with touch and keyboard.",
-      "Do keep the full named Play action, selected card and current hint in agreement; retain dark ink on lime.",
+      "Do keep the full named Play action, selected card and current hint in agreement; retain dark ink on yellow.",
       "Do reveal actual new local draws without selecting them and preserve horizontal position on unrelated updates.",
       "Do keep Draw on the deck, eligible UNO at hand level, and the dock limited to contextual Pass and the pre-inspected-card Play fallback; give button and keyboard the same availability rules.",
       "Do put Set up bots and How to play after Play/Create/Join, and keep optional bot/friend details in disclosures.",
-      "Do honor reduced motion, mute, audio readiness and interrupted gesture cleanup.",
+      "Do keep face tilt and sheen within fine-pointer/no-reduced-motion guards, settle on contact before gesture capture, and honor mute, audio readiness and interrupted gesture cleanup.",
       "Do keep presentation responsive to the current published state without delaying play.",
       "Do derive optional milestone cards from completed device-local rounds and keep result actions reachable inside the native dialog.",
       "Do attach pressure cues to their actual opponent hand or penalty deck and retain full accessible names.",
@@ -1370,7 +1558,7 @@
       "Don't crop the flat home silhouettes or restore cinematic scenery and a boxed or patched background.",
       "Don't show UNO when ineligible, duplicate Draw in the dock or turn sorting into a permanent table control.",
       "Don't use Unicode glyph icons in place of the established SVG icon system.",
-      "Don't give general controls hard offset block shadows; physical deck edges are the intentional exception.",
+      "Don't give information containers decorative block shadows; thin stock edges, the leather rail and pressed control bevels remain native to this physical world.",
       "Don't queue narration, wait for sound or animation, or add a blocking splash.",
       "Don't copy a reference mascot, add idle character loops or replay reactions on unrelated snapshots.",
       "Don't infer points or finishing ranks from cards left, grant rewards per click, or claim a milestone is new without before/after evidence."

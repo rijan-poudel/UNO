@@ -6,7 +6,7 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow: clip;
   --hand-scale: 1.28;
   --pile-scale: 1.16;
 }
@@ -536,5 +536,176 @@
   }
   .game-main .hand-card {
     margin-left: -18px;
+  }
+}
+
+/* Saturated arcade materials. These change finish, never arena geometry. */
+.game-page {
+  --turn-accent: #ffe329;
+  --ui-accent-red: #ff5268;
+  background: radial-gradient(ellipse at 50% 20%, #153a51, #080f24 80%);
+}
+.game-main > .table-boundary {
+  background-color: #101a31;
+  box-shadow:
+    inset 0 2px 3px #b5d2ff50,
+    inset 0 -6px 10px #020617a0,
+    0 6px 2px #020718,
+    0 16px 24px #02071890;
+}
+.game-main > .table-boundary::before {
+  background-color: #047c53;
+  box-shadow: inset 0 5px 14px #00271980;
+}
+.game-main > .table-boundary::after {
+  border-color: #94e8ba50;
+}
+.game-main .hand-card .uno-card,
+.game-main .discard-pile .uno-card {
+  box-shadow: var(--card-elevation);
+}
+.game-main .hand-card:is(:hover, :focus-within, .inspected-card) .uno-card {
+  box-shadow:
+    inset 0 1px 2px #ffffffb0,
+    0 1px 1px #c4ccdf,
+    0 3px 1px #68748e,
+    -3px 15px 20px #02071899;
+}
+.game-main .draw-pile .uno-card {
+  box-shadow:
+    inset 0 1px 2px #ffffffb0,
+    1px 3px 1px #d5dcec,
+    3px 6px 1px #7d8ba8,
+    4px 10px 1px #35435e,
+    4px 16px 15px #02071899;
+}
+.game-main .quiet-card .uno-card {
+  filter: none;
+}
+.game-main .opponent-label {
+  background: #102138;
+  box-shadow:
+    inset 0 1px 1px #8db9ff30,
+    0 3px 6px #02071850;
+}
+.game-main .active-seat .opponent-label {
+  background: #ffe329;
+  color: #211c00;
+}
+.game-main .active-seat .opponent-label small {
+  color: #514100;
+}
+.game-main .active-seat .turn-marker {
+  background: #514100;
+}
+.game-main .turn-cue.active,
+.game-main .draw-available,
+.game-header .wordmark span {
+  color: #ffe329;
+}
+.game-main .last-card-stamp,
+.game-main .catch-button,
+.game-main .hand-uno.uno-button,
+.game-page .button.primary.play-selected {
+  background: #ffd000;
+  color: #392700 !important;
+  box-shadow:
+    inset 0 -3px 2px #bd7600,
+    0 4px 8px #02071860;
+}
+.game-main .player-avatar {
+  box-shadow:
+    inset 0 1px 1px #ffffffa0,
+    0 3px 3px #02071870;
+}
+/* Native color selection is printed in the same four vivid inks. */
+.color-choice.choose-red {
+  background: #e71c3b;
+  color: #ffffff;
+}
+.color-choice.choose-blue {
+  background: #095be5;
+  color: #ffffff;
+}
+.color-choice.choose-green {
+  background: #008749;
+  color: #ffffff;
+}
+.color-choice.choose-yellow {
+  background: #ffd000;
+  color: #392700;
+}
+.color-choice {
+  border-radius: 6px;
+  box-shadow:
+    inset 0 2px 2px #ffffff40,
+    inset 0 -4px 3px #00000028,
+    0 5px 10px #02071820;
+}
+.rotate-phone {
+  background: #0b1d34;
+}
+.rotate-phone-art {
+  color: #ffe329;
+}
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .game-main .hand-card .uno-card {
+    transition:
+      transform 130ms cubic-bezier(0.16, 1, 0.3, 1),
+      box-shadow 130ms;
+  }
+  .game-main .hand-card .uno-card:active {
+    transition: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .game-main .hand-card .uno-card {
+    transition: none;
+  }
+}
+/* On the shortest landscape view, use one-line identities and let the
+   accessible pile names leave the visual row. The card faces and draw-count
+   chip then clear the center seat without taking space from the held hand. */
+@media (max-height: 360px) and (min-width: 541px) {
+  .game-main .opponent-label {
+    min-height: 28px;
+    padding: 4px 8px;
+  }
+  .game-main .opponent-label .player-avatar {
+    display: none;
+  }
+  .game-main .opponent-label > span:nth-child(2) {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .game-main .opponent-label strong {
+    max-width: 48px;
+    font-size: 11px;
+  }
+  .game-main .opponent-label small {
+    flex-shrink: 0;
+    font-size: 10px;
+  }
+  .game-main .count-word {
+    display: none;
+  }
+  .game-main .count-icon {
+    display: block;
+  }
+  .game-main .pile-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .game-main .deck-count {
+    top: 4px;
+  }
+  .game-main .turn-cue {
+    bottom: 15%;
   }
 }

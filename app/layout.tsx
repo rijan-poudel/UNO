@@ -58,6 +58,18 @@ export default function RootLayout({
           ends with the finish review, the verdict, DESIGN.md, and every
           shipping raster carrying its provenance
         </span>
+        <span hidden data-design-contract="vivid-card-depth">
+          THESIS: Vivid native cards with laminated edges and restrained pointer
+          tilt. OWN-WORLD: Saturated crimson, electric blue, emerald, golden
+          yellow, white print and navy leather over rich felt. STORY: Inspect,
+          tap or flick the actual face; motion never gates turns. FIRST
+          VIEWPORT: Shared table and landscape phone geometry stay; brighter
+          cards and deeper contact shadows carry the play experience. FORM:
+          Owner-directed material amplification, code-led extension of
+          seed2e1e4271. FINISH: unreviewed and undocumented is unfinished; this
+          build ends with the finish review, the verdict, DESIGN.md, and every
+          shipping raster carrying its provenance
+        </span>
         <span hidden data-design-contract="shared-table-viewport">
           THESIS: One shared table includes the local hand, contained in the
           window. OWN-WORLD: Native vivid cards on green baize and a dark
