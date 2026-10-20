@@ -1,14 +1,12 @@
-// Entry screen: the two ways to play, an actual card fan, and saved friends.
+// Game title screen: the picture sets the scene; playing owns the foreground.
 "use client";
 import { useState } from "react";
-import { ArrowRight, Check } from "lucide-react";
+import Image from "next/image";
+import { ArrowRight, ChevronDown } from "lucide-react";
 import type { FriendInvite } from "../../types/multiplayer";
-import type { CSSProperties } from "react";
-import UnoCard from "../UnoCard";
-import type { Card } from "../../types/card";
+import cardClubArt from "../../public/artwork/card-club.webp";
 import NotificationPanel from "../NotificationPanel";
 import PlayerProgress from "../PlayerProgress";
-import PlayerAvatar from "../PlayerAvatar";
 
 interface Props {
   themeLabel: string;
@@ -24,129 +22,80 @@ interface Props {
   onAcceptFriendInvite?: (id: string) => Promise<boolean>;
   onDeclineFriendInvite?: (id: string) => Promise<boolean>;
 }
+
 export default function HomeScreen(props: Props) {
   const [help, setHelp] = useState(false);
   return (
-    <div className="home-page">
-      <NotificationPanel
-        {...props}
-        incomingInviteCount={props.incomingInvites.length}
-      />
-      <main className="home-main">
-        <section className="home-hero">
-          <div className="home-copy">
-            <h1>
-              Small cards.
-              <br />
-              <span className="hero-color">Big rivalry.</span>
-            </h1>
-            <p>Bring your people. Bring your game face.</p>
-            <PlayerProgress />
-            <div className="play-choices">
-              <button
-                className="play-choice primary-choice"
-                onClick={props.onQuickPlay}
-              >
-                <span className="choice-art" aria-hidden="true">
-                  <PlayerAvatar seed="bot" expression="happy" />
-                  <span className="mini-card">7</span>
-                </span>
-                <span>
-                  <strong>Play with bots</strong>
-                  <small>Your saved table, ready to deal</small>
-                </span>
-                <ArrowRight />
-              </button>
-              <button
-                className="play-choice friends-choice"
-                onClick={props.onFriends}
-              >
-                <span className="choice-art" aria-hidden="true">
-                  <PlayerAvatar seed="friend" expression="happy" />
-                  <PlayerAvatar seed="pal" expression="celebrate" />
-                </span>
-                <span>
-                  <strong>Create a room</strong>
-                  <small>Your room. Your rules.</small>
-                </span>
-                <ArrowRight />
-              </button>
-            </div>
-            <div className="entry-shortcuts">
-              <button className="text-button" onClick={props.onComputer}>
-                Set up bots <ArrowRight size={16} />
-              </button>
-              <button className="text-button" onClick={props.onJoin}>
-                Join a room <ArrowRight size={16} />
-              </button>
-            </div>
+    <div
+      className="launch-screen"
+      data-design-contract="centered-home-2e1e4271"
+    >
+      <div className="launch-header">
+        <NotificationPanel
+          {...props}
+          incomingInviteCount={props.incomingInvites.length}
+        />
+      </div>
+      <main className="launch-main">
+        <div className="launch-heading">
+          <h1>Deal yourself in.</h1>
+          <p>Your table. Your rules.</p>
+        </div>
+        <figure className="launch-scene">
+          <Image
+            src={cardClubArt}
+            alt="A blue rabbit plays a reverse card while a red panda laughs and a crocodile guards its last card around their card-club table."
+            sizes="(max-width: 700px) 100vw, (max-width: 1250px) 880px, 960px"
+            unoptimized
+            preload
+          />
+        </figure>
+        <section className="launch-play" aria-label="Choose how to play">
+          <button
+            className="launch-action launch-action-main"
+            onClick={props.onQuickPlay}
+          >
+            Play with bots <ArrowRight size={23} aria-hidden="true" />
+          </button>
+          <div className="launch-online">
+            <button className="launch-action" onClick={props.onFriends}>
+              Create a room
+            </button>
+            <button className="launch-action" onClick={props.onJoin}>
+              Join a room
+            </button>
+          </div>
+          <div className="launch-extras">
+            <button className="launch-text-action" onClick={props.onComputer}>
+              Set up bots
+            </button>
             <button
-              className="text-button how-to"
+              className="launch-text-action"
               onClick={() => setHelp(!help)}
               aria-expanded={help}
+              aria-controls="launch-quick-rules"
             >
-              {help ? "Got it, let’s play" : "First time at the table?"}
-              <span>
-                {help ? <Check size={16} /> : <ArrowRight size={16} />}
-              </span>
+              How to play <ChevronDown size={16} aria-hidden="true" />
             </button>
-            {help && (
-              <div className="quick-rules">
-                <p>
-                  Match the top card’s <strong>color or number</strong>. No
-                  match? Draw a card. Wild cards let you choose the color.
-                </p>
-                <p>
-                  Call <strong>UNO</strong> when you have one card left. Empty
-                  your hand to win.
-                </p>
-              </div>
-            )}
           </div>
-          <div
-            className="home-art"
-            role="img"
-            aria-label="Two smiling card characters sharing a fan of red, blue, wild, green and yellow cards"
-          >
-            <div className="home-card-friend friend-left" aria-hidden="true">
-              <PlayerAvatar seed="friend" large expression="happy" />
+          {help && (
+            <div className="launch-rules" id="launch-quick-rules">
+              <p>
+                Match the top card’s <strong>color or number</strong>. No match?
+                Draw a card. Wild cards let you choose the color.
+              </p>
+              <p>
+                Call <strong>UNO</strong> when you have one card left. Empty
+                your hand to win.
+              </p>
             </div>
-            <div className="home-card-friend friend-right" aria-hidden="true">
-              <PlayerAvatar seed="pal" large expression="celebrate" />
-            </div>
-            {(
-              [
-                { color: "red", value: "7" },
-                { color: "blue", value: "reverse" },
-                { color: "wild", value: "wild4" },
-                { color: "green", value: "2" },
-                { color: "yellow", value: "9" },
-              ] as Pick<Card, "color" | "value">[]
-            ).map((card, i) => (
-              <span
-                className="home-deck-card"
-                key={card.color}
-                aria-hidden="true"
-                style={
-                  {
-                    "--preview-i": i - 2,
-                    "--preview-y": Math.abs(i - 2) ** 2 * 12 + "px",
-                  } as CSSProperties
-                }
-              >
-                <UnoCard
-                  card={{ ...card, id: `preview-${i}` }}
-                  sizeMultiplier={2.25}
-                />
-              </span>
-            ))}
-          </div>
+          )}
         </section>
+        <div className="launch-progress">
+          <PlayerProgress />
+        </div>
       </main>
-      <footer className="home-footer">
-        <span>Made for one more round.</span>
-        <span>No signup. Just shuffle.</span>
-      </footer>
+      <footer className="launch-footer">No signup. Just one more round.</footer>
     </div>
   );
 }

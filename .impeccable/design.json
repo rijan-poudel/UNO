@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-20T11:09:30Z",
-  "title": "Design System: UNO — Tactile table",
+  "generatedAt": "2026-10-20T13:37:12.448080+00:00",
+  "title": "Design System: UNO \u2014 Card club and tactile table",
   "extensions": {
     "colorMeta": {
       "ui-bg": {
@@ -679,36 +679,6 @@
           "oklch(95% 0.0130 82.40)"
         ]
       },
-      "play-yellow": {
-        "role": "primary",
-        "displayName": "Play Yellow",
-        "canonical": "#f1c95b",
-        "tonalRamp": [
-          "oklch(15% 0.1351 89.20)",
-          "oklch(26% 0.1351 89.20)",
-          "oklch(38% 0.1351 89.20)",
-          "oklch(49% 0.1351 89.20)",
-          "oklch(61% 0.1351 89.20)",
-          "oklch(72% 0.1351 89.20)",
-          "oklch(84% 0.1351 89.20)",
-          "oklch(95% 0.1351 89.20)"
-        ]
-      },
-      "play-green": {
-        "role": "primary",
-        "displayName": "Play Green",
-        "canonical": "#c9dcb4",
-        "tonalRamp": [
-          "oklch(15% 0.0575 128.27)",
-          "oklch(26% 0.0575 128.27)",
-          "oklch(38% 0.0575 128.27)",
-          "oklch(49% 0.0575 128.27)",
-          "oklch(61% 0.0575 128.27)",
-          "oklch(72% 0.0575 128.27)",
-          "oklch(84% 0.0575 128.27)",
-          "oklch(95% 0.0575 128.27)"
-        ]
-      },
       "avatar-red": {
         "role": "secondary",
         "displayName": "Avatar Red",
@@ -814,81 +784,6 @@
           "oklch(95% 0.0452 128.57)"
         ]
       },
-      "play-green-ink": {
-        "role": "neutral",
-        "displayName": "Room choice ink",
-        "canonical": "#2c3430",
-        "tonalRamp": [
-          "oklch(15% 0.0130 164.02)",
-          "oklch(26% 0.0130 164.02)",
-          "oklch(38% 0.0130 164.02)",
-          "oklch(49% 0.0130 164.02)",
-          "oklch(61% 0.0130 164.02)",
-          "oklch(72% 0.0130 164.02)",
-          "oklch(84% 0.0130 164.02)",
-          "oklch(95% 0.0130 164.02)"
-        ]
-      },
-      "play-green-muted": {
-        "role": "neutral",
-        "displayName": "Room choice supporting ink",
-        "canonical": "#4e5d47",
-        "tonalRamp": [
-          "oklch(15% 0.0394 135.78)",
-          "oklch(26% 0.0394 135.78)",
-          "oklch(38% 0.0394 135.78)",
-          "oklch(49% 0.0394 135.78)",
-          "oklch(61% 0.0394 135.78)",
-          "oklch(72% 0.0394 135.78)",
-          "oklch(84% 0.0394 135.78)",
-          "oklch(95% 0.0394 135.78)"
-        ]
-      },
-      "play-yellow-muted": {
-        "role": "neutral",
-        "displayName": "Bot choice supporting ink",
-        "canonical": "#655425",
-        "tonalRamp": [
-          "oklch(15% 0.0686 89.56)",
-          "oklch(26% 0.0686 89.56)",
-          "oklch(38% 0.0686 89.56)",
-          "oklch(49% 0.0686 89.56)",
-          "oklch(61% 0.0686 89.56)",
-          "oklch(72% 0.0686 89.56)",
-          "oklch(84% 0.0686 89.56)",
-          "oklch(95% 0.0686 89.56)"
-        ]
-      },
-      "play-green-hover": {
-        "role": "primary",
-        "displayName": "Room choice hover",
-        "canonical": "#d9e6c9",
-        "tonalRamp": [
-          "oklch(15% 0.0411 126.95)",
-          "oklch(26% 0.0411 126.95)",
-          "oklch(38% 0.0411 126.95)",
-          "oklch(49% 0.0411 126.95)",
-          "oklch(61% 0.0411 126.95)",
-          "oklch(72% 0.0411 126.95)",
-          "oklch(84% 0.0411 126.95)",
-          "oklch(95% 0.0411 126.95)"
-        ]
-      },
-      "play-yellow-hover": {
-        "role": "primary",
-        "displayName": "Bot choice hover",
-        "canonical": "#f7d775",
-        "tonalRamp": [
-          "oklch(15% 0.1230 91.69)",
-          "oklch(26% 0.1230 91.69)",
-          "oklch(38% 0.1230 91.69)",
-          "oklch(49% 0.1230 91.69)",
-          "oklch(61% 0.1230 91.69)",
-          "oklch(72% 0.1230 91.69)",
-          "oklch(84% 0.1230 91.69)",
-          "oklch(95% 0.1230 91.69)"
-        ]
-      },
       "table-rail": {
         "role": "neutral",
         "displayName": "Table Rail",
@@ -933,12 +828,110 @@
           "oklch(84% 0.1055 77.02)",
           "oklch(95% 0.1055 77.02)"
         ]
+      },
+      "launch-bg": {
+        "displayName": "Club teal",
+        "role": "neutral",
+        "tonalRamp": [
+          "oklch(15.00% 0.0374 218.58)",
+          "oklch(26.43% 0.0374 218.58)",
+          "oklch(37.86% 0.0374 218.58)",
+          "oklch(49.29% 0.0374 218.58)",
+          "oklch(60.71% 0.0374 218.58)",
+          "oklch(72.14% 0.0374 218.58)",
+          "oklch(83.57% 0.0374 218.58)",
+          "oklch(95.00% 0.0374 218.58)"
+        ]
+      },
+      "launch-paper": {
+        "displayName": "Club ivory",
+        "role": "neutral",
+        "tonalRamp": [
+          "oklch(15.00% 0.0261 90.10)",
+          "oklch(26.43% 0.0261 90.10)",
+          "oklch(37.86% 0.0261 90.10)",
+          "oklch(49.29% 0.0261 90.10)",
+          "oklch(60.71% 0.0261 90.10)",
+          "oklch(72.14% 0.0261 90.10)",
+          "oklch(83.57% 0.0261 90.10)",
+          "oklch(95.00% 0.0261 90.10)"
+        ]
+      },
+      "launch-ink": {
+        "displayName": "Club action ink",
+        "role": "neutral",
+        "tonalRamp": [
+          "oklch(15.00% 0.0361 216.03)",
+          "oklch(26.43% 0.0361 216.03)",
+          "oklch(37.86% 0.0361 216.03)",
+          "oklch(49.29% 0.0361 216.03)",
+          "oklch(60.71% 0.0361 216.03)",
+          "oklch(72.14% 0.0361 216.03)",
+          "oklch(83.57% 0.0361 216.03)",
+          "oklch(95.00% 0.0361 216.03)"
+        ]
+      },
+      "launch-yellow": {
+        "displayName": "Club play yellow",
+        "role": "primary",
+        "tonalRamp": [
+          "oklch(15.00% 0.1576 92.18)",
+          "oklch(26.43% 0.1576 92.18)",
+          "oklch(37.86% 0.1576 92.18)",
+          "oklch(49.29% 0.1576 92.18)",
+          "oklch(60.71% 0.1576 92.18)",
+          "oklch(72.14% 0.1576 92.18)",
+          "oklch(83.57% 0.1576 92.18)",
+          "oklch(95.00% 0.1576 92.18)"
+        ]
+      },
+      "launch-surface": {
+        "displayName": "Club utility surface",
+        "role": "neutral",
+        "tonalRamp": [
+          "oklch(15.00% 0.0440 214.14)",
+          "oklch(26.43% 0.0440 214.14)",
+          "oklch(37.86% 0.0440 214.14)",
+          "oklch(49.29% 0.0440 214.14)",
+          "oklch(60.71% 0.0440 214.14)",
+          "oklch(72.14% 0.0440 214.14)",
+          "oklch(83.57% 0.0440 214.14)",
+          "oklch(95.00% 0.0440 214.14)"
+        ]
+      },
+      "launch-muted": {
+        "displayName": "Club secondary copy",
+        "role": "neutral",
+        "tonalRamp": [
+          "oklch(15.00% 0.0170 168.46)",
+          "oklch(26.43% 0.0170 168.46)",
+          "oklch(37.86% 0.0170 168.46)",
+          "oklch(49.29% 0.0170 168.46)",
+          "oklch(60.71% 0.0170 168.46)",
+          "oklch(72.14% 0.0170 168.46)",
+          "oklch(83.57% 0.0170 168.46)",
+          "oklch(95.00% 0.0170 168.46)"
+        ]
+      },
+      "launch-quiet": {
+        "displayName": "Club quiet copy",
+        "role": "neutral",
+        "tonalRamp": [
+          "oklch(15.00% 0.0272 193.67)",
+          "oklch(26.43% 0.0272 193.67)",
+          "oklch(37.86% 0.0272 193.67)",
+          "oklch(49.29% 0.0272 193.67)",
+          "oklch(60.71% 0.0272 193.67)",
+          "oklch(72.14% 0.0272 193.67)",
+          "oklch(83.57% 0.0272 193.67)",
+          "oklch(95.00% 0.0272 193.67)"
+        ]
       }
     },
     "typographyMeta": {
       "display": {
-        "displayName": "Display",
-        "purpose": "Observed display role; responsive variants are recorded in DESIGN.md."
+        "displayName": "Home title",
+        "purpose": "Centered 48px Outfit title, 42px phone and 36px narrow phone."
       },
       "headline": {
         "displayName": "Headline",
@@ -972,10 +965,6 @@
         "displayName": "Wordmark",
         "purpose": "Observed wordmark role; responsive variants are recorded in DESIGN.md."
       },
-      "play-choice": {
-        "displayName": "Play Choice",
-        "purpose": "Observed play choice role; responsive variants are recorded in DESIGN.md."
-      },
       "turn-cue": {
         "displayName": "Turn Cue",
         "purpose": "Observed turn cue role; responsive variants are recorded in DESIGN.md."
@@ -1004,14 +993,6 @@
         "displayName": "Turn Cue Phone",
         "purpose": "Observed recurring turn cue phone role; responsive variants are recorded in DESIGN.md."
       },
-      "play-choice-medium": {
-        "displayName": "Play Choice Medium",
-        "purpose": "Observed recurring play choice medium role; responsive variants are recorded in DESIGN.md."
-      },
-      "play-choice-phone": {
-        "displayName": "Play Choice Phone",
-        "purpose": "Observed recurring play choice phone role; responsive variants are recorded in DESIGN.md."
-      },
       "dialog-title-phone": {
         "displayName": "Dialog Title Phone",
         "purpose": "Observed recurring dialog title phone role; responsive variants are recorded in DESIGN.md."
@@ -1019,6 +1000,14 @@
       "wordmark-phone": {
         "displayName": "Wordmark Phone",
         "purpose": "Observed recurring wordmark phone role; responsive variants are recorded in DESIGN.md."
+      },
+      "launch-primary": {
+        "displayName": "Home Play",
+        "purpose": "24px/800 primary action, 22px on phones."
+      },
+      "launch-secondary": {
+        "displayName": "Home room actions",
+        "purpose": "18px/700, reducing to 16px phone and 15px narrow phone."
       }
     },
     "shadows": [
@@ -1048,11 +1037,6 @@
         "purpose": "Physical deck edges."
       },
       {
-        "name": "launch-choice",
-        "value": "inset 0 -5px 0 #15292626, 0 6px 14px #2c2c3228",
-        "purpose": "Inset tactile edge and soft lift for broad play choices."
-      },
-      {
         "name": "leather-rail",
         "value": "inset 0 2px 3px #b9d3c036, 0 18px 38px #020a0966",
         "purpose": "Soft padded leather edge, without a hard offset step."
@@ -1071,6 +1055,21 @@
         "name": "control-pressed",
         "value": "inset 0 -1px 0 #15292626, 0 1px 3px #15292620",
         "purpose": "Compressed inset and soft contact depth on activation."
+      },
+      {
+        "name": "launch-primary",
+        "value": "inset 0 -4px 0 #bc8d22, 0 6px 16px #04191d70",
+        "purpose": "Home Play inset edge and soft lift."
+      },
+      {
+        "name": "launch-secondary",
+        "value": "inset 0 -3px 0 #d0c7ae, 0 4px 10px #04191d50",
+        "purpose": "Paired room controls."
+      },
+      {
+        "name": "launch-pressed",
+        "value": "inset 0 -1px 0 #bc8d22, 0 1px 4px #04191d50",
+        "purpose": "Play contact depth; room inset uses #b6ad95."
       }
     ],
     "motion": [
@@ -1091,12 +1090,12 @@
       },
       {
         "name": "play-flight",
-        "value": "190–262ms cubic-bezier(.16,1,.3,1)",
+        "value": "190\u2013262ms cubic-bezier(.16,1,.3,1)",
         "purpose": "Actual source center, width and composed rotation to the real endpoint; interrupts on a new snapshot."
       },
       {
         "name": "draw-flight",
-        "value": "190–262ms cubic-bezier(.16,1,.3,1)",
+        "value": "190\u2013262ms cubic-bezier(.16,1,.3,1)",
         "purpose": "Actual source center, width and composed rotation to the real endpoint; interrupts on a new snapshot."
       },
       {
@@ -1132,18 +1131,18 @@
       {
         "name": "control-press",
         "value": "120ms cubic-bezier(0.2, 0.8, 0.2, 1)",
-        "purpose": "Compress primary, launch and color-choice inset surfaces at activation; native controls remain immediate."
+        "purpose": "Compress shared primary and color-choice inset surfaces; native controls remain immediate."
       },
       {
-        "name": "entry-character-hover",
-        "value": "180ms cubic-bezier(0.2, 0.8, 0.2, 1)",
-        "purpose": "Small character lift only for hover-capable fine pointers with no reduced-motion preference."
+        "name": "launch-press",
+        "value": "130ms cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Home 2px hover lift and press feedback; reduced motion removes transitions and travel."
       }
     ],
     "breakpoints": [
       {
         "name": "launch-medium",
-        "value": "max-width: 1000px and min-width: 701px"
+        "value": "min-width: 701px and max-width: 1250px"
       },
       {
         "name": "launch-phone",
@@ -1159,7 +1158,7 @@
       },
       {
         "name": "launch-narrow",
-        "value": "max-width: 380px"
+        "value": "max-width: 360px"
       },
       {
         "name": "arena-narrow",
@@ -1237,19 +1236,27 @@
       "css": ".ds-tabs{display:flex;border-bottom:1px solid var(--ui-line,#e3dbce);gap:12px}.ds-tabs button{font-family:var(--font-body,Outfit),sans-serif;flex:1;border:0;border-bottom:2px solid transparent;background:transparent;padding:13px 3px;color:var(--ui-muted,#706b65);font-size:13px;cursor:pointer}.ds-tabs button[aria-selected=\"true\"]{color:var(--ui-text,#2c2c32);border-bottom-color:var(--ui-accent-red,#c74531);font-weight:600}.ds-tabs button:focus-visible{outline:3px solid var(--ui-accent-blue,#3265a0);outline-offset:4px}.ds-tabs button:hover{color:var(--ui-text,#2c2c32)}.ds-tabs button:active{opacity:.8}"
     },
     {
-      "name": "Play choice",
+      "name": "Home Play",
       "kind": "button",
-      "refersTo": "play-choice-primary",
-      "description": "Immediate bot play with saved settings; room creation is a separate green choice. Original happy card characters share the native deck grammar; press compresses the inset edge.",
-      "html": "<button class=\"ds-choice\"><span><strong>Play with bots</strong><small>Your saved table, ready to deal</small></span><svg width=\"21\" height=\"21\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M5 12h14m-6-6 6 6-6 6\"/></svg></button>",
-      "css": ".ds-choice{font-family:var(--font-body,Outfit),sans-serif;display:flex;align-items:center;justify-content:space-between;gap:15px;text-align:left;min-height:94px;padding:14px 19px 14px 14px;border:2px solid #2c2c32;border-radius:21px;background:#f1c95b;color:#2c2c32;box-shadow:inset 0 -5px 0 #15292626,0 6px 14px #2c2c3228;cursor:pointer;transition:background 160ms,transform 160ms}.ds-choice strong{display:block;font-size:23px;font-weight:700;line-height:1.2}.ds-choice small{display:block;margin-top:4px;color:#655425;font-size:13px;font-weight:700}.ds-choice:focus-visible{outline:3px solid var(--ui-accent-blue,#3265a0);outline-offset:4px}.ds-choice:active:not(:disabled){transform:translateY(3px);box-shadow:inset 0 -1px 0 #15292626,0 1px 3px #15292620}@media(hover:hover){.ds-choice:hover{background:#f7d775;transform:translateY(-3px) rotate(-.4deg)}}@media(prefers-reduced-motion:reduce){.ds-choice{transition:none}.ds-choice:hover,.ds-choice:active:not(:disabled){transform:none}}"
+      "refersTo": "launch-primary",
+      "description": "Centered primary action starts saved bot play immediately.",
+      "html": "<button class=\"ds-launch ds-launch-main\">Play with bots <svg width=\"23\" height=\"23\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M5 12h14m-6-6 6 6-6 6\"/></svg></button>",
+      "css": ".ds-launch{display:flex;align-items:center;justify-content:center;gap:14px;width:100%;min-height:54px;padding:14px 20px 16px;border:0;border-radius:6px;background:#f9f2df;color:#17333a;box-shadow:inset 0 -3px 0 #d0c7ae,0 4px 10px #04191d50;font-family:var(--font-body,Outfit),sans-serif;font-size:18px;font-weight:700;line-height:1.25;cursor:pointer;transition:transform 130ms cubic-bezier(.16,1,.3,1),background 130ms,box-shadow 130ms}.ds-launch:focus-visible{outline:3px solid #ffd64a;outline-offset:5px}.ds-launch:active:not(:disabled){transform:translateY(2px);box-shadow:inset 0 -1px 0 #b6ad95,0 1px 4px #04191d50}.ds-launch:disabled{opacity:.5;cursor:default}.ds-launch-main{min-height:64px;background:#ffd64a;box-shadow:inset 0 -4px 0 #bc8d22,0 6px 16px #04191d70;font-size:24px;font-weight:800}.ds-launch-main:focus-visible{outline-color:#f9f2df}.ds-launch-main:active:not(:disabled){box-shadow:inset 0 -1px 0 #bc8d22,0 1px 4px #04191d50}@media(hover:hover) and (pointer:fine){.ds-launch:hover:not(:disabled){transform:translateY(-2px);background:#fff9ea}.ds-launch-main:hover:not(:disabled){background:#ffe36c}.ds-launch:active:not(:disabled){transform:translateY(2px)}}@media(prefers-reduced-motion:reduce){.ds-launch{transition:none}.ds-launch:hover,.ds-launch:active:not(:disabled){transform:none}}"
+    },
+    {
+      "name": "Home room actions",
+      "kind": "button",
+      "refersTo": "launch-secondary",
+      "description": "Equal secondary actions follow the full-width Play control.",
+      "html": "<div class=\"ds-launch-online\"><button class=\"ds-launch\">Create a room</button><button class=\"ds-launch\">Join a room</button></div>",
+      "css": ".ds-launch-online{display:grid;grid-template-columns:1fr 1fr;gap:12px}.ds-launch{display:flex;align-items:center;justify-content:center;gap:14px;width:100%;min-height:54px;padding:14px 20px 16px;border:0;border-radius:6px;background:#f9f2df;color:#17333a;box-shadow:inset 0 -3px 0 #d0c7ae,0 4px 10px #04191d50;font-family:var(--font-body,Outfit),sans-serif;font-size:18px;font-weight:700;line-height:1.25;cursor:pointer;transition:transform 130ms cubic-bezier(.16,1,.3,1),background 130ms,box-shadow 130ms}.ds-launch:focus-visible{outline:3px solid #ffd64a;outline-offset:5px}.ds-launch:active:not(:disabled){transform:translateY(2px);box-shadow:inset 0 -1px 0 #b6ad95,0 1px 4px #04191d50}.ds-launch:disabled{opacity:.5;cursor:default}@media(hover:hover) and (pointer:fine){.ds-launch:hover:not(:disabled){transform:translateY(-2px);background:#fff9ea}.ds-launch-main:hover:not(:disabled){background:#ffe36c}.ds-launch:active:not(:disabled){transform:translateY(2px)}}@media(prefers-reduced-motion:reduce){.ds-launch{transition:none}.ds-launch:hover,.ds-launch:active:not(:disabled){transform:none}}"
     },
     {
       "name": "Active seat and turn cue",
       "kind": "chip",
       "refersTo": "opponent-badge-active",
-      "description": "Truthful active-seat badge and a wrapping turn cue containing the named active color. A last-card marker attaches inside the opponent hand; an eligible missed call exposes a 56 × 44px Catch target with the full player name. Penalty numerals belong on the actual deck.",
-      "html": "<div class=\"ds-status\"><span class=\"ds-seat\"><span><strong>Alex</strong><small>4 cards</small></span><i aria-hidden=\"true\"></i></span><div class=\"ds-cue\"><span class=\"ds-cue-dot\" aria-hidden=\"true\"></span><h1>Alex’s turn</h1><span class=\"ds-active-color\" aria-label=\"Active color: red\"><i aria-hidden=\"true\"></i><span>red</span></span></div></div>",
+      "description": "Truthful active-seat badge and a wrapping turn cue containing the named active color. A last-card marker attaches inside the opponent hand; an eligible missed call exposes a 56 \u00d7 44px Catch target with the full player name. Penalty numerals belong on the actual deck.",
+      "html": "<div class=\"ds-status\"><span class=\"ds-seat\"><span><strong>Alex</strong><small>4 cards</small></span><i aria-hidden=\"true\"></i></span><div class=\"ds-cue\"><span class=\"ds-cue-dot\" aria-hidden=\"true\"></span><h1>Alex\u2019s turn</h1><span class=\"ds-active-color\" aria-label=\"Active color: red\"><i aria-hidden=\"true\"></i><span>red</span></span></div></div>",
       "css": ".ds-seat{font-family:var(--font-body,Outfit),sans-serif;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:7px 10px;max-width:140px;border-radius:12px;background:#d8ed82;color:#172130}.ds-seat strong{display:block;font-size:12px;font-weight:500}.ds-seat small{display:block;font-size:11px;color:#3f5023}.ds-seat i{width:5px;height:5px;border-radius:50%;background:#3f5023}.ds-status{position:relative;min-height:120px;padding:12px;background:#101c1c;font-family:var(--font-body,Outfit),sans-serif}.ds-cue{position:absolute;bottom:2px;left:50%;transform:translateX(-50%);min-height:42px;display:flex;align-items:center;justify-content:center;gap:9px;text-align:center;width:max-content;max-width:calc(100% - 24px);flex-wrap:wrap;row-gap:3px;padding-block:4px;color:#b1bfd2}.ds-cue h1{margin:0;min-width:0;overflow-wrap:anywhere;font-size:18px;font-weight:500;letter-spacing:-.02em;line-height:1.5}.ds-cue-dot{width:6px;height:6px;border-radius:50%;background:currentColor}.ds-active-color{display:inline-flex;align-items:center;gap:7px;margin-left:7px;font-size:12px;font-weight:400;color:#b1bfd2;text-transform:capitalize;white-space:nowrap}.ds-active-color i{width:10px;height:10px;border-radius:50%;background:#ff727a;border:1px solid #ffffff70}"
     },
     {
@@ -1279,18 +1286,19 @@
       "name": "Original player expressions",
       "kind": "custom",
       "refersTo": "player-character",
-      "description": "Decorative snapshot-derived face, expression-keyed in React so only actual expression changes restart the one-shot. Production names and counts remain accessible siblings. Static happy specimen.",
+      "description": "Small native card characters express published player state in seat badges and results; reactions restart only on expression change. Home uses a separate illustrated narrative scene.",
       "html": "<span class=\"ds-avatar\" data-expression=\"happy\" aria-hidden=\"true\"><span class=\"ds-eyes\"><i></i><i></i></span><span class=\"ds-smile\"></span></span>",
       "css": ".ds-avatar{--avatar-color:#ef755d;position:relative;display:inline-flex;width:33px;height:41px;flex-shrink:0;background:var(--avatar-color);border:2px solid #323139;border-radius:8px;box-shadow:1px 3px 6px #32313938;transform:rotate(-8deg)}.ds-eyes{position:absolute;top:33%;left:22%;right:22%;height:16%;display:flex;justify-content:space-between}.ds-eyes i{width:24%;height:100%;border-radius:50%;background:#323139}.ds-smile{position:absolute;left:35%;top:56%;width:32%;height:15%;border:2px solid #323139;border-top:0;border-radius:0 0 10px 10px}.ds-avatar[data-expression=\"thinking\"] .ds-eyes{transform:translateX(8%)}.ds-avatar[data-expression=\"thinking\"] .ds-eyes i:first-child{transform:translateY(-25%)}.ds-avatar[data-expression=\"thinking\"] .ds-smile{width:23%;left:44%;height:7%;transform:rotate(-12deg)}.ds-avatar[data-expression=\"happy\"] .ds-smile,.ds-avatar[data-expression=\"celebrate\"] .ds-smile{width:40%;height:23%;left:30%;top:54%;background:#323139}.ds-avatar[data-expression=\"surprised\"] .ds-smile{width:21%;height:23%;left:40%;top:57%;border-radius:50%;border-top:2px solid #323139}.ds-avatar[data-expression=\"surprised\"] .ds-eyes{top:25%;height:23%}.ds-avatar[data-expression=\"celebrate\"] .ds-eyes i{background:none;border:2px solid #323139;border-bottom:0;border-radius:50% 50% 0 0;transform:translateY(-10%)}@media(prefers-reduced-motion:no-preference){.ds-avatar:not([data-expression=\"neutral\"]){animation:ds-player-react 260ms var(--ease-out,cubic-bezier(.2,.8,.2,1)) both}@keyframes ds-player-react{0%{transform:rotate(-5deg) scale(.9)}55%{transform:rotate(3deg) scale(1.08)}100%{transform:rotate(-5deg) scale(1)}}}"
     }
   ],
   "narrative": {
     "northStar": "The after-hours card table",
-    "overview": "UNO feels like a held hand of real cards over a shared after-hours table. Deep green baize, a dark padded leather rail, vivid faces and ivory stock establish the material world. Cards are the controls: a legal face plays on its first activation; the foreground fan makes pickup and deliberate upward release tangible.\n\nThe launch and settings shell retains warm, theme-aware surfaces and compact card-face player identities. Live play uses a fixed green-black material palette with lime turn feedback, independent of the selected appearance. The launch illustration is a fan of the same native deck used in play. Outfit UI and Barlow Condensed card lettering remain the two pinned families. Original card characters bring encouragement through expressive faces and tactile pressed surfaces, carrying the owner’s Duolingo-inspired emotional quality within this native-card world.",
+    "overview": "UNO feels like a held hand of real cards over a shared after-hours table. Deep green baize, a dark padded leather rail, vivid faces and ivory stock establish the material world. Cards are the controls: a legal face plays on its first activation; the foreground fan makes pickup and deliberate upward release tangible.\n\nHome is a centered illustrated after-hours card club: deep teal surrounds an original rabbit, red panda and crocodile card-game scene, with yellow Play in the foreground and ivory room actions beside one another. Settings and setup retain theme-aware supporting surfaces. Live play retains its fixed green-black baize/leather palette and lime turn feedback. Outfit UI and Barlow Condensed card lettering remain the two pinned families. Small native card characters continue to express live player state; the home scene has its own authored narrative rather than floating card-face stickers.",
     "keyCharacteristics": [
-      "One shared native card face across launch, hand, piles and motion.",
+      "A centered illustrated card-club welcome, with Play visibly primary.",
+      "One shared native card face across the live hand, piles and motion.",
       "Outfit interface lettering paired with Barlow Condensed card numerals.",
-      "Warm themed supporting surfaces and a fixed baize-and-leather live table.",
+      "Fixed deep teal home, warm themed settings/setup and a fixed baize-and-leather live table.",
       "First-activation legal play, nonmatching-card inspection and deliberate upward release.",
       "Bounded hand scrolling, contextual controls and paper/contact feedback that never delays a turn.",
       "Real round outcomes and optional device-local milestone cards.",
@@ -1298,8 +1306,8 @@
     ],
     "rules": [
       {
-        "name": "The Two Surfaces Rule",
-        "body": "Honor root appearance variables on supporting screens; scope the fixed baize-and-leather palette to live play. Card colors and ivory stock stay stable across both.",
+        "name": "The Scoped Worlds Rule",
+        "body": "Keep home in its fixed teal/ivory/yellow club palette, honor appearance variables in settings and setup, and scope baize/leather with lime to live play. The native deck remains stable across appearances.",
         "section": "colors"
       },
       {
@@ -1316,6 +1324,11 @@
         "name": "The Paper Lift Rule",
         "body": "A moving or inspected card changes its own depth and reveals its face. Keep unrelated chrome quiet and reserve hard stacked edges for actual piles.",
         "section": "elevation"
+      },
+      {
+        "name": "The Central Play Rule",
+        "body": "Keep Play on the home\u2019s center axis ahead of room actions and secondary help; preserve the narrative scene and real, immediately available controls.",
+        "section": "components"
       },
       {
         "name": "The Honest Expression Rule",
@@ -1339,15 +1352,16 @@
       }
     ],
     "dos": [
-      "Do use the same authored face for launch, hand, piles and card motion.",
+      "Do use the same authored native face for the hand, piles and card motion.",
+      "Do keep home Play central, Create/Join paired, sharper 6px action corners and the original illustrated scene with its provenance.",
       "Do preserve stable deck colors and the written active-color label.",
-      "Do use the scoped baize-and-leather table palette while honoring appearance on supporting screens.",
+      "Do retain the fixed home club palette, scoped baize-and-leather table and theme-aware settings/setup.",
       "Do retain readable six-seat phone names, visible corner indices and an independently scrolling large hand.",
       "Do play legal cards on first activation and keep nonmatching inspection, turn state and situational actions clear with touch and keyboard.",
       "Do keep the full named Play action, selected card and current hint in agreement; retain dark ink on lime.",
       "Do reveal actual new local draws without selecting them and preserve horizontal position on unrelated updates.",
       "Do keep Draw on the deck, eligible UNO at hand level, and the dock limited to contextual Pass and the pre-inspected-card Play fallback; give button and keyboard the same availability rules.",
-      "Do put secondary entry shortcuts after the primary choices and keep optional bot/friend details in disclosures.",
+      "Do put Set up bots and How to play after Play/Create/Join, and keep optional bot/friend details in disclosures.",
       "Do honor reduced motion, mute, audio readiness and interrupted gesture cleanup.",
       "Do keep presentation responsive to the current published state without delaying play.",
       "Do derive optional milestone cards from completed device-local rounds and keep result actions reachable inside the native dialog.",
@@ -1356,6 +1370,7 @@
       "Do acknowledge actual card activation with immediate pickup while keeping horizontal scroll silent."
     ],
     "donts": [
+      "Don't restore the rejected home side column, floating card-face fan/stickers, plain cream field, arbitrary decorative 7 or broad rounded action tiles.",
       "Don't restore clay hero art, Fredoka, a third font family or a parallel component library.",
       "Don't replace the held fan with a flat shrinking row or let large hands overflow the page.",
       "Don't show UNO when ineligible, duplicate Draw in the dock or turn sorting into a permanent table control.",

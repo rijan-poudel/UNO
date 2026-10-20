@@ -3,6 +3,7 @@ import { Outfit, Barlow_Condensed } from "next/font/google";
 import { Toaster } from "sonner";
 import "./globals.css";
 import "./table.css";
+import "./home.css";
 
 const bodyFont = Outfit({
   variable: "--font-body",
@@ -42,6 +43,20 @@ export default function RootLayout({
         />
       </head>
       <body className={`${bodyFont.variable} ${cardFont.variable}`}>
+        <span hidden data-design-contract="centered-home-2e1e4271">
+          THESIS: Playing owns the center, replacing the rejected side-column
+          landing page. OWN-WORLD: An illustrated after-hours card club, deep
+          teal ink, warm ivory, yellow play, six-pixel controls, Outfit
+          lettering. STORY: Enter the card scene, then play with bots or
+          create/join a private room. FIRST VIEWPORT: Centered title above
+          original panoramic artwork; a centered foreground action group with
+          visible Play, Create and Join. Short-phone controls remain reachable.
+          FORM: Owner-pinned game title screen; code-led surface direction6,
+          seed2e1e4271. The five browser corrections supersede the prior home
+          verdict. FINISH: unreviewed and undocumented is unfinished; this build
+          ends with the finish review, the verdict, DESIGN.md, and every
+          shipping raster carrying its provenance
+        </span>
         <span hidden data-design-contract="tactile-table">
           Held cards, situational controls, audible immediate feedback. See
           .impeccable/tactile-direction.md.

@@ -36,6 +36,8 @@ UNO is the existing product name. The owner explicitly authorized replacement of
 
 The owner’s October 20 reference is Duolingo: expressive original characters, satisfying pressed controls and encouraging reactions tied to real play. Carry that emotional quality into the existing native-card world; preserve Outfit/Barlow and avoid copied mascots, noisy navigation or a return to the rejected clay treatment.
 
+The owner’s five October 20 browser corrections reject the home’s side-column play controls, plain paper field, floating card faces, decorative number7 and heavily rounded action tiles. Home becomes a centered game title screen with original illustrated card-night artwork, visibly primary play controls and sharper corners. These corrections supersede the prior home composition and its review; live table mechanics, deck lettering and materials remain pinned.
+
 ## Product Principles
 
 - Graphics lead; words clarify actions rather than fill the screen.

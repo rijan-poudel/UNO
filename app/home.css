@@ -1,0 +1,343 @@
+/* Illustrated title-screen geometry is separate from the live card table. */
+.launch-screen {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: clip;
+  background: #102d35;
+  color: #f9f2df;
+}
+.launch-header .app-header {
+  width: 100%;
+  max-width: 1440px;
+  height: 64px;
+  margin-inline: auto;
+  padding-inline: 40px;
+  color: #f9f2df;
+}
+.launch-header .wordmark {
+  color: #f9f2df;
+}
+.launch-header .wordmark span {
+  color: #ffd64a;
+}
+.launch-header .settings-trigger,
+.launch-header .header-actions > .icon-button {
+  min-height: 44px;
+  border: 1px solid #a9c2c166;
+  border-radius: 6px;
+  background: #153a42;
+  color: #f9f2df;
+}
+.launch-main {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  padding: 8px 24px 0;
+}
+.launch-heading {
+  z-index: 1;
+  text-align: center;
+}
+.launch-heading h1 {
+  margin: 0;
+  color: #f9f2df;
+  font-size: 48px;
+  font-weight: 800;
+  line-height: 1.04;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+.launch-heading p {
+  margin: 8px 0 0;
+  color: #c6d9d7;
+  font-size: 17px;
+}
+.launch-scene {
+  position: relative;
+  flex: 0 0 auto;
+  width: min(960px, 100vw);
+  height: auto;
+  aspect-ratio: 1672 / 941;
+  margin: 8px 0 0;
+}
+.launch-scene img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.launch-scene::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  /* Only the room boundary fades into the ink; the game moment stays intact. */
+  background: linear-gradient(0deg, #102d35 0%, transparent 18%);
+}
+.launch-play {
+  position: relative;
+  z-index: 1;
+  width: min(560px, 100%);
+  margin-top: -64px;
+}
+.launch-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  width: 100%;
+  min-height: 54px;
+  padding: 14px 20px 16px;
+  border: 0;
+  border-radius: 6px;
+  background: #f9f2df;
+  color: #17333a;
+  box-shadow:
+    inset 0 -3px 0 #d0c7ae,
+    0 4px 10px #04191d50;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.25;
+  cursor: pointer;
+  transition:
+    transform 130ms cubic-bezier(0.16, 1, 0.3, 1),
+    background 130ms,
+    box-shadow 130ms;
+}
+.launch-action-main {
+  min-height: 64px;
+  background: #ffd64a;
+  box-shadow:
+    inset 0 -4px 0 #bc8d22,
+    0 6px 16px #04191d70;
+  font-size: 24px;
+  font-weight: 800;
+}
+.launch-online {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 12px;
+}
+.launch-action:active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow:
+    inset 0 -1px 0 #b6ad95,
+    0 1px 4px #04191d50;
+}
+.launch-action-main:active:not(:disabled) {
+  box-shadow:
+    inset 0 -1px 0 #bc8d22,
+    0 1px 4px #04191d50;
+}
+.launch-action:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.launch-extras {
+  display: flex;
+  justify-content: center;
+  gap: 36px;
+  margin-top: 10px;
+}
+.launch-text-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 44px;
+  padding: 8px 6px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: #d5e3dd;
+  font-size: 14px;
+  font-weight: 600;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+.launch-text-action[aria-expanded="true"] svg {
+  transform: rotate(180deg);
+}
+.launch-screen .launch-action:focus-visible,
+.launch-screen .launch-text-action:focus-visible,
+.launch-header .app-header button:focus-visible {
+  outline: 3px solid #ffd64a;
+  outline-offset: 5px;
+}
+.launch-action-main:focus-visible {
+  outline-color: #f9f2df !important;
+}
+.launch-rules {
+  padding: 16px 0;
+  border-top: 1px solid #a9c2c166;
+  color: #d5e3dd;
+  text-align: left;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.launch-rules p + p {
+  margin-top: 10px;
+}
+.launch-rules strong {
+  color: #f9f2df;
+}
+.launch-progress {
+  width: min(560px, 100%);
+  text-align: center;
+}
+.launch-progress:empty {
+  display: none;
+}
+.launch-progress .player-progress {
+  max-width: none;
+  margin: 16px 0 0;
+  color: #d5e3dd;
+}
+.launch-progress .progress-record {
+  justify-content: center;
+}
+.launch-progress .progress-record small {
+  color: #a9c2c1;
+}
+.launch-progress .milestone-collection summary {
+  justify-content: center;
+  color: #d5e3dd;
+  margin-inline: auto;
+}
+.launch-progress .milestone-collection summary:focus-visible {
+  outline-color: #ffd64a;
+}
+.launch-progress .collection-fan i {
+  background: #28454a;
+  border-color: #a9c2c1;
+}
+.launch-progress .collection-fan i.collected {
+  background: #ffd64a;
+  border-color: #ffd64a;
+}
+.launch-progress .milestone-stamp {
+  border-radius: 6px;
+  background: #153a42;
+  border-color: #527477;
+  color: #f9f2df;
+}
+.launch-progress .milestone-stamp.unearned {
+  color: #b7cdca;
+}
+.launch-progress .milestone-stamp.earned {
+  background: #f9f2df;
+  color: #17333a;
+}
+.launch-progress .milestone-stamp small {
+  color: inherit;
+}
+.launch-footer {
+  margin-top: 16px;
+  padding: 16px 20px 20px;
+  color: #a9c2c1;
+  text-align: center;
+  font-size: 12px;
+}
+@media (hover: hover) and (pointer: fine) {
+  .launch-action:hover:not(:disabled) {
+    transform: translateY(-2px);
+    background: #fff9ea;
+  }
+  .launch-action-main:hover:not(:disabled) {
+    background: #ffe36c;
+  }
+  .launch-action:active:not(:disabled) {
+    transform: translateY(2px);
+  }
+  .launch-text-action:hover {
+    color: #fff9ea;
+    text-decoration: underline;
+  }
+}
+@media (min-width: 701px) and (max-width: 1250px) {
+  .launch-scene {
+    width: min(880px, 100vw);
+  }
+}
+@media (max-width: 700px) {
+  .launch-header .app-header {
+    height: 64px;
+    padding-inline: 20px;
+  }
+  .launch-heading h1 {
+    font-size: 42px;
+  }
+  .launch-heading p {
+    margin-top: 9px;
+    font-size: 15px;
+  }
+  .launch-main {
+    padding: 12px 20px 0;
+  }
+  .launch-scene {
+    height: 280px;
+    aspect-ratio: auto;
+    margin-top: 16px;
+  }
+  .launch-scene img {
+    object-fit: cover;
+    object-position: 50% 68%;
+  }
+  .launch-play {
+    margin-top: -44px;
+  }
+  .launch-action-main {
+    min-height: 62px;
+    font-size: 22px;
+  }
+  .launch-online {
+    gap: 10px;
+    margin-top: 10px;
+  }
+  .launch-online .launch-action {
+    padding-inline: 12px;
+    font-size: 16px;
+  }
+  .launch-extras {
+    gap: 28px;
+    margin-top: 6px;
+  }
+  .launch-footer {
+    margin-top: 10px;
+  }
+}
+@media (max-width: 360px) {
+  .launch-heading h1 {
+    font-size: 36px;
+  }
+  .launch-scene {
+    height: 230px;
+    margin-top: 12px;
+  }
+  .launch-main {
+    padding-inline: 16px;
+  }
+  .launch-play {
+    margin-top: -36px;
+  }
+  .launch-action-main {
+    min-height: 58px;
+  }
+  .launch-online .launch-action {
+    font-size: 15px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .launch-screen .launch-action,
+  .launch-screen .launch-text-action {
+    transition: none;
+  }
+  .launch-screen .launch-action:hover,
+  .launch-screen .launch-action:active {
+    transform: none;
+  }
+}
