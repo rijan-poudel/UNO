@@ -1,12 +1,12 @@
-/* UNO play field. Card materials live in UnoCard.module.css; this sheet owns
+/* Quiet UNO stage. Card materials live in UnoCard.module.css; this sheet owns
    viewport geometry and state cues. No felt, leather rail or casino table.
-   Contract: .impeccable/review/play-field/contract.md. */
+   Contract: .impeccable/review/quiet-stage/contract.md. */
 .game-page {
-  --ui-bg: #123ac2;
-  --ui-surface: #102966;
+  --ui-bg: #111925;
+  --ui-surface: #1c293c;
   --ui-text: #ffffff;
-  --ui-muted: #d7e3ff;
-  --ui-line: #6586ec;
+  --ui-muted: #c2cedf;
+  --ui-line: #3b4e66;
   --ui-accent-red: #ff536f;
   --turn-accent: #ffe329;
   --hand-scale: 1.65;
@@ -18,7 +18,12 @@
   flex-direction: column;
   overflow: clip;
   color-scheme: dark;
-  background: #123ac2;
+  background: radial-gradient(
+    ellipse at 50% 12%,
+    #223248 0%,
+    #172233 48%,
+    #111925 100%
+  );
 }
 .game-page :focus-visible {
   outline: 3px solid #ffe329;
@@ -58,13 +63,13 @@
   place-items: center;
   color: #ffffff;
   border-radius: 8px;
-  background: #0c2a91;
+  background: #1e2c42;
   box-shadow:
     inset 0 1px 1px #ffffff30,
     0 3px 4px #071d6950;
 }
 .game-header .game-menu-trigger:hover {
-  background: #173fac;
+  background: #2a3b54;
 }
 .game-header .game-menu-trigger:active {
   transform: translateY(2px);
@@ -84,34 +89,6 @@
   gap: 0;
   user-select: none;
   -webkit-user-select: none;
-}
-/* A printed card orbit rather than a bounded table: open edges, no rail.
-   Its two blue planes give the suspended cards a spatial reference. */
-.game-main::before {
-  content: "";
-  position: absolute;
-  z-index: -1;
-  width: min(1120px, 112vw);
-  height: 84%;
-  left: 50%;
-  top: -3%;
-  border-radius: 50%;
-  transform: translateX(-50%) rotate(-19deg);
-  background: #1c49d5;
-  pointer-events: none;
-}
-.game-main::after {
-  content: "";
-  position: absolute;
-  z-index: -1;
-  width: min(900px, 90vw);
-  height: 63%;
-  left: 50%;
-  top: 7%;
-  border-radius: 50%;
-  transform: translateX(-50%) rotate(-19deg);
-  background: #2555df;
-  pointer-events: none;
 }
 .game-main .playing-table {
   min-height: 0;
@@ -144,7 +121,7 @@
     1px 3px 1px #d5dcec,
     3px 6px 1px #7d8ba8,
     4px 10px 1px #35435e,
-    4px 17px 18px #06185a70;
+    4px 17px 18px #03091270;
 }
 .game-main .discard-pile .uno-card,
 .game-main .hand-card .uno-card {
@@ -179,11 +156,11 @@
 }
 .game-main .card-landing span {
   color: #ffffff;
-  background: #102966;
+  background: #1c293c;
 }
 .game-main .table-waiting {
   top: 22%;
-  background: #102966;
+  background: #1c293c;
 }
 .game-main .opponent {
   width: 112px;
@@ -222,7 +199,7 @@
   color: #ffffff;
 }
 .game-main .opponent-label small {
-  color: #d7e3ff;
+  color: #c2cedf;
 }
 .game-main .count-icon {
   display: block;
@@ -235,7 +212,7 @@
   color: #392700;
   box-shadow:
     inset 0 -2px 1px #b39000,
-    0 4px 7px #06185a50;
+    0 4px 7px #03091250;
 }
 .game-main .active-seat .opponent-label small {
   color: #514100;
@@ -256,7 +233,7 @@
   background: #ffd000;
   box-shadow:
     inset 0 -3px 2px #bd7600,
-    0 4px 8px #06185a60;
+    0 4px 8px #03091260;
 }
 /* The hand comes from the player's side of the screen. Its lower quarter is
    deliberately below the viewport; lift/focus still has headroom above it. */
@@ -280,7 +257,7 @@
   overscroll-behavior-x: contain;
   scroll-padding-inline: 28px;
   scrollbar-width: none;
-  scrollbar-color: #9db8ff #123ac2;
+  scrollbar-color: #9db8ff #111925;
 }
 .game-main .hand-scroll::-webkit-scrollbar {
   display: none;
@@ -328,7 +305,7 @@
     inset 0 1px 2px #ffffffb0,
     0 1px 1px #c4ccdf,
     0 3px 1px #68748e,
-    -3px 15px 20px #06185a80;
+    -3px 15px 20px #03091280;
 }
 .game-main .hand-card.dragging-card {
   z-index: 80;
@@ -343,7 +320,7 @@
 }
 .game-main .uno-called.hand-uno {
   padding: 8px 12px;
-  background: #102966;
+  background: #1c293c;
   border-radius: 6px;
   font-size: 12px;
   color: #ffe329 !important;
@@ -368,7 +345,7 @@
   max-width: 42ch;
   padding: 6px 10px;
   border-radius: 6px;
-  background: #102966;
+  background: #1c293c;
   color: #ffffff;
   text-align: center;
   font-size: 12px;
@@ -433,7 +410,7 @@
   padding: 28px;
   gap: 18px;
   text-align: center;
-  background: #123ac2;
+  background: transparent;
 }
 .rotate-phone-art {
   position: relative;
@@ -460,7 +437,7 @@
 .rotate-phone small {
   max-width: 30ch;
   font-size: 12px;
-  color: #d7e3ff;
+  color: #c2cedf;
 }
 .rotate-phone .button {
   margin-top: 12px;

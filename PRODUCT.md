@@ -62,3 +62,7 @@ The owner requires landscape-only gameplay on phones. Home and setup remain usab
 ## October 21 arena correction
 
 The owner rejects the baize/leather arena as poker-like. Replace that live table world with an open vibrant UNO play field. Crop roughly the bottom quarter of the held fan at the viewport edge, center the upper play area, and communicate local turns through a modest card lift/growth. Remove redundant bot-round text, header sound status/control, the word Menu, deck remaining count, ordinary active-color label and visible Your move caption. Use one icon-only menu; sound and room copy remain available inside. Preserve accessible state announcements, explicit penalty/Pass decisions and a chosen-color marker when a wild discard alone cannot communicate it. This supersedes earlier pinned table materials; retain their provenance as historical assets.
+
+## Background correction
+
+The owner rejected the electric-blue orbit background. Background decoration must recede behind the vivid held cards. The working replacement is a quiet, softly lit midnight stage; the open layout, cropped hand, sparse header and graphical state cues remain. Do not restore the rejected large blue ovals or casino furniture.
