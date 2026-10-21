@@ -59,15 +59,16 @@ export default function RootLayout({
           shipping raster carrying its provenance
         </span>
         <span hidden data-design-contract="uno-play-field">
-          THESIS: Vivid held cards over a quiet midnight stage. OWN-WORLD: Soft
-          midnight lighting, white, yellow and vivid native deck inks. STORY:
-          Lifted playable cards invite a direct tap or flick; secondary controls
-          live in Menu. FIRST VIEWPORT: Centered piles, quiet header and
-          bottom-cropped held hand; no casino rail. FORM: Owner-pinned UNO play
-          field, code-led. See .impeccable/review/quiet-stage/contract.md.
-          FINISH: unreviewed and undocumented is unfinished; this build ends
-          with the finish review, the verdict, DESIGN.md, and every shipping
-          raster carrying its provenance
+          THESIS: Vivid held cards in an illustrated game room. OWN-WORLD: Warm
+          lounge furniture above a clear petrol tabletop, vivid deck inks.
+          STORY: Lifted playable cards invite a direct tap or flick; secondary
+          controls live in Menu. FIRST VIEWPORT: Centered piles, quiet header
+          and bottom-cropped held hand; no casino rail. FORM: Owner-pinned UNO
+          play field, code-led. See
+          .impeccable/review/illustrated-room/contract.md. FINISH: unreviewed
+          and undocumented is unfinished; this build ends with the finish
+          review, the verdict, DESIGN.md, and every shipping raster carrying its
+          provenance
         </span>
         {children}
         <Toaster

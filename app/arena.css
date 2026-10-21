@@ -1,6 +1,6 @@
-/* Quiet UNO stage. Card materials live in UnoCard.module.css; this sheet owns
-   viewport geometry and state cues. No felt, leather rail or casino table.
-   Contract: .impeccable/review/quiet-stage/contract.md. */
+/* Illustrated UNO room. Native cards and controls remain live above the artwork.
+   This sheet owns viewport geometry, room cropping and state cues.
+   Contract: .impeccable/review/illustrated-room/contract.md. */
 .game-page {
   --ui-bg: #111925;
   --ui-surface: #1c293c;
@@ -18,12 +18,11 @@
   flex-direction: column;
   overflow: clip;
   color-scheme: dark;
-  background: radial-gradient(
-    ellipse at 50% 12%,
-    #223248 0%,
-    #172233 48%,
-    #111925 100%
-  );
+  background-color: #082a3d;
+  background-image: url("/artwork/game-room-evening.webp");
+  background-size: cover;
+  background-position: center 30%;
+  background-repeat: no-repeat;
 }
 .game-page :focus-visible {
   outline: 3px solid #ffe329;
@@ -42,6 +41,8 @@
   position: relative;
   z-index: 10;
   height: 60px;
+  /* Protect the logo when responsive room crops place the lamp behind it. */
+  background: linear-gradient(#061e2ddd, #061e2d99 65%, #061e2d00);
   justify-content: space-between;
   padding-inline: max(24px, env(safe-area-inset-left))
     max(24px, env(safe-area-inset-right));
@@ -194,7 +195,7 @@
   padding: 5px 8px;
   max-width: 112px;
   border-radius: 7px;
-  background: transparent;
+  background: #102e37;
   box-shadow: none;
   color: #ffffff;
 }

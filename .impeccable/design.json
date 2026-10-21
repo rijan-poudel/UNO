@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-21T03:45:14.085736Z",
-  "title": "Design System: UNO — Card club and open play field",
+  "generatedAt": "2026-10-21T16:11:01.556986Z",
+  "title": "Design System: UNO — Card club and illustrated game room",
   "extensions": {
     "colorMeta": {
       "ui-bg": {
@@ -351,7 +351,7 @@
       },
       "arena-bg": {
         "role": "neutral",
-        "displayName": "Midnight play stage",
+        "displayName": "Arena UI background and scrollbar track",
         "canonical": "#111925"
       },
       "arena-surface": {
@@ -974,16 +974,6 @@
         "displayName": "Midnight menu control",
         "canonical": "#1e2c42"
       },
-      "arena-light": {
-        "role": "neutral",
-        "displayName": "Soft overhead light",
-        "canonical": "#223248"
-      },
-      "arena-midpoint": {
-        "role": "neutral",
-        "displayName": "Midnight light midpoint",
-        "canonical": "#172233"
-      },
       "arena-shadow-ink": {
         "role": "neutral",
         "displayName": "Neutral arena cast ink",
@@ -993,6 +983,51 @@
         "role": "neutral",
         "displayName": "Midnight menu hover",
         "canonical": "#2a3b54"
+      },
+      "arena-room-fallback": {
+        "role": "neutral",
+        "displayName": "Petrol room fallback",
+        "canonical": "#082a3d",
+        "tonalRamp": [
+          "oklch(15% 0.0518 237.89)",
+          "oklch(26% 0.0518 237.89)",
+          "oklch(38% 0.0518 237.89)",
+          "oklch(49% 0.0518 237.89)",
+          "oklch(61% 0.0518 237.89)",
+          "oklch(72% 0.0518 237.89)",
+          "oklch(84% 0.0518 237.89)",
+          "oklch(95% 0.0518 237.89)"
+        ]
+      },
+      "arena-identity": {
+        "role": "neutral",
+        "displayName": "Opaque petrol identity",
+        "canonical": "#102e37",
+        "tonalRamp": [
+          "oklch(15% 0.0390 220.47)",
+          "oklch(26% 0.0390 220.47)",
+          "oklch(38% 0.0390 220.47)",
+          "oklch(49% 0.0390 220.47)",
+          "oklch(61% 0.0390 220.47)",
+          "oklch(72% 0.0390 220.47)",
+          "oklch(84% 0.0390 220.47)",
+          "oklch(95% 0.0390 220.47)"
+        ]
+      },
+      "arena-header-scrim": {
+        "role": "neutral",
+        "displayName": "Header contrast tint",
+        "canonical": "#061e2d",
+        "tonalRamp": [
+          "oklch(15% 0.0418 239.46)",
+          "oklch(26% 0.0418 239.46)",
+          "oklch(38% 0.0418 239.46)",
+          "oklch(49% 0.0418 239.46)",
+          "oklch(61% 0.0418 239.46)",
+          "oklch(72% 0.0418 239.46)",
+          "oklch(84% 0.0418 239.46)",
+          "oklch(95% 0.0418 239.46)"
+        ]
       }
     },
     "typographyMeta": {
@@ -1236,7 +1271,57 @@
         "name": "arena-portrait-gate",
         "value": "orientation: portrait and max-width: 700px"
       }
-    ]
+    ],
+    "materials": {
+      "liveRoom": {
+        "asset": "public/artwork/game-room-evening.webp",
+        "provenance": "public/artwork/game-room-evening.webp.json",
+        "width": 1672,
+        "height": 941,
+        "bytes": 63838,
+        "transparency": false,
+        "animated": false,
+        "sourceCrop": false,
+        "sourceResize": false,
+        "conversion": "cwebp -q 82 -m 6",
+        "backgroundSize": "cover",
+        "backgroundPosition": "center 30%",
+        "backgroundRepeat": "no-repeat",
+        "fallbackToken": "arena-room-fallback",
+        "identityToken": "arena-identity",
+        "headerScrim": "linear-gradient(#061e2ddd, #061e2d99 65%, #061e2d00)",
+        "scope": "Static setting only; semantic live cards, seats, piles and controls remain independent. No background motion or blocking load.",
+        "evidence": ".impeccable/review/illustrated-room/assets.md"
+      },
+      "historical": {
+        "quietStage": ".impeccable/review/quiet-stage/contract.md",
+        "status": "Superseded working assumption; radial lighting and transparent inactive identities are not current authority.",
+        "textures": [
+          "public/textures/green-baize.jpg",
+          "public/textures/padded-leather.jpg"
+        ],
+        "preserveProvenance": true
+      }
+    },
+    "recordScope": {
+      "contract": ".impeccable/review/illustrated-room/contract.md",
+      "verification": ".impeccable/review/illustrated-room/verification.md",
+      "finishReview": ".impeccable/review/illustrated-room/finish-review.md",
+      "inheritedSeed": "457003dd",
+      "ownerChoice": "An illustrated game-room setting",
+      "approvedComp": false,
+      "independentQualityBarSupplied": false,
+      "captures": [
+        "desktop-1440.jpg",
+        "user-848.jpg",
+        "landscape-844.jpg",
+        "landscape-568.jpg",
+        "portrait-gate.jpg"
+      ],
+      "boundary": "Final captures validated; browser geometry and keyboard evidence only. No physical-phone touch, speaker quality, exhaustive accessibility or whole-app certification.",
+      "notCanonized": "Detector advisories, inherited landing radius, incidental colors and compact text do not become new reusable tokens or exemptions. Quiet radial stage and transparent inactive badges are historical only.",
+      "detector": "One pass before header-only scrim correction; no rerun. Intentional shipped material colors recorded from source."
+    }
   },
   "components": [
     {
@@ -1269,7 +1354,7 @@
       "refersTo": "button-play-selected",
       "description": "Contextual inspection or drawn-card decision above the cropped held fan. Eligible UNO stays at hand level; Draw stays on the physical deck.",
       "html": "<div class=\"ds-hand-controls\"><button class=\"ds-move ds-uno\">UNO!</button><div class=\"ds-dock\"><p class=\"ds-hint\" role=\"status\">Ready to play. You can also drag it onto the table.</p><div class=\"ds-moves\"><button class=\"ds-move ds-play\"><span>Play green Discard all</span><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M5 12h14m-6-6 6 6-6 6\"/></svg></button></div></div></div>",
-      "css": ".ds-hand-controls{position:relative;padding-top:56px;background:#111925;color:#ffffff;font-family:var(--font-body,Outfit),sans-serif}.ds-dock{display:flex;align-items:center;justify-content:center;gap:8px;padding:0;min-height:44px;flex-direction:column}.ds-hint{margin:0;max-width:55ch;min-width:0;color:#ffffff;background:#1c293c;padding:6px 10px;border-radius:6px;font-size:12px;line-height:1.3;text-align:center}.ds-moves{display:flex;max-width:60%;gap:8px}.ds-move{font-family:inherit;display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:44px;min-width:0;padding:7px 14px;border:1px solid transparent;border-radius:14px;font-size:14px;font-weight:800;line-height:1.25;cursor:pointer;transition:transform 120ms cubic-bezier(.2,.8,.2,1),box-shadow 120ms}.ds-play{background:#ffd000;color:#392700;box-shadow:inset 0 -3px 2px #bd7600,0 4px 8px #03091260}.ds-uno{position:absolute;right:18px;top:0;background:#ffd000;color:#392700}.ds-move:hover{filter:brightness(1.07)}.ds-move:focus-visible{outline:3px solid #ffe329;outline-offset:4px}.ds-move:active{transform:translateY(3px);box-shadow:inset 0 -1px 0 #15292626,0 1px 3px #15292620}@media(prefers-reduced-motion:reduce){.ds-move{transition:none}.ds-move:active{transform:none}}"
+      "css": ".ds-hand-controls{position:relative;padding-top:56px;background:#082a3d;color:#ffffff;font-family:var(--font-body,Outfit),sans-serif}.ds-dock{display:flex;align-items:center;justify-content:center;gap:8px;padding:0;min-height:44px;flex-direction:column}.ds-hint{margin:0;max-width:55ch;min-width:0;color:#ffffff;background:#1c293c;padding:6px 10px;border-radius:6px;font-size:12px;line-height:1.3;text-align:center}.ds-moves{display:flex;max-width:60%;gap:8px}.ds-move{font-family:inherit;display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:44px;min-width:0;padding:7px 14px;border:1px solid transparent;border-radius:14px;font-size:14px;font-weight:800;line-height:1.25;cursor:pointer;transition:transform 120ms cubic-bezier(.2,.8,.2,1),box-shadow 120ms}.ds-play{background:#ffd000;color:#392700;box-shadow:inset 0 -3px 2px #bd7600,0 4px 8px #03091260}.ds-uno{position:absolute;right:18px;top:0;background:#ffd000;color:#392700}.ds-move:hover{filter:brightness(1.07)}.ds-move:focus-visible{outline:3px solid #ffe329;outline-offset:4px}.ds-move:active{transform:translateY(3px);box-shadow:inset 0 -1px 0 #15292626,0 1px 3px #15292620}@media(prefers-reduced-motion:reduce){.ds-move{transition:none}.ds-move:active{transform:none}}"
     },
     {
       "name": "Text field",
@@ -1315,9 +1400,9 @@
       "name": "Active opponent and accessible turn",
       "kind": "chip",
       "refersTo": "opponent-badge-active",
-      "description": "Yellow active opponent identity; routine turn/color stay accessible-only. Wild chosen color is contextual to a wild discard.",
-      "html": "<div class=\"ds-status\"><span class=\"ds-seat\"><strong>Alex</strong><small>4 cards</small><i aria-hidden=\"true\"></i></span><div class=\"ds-sr-only\"><h1>Alex’s turn</h1><span>Active color: red</span></div></div>",
-      "css": ".ds-status{padding:18px;background:#111925;font-family:var(--font-body,Outfit),sans-serif}.ds-seat{display:inline-flex;align-items:center;gap:8px;padding:5px 8px;border-radius:7px;background:#ffe329;color:#392700;box-shadow:inset 0 -2px 1px #b39000,0 4px 7px #03091250}.ds-seat strong{font-size:12px;font-weight:500}.ds-seat small{font-size:11px;color:#514100}.ds-seat i{width:5px;height:5px;border-radius:50%;background:#514100}.ds-sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}"
+      "description": "Opaque petrol inactive identity and yellow active opponent over the room. Routine turn/color stay accessible-only; wild chosen color remains contextual.",
+      "html": "<div class=\"ds-status\"><span class=\"ds-seat ds-inactive\"><strong>Sam</strong><small>6 cards</small></span><span class=\"ds-seat\"><strong>Alex</strong><small>4 cards</small><i aria-hidden=\"true\"></i></span><div class=\"ds-sr-only\"><h1>Alex’s turn</h1><span>Active color: red</span></div></div>",
+      "css": ".ds-status{padding:18px;background:#082a3d;font-family:var(--font-body,Outfit),sans-serif}.ds-seat{display:inline-flex;align-items:center;gap:8px;padding:5px 8px;border-radius:7px;background:#ffe329;color:#392700;box-shadow:inset 0 -2px 1px #b39000,0 4px 7px #03091250}.ds-seat strong{font-size:12px;font-weight:500}.ds-seat small{font-size:11px;color:#514100}.ds-seat i{width:5px;height:5px;border-radius:50%;background:#514100}.ds-sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}.ds-seat.ds-inactive{background:#102e37;color:#ffffff;box-shadow:none}.ds-inactive small{color:#c2cedf}"
     },
     {
       "name": "UNO card",
@@ -1328,11 +1413,11 @@
       "css": ".ds-cards{display:flex;gap:18px;padding:20px}.ds-card{box-sizing:border-box;--card-color:#df0735;--card-ink:#ffffff;--card-value-ink:var(--card-color);position:relative;isolation:isolate;display:inline-block;width:82px;height:122px;overflow:hidden;padding:0;border:3px solid #ffffff;border-radius:6px;background:linear-gradient(145deg,#ffffff12,transparent 45%,#00000012),var(--card-color);color:var(--card-ink);font-family:var(--font-card,\"Barlow Condensed\"),sans-serif;box-shadow:inset 0 1px 2px #ffffffb0,inset 0 -1px 1px #17234145,0 1px 1px #c4ccdf,0 3px 1px #68748e,0 8px 12px #02071880;backface-visibility:hidden;transform:perspective(650px) rotateX(0deg) rotateY(0deg);transition:transform 130ms cubic-bezier(.16,1,.3,1);user-select:none}.ds-card:focus-visible{outline:2px solid #ffe329;outline-offset:4px}.ds-wild{--card-color:#101d3a}.ds-orbit{position:absolute;width:116%;height:64%;left:-8%;top:18%;background:#ffffff;border-radius:50%;transform:rotate(-34deg);box-shadow:0 1px 3px #06123024}.ds-index{position:absolute;z-index:2;display:grid;place-items:center;min-width:19px;height:22px;font-size:19px;font-weight:800;font-style:italic;line-height:1;color:var(--card-ink)}.ds-top{top:3px;left:3px}.ds-bottom{bottom:3px;right:3px;transform:rotate(180deg)}.ds-value{position:absolute;inset:16% 0;display:flex;align-items:center;justify-content:center;color:var(--card-value-ink);font-size:70px;font-weight:800;font-style:italic;letter-spacing:-.03em;line-height:1;transform:rotate(-10deg)}.ds-finish{position:absolute;inset:18% 0;z-index:4;border-radius:inherit;pointer-events:none;background:linear-gradient(115deg,transparent 32%,#ffffff35 50%,transparent 68%);transform:translateX(-35%);opacity:0;transition:transform 180ms cubic-bezier(.16,1,.3,1),opacity 130ms}.ds-four{position:relative;width:76%;height:66%;transform:rotate(8deg)}.ds-four i{box-sizing:border-box;position:absolute;top:8%;left:2%;width:42%;height:77%;border:2px solid #ffffff;border-radius:3px;box-shadow:-1px 3px 4px #06123050;transform:rotate(-22deg);transform-origin:50% 100%;background:#df0735}.ds-four i:nth-child(2){left:20%;top:2%;transform:rotate(-8deg);background:#075bee}.ds-four i:nth-child(3){left:38%;top:4%;transform:rotate(8deg);background:#ffce00}.ds-four i:nth-child(4){left:56%;top:12%;transform:rotate(22deg);background:#00bc68}@media(hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference){.ds-card:hover{transform:perspective(650px) rotateX(5deg) rotateY(-5deg)}.ds-card:hover .ds-finish{transform:translateX(18%);opacity:1}.ds-card:active{transform:perspective(650px) rotateX(0deg) rotateY(0deg);transition:none}.ds-card:active .ds-finish{opacity:0;transition:none}}@media(prefers-reduced-motion:reduce){.ds-card,.ds-finish{transition:none}}"
     },
     {
-      "name": "Quiet midnight arena",
+      "name": "Illustrated live game room",
       "kind": "custom",
-      "description": "One soft overhead radial light recedes behind vivid cards; no background pseudo-element shapes, rail or raster. The existing cropped held fan enters from the viewport edge.",
-      "html": "<div class=\"ds-arena\" role=\"img\" aria-label=\"Quiet midnight UNO stage with soft overhead lighting\"></div>",
-      "css": ".ds-arena{position:relative;isolation:isolate;height:240px;overflow:clip;background:radial-gradient(ellipse at 50% 12%,#223248 0%,#172233 48%,#111925 100%)}"
+      "description": "Static original warm lounge above a clear petrol tabletop; cover center 30%, opaque identities and a header-only scrim preserve live layer contrast. Native held cards remain separate.",
+      "html": "<div class=\"ds-arena\" role=\"img\" aria-label=\"Illustrated evening lounge above an empty petrol tabletop\"><div class=\"ds-room-header\"></div></div>",
+      "css": ".ds-arena{position:relative;isolation:isolate;height:240px;overflow:clip;background-color:#082a3d;background-image:url(\"/artwork/game-room-evening.webp\");background-size:cover;background-position:center 30%;background-repeat:no-repeat}.ds-room-header{height:60px;background:linear-gradient(#061e2ddd,#061e2d99 65%,#061e2d00)}"
     },
     {
       "name": "Earned round and milestone collection",
@@ -1368,13 +1453,13 @@
     }
   ],
   "narrative": {
-    "northStar": "The open UNO play field and after-hours card club",
-    "overview": "UNO feels like a held hand of vivid real cards over a quiet midnight stage. Soft overhead lighting recedes behind expressive players and centered piles without a bounded table or background shapes. Cards are the controls: a legal face plays on its first activation; the foreground fan comes from below the viewport and makes pickup and deliberate upward release tangible.\n\nHome remains a centered illustrated after-hours card club: a flat transparent original rabbit, red panda and crocodile scene sits directly on navy, with yellow Play and full-color blue Create and crimson Join actions. Settings and setup retain theme-aware supporting surfaces. Live play uses a fixed softly lit midnight field, white lettering and yellow action/active-seat feedback. Outfit UI and Barlow Condensed card lettering remain the two pinned families. Small native card characters express published player state.",
+    "northStar": "The illustrated game room and after-hours card club",
+    "overview": "UNO feels like a held hand of vivid real cards in an illustrated evening game room. Warm lounge furniture occupies the upper band while a clear petrol-blue tabletop recedes behind expressive players and centered piles. Cards are the controls: a legal face plays on its first activation; the foreground fan comes from below the viewport and makes pickup and deliberate upward release tangible.\n\nHome remains a centered illustrated after-hours card club: a flat transparent original rabbit, red panda and crocodile scene sits directly on navy, with yellow Play and full-color blue Create and crimson Join actions. Settings and setup retain theme-aware supporting surfaces. Live play uses a static original room illustration, opaque petrol player identities, white lettering and yellow action/active-seat feedback. Outfit UI and Barlow Condensed card lettering remain the two pinned families. Small native card characters express published player state.",
     "keyCharacteristics": [
       "A centered flat illustrated card-club welcome with complete silhouettes and visibly primary Play.",
       "One shared native card face across the live hand, piles and motion.",
       "Outfit interface lettering paired with Barlow Condensed card numerals.",
-      "Fixed navy home, theme-aware settings/setup and a quiet continuous midnight live arena.",
+      "Fixed navy home, theme-aware settings/setup and an illustrated warm lounge above a clear petrol live tabletop.",
       "First-activation legal play, nonmatching-card inspection and deliberate upward release.",
       "Viewport-edge cropped held fan, bounded horizontal hand scrolling, contextual controls and paper/contact feedback that never delays a turn.",
       "Real round outcomes and optional device-local milestone cards.",
@@ -1383,7 +1468,7 @@
     "rules": [
       {
         "name": "The Scoped Worlds Rule",
-        "body": "Keep home in its fixed navy/ivory/full-color club palette, honor appearance variables in settings and setup, and scope the softly lit midnight stage with white lettering and yellow state feedback to live play. The native deck remains stable across appearances.",
+        "body": "Keep home in its fixed navy/ivory/full-color club palette, honor appearance variables in settings and setup, and scope the illustrated lounge, opaque identities, white lettering and yellow state feedback to live play. The native deck remains stable across appearances.",
         "section": "colors"
       },
       {
@@ -1412,6 +1497,11 @@
         "section": "components"
       },
       {
+        "name": "The Clear Tabletop Rule",
+        "body": "Keep furnishings in the illustrated upper band, piles on uninterrupted petrol tabletop and runtime cards, labels and controls in independent live layers. Protect identities with opaque backing and limit the contrast scrim to the header.",
+        "section": "components"
+      },
+      {
         "name": "The Honest Expression Rule",
         "body": "Derive player reactions from published game facts, restart the decorative one-shot only when expression changes, and preserve readable state without spatial animation under reduced motion.",
         "section": "components"
@@ -1436,7 +1526,8 @@
       "Do use the same authored native face for the hand, piles and card motion.",
       "Do keep home Play central, Create/Join paired, sharper 6px action corners and complete flat transparent silhouettes with their prompt provenance.",
       "Do preserve vivid deck colors, white faces, distinct dark green/yellow index and center inks, and a written chosen-color label for wild top discards.",
-      "Do retain the fixed home club palette, scoped quiet midnight arena and theme-aware settings/setup.",
+      "Do retain the fixed home club palette, scoped illustrated room and theme-aware settings/setup.",
+      "Do preserve the room raster’s prompt provenance, cover crop, solid fallback, opaque identities and header-only contrast scrim.",
       "Do keep one clipped viewport with centered piles and a bottom-cropped fan, complete internal card boxes, top focus clearance and independent horizontal large-hand scrolling.",
       "Do retain distinct six-seat landscape identities and the portrait rotate gate, local pause and online-continuation disclosure.",
       "Do play legal cards on first activation and keep nonmatching inspection, turn state and situational actions clear with touch and keyboard.",
@@ -1456,7 +1547,7 @@
       "Don't restore clay hero art, Fredoka, a third font family or a parallel component library.",
       "Don't replace the held fan with a flat shrinking row or let large hands overflow the page.",
       "Don't restore the separate local-hand toolbar, standalone direction arrow, portrait phone gameplay or side-by-side landscape table/hand.",
-      "Don't crop the flat home silhouettes or restore cinematic scenery and a boxed or patched background.",
+      "Don't crop the flat home silhouettes or restore cinematic scenery and a boxed or patched background on home.",
       "Don't restore the rejected giant blue ovals or electric-blue background planes in live play.",
       "Don't restore poker furniture, felt/leather live backgrounds, a remaining-deck badge, header sound controls or a routine visible turn/color HUD.",
       "Don't show UNO when ineligible, duplicate Draw in the dock or turn sorting into a permanent table control.",

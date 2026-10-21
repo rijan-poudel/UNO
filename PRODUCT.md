@@ -65,4 +65,8 @@ The owner rejects the baize/leather arena as poker-like. Replace that live table
 
 ## Background correction
 
-The owner rejected the electric-blue orbit background. Background decoration must recede behind the vivid held cards. The working replacement is a quiet, softly lit midnight stage; the open layout, cropped hand, sparse header and graphical state cues remain. Do not restore the rejected large blue ovals or casino furniture.
+The owner rejected the electric-blue orbit background. Background decoration must recede behind the vivid held cards. The initial working replacement was a quiet, softly lit midnight stage; the open layout, cropped hand, sparse header and graphical state cues remain. Do not restore the rejected large blue ovals or casino furniture.
+
+## Selected illustrated room
+
+The owner answered the background preference with “An illustrated game-room setting.” This supersedes the quiet-stage assumption. Use original lounge artwork as a static setting around the live cards, with warm furniture above a clear petrol tabletop, compact opaque player-name backings, and responsive crops checked on desktop and landscape phones. Preserve the cropped held hand, sparse controls, direct play and accessible state cues. No illustrated element should impersonate a live card or control, obscure a pile, or delay play.

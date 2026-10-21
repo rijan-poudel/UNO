@@ -1,0 +1,54 @@
+{
+  "prompt": "Edit this original game-room background for live card-game compositing. Preserve its painterly cel-illustration character, evening window, mustard couch, warm pendant, coral board-game shelf, petrol-teal palette and inviting warm light. Change only the camera/composition: use a more elevated seated-player view and move the table's far edge up to exactly the top QUARTER of the image (24% down). Compress the room's visible height by recomposing it into the upper quarter, not by distorting the furniture. The remaining lower 76% is one empty uninterrupted matte deep-petrol-blue tabletop, with extremely subtle lighting and no distinct center feature. All major room cues must be identifiable in the central 60% of the top quarter as well as the corners, so a square crop of this landscape asset keeps recognizable furniture. The actual card piles will sit between 32% and 55% down the screen; that entire central region MUST be blank tabletop. Keep the tabletop continuing beyond the side and bottom edges. No table rim, oval, leather rail or casino furniture. Keep a clean foreground with no painted cards, pieces, UI, lettering, logos, characters, or additional ornaments. Wide landscape 1920x1080.\n",
+  "createdAt": "2026-10-21T15:50:32.720Z",
+  "id": "game-room-evening",
+  "assetRole": "Original illustrated room background for live game compositing",
+  "mediaType": "image/webp",
+  "width": 1672,
+  "height": 941,
+  "bytes": 63838,
+  "transparency": false,
+  "sha256": "37ec6d9a2456b49c4170d7aef2a238e2f137bc3a212fe31ea9fb153b23db509b",
+  "promptFile": ".impeccable/review/illustrated-room/art-edit-prompt.txt",
+  "originalGeneration": {
+    "tool": "image_gen.imagegen (built-in)",
+    "prompt": "Use case: illustration-story.\nAsset type: a finished original background painting for a browser UNO multiplayer game. Background artwork ONLY, not a UI mockup.\nPrimary request: a playful illustrated game-room setting that feels welcoming, vibrant and thoughtfully art-directed, with clean cel-animation craft and subtle spatial depth.\n\nScene and framing: wide landscape 1920 x 1080 composition, viewed from a seated player's slightly elevated viewpoint into a compact modern game lounge. The room is clearly recognizable in the upper third: a mustard sofa end to the left, a low coral bookcase with a few colored board-game boxes to the right, a small centered back-wall window with a simple evening skyline, and a warm pendant lamp toward the upper left. Keep the groups economical and distinct. Muted petrol-teal walls, warm amber lighting and a few vivid coral/mustard accents. No characters, because live player avatars will be overlaid by code.\n\nCritical playable area: a single broad matte deep-petrol-blue RECTANGULAR tabletop fills the lower two thirds and continues beyond the entire bottom and side edges. It must remain a beautifully quiet, uninterrupted surface with very subtle lighting, not felt and not a casino table. There is NO oval table, raised rail, border, central emblem, giant geometric background motif or dramatic spotlight circle. The central 25–75 percent of the image width from 32 percent height down to the bottom is empty playable surface for real live cards. Do not paint cards or any game pieces into this area. Important room cues stay in the central 65 percent of the top band as well as the outer corners so a narrower desktop crop still reads as a room. Keep the topmost left and right corners low-detail for a small overlaid logo and menu.\n\nStyle: confident flat 2D animation background painting with large considered forms, restrained clean contours and precisely placed cel shadows, cheerful modern game character, slight believable perspective; no glossy 3D or clay rendering. Colorful furniture is a supporting accent, not a competing focal point. Finished production game art, not a sketch or stock vector scene.\nLighting: warm room light at the back, cool dark tabletop at the front; balanced readable values. Avoid texture noise, artificial grain, haze, blur and excessive gradients.\nText: NONE.\nAvoid: text, logos, watermarks, UI controls, interface chrome, card faces, card backs, poker chips, dice, people, mascots, floating stickers, computer screens, LEDs, neon, fantasy scenery, photorealism, fuzzy detail, plastic highlights. Do not create any fake buttons or playable objects.\n",
+    "promptFile": ".impeccable/review/illustrated-room/art-prompt.txt",
+    "outputPath": "/Users/rizx/.codex/generated_images/01a14826-ce7e-7810-b29f-cc5709f6fe93/exec-210e942c-406e-4be2-ada9-9b0a5e96a9b3.png",
+    "width": 1672,
+    "height": 941,
+    "sha256": "7290f7c97347d954b288551c682a6b1661ab14f7f64da92bbe0c2288e4a985de"
+  },
+  "finalEdit": {
+    "tool": "image_gen.imagegen (built-in)",
+    "inputPath": "/Users/rizx/.codex/generated_images/01a14826-ce7e-7810-b29f-cc5709f6fe93/exec-210e942c-406e-4be2-ada9-9b0a5e96a9b3.png",
+    "outputPath": "/Users/rizx/.codex/generated_images/01a14826-ce7e-7810-b29f-cc5709f6fe93/exec-fe44a26b-52b9-409d-b35c-01516e56d594.png",
+    "width": 1672,
+    "height": 941,
+    "sha256": "810ac2a387717212e7a52263db65da149581d0add72fbe44ea1564973b60ee3b",
+    "promptFile": ".impeccable/review/illustrated-room/art-edit-prompt.txt",
+    "prompt": "Edit this original game-room background for live card-game compositing. Preserve its painterly cel-illustration character, evening window, mustard couch, warm pendant, coral board-game shelf, petrol-teal palette and inviting warm light. Change only the camera/composition: use a more elevated seated-player view and move the table's far edge up to exactly the top QUARTER of the image (24% down). Compress the room's visible height by recomposing it into the upper quarter, not by distorting the furniture. The remaining lower 76% is one empty uninterrupted matte deep-petrol-blue tabletop, with extremely subtle lighting and no distinct center feature. All major room cues must be identifiable in the central 60% of the top quarter as well as the corners, so a square crop of this landscape asset keeps recognizable furniture. The actual card piles will sit between 32% and 55% down the screen; that entire central region MUST be blank tabletop. Keep the tabletop continuing beyond the side and bottom edges. No table rim, oval, leather rail or casino furniture. Keep a clean foreground with no painted cards, pieces, UI, lettering, logos, characters, or additional ornaments. Wide landscape 1920x1080.\n"
+  },
+  "conversion": {
+    "tool": "/opt/homebrew/bin/cwebp",
+    "arguments": [
+      "-q",
+      "82",
+      "-m",
+      "6",
+      "/Users/rizx/.codex/generated_images/01a14826-ce7e-7810-b29f-cc5709f6fe93/exec-fe44a26b-52b9-409d-b35c-01516e56d594.png",
+      "-o",
+      "public/artwork/game-room-evening.webp"
+    ],
+    "crop": false,
+    "resize": false,
+    "colorEncoding": "Lossy VP8 YUV"
+  },
+  "promptStorage": "embed-prompt.mjs WebP JSON sidecar fallback",
+  "validation": {
+    "media": "file and webpinfo confirm valid nonanimated opaque 1672x941 WebP",
+    "visualComparison": "Source PNG and shipping WebP opened and compared; full image, silhouette, palette, furniture and empty playable surface retained",
+    "status": "accepted",
+    "scope": "Faithful artwork packaging only; responsive game composition remains parent review"
+  }
+}

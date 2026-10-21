@@ -118,6 +118,12 @@ The lower hand is deliberately cropped by the page boundary. Its actual horizont
 
 `.impeccable/review/play-field/` records the owner correction, contract, captures and checks. No engine, network protocol, state-transition motion/audio timing, new dependency or raster change was required.
 
-### Quiet stage background correction — current material authority
+### Quiet stage background correction — superseded assumption
 
 The owner rejected the electric-blue orbit field as well. `app/arena.css` removes both decorative main pseudo-elements and uses restrained midnight overhead lighting. Supporting menu/hint surfaces and cast-shadow ink follow that ground. The fixed viewport, cropped-hand geometry, independent scrolling, gestures, turn lift, wild marker and audio/network behavior are unchanged. The preceding blue-orbit material notes are historical; `.impeccable/review/quiet-stage/` holds the superseding background review.
+
+### Illustrated game room — current background authority
+
+The owner explicitly selected an illustrated game-room setting after the quiet-stage assumption. `app/arena.css` uses the static `public/artwork/game-room-evening.webp` as a cover background at center30%, with a solid petrol fallback. Furniture occupies the upper band; the broad painted tabletop stays clear under native live piles. Compact inactive player identities use opaque#102e37 backing for stable text contrast over the room. The62.3KiB image never gates input or turns and has no animation. Cards, seats, controls, gesture/audio timing and the phone landscape gate remain code-owned and unchanged.
+
+The original image and targeted composition edit were made with the built-in image tool; the shipping JSON sidecar preserves exact prompts, source paths, conversion settings and hashes. `.impeccable/review/illustrated-room/` records composition, independent asset packaging, responsive verification and finish review. Earlier quiet-stage and orbit-field background notes are historical.

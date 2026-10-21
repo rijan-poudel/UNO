@@ -1,6 +1,6 @@
 ---
-name: "UNO — Card club and open play field"
-description: "Flat illustrated friends and vivid held cards over a quiet midnight UNO stage."
+name: "UNO — Card club and illustrated game room"
+description: "Original card-club friends and vivid held cards in a warm illustrated game room."
 colors:
   ui-bg: "#fff8ec"
   ui-surface: "#fffcf5"
@@ -27,8 +27,9 @@ colors:
   sunset-line: "#dfc4b4"
   arena-bg: "#111925"
   arena-surface: "#1c293c"
-  arena-light: "#223248"
-  arena-midpoint: "#172233"
+  arena-room-fallback: "#082a3d"
+  arena-identity: "#102e37"
+  arena-header-scrim: "#061e2d"
   arena-shadow-ink: "#030912"
   arena-menu: "#1e2c42"
   arena-menu-hover: "#2a3b54"
@@ -248,7 +249,7 @@ components:
     rounded: "{rounded.dialog}"
     padding: "28px"
   opponent-badge:
-    backgroundColor: "transparent"
+    backgroundColor: "{colors.arena-identity}"
     textColor: "{colors.arena-text}"
     rounded: "{rounded.seat}"
     padding: "5px 8px"
@@ -304,28 +305,28 @@ components:
     rounded: "{rounded.launch-action}"
 ---
 
-# Design System: UNO — Card club and open play field
+# Design System: UNO — Card club and illustrated game room
 
 ## Overview
 
-**Creative North Star: "The open UNO play field and after-hours card club"**
+**Creative North Star: "The illustrated game room and after-hours card club"**
 
-UNO feels like a held hand of vivid real cards over a quiet midnight stage. Soft overhead lighting recedes behind expressive players and centered piles without a bounded table or background shapes. Cards are the controls: a legal face plays on its first activation; the foreground fan comes from below the viewport and makes pickup and deliberate upward release tangible.
+UNO feels like a held hand of vivid real cards in an illustrated evening game room. Warm lounge furniture occupies the upper band while a clear petrol-blue tabletop recedes behind expressive players and centered piles. Cards are the controls: a legal face plays on its first activation; the foreground fan comes from below the viewport and makes pickup and deliberate upward release tangible.
 
-Home remains a centered illustrated after-hours card club: a flat transparent original rabbit, red panda and crocodile scene sits directly on navy, with yellow Play and full-color blue Create and crimson Join actions. Settings and setup retain theme-aware supporting surfaces. Live play uses a fixed softly lit midnight field, white lettering and yellow action/active-seat feedback. Outfit UI and Barlow Condensed card lettering remain the two pinned families. Small native card characters express published player state.
+Home remains a centered illustrated after-hours card club: a flat transparent original rabbit, red panda and crocodile scene sits directly on navy, with yellow Play and full-color blue Create and crimson Join actions. Settings and setup retain theme-aware supporting surfaces. Live play uses a static original room illustration, opaque petrol player identities, white lettering and yellow action/active-seat feedback. Outfit UI and Barlow Condensed card lettering remain the two pinned families. Small native card characters express published player state.
 
 **Key Characteristics:**
 
 - A centered flat illustrated card-club welcome with complete silhouettes and visibly primary Play.
 - One shared native card face across the live hand, piles and motion.
 - Outfit interface lettering paired with Barlow Condensed card numerals.
-- Fixed navy home, theme-aware settings/setup and a quiet continuous midnight live arena.
+- Fixed navy home, theme-aware settings/setup and an illustrated warm lounge above a clear petrol live tabletop.
 - First-activation legal play, nonmatching-card inspection and deliberate upward release.
 - Viewport-edge cropped held fan, bounded horizontal hand scrolling, contextual controls and paper/contact feedback that never delays a turn.
 - Real round outcomes and optional device-local milestone cards.
 - Original card characters with truthful expressions, bounded reactions and pressed control surfaces.
 
-Historical evidence below preserves provenance; its live-table materials and HUD are superseded by the October 21 play-field correction, and its blue orbit background is superseded by the quiet-stage refinement.
+Historical evidence below preserves provenance. The October 21 play-field correction supersedes earlier live-table materials and HUD; the quiet-stage working assumption superseded the rejected blue orbit and is itself superseded by the owner-selected illustrated room recorded last below.
 
 Historical table evidence, recorded on 2026-10-19: The owner-directed replacement in `.impeccable/review/direct-play/contract.md` and `.impeccable/direction.md` supersedes the previous midnight table and inspect-first flow; that review retained the then-incumbent launch/settings. Its home composition is superseded below. Evidence is `app/table.css`, `components/UnoCard.tsx`, `components/HandCard.tsx`, `components/GameBoard.tsx`, `hooks/useGamePresentation.ts`, `lib/cardGesture.ts` and `lib/tableChimes.ts`, alongside unchanged shell primitives. This is code-led work with no approved raster comp. The fresh full material review is `finish-review-rebuild.md` in that review packet; `verdict.md` confirms the sole rail-shadow fix resolved. Six valid captures at 320, 390 and 1440px are seeded local fixtures, not public matches. Reduced-motion behavior is evidenced by source guards, not an emulated capture; screenshots and audio scheduling assertions do not certify physical speaker quality.
 
@@ -345,9 +346,11 @@ The owner-directed open play field was recorded on 2026-10-21 from `app/arena.cs
 
 The narrow quiet-stage background refinement was recorded on 2026-10-21 from `app/arena.css` and the live contract in `app/layout.tsx`. `.impeccable/review/quiet-stage/contract.md` supersedes the giant blue ovals and their palette, inheriting seed `457003dd` without a reroll. The owner rejected the blue background; the dark stage was explicitly stated as a working assumption after an optional preference question remained unanswered, not as user aesthetic approval. The packet’s verification and finish review record four opened valid captures: `user-848.jpg`, `landscape-844.jpg`, `landscape-568.jpg` and `portrait-gate.jpg`. They cover the supplied viewport, six-seat large-hand keyboard focus at both landscape sizes, and the portrait gate. The refinement changes only lighting, related UI surfaces and cast-shadow ink; foreground deck materials, geometry, typography, motion, engine/audio rules, home and selected-theme support remain pinned. No approved comp or independent quality bar is implied. No new raster assets were added; historical texture and artwork provenance remains preserved. The final verdict belongs to that packet and is not assigned here.
 
+The owner-selected illustrated-room adaptation was recorded on 2026-10-21 from `app/arena.css`, `app/layout.tsx`, the shipping artwork and `.impeccable/review/illustrated-room/`. The owner’s explicit “An illustrated game-room setting” supersedes the quiet-stage assumption. The code-led adaptation retains seed `457003dd`, corroborated in the play-field contract, without a new approved comp or an independent quality-bar card. Its original lounge raster supplies mustard seating, coral shelving, an evening window and warm pendant above a clear petrol tabletop; native cards, geometry, gestures, audio, fonts, home and setup remain pinned. All five final captures were opened and validated: 1440 × 900 desktop, 848 × 765 owner viewport, 844 × 390 and 568 × 320 six-seat/20-card landscape with End focus, and 390 × 844 portrait gate. Verification records accessible pile clearance, opaque identities, header contrast, bounded page/hand scrolling and a draw acknowledgement without waiting on artwork. The final header-only scrim is the single material correction batch. Browser proof does not certify physical-phone touch, speaker quality or exhaustive accessibility. The finish review requests this persistence refresh only; no approved-painting or independent quality-bar certification is implied, and the final verdict belongs to that packet.
+
 ## Colors
 
-Navy and ivory frame the illustrated invitation; yellow makes Play immediate. Theme-aware paper supports setup and settings, while stable saturated card colors lead against quiet midnight lighting in play.
+Navy and ivory frame the illustrated invitation; yellow makes Play immediate. Theme-aware paper supports setup and settings, while stable saturated card colors lead over the illustrated room’s quiet petrol tabletop in play.
 
 ### Primary
 
@@ -365,10 +368,10 @@ Navy and ivory frame the illustrated invitation; yellow makes Play immediate. Th
 
 - **Club navy and ivory:** `launch-bg` is the home field; `launch-paper` is its title lettering. `launch-surface` supports home utilities and collection cards; `launch-muted` and `launch-quiet` carry secondary copy. These scoped home colors remain fixed across appearance choices.
 - **Warm paper and ink:** `ui-bg`, `ui-surface`, `ui-text`, `ui-muted` and `ui-line` form the supporting shell. Paper, midnight, forest and sunset appearances change these root variables.
-- **Quiet play stage:** `arena-bg` is the live base; `arena-light` and `arena-midpoint` supply one soft overhead radial light. `arena-surface` backs contextual hints, waiting and called-UNO status; `arena-menu` and `arena-menu-hover` back the icon-only header control. `arena-shadow-ink` unifies the cast depth of raised cards, the draw stack, active seat and yellow actions. `arena-text`, `arena-muted`, `arena-line` and `arena-accent-red` scope the supporting UI roles inside live play. These fixed arena colors do not replace appearance variables in settings/setup.
+- **Illustrated play room:** `arena-room-fallback` is the solid petrol background beneath the room raster; `arena-identity` makes inactive names/counts opaque over furniture; `arena-header-scrim` supplies the header-only contrast tint. `arena-bg` remains the scoped UI background variable and scrollbar track, not the room’s painted background. `arena-surface` backs contextual hints, waiting and called-UNO status; `arena-menu` and `arena-menu-hover` back the icon-only header control. `arena-shadow-ink` unifies the cast depth of raised cards, the draw stack, active seat and yellow actions. `arena-text`, `arena-muted`, `arena-line` and `arena-accent-red` scope the supporting UI roles inside live play. These fixed arena colors do not replace appearance variables in settings/setup.
 - **White stock and dark back:** `card-paper`, navy `card-back` and `arena-dark-ink` anchor the deck and dark text on the active yellow seat. The back carries a crimson diagonal mark and white Outfit lettering.
 
-**The Scoped Worlds Rule.** Keep home in its fixed navy/ivory/full-color club palette, honor appearance variables in settings and setup, and scope the softly lit midnight stage with white lettering and yellow state feedback to live play. The native deck remains stable across appearances.
+**The Scoped Worlds Rule.** Keep home in its fixed navy/ivory/full-color club palette, honor appearance variables in settings and setup, and scope the illustrated lounge, opaque identities, white lettering and yellow state feedback to live play. The native deck remains stable across appearances.
 
 ## Typography
 
@@ -400,7 +403,7 @@ At 700px and below main padding is 12px 20px 0, the scene is 230px high and cont
 
 Live play is an open `100dvh` flex column with page `overflow: clip`. The 60px header keeps the leave-game wordmark and one 44 × 44px icon-only Game menu control at opposite corners. There is no bot-round sentence, header sound control, remaining-deck count or visible routine turn/color HUD. Sound, room-code copy, written direction/next player, sorting and activity live in the native menu. Accessible turn/color/action status and the hand's full count remain available.
 
-`game-main` is bounded to 1600px, with one `minmax(0, 1fr)` column and rows `minmax(0, 1fr) var(--hand-height)`. Ordinary side padding is 24px. The page supplies one continuous radial light centered at 50% 12%, with the light, midpoint and base stops at 0%, 48% and 100%. The main play region has no pseudo-element background shapes, felt, seam, rail or raster background. Piles sit at `calc(50% + 34px)` within the upper play region with 40px separation; opponents keep independent perimeter lanes.
+`game-main` is bounded to 1600px, with one `minmax(0, 1fr)` column and rows `minmax(0, 1fr) var(--hand-height)`. Ordinary side padding is 24px. The page uses the same single static room raster at every size, with `background-size: cover`, `background-position: center 30%` and no repeat over the solid petrol fallback. The header alone carries `linear-gradient(#061e2ddd, #061e2d99 65%, #061e2d00)` to protect the wordmark when a crop places the lamp behind it; the tabletop has no added scrim. Furnishings stay above the pile faces in the verified desktop and landscape crops. The main play region has no added background shapes, felt, seam or rail. Piles sit at `calc(50% + 34px)` within the upper play region with 40px separation; opponents keep independent perimeter lanes.
 
 The hand intentionally enters from below the viewport: roughly its lower quarter is clipped by the page. Ordinary hand/pile multipliers are 1.65/1.35 with a 188px hand row; at heights at least 900px and widths at least 701px they become 1.95/1.65 with a 216px row. The horizontal scrollport contains complete card boxes below that page clip: its height is `calc(122px * var(--hand-scale) + 120px)`, with 42px top padding, horizontal scrolling and hidden vertical overflow. Preserve this distinction so keyboard focus never vertically scrolls away the card tops. Cards overlap by 44px; their bounded fan drop is multiplied by 0.45. Local turn raises the hand 8px; legal cards rise 19px and grow to 1.025. Focus/inspection rises 32px and straightens to 1.04; fine-pointer hover rises 34px. These source distances are response geometry, not extra spacing primitives.
 
@@ -418,7 +421,7 @@ Compact opponent labels keep their card-face avatar visible except in the shorte
 
 ## Elevation & Depth
 
-Soft overhead light supplies quiet arena depth without physical furniture or oversized geometric planes. The shared face retains a thin white laminate edge, short stock layers and directional cast shadows; held and inspected cards deepen as they rise. Controls retain bevel highlights, inset pressed lips and soft contact depth. Ordinary information containers do not inherit card stock shadows.
+The static illustration supplies spatial depth through warm lounge furniture above a cool empty tabletop. A header-only fading scrim and opaque identity backings protect live text without darkening the central play surface. The shared face retains a thin white laminate edge, short stock layers and directional cast shadows; held and inspected cards deepen as they rise. Controls retain bevel highlights, inset pressed lips and soft contact depth. Ordinary information containers do not inherit card stock shadows.
 
 Historical `public/textures/green-baize.jpg` and `public/textures/padded-leather.jpg`, their exact adjacent `.prompt.txt` prompts and embedded provenance stay preserved as historical assets. They are not current arena materials and do not authorize a felt or leather extension.
 
@@ -475,6 +478,14 @@ Creation and joining are distinct labeled choices. Joining accepts either the si
 
 **The Central Play Rule.** Keep Play on the home’s center axis ahead of room actions and secondary help; preserve the complete flat transparent scene and real, immediately available controls.
 
+### Illustrated live game room
+
+`public/artwork/game-room-evening.webp` is the original static evening lounge for live play: warm mustard seating, coral shelving, sunset window, pendant and plants occupy the upper band above an uninterrupted petrol-blue tabletop. The opaque, nonanimated 1672 × 941 WebP is 63,838 bytes (62.3KiB), converted at full source dimensions with cwebp quality 82/method 6 and no source crop or resize. Responsive CSS performs the cover crop described in Layout; no illustration is stretched or replaced at phone sizes. Preserve the exact original generation and targeted edit prompts, built-in `image_gen.imagegen` provenance, source/output hashes and conversion details in `public/artwork/game-room-evening.webp.json`; the matching prompt files and packaging QA live in `.impeccable/review/illustrated-room/`. The tool supplied these actual dimensions despite the prompt requesting 1920 × 1080; the source’s tabletop edge is approximately 28% down at center rather than the edit’s requested 24%. The validated live crops, not that requested percentage, evidence the shipped composition.
+
+The image carries setting only. Native `UnoCard`/`HandCard`, seats, piles, menu and dialogs remain independent live layers; no painted cards, controls or text impersonate them. Asset load never gates play. Inactive player identities have solid petrol backing, and the header-only scrim protects the wordmark without obscuring the tabletop. The selected room category is owner-authorized; neither a specific-painting approval nor an approved UI comp is claimed.
+
+**The Clear Tabletop Rule.** Keep furnishings in the illustrated upper band, piles on uninterrupted petrol tabletop and runtime cards, labels and controls in independent live layers. Protect identities with opaque backing and limit the contrast scrim to the header.
+
 ### Original player expressions
 
 `PlayerAvatar` is the same small original card character in seat badges and the winning result. It does not define the home’s illustrated animal scene. Its deterministic seed picks one of the existing six identity colors and a small resting tilt. Eyes and mouth use native CSS shapes; the badge is decorative (`aria-hidden`), leaving names, actual counts, accessible turn status and native controls authoritative. The completed-round winner celebrates.
@@ -487,7 +498,7 @@ A non-neutral opponent face reacts once over 260ms using the shared easing, only
 
 ### Active seat and turn cue
 
-An active opponent badge fills bright yellow with `move-action-ink`; inactive badges are transparent over the midnight stage with white names and pale secondary counts. Local turn raises all held cards 8px; legal cards rise 19px and grow 2.5%, with the smaller landscape distances in Layout. This is a bounded 200ms transform transition, absent under reduced motion; the raised static state stays readable. The old legal-card bottom mark is hidden and quiet cards keep their vivid ink.
+An active opponent badge fills bright yellow with `move-action-ink`; inactive badges use opaque `arena-identity` backing over the illustration with white names and pale secondary counts. Local turn raises all held cards 8px; legal cards rise 19px and grow 2.5%, with the smaller landscape distances in Layout. This is a bounded 200ms transform transition, absent under reduced motion; the raised static state stays readable. The old legal-card bottom mark is hidden and quiet cards keep their vivid ink.
 
 Routine turn heading and active color are accessible-only. The top discard itself supplies ordinary color. Only a wild top discard exposes a written chosen-color label plus bordered 16px swatch. Waiting for a remote wild choice, penalties, invalid inspection, drawn-card decisions, optional Pass and reconnect/error states keep contextual guidance. No permanent Your move sentence, ordinary color caption or remaining-deck badge is part of live play.
 
@@ -509,7 +520,7 @@ The collection derives from the existing idempotent completed-round record; it i
 
 ### Held hand and piles
 
-`UnoCard` and its scoped `UnoCard.module.css` own the shared native face finish, white stock, print inks, Wild+4 fan and guarded CSS tilt/sheen; `HandCard` owns inspection and gestures; `app/table.css` owns inherited base card geometry; the later-imported `app/arena.css` owns the quiet midnight live world, viewport geometry and hand clearance; `app/home.css` owns the separate title screen. The first tap or native keyboard activation plays a legal card immediately. A nonmatching card remains inspectable; explicit named Play is a fallback if that inspected card later becomes legal. Waiting players can inspect their hands; a legal exact-match jump-in follows the same direct-play availability. Cancelled dialogs return focus to their opener. A locally played focused card hands keyboard focus to a surviving neighbor without stealing focus from another dialog/control. Arrow keys browse the hand with wrapping; Home and End reach its ends, keeping focused cards in view. A legal card can also be dragged upward. Readiness and release use the same `canReleaseCard` predicate: `dy < -65` and `abs(dy) > abs(dx) * 0.8`, with finite coordinates. The table says “Slide up to play” during lift and “Release to play” only when that exact predicate passes. Focus lifts a card, native button activation preserves keyboard access, and legal lift/growth identifies availability without dimming native inks.
+`UnoCard` and its scoped `UnoCard.module.css` own the shared native face finish, white stock, print inks, Wild+4 fan and guarded CSS tilt/sheen; `HandCard` owns inspection and gestures; `app/table.css` owns inherited base card geometry; the later-imported `app/arena.css` owns the illustrated room crop, live identity/header contrast, viewport geometry and hand clearance; `app/home.css` owns the separate title screen. The first tap or native keyboard activation plays a legal card immediately. A nonmatching card remains inspectable; explicit named Play is a fallback if that inspected card later becomes legal. Waiting players can inspect their hands; a legal exact-match jump-in follows the same direct-play availability. Cancelled dialogs return focus to their opener. A locally played focused card hands keyboard focus to a surviving neighbor without stealing focus from another dialog/control. Arrow keys browse the hand with wrapping; Home and End reach its ends, keeping focused cards in view. A legal card can also be dragged upward. Readiness and release use the same `canReleaseCard` predicate: `dy < -65` and `abs(dy) > abs(dx) * 0.8`, with finite coordinates. The table says “Slide up to play” during lift and “Release to play” only when that exact predicate passes. Focus lifts a card, native button activation preserves keyboard access, and legal lift/growth identifies availability without dimming native inks.
 
 Pointer capture starts on the face. Nonprimary pointers and nonleft clicks are ignored; button loss, pointer cancellation, capture loss, blur, visibility changes and unmount cancel or clean up the gesture. An unsuccessful drag returns quickly. Reduced motion removes travel and drag rotation while retaining a usable selection state. Identity follows the card through sorting and game updates.
 
@@ -532,7 +543,8 @@ Pointer-down primes audio silently. Actual tap or keyboard activation produces a
 - **Do** use the same authored native face for the hand, piles and card motion.
 - **Do** keep home Play central, Create/Join paired, sharper 6px action corners and complete flat transparent silhouettes with their prompt provenance.
 - **Do** preserve vivid deck colors, white faces, distinct dark green/yellow index and center inks, and a written chosen-color label for wild top discards.
-- **Do** retain the fixed home club palette, scoped quiet midnight arena and theme-aware settings/setup.
+- **Do** retain the fixed home club palette, scoped illustrated room and theme-aware settings/setup.
+- **Do** preserve the room raster’s prompt provenance, cover crop, solid fallback, opaque identities and header-only contrast scrim.
 - **Do** keep one clipped viewport with centered piles and a bottom-cropped fan, complete internal card boxes, top focus clearance and independent horizontal large-hand scrolling.
 - **Do** retain distinct six-seat landscape identities and the portrait rotate gate, local pause and online-continuation disclosure.
 - **Do** play legal cards on first activation and keep nonmatching inspection, turn state and situational actions clear with touch and keyboard.
@@ -553,7 +565,7 @@ Pointer-down primes audio silently. Actual tap or keyboard activation produces a
 - **Don't** restore clay hero art, Fredoka, a third font family or a parallel component library.
 - **Don't** replace the held fan with a flat shrinking row or let large hands overflow the page.
 - **Don't** restore the separate local-hand toolbar, standalone direction arrow, portrait phone gameplay or side-by-side landscape table/hand.
-- **Don't** crop the flat home silhouettes or restore cinematic scenery and a boxed or patched background.
+- **Don't** crop the flat home silhouettes or restore cinematic scenery and a boxed or patched background on home.
 - **Don't** restore the rejected giant blue ovals or electric-blue background planes in live play.
 - **Don't** restore poker furniture, felt/leather live backgrounds, a remaining-deck badge, header sound controls or a routine visible turn/color HUD.
 - **Don't** show UNO when ineligible, duplicate Draw in the dock or turn sorting into a permanent table control.
@@ -570,3 +582,5 @@ The vivid-depth detector’s 59 material/palette advisories are review evidence 
 The October 21 play-field detector’s 19 advisories are review evidence, not new system tokens or exemptions. Superseded felt/leather shadows, hidden turn-cue type roles and retired deck-count geometry are deliberately not canonized. The intentional foreground crop is a viewport treatment with complete internal scrollport cards, not permission to clip card tops or keyboard focus. Compact 11px landscape text is a bounded density treatment, not a general typography floor. No new raster comp, physical phone test, speaker listening check or exhaustive accessibility audit is claimed.
 
 The quiet-stage detector’s 15 advisories are review evidence, not system tokens or exemptions. The rejected giant blue ovals and prior electric-blue background palette are historical evidence only; the soft midnight replacement records the shipped working assumption without claiming user aesthetic approval. Card-face ellipses remain native deck graphics. No new legibility floor, typography, geometry or physical-device/audio certification is established by this background refinement.
+
+The illustrated-room detector ran once before the final header scrim; its palette/radius/type advisories remain review evidence rather than blanket exemptions. The shipped fallback, repeated opaque identity backing and header contrast tint are intentional material roles recorded here; inherited 24px landing geometry, one-off selection/active-seat colors and compact type advisories are not promoted to new reusable tokens. Retired radial-light colors and transparent inactive badges are historical only. The room illustration does not authorize artwork that impersonates controls or live cards, nor an all-app, physical-device or audio certification.
