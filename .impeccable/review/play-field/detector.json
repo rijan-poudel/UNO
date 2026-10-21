@@ -1,0 +1,211 @@
+[
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/.codex/worktrees/uno-play-arena/UNO/app/arena.css",
+    "line": 21,
+    "snippet": "Undocumented color #123ac2 is outside DESIGN.md colors",
+    "ignoreValue": "#123ac2"
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/.codex/worktrees/uno-play-arena/UNO/app/arena.css",
+    "line": 29,
+    "snippet": "Undocumented color #172553 is outside DESIGN.md colors",
+    "ignoreValue": "#172553"
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/.codex/worktrees/uno-play-arena/UNO/app/arena.css",
+    "line": 59,
+    "snippet": "Undocumented color #0c2a91 is outside DESIGN.md colors",
+    "ignoreValue": "#0c2a91"
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/.codex/worktrees/uno-play-arena/UNO/app/arena.css",
+    "line": 65,
+    "snippet": "Undocumented color #173fac is outside DESIGN.md colors",
+    "ignoreValue": "#173fac"
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/.codex/worktrees/uno-play-arena/UNO/app/arena.css",
+    "line": 98,
+    "snippet": "Undocumented color #1c49d5 is outside DESIGN.md colors",
+    "ignoreValue": "#1c49d5"
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/.codex/worktrees/uno-play-arena/UNO/app/arena.css",
+    "line": 111,
+    "snippet": "Undocumented color #2555df is outside DESIGN.md colors",
+    "ignoreValue": "#2555df"
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/.codex/worktrees/uno-play-arena/UNO/app/arena.css",
+    "line": 170,
+    "snippet": "border-radius: 24px is outside the DESIGN.md rounded scale",
+    "ignoreValue": "24px"
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/.codex/worktrees/uno-play-arena/UNO/app/arena.css",
+    "line": 180,
+    "snippet": "Undocumented color #102966 is outside DESIGN.md colors",
+    "ignoreValue": "#102966"
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/.codex/worktrees/uno-play-arena/UNO/app/arena.css",
+    "line": 184,
+    "snippet": "Undocumented color #102966 is outside DESIGN.md colors",
+    "ignoreValue": "#102966"
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/.codex/worktrees/uno-play-arena/UNO/app/arena.css",
+    "line": 223,
+    "snippet": "Undocumented color #d7e3ff is outside DESIGN.md colors",
+    "ignoreValue": "#d7e3ff"
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/.codex/worktrees/uno-play-arena/UNO/app/arena.css",
+    "line": 239,
+    "snippet": "Undocumented color #514100 is outside DESIGN.md colors",
+    "ignoreValue": "#514100"
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/.codex/worktrees/uno-play-arena/UNO/app/arena.css",
+    "line": 242,
+    "snippet": "Undocumented color #514100 is outside DESIGN.md colors",
+    "ignoreValue": "#514100"
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/.codex/worktrees/uno-play-arena/UNO/app/arena.css",
+    "line": 344,
+    "snippet": "Undocumented color #102966 is outside DESIGN.md colors",
+    "ignoreValue": "#102966"
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/.codex/worktrees/uno-play-arena/UNO/app/arena.css",
+    "line": 369,
+    "snippet": "Undocumented color #102966 is outside DESIGN.md colors",
+    "ignoreValue": "#102966"
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/.codex/worktrees/uno-play-arena/UNO/app/arena.css",
+    "line": 434,
+    "snippet": "Undocumented color #123ac2 is outside DESIGN.md colors",
+    "ignoreValue": "#123ac2"
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/.codex/worktrees/uno-play-arena/UNO/app/arena.css",
+    "line": 448,
+    "snippet": "font-size: 32px is off the DESIGN.md type ramp",
+    "ignoreValue": "32px"
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/.codex/worktrees/uno-play-arena/UNO/app/arena.css",
+    "line": 455,
+    "snippet": "font-size: 16px is off the DESIGN.md type ramp",
+    "ignoreValue": "16px"
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/.codex/worktrees/uno-play-arena/UNO/app/arena.css",
+    "line": 461,
+    "snippet": "Undocumented color #d7e3ff is outside DESIGN.md colors",
+    "ignoreValue": "#d7e3ff"
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/.codex/worktrees/uno-play-arena/UNO/app/arena.css",
+    "line": 526,
+    "snippet": "font-size: 28px is off the DESIGN.md type ramp",
+    "ignoreValue": "28px"
+  }
+]

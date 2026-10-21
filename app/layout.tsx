@@ -58,34 +58,17 @@ export default function RootLayout({
           ends with the finish review, the verdict, DESIGN.md, and every
           shipping raster carrying its provenance
         </span>
-        <span hidden data-design-contract="vivid-card-depth">
-          THESIS: Vivid native cards with laminated edges and restrained pointer
-          tilt. OWN-WORLD: Saturated crimson, electric blue, emerald, golden
-          yellow, white print and navy leather over rich felt. STORY: Inspect,
-          tap or flick the actual face; motion never gates turns. FIRST
-          VIEWPORT: Shared table and landscape phone geometry stay; brighter
-          cards and deeper contact shadows carry the play experience. FORM:
-          Owner-directed material amplification, code-led extension of
-          seed2e1e4271. FINISH: unreviewed and undocumented is unfinished; this
-          build ends with the finish review, the verdict, DESIGN.md, and every
-          shipping raster carrying its provenance
-        </span>
-        <span hidden data-design-contract="shared-table-viewport">
-          THESIS: One shared table includes the local hand, contained in the
-          window. OWN-WORLD: Native vivid cards on green baize and a dark
-          leather rail; Outfit and Barlow Condensed. STORY: See whose turn it
-          is, tap or flick a match, draw directly from the deck. FIRST VIEWPORT:
-          Opponents occupy the perimeter, clear of central piles; the hand fills
-          the lower table with lift clearance and contextual controls. FORM:
-          Owner-pinned tactile game arena, adapting the existing table. Home
-          uses flat transparent character art, not a framed cinematic scene.
-          FINISH: unreviewed and undocumented is unfinished; this build ends
-          with the finish review, the verdict, DESIGN.md, and every shipping
-          raster carrying its provenance
-        </span>
-        <span hidden data-design-contract="tactile-table">
-          Held cards, situational controls, audible immediate feedback. See
-          .impeccable/tactile-direction.md.
+        <span hidden data-design-contract="uno-play-field">
+          THESIS: Vivid held cards in an open electric-blue play field.
+          OWN-WORLD: Blue printed card-orbit planes, white, yellow and vivid
+          native deck inks. STORY: Lifted playable cards invite a direct tap or
+          flick; secondary controls live in Menu. FIRST VIEWPORT: Centered
+          piles, quiet header and bottom-cropped held hand; no casino rail.
+          FORM: Owner-pinned UNO play field, code-led. See
+          .impeccable/review/play-field/contract.md. FINISH: unreviewed and
+          undocumented is unfinished; this build ends with the finish review,
+          the verdict, DESIGN.md, and every shipping raster carrying its
+          provenance
         </span>
         {children}
         <Toaster

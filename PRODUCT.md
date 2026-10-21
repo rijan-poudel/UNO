@@ -58,3 +58,7 @@ The owner asks to gamify the interface while keeping direct play central. Near-f
 ## Phone orientation
 
 The owner requires landscape-only gameplay on phones. Home and setup remain usable in portrait; entering or rotating a match upright shows clear rotate guidance and a leave action. Local bot rounds pause until landscape returns. Online prompts state that the shared round continues. Keep the match within the available viewport, with horizontal large-hand scrolling and no document scrolling. Verify at568×320 and844×390, six seats,20cards and keyboard focus; portrait verifies the orientation gate rather than a second gameplay layout.
+
+## October 21 arena correction
+
+The owner rejects the baize/leather arena as poker-like. Replace that live table world with an open vibrant UNO play field. Crop roughly the bottom quarter of the held fan at the viewport edge, center the upper play area, and communicate local turns through a modest card lift/growth. Remove redundant bot-round text, header sound status/control, the word Menu, deck remaining count, ordinary active-color label and visible Your move caption. Use one icon-only menu; sound and room copy remain available inside. Preserve accessible state announcements, explicit penalty/Pass decisions and a chosen-color marker when a wild discard alone cannot communicate it. This supersedes earlier pinned table materials; retain their provenance as historical assets.

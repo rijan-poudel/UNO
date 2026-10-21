@@ -1,14 +1,32 @@
-/* The viewport owns the arena. Materials/card faces remain in table.css.
-   This file owns board geometry: one shared table, perimeter seats, a lifted hand.
-   Contract: .impeccable/review/shared-table/contract.md. */
+/* UNO play field. Card materials live in UnoCard.module.css; this sheet owns
+   viewport geometry and state cues. No felt, leather rail or casino table.
+   Contract: .impeccable/review/play-field/contract.md. */
 .game-page {
+  --ui-bg: #123ac2;
+  --ui-surface: #102966;
+  --ui-text: #ffffff;
+  --ui-muted: #d7e3ff;
+  --ui-line: #6586ec;
+  --ui-accent-red: #ff536f;
+  --turn-accent: #ffe329;
+  --hand-scale: 1.65;
+  --pile-scale: 1.35;
+  --hand-height: 188px;
   height: 100dvh;
   min-height: 0;
   display: flex;
   flex-direction: column;
   overflow: clip;
-  --hand-scale: 1.28;
-  --pile-scale: 1.16;
+  color-scheme: dark;
+  background: #123ac2;
+}
+.game-page :focus-visible {
+  outline: 3px solid #ffe329;
+  outline-offset: 4px;
+}
+.game-page ::selection {
+  background: #ffe329;
+  color: #172553;
 }
 .game-header,
 .game-page > .reconnect-banner,
@@ -16,7 +34,40 @@
   flex-shrink: 0;
 }
 .game-header {
+  position: relative;
+  z-index: 10;
   height: 60px;
+  justify-content: space-between;
+  padding-inline: max(24px, env(safe-area-inset-left))
+    max(24px, env(safe-area-inset-right));
+}
+.game-header .wordmark {
+  font-size: 34px;
+}
+.game-header .wordmark span {
+  color: #ffe329;
+}
+.game-header .header-actions {
+  margin-left: auto;
+}
+.game-header .game-menu-trigger {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  color: #ffffff;
+  border-radius: 8px;
+  background: #0c2a91;
+  box-shadow:
+    inset 0 1px 1px #ffffff30,
+    0 3px 4px #071d6950;
+}
+.game-header .game-menu-trigger:hover {
+  background: #173fac;
+}
+.game-header .game-menu-trigger:active {
+  transform: translateY(2px);
 }
 .game-main {
   position: relative;
@@ -24,55 +75,115 @@
   flex: 1;
   width: 100%;
   min-height: 0;
-  max-width: 1440px;
+  max-width: 1600px;
   margin: 0 auto;
-  padding: 8px 24px max(8px, env(safe-area-inset-bottom));
+  padding: 0 24px;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  grid-template-rows: minmax(0, 1fr) 280px;
+  grid-template-rows: minmax(0, 1fr) var(--hand-height);
   gap: 0;
   user-select: none;
   -webkit-user-select: none;
 }
-.game-main > .table-boundary {
+/* A printed card orbit rather than a bounded table: open edges, no rail.
+   Its two blue planes give the suspended cards a spatial reference. */
+.game-main::before {
+  content: "";
+  position: absolute;
   z-index: -1;
-  inset: 10px 16px 12px;
-  border-radius: 100px;
+  width: min(1120px, 112vw);
+  height: 84%;
+  left: 50%;
+  top: -3%;
+  border-radius: 50%;
+  transform: translateX(-50%) rotate(-19deg);
+  background: #1c49d5;
+  pointer-events: none;
 }
-.game-main > .table-boundary::before {
-  inset: 12px;
-}
-.game-main > .table-boundary::after {
-  inset: 24px;
+.game-main::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  width: min(900px, 90vw);
+  height: 63%;
+  left: 50%;
+  top: 7%;
+  border-radius: 50%;
+  transform: translateX(-50%) rotate(-19deg);
+  background: #2555df;
+  pointer-events: none;
 }
 .game-main .playing-table {
   min-height: 0;
   isolation: auto;
 }
 .game-main .table-center {
-  top: calc(50% + 38px);
+  top: calc(50% + 34px);
   padding: 0;
-  gap: 36px;
+  gap: 40px;
+  align-items: flex-start;
 }
 .game-main .table-center .uno-card {
   --card-scale: var(--pile-scale) !important;
 }
 .game-main .pile-zone {
-  gap: 12px;
+  gap: 14px;
 }
-.game-main .turn-cue {
-  bottom: -4px;
-  min-height: 32px;
-  z-index: 4;
-  padding: 0 8px;
-  flex-wrap: nowrap;
+.game-main .pile-label {
+  height: 22px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffffff;
 }
-.game-main .turn-cue h1 {
-  font-size: 17px;
+.game-main .draw-pile:not(:disabled) {
+  transform: translateY(-6px) rotate(-7deg);
+}
+.game-main .draw-pile .uno-card {
+  box-shadow:
+    inset 0 1px 2px #ffffffb0,
+    1px 3px 1px #d5dcec,
+    3px 6px 1px #7d8ba8,
+    4px 10px 1px #35435e,
+    4px 17px 18px #06185a70;
+}
+.game-main .discard-pile .uno-card,
+.game-main .hand-card .uno-card {
+  box-shadow: var(--card-elevation);
+}
+.game-main .wild-color {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  text-transform: capitalize;
+  font-size: 13px;
+  font-weight: 600;
+  color: #ffffff;
+}
+.game-main .wild-color i {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  background: var(--active-card-color);
+  border: 2px solid #ffffff;
 }
 .game-main .card-landing {
-  inset: 120px 20% 40px;
-  border-radius: 30px;
+  inset: 106px 18% 20px;
+  border-radius: 24px;
+  align-items: end;
+  padding-bottom: 12px;
+}
+.game-main .receiving-card .card-landing {
+  border-color: #ffffffa0;
+  background: #ffffff12;
+}
+.game-main .card-landing span {
+  color: #ffffff;
+  background: #102966;
+}
+.game-main .table-waiting {
+  top: 22%;
+  background: #102966;
 }
 .game-main .opponent {
   width: 112px;
@@ -80,68 +191,112 @@
 .game-main .seat-top,
 .game-main .seat-upper-left,
 .game-main .seat-upper-right {
-  top: 58px;
+  top: 60px;
 }
 .game-main .seat-upper-left {
-  left: 24%;
+  left: 25%;
 }
 .game-main .seat-upper-right {
-  left: 76%;
+  left: 75%;
 }
 .game-main .seat-left {
   left: 9%;
-  top: 59%;
+  top: 55%;
 }
 .game-main .seat-right {
   left: 91%;
-  top: 59%;
+  top: 55%;
 }
 .game-main .opponent-hand {
-  height: 56px;
+  height: 52px;
 }
 .game-main .opponent-hand .uno-card {
-  --card-scale: 0.44 !important;
+  --card-scale: 0.4 !important;
 }
 .game-main .opponent-label {
+  padding: 5px 8px;
   max-width: 112px;
   border-radius: 7px;
-  padding: 5px 8px;
+  background: transparent;
+  box-shadow: none;
+  color: #ffffff;
+}
+.game-main .opponent-label small {
+  color: #d7e3ff;
+}
+.game-main .count-icon {
+  display: block;
+}
+.game-main .count-word {
+  display: none;
+}
+.game-main .active-seat .opponent-label {
+  background: #ffe329;
+  color: #392700;
+  box-shadow:
+    inset 0 -2px 1px #b39000,
+    0 4px 7px #06185a50;
+}
+.game-main .active-seat .opponent-label small {
+  color: #514100;
+}
+.game-main .active-seat .turn-marker {
+  background: #514100;
 }
 .game-main .catch-button {
   left: 50%;
   transform: translateX(-50%);
   top: calc(100% + 3px);
 }
+.game-main .last-card-stamp,
+.game-main .catch-button,
+.game-main .hand-uno.uno-button,
+.game-page .button.primary.play-selected {
+  color: #392700 !important;
+  background: #ffd000;
+  box-shadow:
+    inset 0 -3px 2px #bd7600,
+    0 4px 8px #06185a60;
+}
+/* The hand comes from the player's side of the screen. Its lower quarter is
+   deliberately below the viewport; lift/focus still has headroom above it. */
 .game-main .hand-section {
   min-width: 0;
   min-height: 0;
   margin: 0;
   align-self: stretch;
-  display: grid;
-  grid-template-rows: minmax(0, 1fr) 44px;
+  display: block;
   z-index: 5;
 }
-/* The scrollport includes the entire raised face, fan corners and focus ring.
-   Horizontal scrolling must not make the vertical card lift a clipped overflow. */
 .game-main .hand-scroll {
+  /* Keep full faces inside the scrollport. The page clips the foreground,
+     so native keyboard focus never scrolls this container vertically. */
+  height: calc(122px * var(--hand-scale) + 120px);
   min-height: 0;
   margin: 0 -24px;
-  padding: 52px 28px 24px;
+  padding: 42px 28px 0;
   overflow-x: auto;
   overflow-y: hidden;
   overscroll-behavior-x: contain;
   scroll-padding-inline: 28px;
-  scrollbar-color: #a9c2b1 #183d33;
+  scrollbar-width: none;
+  scrollbar-color: #9db8ff #123ac2;
+}
+.game-main .hand-scroll::-webkit-scrollbar {
+  display: none;
 }
 .game-main .hand-cards {
+  min-height: 0;
   height: auto;
-  min-height: 100%;
   padding: 0 28px;
   align-items: flex-start;
 }
 .game-main .hand-card {
-  margin-left: -34px;
-  transform: translateY(calc(var(--fan-drop) * 0.45)) rotate(var(--fan-angle));
+  --turn-lift: 0px;
+  margin-left: -44px;
+  transform: translateY(calc(var(--fan-drop) * 0.45 - var(--turn-lift)))
+    rotate(var(--fan-angle));
+  transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 .game-main .hand-card:first-child {
   margin-left: 0;
@@ -149,49 +304,79 @@
 .game-main .hand-card .uno-card {
   --card-scale: var(--hand-scale) !important;
 }
-.game-main .hand-card.inspected-card {
-  z-index: 50;
-  transform: translateY(-20px) rotate(0deg) scale(1.03);
+.game-main .hand-section.your-turn .hand-card {
+  --turn-lift: 8px;
 }
+.game-main .hand-section .hand-card.legal-card {
+  --turn-lift: 19px;
+  transform: translateY(calc(var(--fan-drop) * 0.45 - var(--turn-lift)))
+    rotate(var(--fan-angle)) scale(1.025);
+}
+.game-main .legal-card .uno-card::after {
+  display: none;
+}
+.game-main .quiet-card .uno-card {
+  filter: none;
+}
+.game-main .hand-card.inspected-card,
 .game-main .hand-card:focus-within {
   z-index: 60;
-  transform: translateY(-24px) rotate(0deg) scale(1.03);
+  transform: translateY(-32px) rotate(0deg) scale(1.04);
+}
+.game-main .hand-card:is(:hover, :focus-within, .inspected-card) .uno-card {
+  box-shadow:
+    inset 0 1px 2px #ffffffb0,
+    0 1px 1px #c4ccdf,
+    0 3px 1px #68748e,
+    -3px 15px 20px #06185a80;
 }
 .game-main .hand-card.dragging-card {
   z-index: 80;
 }
 .game-main .hand-uno {
   position: absolute;
-  right: 18px;
-  top: 0;
+  right: 12px;
+  top: -15px;
   z-index: 100;
   min-height: 44px;
   margin: 0;
 }
 .game-main .uno-called.hand-uno {
   padding: 8px 12px;
-  background: #173d31;
+  background: #102966;
   border-radius: 6px;
   font-size: 12px;
+  color: #ffe329 !important;
 }
+/* Only a decision or an invalid inspection earns visible helper copy.
+   The normal turn and color are available to screen readers without a HUD. */
 .game-main .move-dock {
+  position: absolute;
+  z-index: 90;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: calc(100% - 24px);
   min-height: 0;
-  padding: 0 20px;
-  gap: 12px;
-  flex-direction: row;
+  padding: 0;
+  gap: 8px;
+  flex-direction: column;
   justify-content: center;
 }
-.game-main .move-hint {
-  font-size: 12px;
+.game-main .move-hint:not(.sr-only) {
+  max-width: 42ch;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: #102966;
+  color: #ffffff;
   text-align: center;
-  max-width: 55ch;
-  min-height: 0;
+  font-size: 12px;
   line-height: 1.3;
-  color: #d4e4db;
 }
 .game-main .move-buttons {
   width: auto;
-  max-width: 60%;
+  max-width: 100%;
 }
 .game-main .move-buttons:empty {
   display: none;
@@ -206,419 +391,16 @@
   font-size: 14px;
   margin: 0 0 12px;
 }
-@media (hover: hover) and (pointer: fine) {
-  .game-main .hand-card:hover {
-    /* Hover wins even when a neighboring card retains keyboard focus. */
-    z-index: 70;
-    transform: translateY(-28px) rotate(0deg) scale(1.04);
-  }
+.game-menu > button.game-sound-control {
+  color: inherit;
 }
-@media (min-height: 850px) and (min-width: 701px) {
-  .game-page {
-    --hand-scale: 1.45;
-    --pile-scale: 1.3;
-  }
-  .game-main {
-    grid-template-rows: minmax(0, 1fr) 310px;
-  }
+.game-sound-control b {
+  margin-left: auto;
+  font-size: 13px;
 }
-@media (max-width: 700px) {
-  .game-page {
-    --hand-scale: 1.14;
-    --pile-scale: 1;
-  }
-  .game-header {
-    height: 52px;
-    padding-inline: 16px;
-  }
-  .game-main {
-    padding: 4px 12px max(6px, env(safe-area-inset-bottom));
-    grid-template-rows: minmax(0, 1fr) 262px;
-  }
-  .game-main > .table-boundary {
-    inset: 6px -24px 8px;
-    border-radius: 95px;
-  }
-  .game-main .table-center {
-    gap: 24px;
-    top: calc(50% + 38px);
-  }
-  .game-main .opponent {
-    width: 88px;
-  }
-  .game-main .opponent-label {
-    max-width: 88px;
-    padding: 5px 6px;
-    gap: 5px;
-  }
-  .game-main .opponent-label strong {
-    max-width: 55px;
-  }
-  .game-main .seat-upper-left {
-    left: 22%;
-  }
-  .game-main .seat-upper-right {
-    left: 78%;
-  }
-  .game-main .opponent-hand {
-    height: 42px;
-  }
-  .game-main .opponent-hand .uno-card {
-    --card-scale: 0.34 !important;
-  }
-  .game-main .seat-left {
-    left: 12%;
-    top: 45%;
-  }
-  .game-main .seat-right {
-    left: 88%;
-    top: 45%;
-  }
-  .game-main .seats-5 .seat-upper-left,
-  .game-main .seats-6 .seat-upper-left {
-    left: 18%;
-  }
-  .game-main .seats-5 .seat-upper-right,
-  .game-main .seats-6 .seat-upper-right {
-    left: 82%;
-  }
-  .game-main .hand-scroll {
-    margin-inline: -12px;
-    padding: 48px 18px 22px;
-    scroll-padding-inline: 18px;
-  }
-  .game-main .hand-cards {
-    padding-inline: 12px;
-  }
-  .game-main .hand-card {
-    margin-left: -30px;
-  }
-  .game-main .move-dock {
-    padding-inline: 4px;
-    gap: 8px;
-  }
-  .game-main .move-buttons {
-    max-width: 64%;
-  }
-  .game-main .move-hint {
-    font-size: 11px;
-  }
-  .game-main .hand-uno {
-    right: 6px;
-  }
+.room-code-control {
+  margin-bottom: 12px;
 }
-@media (max-height: 680px) {
-  .game-page {
-    --hand-scale: 1.02;
-    --pile-scale: 0.83;
-  }
-  .game-main {
-    grid-template-rows: minmax(0, 1fr) 232px;
-  }
-  .game-main .opponent-hand {
-    height: 32px;
-  }
-  .game-main .opponent-hand .uno-card {
-    --card-scale: 0.28 !important;
-  }
-  .game-main .seat-top,
-  .game-main .seat-upper-left,
-  .game-main .seat-upper-right {
-    top: 42px;
-  }
-  .game-main .table-center {
-    top: calc(50% + 28px);
-    gap: 24px;
-  }
-  .game-main .hand-scroll {
-    padding-top: 44px;
-    padding-bottom: 18px;
-  }
-  .game-main .turn-cue h1 {
-    font-size: 15px;
-  }
-}
-/* Six seats in a short portrait: small fans up top, labels on the side rail.
-   Side fans are redundant with counts and would overlap the central deck. */
-@media (max-width: 540px) {
-  .game-main .seat-left .opponent-hand,
-  .game-main .seat-right .opponent-hand {
-    display: none;
-  }
-  .game-main .seat-left .opponent-label,
-  .game-main .seat-right .opponent-label {
-    flex-direction: column;
-    min-width: 52px;
-    max-width: 66px;
-    text-align: center;
-    gap: 3px;
-  }
-  .game-main .seat-left .player-avatar,
-  .game-main .seat-right .player-avatar {
-    width: 22px;
-    height: 25px;
-  }
-  .game-main .seat-left small,
-  .game-main .seat-right small {
-    justify-content: center;
-  }
-  .game-main .seat-left {
-    left: 6%;
-    top: 59%;
-  }
-  .game-main .seat-right {
-    left: 94%;
-    top: 59%;
-  }
-  .game-main .card-landing {
-    inset-inline: 20%;
-    inset-block: 90px 30px;
-  }
-}
-@media (max-height: 460px) and (min-width: 541px) {
-  .game-page {
-    --hand-scale: 0.94;
-    --pile-scale: 0.68;
-  }
-  .game-header {
-    height: 44px;
-  }
-  .game-main {
-    grid-template-rows: minmax(0, 1fr) 190px;
-  }
-  .game-main > .table-boundary {
-    inset-block: 0 4px;
-    border-radius: 55px;
-  }
-  .game-main .opponent-hand {
-    display: none;
-  }
-  .game-main .opponent-label {
-    padding: 4px 8px;
-    min-height: 38px;
-  }
-  .game-main .seat-top,
-  .game-main .seat-upper-left,
-  .game-main .seat-upper-right,
-  .game-main .seat-left,
-  .game-main .seat-right {
-    top: 24px;
-  }
-  .game-main .seat-left {
-    left: 10%;
-  }
-  .game-main .seat-upper-left,
-  .game-main .seats-5 .seat-upper-left,
-  .game-main .seats-6 .seat-upper-left {
-    left: 30%;
-  }
-  .game-main .seat-top {
-    left: 50%;
-  }
-  .game-main .seat-upper-right,
-  .game-main .seats-5 .seat-upper-right,
-  .game-main .seats-6 .seat-upper-right {
-    left: 70%;
-  }
-  .game-main .seat-right {
-    left: 90%;
-  }
-  .game-main .table-center {
-    top: calc(50% + 28px);
-    gap: 22px;
-  }
-  .game-main .pile-label {
-    font-size: 10px;
-  }
-  .game-main .pile-zone {
-    gap: 7px;
-  }
-  .game-main .turn-cue {
-    left: 22%;
-    bottom: 20%;
-    max-width: 28%;
-    flex-wrap: wrap;
-    row-gap: 1px;
-  }
-  .game-main .hand-section {
-    grid-template-rows: minmax(0, 1fr) 28px;
-  }
-  .game-main .hand-scroll {
-    padding-block: 28px 10px;
-  }
-  .game-main .hand-card {
-    margin-left: -26px;
-    transform: rotate(calc(var(--fan-angle) * 0.3));
-  }
-  .game-main .hand-card:is(.inspected-card, :focus-within, :hover) {
-    transform: translateY(-14px) rotate(0deg);
-  }
-  .game-main .hand-uno {
-    top: 6px;
-  }
-  .game-main .card-landing {
-    inset: 44px 20% 12px;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .game-main .hand-card {
-    transition: none;
-  }
-}
-
-/* Phone matches use landscape; home and setup remain portrait-friendly. */
-.rotate-phone {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  padding: 28px;
-  gap: 18px;
-  text-align: center;
-  background: #102d2a;
-}
-.rotate-phone-art {
-  position: relative;
-  color: #d8ed82;
-  padding: 16px;
-  transform: rotate(90deg);
-}
-.rotate-phone-art > svg + svg {
-  position: absolute;
-  right: -12px;
-  top: 0;
-  color: #f7c934;
-}
-.rotate-phone h1 {
-  font-size: 32px;
-  font-weight: 750;
-  line-height: 1.1;
-  letter-spacing: -0.025em;
-}
-.rotate-phone p {
-  max-width: 26ch;
-  font-size: 16px;
-  color: #d4e4db;
-}
-.rotate-phone small {
-  max-width: 30ch;
-  font-size: 12px;
-  color: #b9d1c5;
-}
-.rotate-phone .button {
-  margin-top: 12px;
-}
-.needs-landscape > .game-header,
-.needs-landscape > .game-main,
-.needs-landscape > .reconnect-banner,
-.needs-landscape > .game-error {
-  display: none;
-}
-
-@media (max-height: 360px) and (min-width: 541px) {
-  .game-page {
-    --hand-scale: 0.78;
-    --pile-scale: 0.57;
-  }
-  .game-main {
-    grid-template-rows: minmax(0, 1fr) 164px;
-  }
-  .game-main .seat-top,
-  .game-main .seat-upper-left,
-  .game-main .seat-upper-right,
-  .game-main .seat-left,
-  .game-main .seat-right {
-    top: 18px;
-  }
-  .game-main .table-center {
-    top: calc(50% + 22px);
-  }
-  .game-main .hand-card {
-    margin-left: -18px;
-  }
-}
-
-/* Saturated arcade materials. These change finish, never arena geometry. */
-.game-page {
-  --turn-accent: #ffe329;
-  --ui-accent-red: #ff5268;
-  background: radial-gradient(ellipse at 50% 20%, #153a51, #080f24 80%);
-}
-.game-main > .table-boundary {
-  background-color: #101a31;
-  box-shadow:
-    inset 0 2px 3px #b5d2ff50,
-    inset 0 -6px 10px #020617a0,
-    0 6px 2px #020718,
-    0 16px 24px #02071890;
-}
-.game-main > .table-boundary::before {
-  background-color: #047c53;
-  box-shadow: inset 0 5px 14px #00271980;
-}
-.game-main > .table-boundary::after {
-  border-color: #94e8ba50;
-}
-.game-main .hand-card .uno-card,
-.game-main .discard-pile .uno-card {
-  box-shadow: var(--card-elevation);
-}
-.game-main .hand-card:is(:hover, :focus-within, .inspected-card) .uno-card {
-  box-shadow:
-    inset 0 1px 2px #ffffffb0,
-    0 1px 1px #c4ccdf,
-    0 3px 1px #68748e,
-    -3px 15px 20px #02071899;
-}
-.game-main .draw-pile .uno-card {
-  box-shadow:
-    inset 0 1px 2px #ffffffb0,
-    1px 3px 1px #d5dcec,
-    3px 6px 1px #7d8ba8,
-    4px 10px 1px #35435e,
-    4px 16px 15px #02071899;
-}
-.game-main .quiet-card .uno-card {
-  filter: none;
-}
-.game-main .opponent-label {
-  background: #102138;
-  box-shadow:
-    inset 0 1px 1px #8db9ff30,
-    0 3px 6px #02071850;
-}
-.game-main .active-seat .opponent-label {
-  background: #ffe329;
-  color: #211c00;
-}
-.game-main .active-seat .opponent-label small {
-  color: #514100;
-}
-.game-main .active-seat .turn-marker {
-  background: #514100;
-}
-.game-main .turn-cue.active,
-.game-main .draw-available,
-.game-header .wordmark span {
-  color: #ffe329;
-}
-.game-main .last-card-stamp,
-.game-main .catch-button,
-.game-main .hand-uno.uno-button,
-.game-page .button.primary.play-selected {
-  background: #ffd000;
-  color: #392700 !important;
-  box-shadow:
-    inset 0 -3px 2px #bd7600,
-    0 4px 8px #02071860;
-}
-.game-main .player-avatar {
-  box-shadow:
-    inset 0 1px 1px #ffffffa0,
-    0 3px 3px #02071870;
-}
-/* Native color selection is printed in the same four vivid inks. */
 .color-choice.choose-red {
   background: #e71c3b;
   color: #ffffff;
@@ -643,69 +425,265 @@
     0 5px 10px #02071820;
 }
 .rotate-phone {
-  background: #0b1d34;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 28px;
+  gap: 18px;
+  text-align: center;
+  background: #123ac2;
 }
 .rotate-phone-art {
+  position: relative;
   color: #ffe329;
+  padding: 16px;
+  transform: rotate(90deg);
 }
-@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
-  .game-main .hand-card .uno-card {
-    transition:
-      transform 130ms cubic-bezier(0.16, 1, 0.3, 1),
-      box-shadow 130ms;
+.rotate-phone-art > svg + svg {
+  position: absolute;
+  right: -12px;
+  top: 0;
+}
+.rotate-phone h1 {
+  font-size: 32px;
+  font-weight: 750;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+}
+.rotate-phone p {
+  max-width: 26ch;
+  font-size: 16px;
+  color: #ffffff;
+}
+.rotate-phone small {
+  max-width: 30ch;
+  font-size: 12px;
+  color: #d7e3ff;
+}
+.rotate-phone .button {
+  margin-top: 12px;
+}
+.needs-landscape > .game-header,
+.needs-landscape > .game-main,
+.needs-landscape > .reconnect-banner,
+.needs-landscape > .game-error {
+  display: none;
+}
+@media (hover: hover) and (pointer: fine) {
+  .game-main .hand-card:hover {
+    z-index: 70;
+    transform: translateY(-34px) rotate(0deg) scale(1.04);
   }
-  .game-main .hand-card .uno-card:active {
-    transition: none;
+  .game-main .draw-pile:not(:disabled):hover {
+    transform: translateY(-11px) rotate(-3deg);
   }
 }
-@media (prefers-reduced-motion: reduce) {
-  .game-main .hand-card .uno-card {
-    transition: none;
+@media (min-height: 900px) and (min-width: 701px) {
+  .game-page {
+    --hand-scale: 1.95;
+    --pile-scale: 1.65;
+    --hand-height: 216px;
+  }
+  .game-main .table-center {
+    gap: 50px;
   }
 }
-/* On the shortest landscape view, use one-line identities and let the
-   accessible pile names leave the visual row. The card faces and draw-count
-   chip then clear the center seat without taking space from the held hand. */
-@media (max-height: 360px) and (min-width: 541px) {
-  .game-main .opponent-label {
-    min-height: 28px;
-    padding: 4px 8px;
+@media (max-height: 680px) {
+  .game-page {
+    --hand-scale: 1.35;
+    --pile-scale: 1.08;
+    --hand-height: 152px;
   }
-  .game-main .opponent-label .player-avatar {
+  .game-main .table-center {
+    top: calc(50% + 24px);
+    gap: 32px;
+  }
+  .game-main .hand-scroll {
+    padding-top: 36px;
+  }
+  .game-main .hand-card {
+    margin-left: -34px;
+  }
+  .game-main .opponent-hand {
+    height: 38px;
+  }
+  .game-main .opponent-hand .uno-card {
+    --card-scale: 0.31 !important;
+  }
+}
+@media (max-height: 460px) and (min-width: 541px) {
+  .game-page {
+    --hand-scale: 1.08;
+    --pile-scale: 0.72;
+    --hand-height: 110px;
+  }
+  .game-header {
+    height: 44px;
+    padding-inline: max(12px, env(safe-area-inset-left))
+      max(12px, env(safe-area-inset-right));
+  }
+  .game-header .wordmark {
+    font-size: 28px;
+  }
+  .game-main {
+    padding-inline: 16px;
+  }
+  .game-main .opponent-hand {
     display: none;
+  }
+  .game-main .opponent-label {
+    padding: 4px 8px;
+    min-height: 34px;
   }
   .game-main .opponent-label > span:nth-child(2) {
     display: flex;
     align-items: center;
     gap: 5px;
   }
+  .game-main .opponent-label .player-avatar {
+    width: 22px;
+    height: 25px;
+  }
   .game-main .opponent-label strong {
-    max-width: 48px;
+    max-width: 50px;
     font-size: 11px;
   }
   .game-main .opponent-label small {
-    flex-shrink: 0;
-    font-size: 10px;
+    font-size: 11px;
   }
-  .game-main .count-word {
+  .game-main .seat-top,
+  .game-main .seat-upper-left,
+  .game-main .seat-upper-right,
+  .game-main .seat-left,
+  .game-main .seat-right {
+    top: 22px;
+  }
+  .game-main .seat-left {
+    left: 10%;
+  }
+  .game-main .seat-upper-left,
+  .game-main .seats-5 .seat-upper-left,
+  .game-main .seats-6 .seat-upper-left {
+    left: 30%;
+  }
+  .game-main .seat-top {
+    left: 50%;
+  }
+  .game-main .seat-upper-right,
+  .game-main .seats-5 .seat-upper-right,
+  .game-main .seats-6 .seat-upper-right {
+    left: 70%;
+  }
+  .game-main .seat-right {
+    left: 90%;
+  }
+  .game-main .table-center {
+    top: calc(50% + 17px);
+    gap: 24px;
+  }
+  .game-main .pile-zone {
+    gap: 5px;
+  }
+  .game-main .pile-label,
+  .game-main .wild-color {
+    height: 14px;
+    font-size: 11px;
+  }
+  .game-main .hand-scroll {
+    margin-inline: -16px;
+    padding: 30px 24px 0;
+  }
+  .game-main .hand-card {
+    margin-left: -30px;
+    transform: translateY(calc(0px - var(--turn-lift)))
+      rotate(calc(var(--fan-angle) * 0.3));
+  }
+  .game-main .hand-section .hand-card.legal-card {
+    transform: translateY(calc(0px - var(--turn-lift)))
+      rotate(calc(var(--fan-angle) * 0.3)) scale(1.025);
+  }
+  .game-main .hand-section.your-turn .hand-card {
+    --turn-lift: 5px;
+  }
+  .game-main .hand-section .hand-card.legal-card {
+    --turn-lift: 12px;
+  }
+  .game-main .hand-card:is(.inspected-card, :focus-within, :hover) {
+    transform: translateY(-22px) rotate(0deg) scale(1.025);
+  }
+  .game-main .hand-uno {
+    top: -12px;
+    right: 4px;
+  }
+  .game-main .card-landing {
+    inset: 46px 20% 4px;
+    padding-bottom: 4px;
+  }
+  .game-main .move-dock {
+    bottom: calc(100% + 4px);
+  }
+  .game-main .move-hint:not(.sr-only) {
+    padding: 3px 8px;
+  }
+  .game-main .has-hand-actions .move-hint {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+}
+@media (max-height: 360px) and (min-width: 541px) {
+  .game-page {
+    --hand-scale: 0.88;
+    --pile-scale: 0.61;
+    --hand-height: 86px;
+  }
+  .game-main .opponent-label {
+    min-height: 28px;
+    padding: 4px 7px;
+  }
+  .game-main .opponent-label .player-avatar {
     display: none;
   }
-  .game-main .count-icon {
-    display: block;
+  .game-main .seat-top,
+  .game-main .seat-upper-left,
+  .game-main .seat-upper-right,
+  .game-main .seat-left,
+  .game-main .seat-right {
+    top: 17px;
+  }
+  .game-main .hand-scroll {
+    padding-top: 25px;
+  }
+  .game-main .hand-card {
+    margin-left: -21px;
+  }
+  .game-main .hand-section.your-turn .hand-card {
+    --turn-lift: 4px;
+  }
+  .game-main .hand-section .hand-card.legal-card {
+    --turn-lift: 10px;
+  }
+  .game-main .hand-card:is(.inspected-card, :focus-within, :hover) {
+    transform: translateY(-18px) rotate(0deg) scale(1.025);
+  }
+  .game-main .table-center {
+    top: calc(50% + 13px);
   }
   .game-main .pile-label {
     position: absolute;
     width: 1px;
     height: 1px;
-    padding: 0;
     overflow: hidden;
     clip-path: inset(50%);
-    white-space: nowrap;
   }
-  .game-main .deck-count {
-    top: 4px;
-  }
-  .game-main .turn-cue {
-    bottom: 15%;
+}
+@media (prefers-reduced-motion: reduce) {
+  .game-main .hand-card,
+  .game-main .hand-card .uno-card {
+    transition: none;
   }
 }

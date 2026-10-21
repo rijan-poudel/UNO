@@ -2,13 +2,13 @@
 version: 1
 slug: "components-gameboard-tsx"
 primary_target: "components/GameBoard.tsx"
-related_targets: ["app/arena.css","components/HandCard.tsx","hooks/usePhonePortrait.ts"]
+related_targets: ["app/arena.css", "components/HandCard.tsx", "hooks/usePhonePortrait.ts"]
 ---
 
-Visitor mode: Experience. Scope: live local/online card table and phone orientation gate.
-Job: see the next move, tap/flick a legal card or draw, keep every hand reachable within the window.
-Direction: vivid crimson/blue/emerald/gold native cards over one shared baize/leather table including the local hand; perimeter seats, central piles, raised card faces fully above their neighbors. A single short cue replaces redundant player/count chrome. Direction/next-player detail belongs in Menu.
-Phone gameplay is landscape only, per owner steering. Portrait gives rotate guidance and Leave, pauses local bots/auto-pass, and truthfully discloses online continuation. Home/setup are portrait-friendly.
-Signature: hold, lift and flick the actual native face into the discard; direct tap is equally immediate. No motion/audio gates engine turns. Large hands scroll horizontally; keyboard reveal never scrolls the document.
-Material: UnoCard.module.css owns bright inks, a thin laminated edge, directional shadows, a bounded CSS3D hover and sheen sweep. Contact settles it; reduced motion and coarse touch retain static depth. No pointer/render loop. Short320pxlandscape uses28pxinline identities and accessible-only pile captions to clear the draw count.
-Proof: .impeccable/review/vivid-depth/contract.md and verification.md supersede material/short-clearance evidence; .impeccable/review/shared-table/contract.md and verification.md; user845×765, landscape568×320/844×390, six seats and20cards. Real hardware touch/speaker review remains outside browser-emulation evidence.
+Visitor mode: Experience. Scope: live local/online game and phone orientation gate.
+Job: find a lifted legal card, tap/flick or draw; keep every hand reachable within the viewport.
+Direction: open electric-blue UNO printed-orbit field. No baize/leather rail or casino furniture. Native saturated cards, Outfit/Barlow, original expressive card avatars remain. Quiet header has logo and one44px icon-only Menu; sound and room copy inside. No visible routine Your move/color/status/count HUD. Chosen wild color, pending deck penalty, contextual decisions and accessible announcements remain.
+Signature: the held fan rises a little on your turn; legal cards rise/grow further. The lower quarter sits below the viewport edge. Its scrollport still contains full cards, so focus/hover tops cannot clip; horizontal large-hand scrolling never scrolls the page. Direct legal tap/flick remains immediate. No animation/audio gates engine turns.
+Phones: landscape only, compact six-seat identities, readable20-card hands. Portrait rotate gate pauses local bots/auto-pass and discloses online continuation. Home/setup remain portrait-friendly.
+Materials: UnoCard.module.css owns shared print, stock edges and fine-pointer3D/sheens. app/arena.css is current live layout/background authority after legacy app/table.css. Reduced motion keeps state changes static.
+Proof: .impeccable/review/play-field/contract.md and verification.md supersede earlier table-world approvals. Required user848×765, desktop1440×900, landscape568×320/844×390 with six seats/20cards and focus;390×844portrait. Physical touch/speaker quality is not established by browser tests.

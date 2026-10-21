@@ -13,7 +13,6 @@ import {
   ArrowLeft,
   ArrowRight,
   Check,
-  Copy,
   HelpCircle,
   Menu,
   Smartphone,
@@ -503,76 +502,14 @@ export default function GameBoard({
         >
           <UnoWordmark compact />
         </button>
-        <div className="game-room-label">
-          {online?.room ? (
-            <button
-              className="text-button"
-              onClick={() => {
-                void navigator.clipboard
-                  .writeText(online.room?.roomId ?? "")
-                  .then(() => toast.success("Room code copied."))
-                  .catch(() => toast.error("Couldn’t copy room code."));
-              }}
-            >
-              Table {online.room.roomId}
-              <Copy size={13} />
-            </button>
-          ) : (
-            <span>A round with bots</span>
-          )}
-        </div>
         <div className="header-actions">
           <button
-            className="icon-button"
-            aria-label={
-              soundOn && audioStatus === "ready"
-                ? "Turn sound off"
-                : "Enable sound"
-            }
-            aria-pressed={soundOn && audioStatus === "ready"}
-            onPointerDown={() => {
-              soundIntent.current =
-                soundOn && audioStatus === "ready" ? "mute" : "enable";
-            }}
-            onKeyDown={(event) => {
-              if (event.key === "Enter" || event.key === " ")
-                soundIntent.current =
-                  soundOn && audioStatus === "ready" ? "mute" : "enable";
-            }}
-            onClick={() => {
-              const intent =
-                soundIntent.current ??
-                (soundOn && audioStatus === "ready" ? "mute" : "enable");
-              soundIntent.current = null;
-              if (intent === "mute") setAudioSettings({ muted: true });
-              else {
-                const settings = getAudioSettings();
-                setAudioSettings({
-                  muted: false,
-                  chimesEnabled: true,
-                  sfxVolume: settings.sfxVolume || 0.65,
-                });
-                primeTableAudioFromUserGesture();
-                playTableChime("cardPlay");
-              }
-            }}
-          >
-            {soundOn && audioStatus === "ready" ? (
-              <Volume2 size={19} />
-            ) : (
-              <VolumeX size={19} />
-            )}
-            <span className="sound-label">
-              {soundOn && audioStatus === "ready" ? "Sound on" : "Enable sound"}
-            </span>
-          </button>
-          <button
-            className="button secondary small"
+            className="icon-button game-menu-trigger"
             aria-label="Game menu"
+            title="Game menu"
             onClick={() => setMenu(true)}
           >
-            <Menu size={18} />
-            <span>Menu</span>
+            <Menu size={24} strokeWidth={2.8} aria-hidden="true" />
           </button>
         </div>
       </header>
@@ -586,8 +523,7 @@ export default function GameBoard({
           {online.error}
         </div>
       )}
-      <main className="game-main" data-design-contract="shared-table-viewport">
-        <div className="table-boundary" aria-hidden="true" />
+      <main className="game-main" data-design-contract="uno-play-field">
         <section
           className={`playing-table color-${activeColor} seats-${game.players.length} ${draggingCard ? "receiving-card" : ""}`}
           aria-label="Playing table"
@@ -645,7 +581,6 @@ export default function GameBoard({
                   faceDown
                   sizeMultiplier={1.25}
                 />
-                <span className="deck-count">{game.drawPile.length}</span>
                 {game.pendingDraw > 0 && (
                   <span className="draw-penalty" aria-hidden="true">
                     +{game.pendingDraw}
@@ -653,12 +588,12 @@ export default function GameBoard({
                 )}
               </button>
               <span
-                className={`pile-label ${!drawDisabled ? "draw-available" : ""}`}
+                className={`pile-label ${!drawDisabled ? "draw-available" : "sr-only"}`}
               >
                 {!drawDisabled
                   ? game.pendingDraw
                     ? `Draw ${game.pendingDraw}`
-                    : "Tap to draw"
+                    : "Draw"
                   : "Draw pile"}
               </span>
             </div>
@@ -678,7 +613,16 @@ export default function GameBoard({
                   {top && <UnoCard card={top} sizeMultiplier={1.25} />}
                 </div>
               </div>
-              <span className="pile-label">Last played</span>
+              <span className="sr-only">Last played</span>
+              {top?.color === "wild" && (
+                <span
+                  className="wild-color"
+                  aria-label={`Chosen color: ${activeColor}`}
+                >
+                  <i aria-hidden="true" />
+                  {activeColor}
+                </span>
+              )}
             </div>
           </div>
           <div className="sr-only" role="status">
@@ -691,20 +635,13 @@ export default function GameBoard({
                 {api.wildPickerPlayerName} is choosing a color…
               </div>
             )}
-          <div className={`turn-cue ${isLocalTurn ? "active" : ""}`}>
-            <span className="turn-cue-dot" aria-hidden="true" />
+          <div className="sr-only">
             <h1 aria-live="polite">{turnTitle}</h1>
-            <div
-              className="active-color"
-              aria-label={`Active color: ${activeColor}`}
-            >
-              <i />
-              <span>{activeColor}</span>
-            </div>
+            <span>Active color: {activeColor}</span>
           </div>
         </section>
         <section
-          className={`hand-section ${isLocalTurn ? "your-turn" : ""}`}
+          className={`hand-section ${isLocalTurn ? "your-turn" : ""} ${canPass || canPlaySelected ? "has-hand-actions" : ""}`}
           aria-label={`Your hand, ${cards.length} ${cards.length === 1 ? "card" : "cards"}`}
           data-seat={localPlayer.id}
         >
@@ -787,7 +724,10 @@ export default function GameBoard({
             </div>
           </div>
           <div className="move-dock">
-            <div className="move-hint" role="status">
+            <div
+              className={`move-hint ${selectedCard || drawnThisTurn || (online && !online.connected) ? "" : "sr-only"}`}
+              role="status"
+            >
               {moveHint}
             </div>
             <div className="move-buttons">
@@ -872,7 +812,66 @@ export default function GameBoard({
             }
             .
           </p>
+          {online?.room && (
+            <button
+              className="text-button room-code-control"
+              onClick={() => {
+                void navigator.clipboard
+                  .writeText(online.room?.roomId ?? "")
+                  .then(() => toast.success("Room code copied."))
+                  .catch(() => toast.error("Couldn’t copy room code."));
+              }}
+            >
+              Copy room code: {online.room.roomId}
+            </button>
+          )}
           <div className="game-menu">
+            <button
+              className="game-sound-control"
+              aria-label={
+                soundOn && audioStatus === "ready"
+                  ? "Turn sound off"
+                  : "Enable sound"
+              }
+              aria-pressed={soundOn && audioStatus === "ready"}
+              onPointerDown={() => {
+                soundIntent.current =
+                  soundOn && audioStatus === "ready" ? "mute" : "enable";
+              }}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ")
+                  soundIntent.current =
+                    soundOn && audioStatus === "ready" ? "mute" : "enable";
+              }}
+              onClick={() => {
+                const intent =
+                  soundIntent.current ??
+                  (soundOn && audioStatus === "ready" ? "mute" : "enable");
+                soundIntent.current = null;
+                if (intent === "mute") setAudioSettings({ muted: true });
+                else {
+                  const settings = getAudioSettings();
+                  setAudioSettings({
+                    muted: false,
+                    chimesEnabled: true,
+                    sfxVolume: settings.sfxVolume || 0.65,
+                  });
+                  primeTableAudioFromUserGesture();
+                  playTableChime("cardPlay");
+                }
+              }}
+            >
+              {soundOn && audioStatus === "ready" ? (
+                <Volume2 size={19} />
+              ) : (
+                <VolumeX size={19} />
+              )}
+              <span>Sound</span>
+              <b aria-hidden="true">
+                {soundOn && audioStatus === "ready" ? "On" : "Off"}
+              </b>
+            </button>
+
             <button onClick={() => setMenu(false)}>
               <ArrowLeft />
               <span>Back to game</span>
