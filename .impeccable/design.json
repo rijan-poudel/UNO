@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-21T16:11:01.556986Z",
+  "generatedAt": "2026-10-22T08:17:26Z",
   "title": "Design System: UNO — Card club and illustrated game room",
   "extensions": {
     "colorMeta": {
@@ -1270,6 +1270,10 @@
       {
         "name": "arena-portrait-gate",
         "value": "orientation: portrait and max-width: 700px"
+      },
+      {
+        "name": "wild-color-landscape",
+        "value": "orientation: landscape and max-height: 460px"
       }
     ],
     "materials": {
@@ -1304,23 +1308,145 @@
       }
     },
     "recordScope": {
-      "contract": ".impeccable/review/illustrated-room/contract.md",
-      "verification": ".impeccable/review/illustrated-room/verification.md",
-      "finishReview": ".impeccable/review/illustrated-room/finish-review.md",
+      "contract": ".impeccable/review/closer-table/contract.md",
+      "baselineReview": ".impeccable/review/closer-table/baseline-review.md",
+      "layoutVerdict": ".impeccable/review/closer-table/layout-verdict.md",
+      "finishReview": ".impeccable/review/closer-table/finish-review.md",
       "inheritedSeed": "457003dd",
-      "ownerChoice": "An illustrated game-room setting",
+      "ownerChoice": "Correct the rejected shipped layout inside the selected illustrated game-room setting.",
       "approvedComp": false,
       "independentQualityBarSupplied": false,
       "captures": [
-        "desktop-1440.jpg",
-        "user-848.jpg",
-        "landscape-844.jpg",
-        "landscape-568.jpg",
-        "portrait-gate.jpg"
+        "desktop-1440.png",
+        "user-848.png",
+        "hover-848.png",
+        "wild-848.png",
+        "landscape-844-rest.png",
+        "landscape-844-focus.png",
+        "landscape-568-rest.png",
+        "landscape-568-focus.png",
+        "phone-fan-844.png",
+        "phone-pass-844.png",
+        "phone-uno-568.png",
+        "phone-wild-568.png",
+        "phone-wild-844.png",
+        "portrait-gate.png",
+        "reduced-844.png"
       ],
-      "boundary": "Final captures validated; browser geometry and keyboard evidence only. No physical-phone touch, speaker quality, exhaustive accessibility or whole-app certification.",
-      "notCanonized": "Detector advisories, inherited landing radius, incidental colors and compact text do not become new reusable tokens or exemptions. Quiet radial stage and transparent inactive badges are historical only.",
-      "detector": "One pass before header-only scrim correction; no rerun. Intentional shipped material colors recorded from source."
+      "reviewOutcome": "Four scored layout fixes cleared in layout-verdict.md; the subsequent full finish review required a complete short-landscape color decision and this design refresh. Final production verification records fifteen opened captures after the scoped dialog correction; both phone wild states show complete controls without scrolling. Final disposition belongs to the review packet.",
+      "checks": "Reported passing lint, strict types, game/audio/multiplayer assertions and production build. Existing raster scan: four assets, zero missing provenance records.",
+      "boundary": "Browser geometry and keyboard/mouse evidence plus source guards only. No independent quality-bar, whole-app, public-deployment, physical-phone touch, speaker quality or exhaustive accessibility certification.",
+      "notCanonized": "Superseded independent pile centering, former phone hand rows and hidden avatars, scrolling phone wild decision, incidental response values and historical scan advisories do not become broad tokens or exemptions.",
+      "detector": "Baseline scoped mechanical layout scan reported no findings; no new detector run for this documentation pass.",
+      "previousRecord": {
+        "contract": ".impeccable/review/illustrated-room/contract.md",
+        "verification": ".impeccable/review/illustrated-room/verification.md",
+        "finishReview": ".impeccable/review/illustrated-room/finish-review.md",
+        "inheritedSeed": "457003dd",
+        "ownerChoice": "An illustrated game-room setting",
+        "approvedComp": false,
+        "independentQualityBarSupplied": false,
+        "captures": [
+          "desktop-1440.jpg",
+          "user-848.jpg",
+          "landscape-844.jpg",
+          "landscape-568.jpg",
+          "portrait-gate.jpg"
+        ],
+        "boundary": "Final captures validated; browser geometry and keyboard evidence only. No physical-phone touch, speaker quality, exhaustive accessibility or whole-app certification.",
+        "notCanonized": "Detector advisories, inherited landing radius, incidental colors and compact text do not become new reusable tokens or exemptions. Quiet radial stage and transparent inactive badges are historical only.",
+        "detector": "One pass before header-only scrim correction; no rerun. Intentional shipped material colors recorded from source."
+      },
+      "verification": ".impeccable/review/closer-table/verification.md",
+      "wildDecisionEvidence": {
+        "viewports": ["568x320", "844x390"],
+        "dialogClientHeight": 246,
+        "dialogScrollHeight": 246,
+        "colorTargetHeight": 72,
+        "closeAndKeepTargetHeight": 44,
+        "internalScrollingRequired": false,
+        "source": ".impeccable/review/closer-table/verification.md"
+      }
+    },
+    "arenaGeometry": {
+      "source": "app/arena.css",
+      "pileAnchor": "bottom of upper playing region; top auto; horizontally centered",
+      "ordinary": {
+        "handScale": 1.65,
+        "pileScale": 1.35,
+        "handRow": "188px",
+        "pileBottom": "52px",
+        "pileGap": "40px"
+      },
+      "tall": {
+        "query": "min-height: 900px and min-width: 701px",
+        "handScale": 1.95,
+        "pileScale": 1.65,
+        "handRow": "216px",
+        "pileBottom": "52px",
+        "pileGap": "50px"
+      },
+      "short": {
+        "query": "max-height: 680px",
+        "handScale": 1.35,
+        "pileScale": 1.08,
+        "handRow": "152px",
+        "pileBottom": "44px",
+        "pileGap": "32px"
+      },
+      "landscapePhone": {
+        "query": "max-height: 460px and min-width: 541px",
+        "handScale": 1.08,
+        "pileScale": 0.86,
+        "handRow": "140px",
+        "pileBottom": "8px",
+        "pileGap": "32px",
+        "fanRotationMultiplier": 0.5,
+        "fanDropMultiplier": 0.2,
+        "badgeWidth": "128px",
+        "badgeMinHeight": "38px",
+        "avatar": "26px 30px"
+      },
+      "shortestLandscapePhone": {
+        "query": "max-height: 360px and min-width: 541px",
+        "handScale": 0.88,
+        "pileScale": 0.69,
+        "handRow": "116px",
+        "pileBottom": "4px",
+        "badgeWidth": "98px",
+        "badgeMinHeight": "32px",
+        "avatar": "18px 22px"
+      },
+      "opponents": {
+        "desktopWidth": "144px",
+        "desktopAvatar": "36px 42px",
+        "desktopBackFan": "96px 66px at scale 0.5",
+        "phoneGrid": "auto minmax(0, 1fr) auto",
+        "phoneAvatarsRemainVisible": true
+      },
+      "contextualLane": {
+        "right": "16px",
+        "left": "auto",
+        "transform": "none",
+        "maxWidth": "min(240px, calc(100% - 24px))",
+        "bottom": "calc(100% + 10px)",
+        "phoneBottom": "calc(100% + 4px)",
+        "actionMinHeight": "44px"
+      },
+      "wildColorLandscape": {
+        "query": "orientation: landscape and max-height: 460px",
+        "width": "min(680px, calc(100vw - 32px))",
+        "maxHeight": "calc(100dvh - 24px)",
+        "contentPadding": "16px",
+        "contentGap": "12px",
+        "titleSize": "24px",
+        "colorColumns": 4,
+        "colorGap": "10px",
+        "colorMinHeight": "72px",
+        "cancelMinHeight": "44px",
+        "scope": "color-picker-modal only"
+      },
+      "scope": "Observed responsive arena geometry, not new global primitive tokens. Preserve complete internal card boxes, foreground page crop, horizontal hand scrolling, focus clearance, native dialog and portrait gate."
     }
   },
   "components": [
@@ -1352,9 +1478,9 @@
       "name": "Contextual move dock",
       "kind": "custom",
       "refersTo": "button-play-selected",
-      "description": "Contextual inspection or drawn-card decision above the cropped held fan. Eligible UNO stays at hand level; Draw stays on the physical deck.",
+      "description": "Right-side contextual decision lane above the held fan, clear of central piles. Draw stays on the physical deck; eligible UNO stays at hand level.",
       "html": "<div class=\"ds-hand-controls\"><button class=\"ds-move ds-uno\">UNO!</button><div class=\"ds-dock\"><p class=\"ds-hint\" role=\"status\">Ready to play. You can also drag it onto the table.</p><div class=\"ds-moves\"><button class=\"ds-move ds-play\"><span>Play green Discard all</span><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M5 12h14m-6-6 6 6-6 6\"/></svg></button></div></div></div>",
-      "css": ".ds-hand-controls{position:relative;padding-top:56px;background:#082a3d;color:#ffffff;font-family:var(--font-body,Outfit),sans-serif}.ds-dock{display:flex;align-items:center;justify-content:center;gap:8px;padding:0;min-height:44px;flex-direction:column}.ds-hint{margin:0;max-width:55ch;min-width:0;color:#ffffff;background:#1c293c;padding:6px 10px;border-radius:6px;font-size:12px;line-height:1.3;text-align:center}.ds-moves{display:flex;max-width:60%;gap:8px}.ds-move{font-family:inherit;display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:44px;min-width:0;padding:7px 14px;border:1px solid transparent;border-radius:14px;font-size:14px;font-weight:800;line-height:1.25;cursor:pointer;transition:transform 120ms cubic-bezier(.2,.8,.2,1),box-shadow 120ms}.ds-play{background:#ffd000;color:#392700;box-shadow:inset 0 -3px 2px #bd7600,0 4px 8px #03091260}.ds-uno{position:absolute;right:18px;top:0;background:#ffd000;color:#392700}.ds-move:hover{filter:brightness(1.07)}.ds-move:focus-visible{outline:3px solid #ffe329;outline-offset:4px}.ds-move:active{transform:translateY(3px);box-shadow:inset 0 -1px 0 #15292626,0 1px 3px #15292620}@media(prefers-reduced-motion:reduce){.ds-move{transition:none}.ds-move:active{transform:none}}"
+      "css": ".ds-hand-controls{position:relative;height:44px;margin-top:160px;background:#082a3d;color:#ffffff;font-family:var(--font-body,Outfit),sans-serif}.ds-dock{position:absolute;right:16px;left:auto;bottom:calc(100% + 10px);transform:none;width:max-content;max-width:min(240px,calc(100% - 24px));display:flex;align-items:center;justify-content:center;gap:8px;padding:0;min-height:0;flex-direction:column}.ds-hint{margin:0;max-width:42ch;min-width:0;color:#ffffff;background:#1c293c;padding:6px 10px;border-radius:6px;font-size:12px;line-height:1.3;text-align:center}.ds-moves{display:flex;max-width:100%;gap:8px}.ds-move{font-family:inherit;display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:44px;min-width:0;padding:7px 14px;border:1px solid transparent;border-radius:14px;font-size:14px;font-weight:800;line-height:1.25;cursor:pointer;transition:transform 120ms cubic-bezier(.2,.8,.2,1),box-shadow 120ms}.ds-play{background:#ffd000;color:#392700;box-shadow:inset 0 -3px 2px #bd7600,0 4px 8px #03091260}.ds-uno{position:absolute;right:12px;top:-15px;background:#ffd000;color:#392700}.ds-move:hover{filter:brightness(1.07)}.ds-move:focus-visible{outline:3px solid #ffe329;outline-offset:4px}.ds-move:active{transform:translateY(3px);box-shadow:inset 0 -1px 0 #15292626,0 1px 3px #15292620}@media(prefers-reduced-motion:reduce){.ds-move{transition:none}.ds-move:active{transform:none}}@media(max-height:460px) and (min-width:541px){.ds-dock{bottom:calc(100% + 4px)}.ds-uno{right:4px;top:-12px}.ds-hint{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}}"
     },
     {
       "name": "Text field",
@@ -1400,9 +1526,9 @@
       "name": "Active opponent and accessible turn",
       "kind": "chip",
       "refersTo": "opponent-badge-active",
-      "description": "Opaque petrol inactive identity and yellow active opponent over the room. Routine turn/color stay accessible-only; wild chosen color remains contextual.",
-      "html": "<div class=\"ds-status\"><span class=\"ds-seat ds-inactive\"><strong>Sam</strong><small>6 cards</small></span><span class=\"ds-seat\"><strong>Alex</strong><small>4 cards</small><i aria-hidden=\"true\"></i></span><div class=\"ds-sr-only\"><h1>Alex’s turn</h1><span>Active color: red</span></div></div>",
-      "css": ".ds-status{padding:18px;background:#082a3d;font-family:var(--font-body,Outfit),sans-serif}.ds-seat{display:inline-flex;align-items:center;gap:8px;padding:5px 8px;border-radius:7px;background:#ffe329;color:#392700;box-shadow:inset 0 -2px 1px #b39000,0 4px 7px #03091250}.ds-seat strong{font-size:12px;font-weight:500}.ds-seat small{font-size:11px;color:#514100}.ds-seat i{width:5px;height:5px;border-radius:50%;background:#514100}.ds-sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}.ds-seat.ds-inactive{background:#102e37;color:#ffffff;box-shadow:none}.ds-inactive small{color:#c2cedf}"
+      "description": "Larger graphical desktop identities; three-column 128px/98px phone badges retain avatars, names and real counts at both short landscape heights. Active state stays yellow; routine turn/color remain accessible-only.",
+      "html": "<div class=\"ds-status\"><span class=\"ds-seat ds-inactive\"><span class=\"ds-seat-avatar\" aria-hidden=\"true\"><i></i><i></i></span><span><strong>Sam</strong><small>6 cards</small></span></span><span class=\"ds-seat\"><span class=\"ds-seat-avatar\" aria-hidden=\"true\"><i></i><i></i></span><span><strong>Alex</strong><small>4 cards</small></span><i class=\"ds-turn\" aria-hidden=\"true\"></i></span><div class=\"ds-sr-only\"><h1>Alex’s turn</h1><span>Active color: red</span></div></div>",
+      "css": ".ds-status{display:flex;gap:12px;flex-wrap:wrap;padding:18px;background:#082a3d;font-family:var(--font-body,Outfit),sans-serif}.ds-seat{display:flex;align-items:center;justify-content:center;gap:8px;padding:7px 10px;max-width:144px;border-radius:7px;background:#ffe329;color:#392700;box-shadow:inset 0 -2px 1px #b39000,0 4px 7px #03091250}.ds-seat>span:nth-child(2){min-width:0}.ds-seat strong{display:block;max-width:88px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px;font-weight:650}.ds-seat small{display:flex;align-items:center;gap:3px;font-size:12px;color:#514100}.ds-turn{width:5px;height:5px;border-radius:50%;background:#514100}.ds-sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}.ds-seat.ds-inactive{background:#102e37;color:#ffffff;box-shadow:none}.ds-inactive small{color:#c2cedf}.ds-seat-avatar{position:relative;display:inline-flex;flex-shrink:0;width:36px;height:42px;transform:rotate(-5deg);border:2px solid #323139;border-radius:7px;background:#ff6942;box-shadow:inset 0 1px 1px #ffffffa0,0 3px 3px #02071870}.ds-seat-avatar i{position:absolute;top:33%;width:14%;height:16%;border-radius:50%;background:#323139}.ds-seat-avatar i:first-child{left:22%}.ds-seat-avatar i:last-child{right:22%}.ds-seat-avatar:after{content:\"\";position:absolute;left:35%;top:56%;width:32%;height:15%;border:2px solid #323139;border-top:0;border-radius:0 0 10px 10px}@media(max-height:460px) and (min-width:541px){.ds-seat{display:grid;grid-template-columns:auto minmax(0,1fr) auto;width:128px;max-width:128px;min-height:38px;gap:5px;padding:4px 8px}.ds-seat>span:nth-child(2){display:flex;align-items:center;gap:5px}.ds-seat-avatar{width:26px;height:30px}.ds-seat strong{max-width:50px;font-size:12px}.ds-seat small{font-size:11px}}@media(max-height:360px) and (min-width:541px){.ds-seat{width:98px;max-width:98px;min-height:32px;padding:4px 6px;gap:4px}.ds-seat>span:nth-child(2){gap:4px}.ds-seat-avatar{width:18px;height:22px}.ds-seat strong{max-width:43px;font-size:11px}}"
     },
     {
       "name": "UNO card",
@@ -1439,9 +1565,9 @@
       "name": "Native wild color choices",
       "kind": "button",
       "refersTo": "color-choice-red",
-      "description": "Four named vivid native choices preserve explicit color labels and contrasting white/dark inks.",
-      "html": "<div class=\"ds-choices\"><button class=\"ds-choice ds-red\">Red</button><button class=\"ds-choice ds-blue\">Blue</button><button class=\"ds-choice ds-green\">Green</button><button class=\"ds-choice ds-yellow\">Yellow</button></div>",
-      "css": ".ds-choices{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.ds-choice{min-height:88px;border:0;display:flex;align-items:center;justify-content:center;gap:10px;text-transform:capitalize;border-radius:6px;font-family:var(--font-body,Outfit),sans-serif;font-size:15px;font-weight:600;cursor:pointer;box-shadow:inset 0 2px 2px #ffffff40,inset 0 -4px 3px #00000028,0 5px 10px #02071820;transition:transform 120ms cubic-bezier(.2,.8,.2,1),box-shadow 120ms}.ds-red{background:#e71c3b;color:#ffffff}.ds-blue{background:#095be5;color:#ffffff}.ds-green{background:#008749;color:#ffffff}.ds-yellow{background:#ffd000;color:#392700}.ds-choice:focus-visible{outline:2px solid var(--ui-accent-blue,#3265a0);outline-offset:4px}.ds-choice:active{transform:translateY(3px);box-shadow:inset 0 -1px 0 #15292626,0 1px 3px #15292620}"
+      "description": "Native named wild decision: four complete targets and keep-card action fit together in short landscape, using a color-picker-specific four-column composition without shrinking shared dialogs.",
+      "html": "<div class=\"ds-color-picker\"><div class=\"ds-color-heading\"><h2>Your wild. Your color.</h2><button class=\"ds-color-close\" aria-label=\"Close dialog\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"m18 6-12 12M6 6l12 12\"/></svg></button></div><p class=\"ds-color-guidance\">Choose the color for the next play.</p><div class=\"ds-choices\"><button class=\"ds-choice ds-red\">Red</button><button class=\"ds-choice ds-yellow\">Yellow</button><button class=\"ds-choice ds-green\">Green</button><button class=\"ds-choice ds-blue\">Blue</button></div><button class=\"ds-color-cancel\">Keep the wild card</button></div>",
+      "css": ".ds-choices{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.ds-choice{min-height:88px;border:0;display:flex;align-items:center;justify-content:center;gap:10px;text-transform:capitalize;border-radius:6px;font-family:var(--font-body,Outfit),sans-serif;font-size:15px;font-weight:600;cursor:pointer;box-shadow:inset 0 2px 2px #ffffff40,inset 0 -4px 3px #00000028,0 5px 10px #02071820;transition:transform 120ms cubic-bezier(.2,.8,.2,1),box-shadow 120ms}.ds-red{background:#e71c3b;color:#ffffff}.ds-blue{background:#095be5;color:#ffffff}.ds-green{background:#008749;color:#ffffff}.ds-yellow{background:#ffd000;color:#392700}.ds-choice:focus-visible{outline:2px solid var(--ui-accent-blue,#3265a0);outline-offset:4px}.ds-choice:active{transform:translateY(3px);box-shadow:inset 0 -1px 0 #15292626,0 1px 3px #15292620}.ds-color-picker{display:grid;gap:22px;max-width:100%;padding:28px;background:var(--ui-surface,#fffcf5);color:var(--ui-text,#2c2c32);border-radius:16px;font-family:var(--font-body,Outfit),sans-serif}.ds-color-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:15px}.ds-color-heading h2{margin:0;font-size:29px;font-weight:600;line-height:1.2;letter-spacing:-.03em}.ds-color-close{display:grid;place-items:center;width:44px;height:44px;padding:0;border:0;border-radius:10px;color:inherit;background:transparent}.ds-color-guidance{margin:0;color:var(--ui-muted,#706b65);font-size:14px;line-height:1.6}.ds-color-cancel{justify-self:start;min-height:44px;padding:4px 0;border:0;background:transparent;color:inherit;font:inherit}@media(hover:hover) and (pointer:fine){.ds-color-close:hover{background:color-mix(in srgb,var(--ui-text,#2c2c32) 7%,transparent)}.ds-color-cancel:hover{text-decoration:underline}}.ds-color-close:focus-visible,.ds-color-cancel:focus-visible{outline:2px solid var(--ui-accent-blue,#3265a0);outline-offset:4px}@media(orientation:landscape) and (max-height:460px){.ds-color-picker{width:min(680px,calc(100vw - 32px));max-height:calc(100dvh - 24px);padding:16px;gap:12px}.ds-color-heading{align-items:center}.ds-color-heading h2{font-size:24px}.ds-color-guidance{font-size:13px;line-height:1.35}.ds-choices{grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.ds-choice{min-height:72px;padding:12px 6px;font-size:14px}}"
     },
     {
       "name": "Arena menu",
@@ -1454,14 +1580,14 @@
   ],
   "narrative": {
     "northStar": "The illustrated game room and after-hours card club",
-    "overview": "UNO feels like a held hand of vivid real cards in an illustrated evening game room. Warm lounge furniture occupies the upper band while a clear petrol-blue tabletop recedes behind expressive players and centered piles. Cards are the controls: a legal face plays on its first activation; the foreground fan comes from below the viewport and makes pickup and deliberate upward release tangible.\n\nHome remains a centered illustrated after-hours card club: a flat transparent original rabbit, red panda and crocodile scene sits directly on navy, with yellow Play and full-color blue Create and crimson Join actions. Settings and setup retain theme-aware supporting surfaces. Live play uses a static original room illustration, opaque petrol player identities, white lettering and yellow action/active-seat feedback. Outfit UI and Barlow Condensed card lettering remain the two pinned families. Small native card characters express published player state.",
+    "overview": "UNO feels like a held hand of vivid real cards in an illustrated evening game room. Warm lounge furniture occupies the upper band while a clear petrol-blue tabletop recedes behind expressive players and nearby central piles. The piles and foreground hand form one close play group, with graphical opponents around it. Cards are the controls: a legal face plays on its first activation; the foreground fan comes from below the viewport and makes pickup and deliberate upward release tangible.\n\nHome remains a centered illustrated after-hours card club: a flat transparent original rabbit, red panda and crocodile scene sits directly on navy, with yellow Play and full-color blue Create and crimson Join actions. Settings and setup retain theme-aware supporting surfaces. Live play uses a static original room illustration, opaque petrol player identities, white lettering and yellow action/active-seat feedback. Outfit UI and Barlow Condensed card lettering remain the two pinned families. Small native card characters express published player state.",
     "keyCharacteristics": [
       "A centered flat illustrated card-club welcome with complete silhouettes and visibly primary Play.",
       "One shared native card face across the live hand, piles and motion.",
       "Outfit interface lettering paired with Barlow Condensed card numerals.",
       "Fixed navy home, theme-aware settings/setup and an illustrated warm lounge above a clear petrol live tabletop.",
       "First-activation legal play, nonmatching-card inspection and deliberate upward release.",
-      "Viewport-edge cropped held fan, bounded horizontal hand scrolling, contextual controls and paper/contact feedback that never delays a turn.",
+      "Close central piles and a viewport-edge cropped held fan, bounded horizontal hand scrolling, a separate right-side decision lane and paper/contact feedback that never delays a turn.",
       "Real round outcomes and optional device-local milestone cards.",
       "Original card characters with truthful expressions, bounded reactions and pressed control surfaces."
     ],
@@ -1528,8 +1654,8 @@
       "Do preserve vivid deck colors, white faces, distinct dark green/yellow index and center inks, and a written chosen-color label for wild top discards.",
       "Do retain the fixed home club palette, scoped illustrated room and theme-aware settings/setup.",
       "Do preserve the room raster’s prompt provenance, cover crop, solid fallback, opaque identities and header-only contrast scrim.",
-      "Do keep one clipped viewport with centered piles and a bottom-cropped fan, complete internal card boxes, top focus clearance and independent horizontal large-hand scrolling.",
-      "Do retain distinct six-seat landscape identities and the portrait rotate gate, local pause and online-continuation disclosure.",
+      "Do keep one clipped viewport with nearby bottom-anchored central piles and a bottom-cropped fan, complete internal card boxes, top focus clearance and independent horizontal large-hand scrolling.",
+      "Do retain graphical identities for all five opponents on six-seat landscape phones, the separate right-side contextual lane, and the portrait rotate gate, local pause and online-continuation disclosure.",
       "Do play legal cards on first activation and keep nonmatching inspection, turn state and situational actions clear with touch and keyboard.",
       "Do keep the full named Play action, selected card and current hint in agreement; retain dark ink on yellow.",
       "Do reveal actual new local draws without selecting them and preserve horizontal position on unrelated updates.",
@@ -1540,6 +1666,7 @@
       "Do derive optional milestone cards from completed device-local rounds and keep result actions reachable inside the native dialog.",
       "Do attach pressure cues to their actual opponent hand or penalty deck and retain full accessible names.",
       "Do use original expressive card characters, preserve compact phone identities, and restart their bounded reaction only on a real expression change.",
+      "Do fit all four complete wild-color targets and the keep-card action together in short landscape using the color-picker-specific responsive composition.",
       "Do acknowledge actual card activation with immediate pickup while keeping horizontal scroll silent."
     ],
     "donts": [

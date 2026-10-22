@@ -1,0 +1,14 @@
+# Closer shared game — corrective layout
+
+THESIS: Playing cards and people own the screen; the illustrated room supports a close shared game.
+OWN-WORLD: Preserve the owner-selected illustrated lounge, native vivid deck, Outfit/Barlow lettering, yellow action state and physical card depth. No new background generation, font, palette or component library.
+STORY: Find your raised legal card, tap/flick it onto a nearby central pile, or draw from the deck. Opponents should feel seated around that action.
+FIRST VIEWPORT: Use available tabletop area for a legible foreground hand, decisive central piles and readable opponent identities. Roughly the bottom quarter of the hand may leave the viewport; do not crop away half the card face. Reduce empty distance between piles and hand while preserving independent seat lanes. Landscape phones keep all seats and a large hand reachable with no page scroll or clipping of lifted cards.
+FORM: Owner rejected the shipped UI after the illustrated-room release and specifically asked to solve it. Correct layout inside that explicitly chosen world; inherited seed457003dd, code-led, no approved comp or new concept tournament. The prior room review is not authority to disregard this rejection. Before evidence is the public desktop/landscape captures in ../illustrated-room/ plus the previous owner848px and six-seat captures there. Preserve engine, online protocol, gestures, sound timing, accessible announcements, contextual actions and landscape-only phone gate. Primary checkout unrelated globals/table/GameFeedback edits are excluded via this worktree.
+FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance
+
+Spatial thesis: your hand is the primary task, central draw/discard the next target, opponents support turn awareness. Join the piles and held fan into one close composition while keeping opponents clear of both. Room furniture remains atmosphere above; no new HUD or decorative scaffold.
+
+Verification: baseline layout assessment independent of scoped mechanical scan; one build, batched desktop1440×900/user848×765 and landscape844×390/568×320 six-seat20-card checks, portrait gate, hover/focus, reduced motion and contextual wild/UNO states. One correction/confirmation round at most before fresh finish handoff. Existing raster reused with provenance intact. Required repository checks and public deployment verification. Physical phone/speaker quality not certified.
+
+Independent baseline review: four material fixes in baseline-review.md. Desktop crop broadly meets the brief and stays; recover normal phone-card visibility, move piles toward the hand with a separate right-side contextual lane, strengthen graphical opponents, and restore shallow phone fan geometry. Scoped mechanical assessment layout-before.json has no findings.

@@ -1,0 +1,14 @@
+## verdict
+
+1. Resolved — shared play group: desktop-1440.png and user-848.png show the piles moved toward the held hand and opponents lowered to the tabletop edge. The former approximately 180px empty interval is substantially reduced; the images now read as one shared action area. The revised geometry preserves the desktop fan rather than globally raising it.
+2. Resolved — normal phone-card exposure: landscape-844-rest.png and landscape-568-rest.png show roughly the bottom quarter leaving the viewport before focus. Corroborating bounding-box exposure is 75.5% and 75.6% for the measured outer normal cards. The separate focus captures show the last card raised and horizontally reachable, with clear top and side focus headroom and no page scrolling.
+3. Resolved — graphical opponents: desktop identities and backs are larger and sit at the room/table boundary. Both six-seat phone captures retain all five avatars, names, counts or UNO state, and active-seat contrast. Frankie and Robin/UNO remain identifiable at 568px; compact badges are an acceptable adaptation to the owner-required landscape phone format.
+4. Resolved — held fan and contextual lanes: phone-fan-844.png visibly restores a shallow arc and overlap rhythm; the 20-card rest/focus pairs preserve exposed values and horizontal navigation. phone-pass-844.png and phone-uno-568.png place the current decision in a distinct right-side lane without colliding with piles or the held cards. Hover and reduced-motion captures preserve the corrected composition. The 568px wild dialog has internal overflow, with the lower choices partly cropped at rest; all four color labels, usable choice regions, and close control remain visible. This is valid evidence and does not establish an unresolved material failure of the scored layout fixes.
+
+All 14 required final captures were opened: desktop-1440.png, user-848.png, hover-848.png, wild-848.png, landscape-844-rest.png, landscape-844-focus.png, landscape-568-rest.png, landscape-568-focus.png, phone-fan-844.png, phone-pass-844.png, phone-uno-568.png, phone-wild-568.png, portrait-gate.png, and reduced-844.png. Each exists, matches its stated viewport/context, and contains settled content rather than blank or malformed capture regions. No material regression attributable to the correction batch is visible. The supplied interaction log corroborates drag, Draw, horizontal End reveal, Pass, UNO, and wild confirmation; it does not substitute for the image scores above.
+
+## remaining
+
+Clear for the four scored layout fixes. This ship covers the scored fixes, not the whole surface. Existing DESIGN.md still requires the parent-planned record refresh before the corrective FINISH promise is complete; this verdict does not certify the whole app, public deployment, physical-phone touch, speaker quality, or exhaustive accessibility. No new visual world, approved comp, or independent QUALITY BAR certification is implied.
+
+disposition: ship

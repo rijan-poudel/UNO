@@ -11,7 +11,11 @@ export default function ColorPicker({
   playerName?: string;
 }) {
   return (
-    <Modal title="Your wild. Your color." onClose={onCancel}>
+    <Modal
+      title="Your wild. Your color."
+      onClose={onCancel}
+      className="color-picker-modal"
+    >
       <p className="muted">
         {playerName ? `${playerName}, choose` : "Choose"} the color for the next
         play.

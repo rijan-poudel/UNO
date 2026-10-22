@@ -62,12 +62,12 @@ export default function RootLayout({
           THESIS: Vivid held cards in an illustrated game room. OWN-WORLD: Warm
           lounge furniture above a clear petrol tabletop, vivid deck inks.
           STORY: Lifted playable cards invite a direct tap or flick; secondary
-          controls live in Menu. FIRST VIEWPORT: Centered piles, quiet header
-          and bottom-cropped held hand; no casino rail. FORM: Owner-pinned UNO
-          play field, code-led. See
-          .impeccable/review/illustrated-room/contract.md. FINISH: unreviewed
-          and undocumented is unfinished; this build ends with the finish
-          review, the verdict, DESIGN.md, and every shipping raster carrying its
+          controls live in Menu. FIRST VIEWPORT: Close piles and a held hand,
+          graphical opponents and a quiet header; no casino rail. FORM:
+          Owner-pinned UNO play field, code-led, inherited seed457003dd. See
+          .impeccable/review/closer-table/contract.md. FINISH: unreviewed and
+          undocumented is unfinished; this build ends with the finish review,
+          the verdict, DESIGN.md, and every shipping raster carrying its
           provenance
         </span>
         {children}

@@ -70,3 +70,7 @@ The owner rejected the electric-blue orbit background. Background decoration mus
 ## Selected illustrated room
 
 The owner answered the background preference with “An illustrated game-room setting.” This supersedes the quiet-stage assumption. Use original lounge artwork as a static setting around the live cards, with warm furniture above a clear petrol tabletop, compact opaque player-name backings, and responsive crops checked on desktop and landscape phones. Preserve the cropped held hand, sparse controls, direct play and accessible state cues. No illustrated element should impersonate a live card or control, obscure a pile, or delay play.
+
+## October 22 corrective game layout
+
+The owner rejected the shipped illustrated-room UI. Keep the selected room and native cards while making the play itself a close shared composition: piles near the held fan, readable graphical opponents, normal landscape cards visible before focus, and a shallow phone fan that stays scrollable with20cards. Desktop crop already broadly meets the brief; the phone extremes need more hand space. Contextual Pass/inspection controls need their own lane clear of the piles. These are corrective layout findings, not a request for more decorative artwork or a routine status HUD.
