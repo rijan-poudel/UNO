@@ -1,6 +1,6 @@
 // One preset picker for setup and preferences; every choice uses engine-supported rules.
 "use client";
-import { ChevronsLeftRight } from "lucide-react";
+import { Check, ChevronsLeftRight } from "lucide-react";
 import { RULE_PRESETS, matchesPreset } from "../lib/rulePresets";
 import type { GameRules } from "../types/rules";
 export default function RulePresets({
@@ -33,6 +33,9 @@ export default function RulePresets({
           </span>
           <strong>{p.label}</strong>
           <small>{p.description}</small>
+          {matchesPreset(rules, p.rules) && (
+            <Check className="preset-selected" size={20} aria-hidden="true" />
+          )}
         </button>
       ))}
     </div>

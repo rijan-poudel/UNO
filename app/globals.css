@@ -23,7 +23,8 @@
   --ui-table-text: #f4f1e6;
   --ui-table-muted: #c1d2c3;
   --ui-shadow: 0 18px 60px #1b29251c;
-  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-standard: cubic-bezier(0.2, 0.8, 0.2, 1);
   color-scheme: light;
 }
 :root[data-theme="midnight"] {
@@ -192,9 +193,6 @@ input[type="range"] {
   background: var(--ui-accent-red);
   color: var(--ui-bg);
 }
-:root:not([data-theme="midnight"]) .primary {
-  color: #fffaf1;
-}
 .secondary {
   background: transparent;
   border-color: var(--ui-line);
@@ -274,6 +272,18 @@ input[type="range"] {
   min-width: 17px;
   font-size: 10px;
   line-height: 17px;
+  animation: notification-pulse 2s ease infinite;
+}
+@keyframes notification-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0
+      color-mix(in srgb, var(--ui-accent-red) 50%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 4px
+      color-mix(in srgb, var(--ui-accent-red) 0%, transparent);
+  }
 }
 .home-main {
   max-width: 1600px;
@@ -353,7 +363,23 @@ input[type="range"] {
   max-width: 420px;
   font-size: 14px;
   line-height: 1.65;
-  padding-top: 12px;
+  padding: 16px 20px;
+  background: var(--ui-surface);
+  border: 1px solid var(--ui-line);
+  border-radius: 16px;
+  margin-top: 14px;
+  box-shadow: 0 4px 12px #0000000a;
+  animation: quick-rules-appear 220ms var(--ease-out) both;
+}
+@keyframes quick-rules-appear {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 .quick-rules p + p {
   margin-top: 9px;
@@ -531,14 +557,34 @@ input[type="range"] {
   display: flex;
   align-items: center;
   border: 1px solid var(--ui-line);
-  border-radius: 10px;
-  padding: 2px;
+  border-radius: 999px;
+  background: var(--ui-surface);
+  padding: 3px;
+  box-shadow: inset 0 1px 2px #0000000a;
+}
+.stepper .icon-button {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  transition:
+    transform 120ms var(--ease-out),
+    background 120ms;
+}
+@media (hover: hover) and (pointer: fine) {
+  .stepper .icon-button:hover:not(:disabled) {
+    background: var(--ui-line);
+    transform: scale(1.1);
+  }
+}
+.stepper .icon-button:active:not(:disabled) {
+  transform: scale(0.9);
 }
 .stepper output {
-  width: 30px;
+  width: 34px;
   text-align: center;
   font-variant-numeric: tabular-nums;
-  font-weight: 600;
+  font-weight: 700;
+  font-size: 16px;
 }
 .seat-row {
   display: flex;
@@ -627,19 +673,29 @@ input[type="range"] {
   gap: 4px;
   padding: 4px;
   background: var(--ui-line);
-  border-radius: 12px;
+  border-radius: 999px;
+  box-shadow: inset 0 1px 2px #0000000d;
 }
 .segmented button {
   flex: 1;
-  min-height: 43px;
+  min-height: 42px;
   background: transparent;
   border: 0;
-  border-radius: 8px;
+  border-radius: 999px;
   font-size: 14px;
+  font-weight: 600;
+  transition:
+    background 150ms,
+    transform 140ms var(--ease-out),
+    box-shadow 150ms;
 }
 .segmented button[aria-pressed="true"] {
   background: var(--ui-surface);
-  font-weight: 600;
+  box-shadow: 0 2px 6px #00000018;
+  transform: scale(1.02);
+}
+.segmented button:active {
+  transform: scale(0.96);
 }
 .field-label {
   display: block;
@@ -757,10 +813,21 @@ input[type="range"] {
   box-shadow: var(--ui-shadow);
 }
 .modal::backdrop {
-  background: #14231de0;
+  background: #14231dc8;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  animation: backdrop-fade 200ms ease-out;
+}
+@keyframes backdrop-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 .modal[open] {
-  animation: modal-enter 200ms var(--ease-out);
+  animation: modal-enter 280ms var(--ease-out);
 }
 .modal-content {
   padding: 28px;
@@ -944,7 +1011,12 @@ input[type="range"] {
   border-radius: 50%;
   background: var(--ui-surface);
   box-shadow: 0 1px 3px #0002;
-  transition: transform 160ms var(--ease-out);
+  transition:
+    transform 160ms var(--ease-out),
+    width 120ms ease;
+}
+.preference-row:active .switch-track::after {
+  width: 23px;
 }
 .preference-row input:checked + .switch-track {
   background: var(--ui-accent-green);
@@ -999,32 +1071,92 @@ input[type="range"] {
 .color-choices {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  gap: 14px;
 }
 .color-choice {
-  min-height: 88px;
+  min-height: 92px;
   border: 0;
-  border-radius: 12px;
+  border-radius: 16px;
   color: #fffaf1;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 12px;
   text-transform: capitalize;
-  font-weight: 600;
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    transform 140ms var(--ease-out),
+    box-shadow 140ms var(--ease-out),
+    filter 140ms;
+}
+.color-choice span {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 0 2px #ffffff60;
+  display: inline-block;
+  flex-shrink: 0;
+  transition: transform 140ms var(--ease-out);
 }
 .choose-red {
   background: #bf422e;
+  box-shadow:
+    inset 0 -5px 0 #8f2314,
+    0 6px 14px #bf422e40;
 }
 .choose-yellow {
   background: #ecc04c;
   color: #292b27;
+  box-shadow:
+    inset 0 -5px 0 #b38820,
+    0 6px 14px #ecc04c40;
 }
 .choose-green {
   background: #317257;
+  box-shadow:
+    inset 0 -5px 0 #1a4a36,
+    0 6px 14px #31725740;
 }
 .choose-blue {
   background: #3265a0;
+  box-shadow:
+    inset 0 -5px 0 #1d4678,
+    0 6px 14px #3265a040;
+}
+@media (hover: hover) and (pointer: fine) {
+  .color-choice:hover {
+    transform: translateY(-3px) scale(1.02);
+    filter: brightness(1.05);
+  }
+  .color-choice:hover span {
+    transform: scale(1.2);
+  }
+}
+.color-choice:active:not(:disabled) {
+  transform: translateY(3px) scale(0.98);
+}
+.choose-red:active:not(:disabled) {
+  box-shadow:
+    inset 0 -1px 0 #8f2314,
+    0 2px 4px #bf422e30;
+}
+.choose-yellow:active:not(:disabled) {
+  box-shadow:
+    inset 0 -1px 0 #b38820,
+    0 2px 4px #ecc04c30;
+}
+.choose-green:active:not(:disabled) {
+  box-shadow:
+    inset 0 -1px 0 #1a4a36,
+    0 2px 4px #31725730;
+}
+.choose-blue:active:not(:disabled) {
+  box-shadow:
+    inset 0 -1px 0 #1d4678,
+    0 2px 4px #3265a030;
 }
 .help-rules {
   display: grid;
@@ -1057,7 +1189,7 @@ input[type="range"] {
 @keyframes modal-enter {
   from {
     opacity: 0;
-    transform: translateY(10px) scale(0.98);
+    transform: translateY(16px) scale(0.96);
   }
   to {
     opacity: 1;
@@ -1389,6 +1521,18 @@ input[type="range"] {
   transform: rotate(18deg);
   margin-left: -10px;
   margin-top: 18px;
+  transition: transform 180ms var(--ease-out);
+}
+.play-choice svg {
+  transition: transform 180ms var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .play-choice:hover svg {
+    transform: translateX(4px);
+  }
+  .play-choice:hover .mini-card {
+    transform: rotate(24deg) translateY(-5px) scale(1.1);
+  }
 }
 .how-to {
   margin-top: 20px;
@@ -1488,24 +1632,92 @@ input[type="range"] {
   transform: translateY(-10%);
 }
 @media (prefers-reduced-motion: no-preference) {
+  /* Subtle natural character blink — makes avatars feel alive like Duolingo characters */
+  .player-avatar:not([data-expression="celebrate"]):not(
+      [data-expression="surprised"]
+    )
+    .avatar-eyes
+    i {
+    transform-origin: center;
+    animation: avatar-blink 4.8s ease-in-out infinite;
+  }
+  @keyframes avatar-blink {
+    0%,
+    94%,
+    98%,
+    100% {
+      transform: scaleY(1);
+    }
+    96% {
+      transform: scaleY(0.12);
+    }
+  }
   .opponent-label .player-avatar:not([data-expression="neutral"]) {
-    animation: player-react 260ms var(--ease-out) both;
+    animation: player-react 350ms var(--ease-out) both;
   }
   @keyframes player-react {
     0% {
-      transform: rotate(-5deg) scale(0.9);
+      transform: rotate(-5deg) scale(0.88);
     }
-    55% {
-      transform: rotate(3deg) scale(1.08);
+    35% {
+      transform: rotate(6deg) scale(1.15);
+    }
+    65% {
+      transform: rotate(-3deg) scale(1.04);
     }
     100% {
       transform: rotate(-5deg) scale(1);
     }
   }
+  /* Gentle idle float for home art characters — Duolingo's mascot energy */
+  .home-card-friend.friend-left {
+    animation: avatar-float-left 3.2s ease-in-out infinite;
+  }
+  .home-card-friend.friend-right {
+    animation: avatar-float-right 3.8s ease-in-out infinite;
+    animation-delay: 0.5s;
+  }
+  @keyframes avatar-float-left {
+    0%,
+    100% {
+      transform: rotate(-13deg) translateY(0px);
+    }
+    50% {
+      transform: rotate(-10deg) translateY(-8px);
+    }
+  }
+  @keyframes avatar-float-right {
+    0%,
+    100% {
+      transform: rotate(15deg) translateY(0px);
+    }
+    50% {
+      transform: rotate(18deg) translateY(-10px);
+    }
+  }
+  /* Stagger entrance for play choices */
+  .play-choices .play-choice:nth-child(1) {
+    animation: choice-arrive 360ms var(--ease-out) both;
+    animation-delay: 50ms;
+  }
+  .play-choices .play-choice:nth-child(2) {
+    animation: choice-arrive 360ms var(--ease-out) both;
+    animation-delay: 130ms;
+  }
+  @keyframes choice-arrive {
+    from {
+      opacity: 0;
+      transform: translateY(12px) scale(0.96);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
 }
 @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
   .play-choice:hover .choice-art .player-avatar {
-    transform: translateY(-3px) rotate(5deg);
+    transform: translateY(-6px) rotate(8deg) scale(1.08);
   }
   .choice-art .player-avatar {
     transition: transform 180ms var(--ease-out);
@@ -1555,6 +1767,20 @@ input[type="range"] {
 .rule-preset[aria-pressed="true"] {
   border-color: var(--ui-accent-red);
   background: var(--ui-surface);
+}
+.rule-preset {
+  transition:
+    transform 140ms var(--ease-out),
+    border-color 140ms,
+    background 140ms;
+}
+@media (hover: hover) and (pointer: fine) {
+  .rule-preset:hover {
+    transform: scale(1.03);
+  }
+  .rule-preset[aria-pressed="true"] {
+    transform: scale(1.04);
+  }
 }
 .rule-preset strong {
   font-family: var(--font-display);
@@ -1674,37 +1900,43 @@ input[type="range"] {
   border-radius: 3px;
   position: absolute;
   opacity: 0;
-  animation: victory-piece 1300ms var(--ease-out) both;
+  animation: victory-piece 1500ms var(--ease-out) both;
   animation-delay: calc(var(--piece) * 12ms);
 }
 
 @keyframes action-pop {
   0% {
     opacity: 0;
-    transform: translate(-50%, -20%) scale(0.4) rotate(-10deg);
+    transform: translate(-50%, -10%) scale(0.3) rotate(-15deg);
   }
-  20%,
-  60% {
+  18% {
     opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
+    transform: translate(-50%, -55%) scale(1.12) rotate(4deg);
+  }
+  30%,
+  55% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1) rotate(-3deg);
   }
   100% {
     opacity: 0;
-    transform: translate(-50%, -80%) scale(0.95);
+    transform: translate(-50%, -90%) scale(0.88) rotate(2deg);
   }
 }
 @keyframes victory-piece {
   0% {
     opacity: 0;
-    transform: translate(0, 0) rotate(0);
+    transform: translate(0, 0) rotate(0) scale(0.3);
   }
-  15% {
+  12% {
     opacity: 1;
+    transform: translate(calc(var(--piece-x) * 0.1), calc(var(--piece-y) * 0.1))
+      rotate(calc(var(--piece-rotation) * 0.2)) scale(1.2);
   }
   100% {
     opacity: 0;
     transform: translate(var(--piece-x), var(--piece-y))
-      rotate(var(--piece-rotation));
+      rotate(var(--piece-rotation)) scale(0.6);
   }
 }
 @media (hover: hover) {
@@ -1883,6 +2115,19 @@ input[type="range"] {
 }
 .progress-record svg {
   color: var(--ui-accent-red);
+}
+/* Streak count pulse — like Duolingo's fire streak */
+.progress-record > span:has(svg) {
+  animation: streak-glow 2.5s ease-in-out infinite;
+}
+@keyframes streak-glow {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.75;
+  }
 }
 .milestone-collection summary {
   display: flex;
@@ -2100,7 +2345,7 @@ input[type="range"] {
   animation: screen-arrive 240ms var(--ease-out) both;
 }
 .seat-row {
-  animation: screen-arrive 200ms var(--ease-out) both;
+  animation: screen-arrive 220ms var(--ease-out) both;
 }
 @keyframes screen-arrive {
   from {
@@ -2131,10 +2376,41 @@ input[type="range"] {
   display: flex;
   justify-content: space-between;
   gap: 16px;
-  margin-top: 12px;
+  margin-top: 14px;
 }
 .entry-shortcuts .text-button {
-  min-height: 44px;
+  min-height: 42px;
+  padding: 8px 18px;
+  border-radius: 999px;
+  background: var(--ui-surface);
+  border: 1px solid var(--ui-line);
+  font-weight: 600;
+  box-shadow: 0 2px 5px #0000000a;
+  transition:
+    transform 140ms var(--ease-out),
+    background 140ms,
+    border-color 140ms,
+    box-shadow 140ms,
+    color 140ms;
+}
+.entry-shortcuts .text-button svg {
+  transition: transform 140ms var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .entry-shortcuts .text-button:hover {
+    background: var(--ui-surface);
+    border-color: var(--ui-accent-red);
+    color: var(--ui-text);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px #00000014;
+    text-decoration: none;
+  }
+  .entry-shortcuts .text-button:hover svg {
+    transform: translateX(3px);
+  }
+}
+.entry-shortcuts .text-button:active {
+  transform: translateY(1px);
 }
 .crew-line {
   display: flex;
@@ -2255,20 +2531,29 @@ input[type="range"] {
 @media (prefers-reduced-motion: reduce) {
   .modal[open],
   .setup-content,
-  .seat-row {
+  .seat-row,
+  .quick-rules {
     animation: none;
   }
   .button,
   .icon-button,
   .play-choice,
   .switch-track::after,
-  .milestone-collection summary > svg {
+  .milestone-collection summary > svg,
+  .color-choice,
+  .entry-shortcuts .text-button,
+  .stepper .icon-button,
+  .segmented button {
     transition: none;
   }
   .button:active:not(:disabled),
   .icon-button:active:not(:disabled),
   .play-choice:active,
-  .play-choice:hover {
+  .play-choice:hover,
+  .color-choice:active,
+  .color-choice:hover,
+  .entry-shortcuts .text-button:hover,
+  .entry-shortcuts .text-button:active {
     transform: none;
   }
   .game-page .game-feedback {

@@ -39,36 +39,29 @@ export function canPlayCard(
   state: GameState,
   playerIndex: number,
 ): boolean {
-  // Rule branch 1 — turn guard
-  if (playerIndex !== state.currentPlayerIndex) {
-    return canJumpInPlay(card, state);
-  }
-
+  const player = state.players[playerIndex];
+  if (!player || state.winnerId) return false;
   const { activeColor, pendingDraw, pendingDrawType, rules, discardPile } =
     state;
   const topDiscard = discardPile[discardPile.length - 1];
   if (!topDiscard) return false;
-
   if (card.value === 'discardAll' && !rules.allowDiscardAll) return false;
   if (card.value === 'shuffle' && !rules.allowShuffleCard) return false;
-
-  // Rule branch 2 — pending draw means the player must resolve it before playing,
-  // UNLESS stacking rules permit a valid counter-card.
-  if (pendingDraw > 0 && pendingDrawType !== null) {
-    return isValidStackCard(card, pendingDrawType, rules);
-  }
-
-  // Rule branch 3 — standard playability
-
-  // If the player is down to their last card and canFinishWithActionCard is false,
-  // block action/wild cards from being played as the final card.
-  const playerHand = state.players[playerIndex]?.hand ?? [];
+  // These restrictions apply equally to normal plays, stacks and jump-ins.
   if (
     !rules.canFinishWithActionCard &&
-    playerHand.length === 1 &&
-    isActionCard(card)
-  ) {
+    isActionCard(card) &&
+    (player.hand.length === 1 ||
+      (card.value === 'discardAll' &&
+        player.hand.every((entry) => entry.color === card.color)))
+  )
     return false;
+  if (playerIndex !== state.currentPlayerIndex)
+    return canJumpInPlay(card, state);
+  if (pendingDraw > 0) {
+    return (
+      pendingDrawType !== null && isValidStackCard(card, pendingDrawType, rules)
+    );
   }
 
   // Wild cards (wild / wild4) are always playable when there is no pending draw.

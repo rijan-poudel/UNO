@@ -6,7 +6,13 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 export function UnoWordmark({ compact = false }: { compact?: boolean }) {
   return (
     <span className={`wordmark ${compact ? "compact" : ""}`} aria-label="UNO">
-      uno<span>.</span>
+      UNO
+      <span className="brand-colors" aria-hidden="true">
+        <i />
+        <i />
+        <i />
+        <i />
+      </span>
     </span>
   );
 }

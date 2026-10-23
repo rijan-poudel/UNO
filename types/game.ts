@@ -98,6 +98,9 @@ export interface GameState {
    */
   pendingDrawType: "draw2" | "wild4" | null;
 
+  /** Whether the current player has already taken their voluntary draw. */
+  drawnThisTurn: boolean;
+
   /** Set to the winning player's id the moment a player empties their hand. */
   winnerId: string | null;
 

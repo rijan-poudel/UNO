@@ -479,7 +479,6 @@ function handleGameAction(
 
   switch (action.type) {
     case 'prepareWild': {
-      requireTurn();
       const card = state.players[actorIndex]?.hand.find(
         (entry) => entry.id === action.cardId,
       );
@@ -508,13 +507,13 @@ function handleGameAction(
         ) {
           room.pendingColorChoice = null;
           broadcastRoom(ioServer, room);
+          runOfflineBotTurns(room);
         }
       }, 30_000);
 
       break;
     }
     case 'cancelWildChoice': {
-      requireTurn();
       if (!activeChoice) {
         break;
       }
@@ -602,7 +601,8 @@ function runOfflineBotTurns(room: ServerRoom): void {
     botTimers.has(room.roomId) ||
     !room.started ||
     !room.game ||
-    room.game.winnerId
+    room.game.winnerId ||
+    room.pendingColorChoice
   )
     return;
   if (!room.players.some((player) => player.connected)) return;
@@ -621,6 +621,7 @@ function runOfflineBotTurns(room: ServerRoom): void {
         return;
       }
       const state = room.game;
+      if (room.pendingColorChoice) return;
       if (
         room.players.find(
           (player) =>
@@ -647,12 +648,19 @@ function runOfflineBotTurns(room: ServerRoom): void {
 
         if (move.action === 'drawRequired') {
           nextState = drawRequiredCards(botState, currentIndex);
+        } else if (move.action === 'pass') {
+          nextState = passTurn(botState, currentIndex);
         } else if (move.action === 'draw') {
           const afterDraw = drawOneCard(botState, currentIndex);
           const updatedHand = afterDraw.players[currentIndex].hand;
           const drawnCard = updatedHand[updatedHand.length - 1];
 
-          if (drawnCard && canPlayCard(drawnCard, afterDraw, currentIndex)) {
+          if (afterDraw.currentPlayerIndex !== currentIndex) {
+            nextState = afterDraw;
+          } else if (
+            drawnCard &&
+            canPlayCard(drawnCard, afterDraw, currentIndex)
+          ) {
             const chosenColor =
               drawnCard.color === 'wild'
                 ? ((move as { chosenColor?: CardColor }).chosenColor ?? 'red')
@@ -1143,21 +1151,23 @@ io.on('connection', (socket) => {
           return;
         }
 
-        room.started = true;
-        room.pendingColorChoice = null;
-        room.game = initializeGame(
+        // Validate and deal before changing the live room. A rejected configuration
+        // must leave its lobby or current round intact.
+        const newGame = initializeGame(
           room.players.map((p) => p.name),
           payload.rules,
           room.players.map((p) => p.isBot),
         );
         // Preserve room identities when a lobby seat has been removed or replaced.
         room.game = {
-          ...room.game,
-          players: room.game.players.map((player, index) => ({
+          ...newGame,
+          players: newGame.players.map((player, index) => ({
             ...player,
             id: room.players[index].playerId,
           })),
         };
+        room.started = true;
+        room.pendingColorChoice = null;
         const timer = botTimers.get(room.roomId);
         if (timer) clearTimeout(timer);
         botTimers.delete(room.roomId);

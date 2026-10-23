@@ -358,7 +358,9 @@ export default function GameBoard({
                   : "No match. Passing…"
                 : selectedCard
                   ? game.pendingDraw
-                    ? `That card can’t stack. Choose a draw card or draw ${game.pendingDraw}.`
+                    ? playable.length
+                      ? `That card can’t stack. Choose a highlighted draw card or draw ${game.pendingDraw}.`
+                      : `Draw ${game.pendingDraw} to take the penalty. No cards in your hand can stack.`
                     : "That card doesn’t match. Choose another or draw."
                   : game.pendingDraw
                     ? playable.length

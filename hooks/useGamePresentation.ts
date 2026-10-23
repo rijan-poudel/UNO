@@ -22,7 +22,7 @@ const ACTION_SOUNDS: Record<string, TableChime> = {
   shuffle: "shuffle",
 };
 
-type HandPosition = { left: number; top: number; transform: string };
+type HandPosition = { left: number; top: number };
 export function useGamePresentation(
   game: GameState | null,
   localPlayerId: string | undefined,
@@ -206,7 +206,8 @@ export function useGamePresentation(
           behavior: "instant",
         });
     }
-    // Read positions together before applying FLIP, preserving the fan's actual transform.
+    // Reflow only the layout offset. CSS owns the fan, legal lift and inspection,
+    // so a turn change cannot be frozen or snapped by a competing transform.
     const nextPositions = new Map<string, HandPosition>();
     const reflows: {
       element: HTMLElement;
@@ -221,16 +222,13 @@ export function useGamePresentation(
         const to = {
           left: wrapper.offsetLeft,
           top: wrapper.offsetTop,
-          transform: getComputedStyle(wrapper).transform,
         };
         nextPositions.set(id, to);
         const from = handPositions.current.get(id);
         if (
           from &&
           !reduced &&
-          (Math.abs(from.left - to.left) > 1 ||
-            Math.abs(from.top - to.top) > 1 ||
-            from.transform !== to.transform)
+          (Math.abs(from.left - to.left) > 1 || Math.abs(from.top - to.top) > 1)
         )
           reflows.push({ element: wrapper, from, to });
       });
@@ -240,9 +238,9 @@ export function useGamePresentation(
         element.animate(
           [
             {
-              transform: `translate(${from.left - to.left}px, ${from.top - to.top}px) ${from.transform === "none" ? "" : from.transform}`,
+              translate: `${from.left - to.left}px ${from.top - to.top}px`,
             },
-            { transform: to.transform },
+            { translate: "0px 0px" },
           ],
           { duration: 180, easing: "cubic-bezier(.16,1,.3,1)" },
         ),
@@ -322,13 +320,20 @@ export function useGamePresentation(
     const onMotion = () => {
       if (media.matches) interrupt();
     };
+    const onResize = () => {
+      interrupt();
+      // A rotated phone starts a new layout, not a flight from its old fan.
+      handPositions.current.clear();
+    };
     window.addEventListener("uno:audio-settings", onSettings);
+    window.addEventListener("resize", onResize);
     document.addEventListener("visibilitychange", onVisibility);
     media.addEventListener("change", onMotion);
     const active = running.current;
     const activeGhosts = ghosts.current;
     return () => {
       window.removeEventListener("uno:audio-settings", onSettings);
+      window.removeEventListener("resize", onResize);
       document.removeEventListener("visibilitychange", onVisibility);
       media.removeEventListener("change", onMotion);
       stopBoardVoiceover();

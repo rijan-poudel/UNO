@@ -6,9 +6,8 @@
 import type { GameState, Player } from '../types/game';
 import type { GameRules } from '../types/rules';
 import type { Card, CardColor } from '../types/card';
-import { defaultRules } from '../types/rules';
 import { isActionCard, isWildCard, STANDARD_COLORS } from '../types/card';
-import { MIN_SUPPORTED_MAX_PLAYERS } from './gameLimits';
+import { validateGameRules } from './validateGameRules';
 import {
   createStandardUnoDeck,
   shuffleDeck,
@@ -82,15 +81,7 @@ export function initializeGame(
   resetCardIdCounter();
 
   // ── 1. Merge rules ───────────────────────────────────────────────────────
-  const mergedRules: GameRules = {
-    ...defaultRules,
-    ...rules,
-    // Guard against stale persisted configs forcing old 4-player caps.
-    maxPlayers: Math.max(
-      MIN_SUPPORTED_MAX_PLAYERS,
-      rules?.maxPlayers ?? defaultRules.maxPlayers,
-    ),
-  };
+  const mergedRules = validateGameRules(rules);
 
   // ── 2. Validate player count ─────────────────────────────────────────────
   if (playerNames.length < 2) {
@@ -119,6 +110,21 @@ export function initializeGame(
     if (card.value === 'shuffle' && !mergedRules.allowShuffleCard) return false;
     return true;
   });
+  // Reserve all wild/action candidates so the opener can always be a number.
+  const openingReserve =
+    deck.filter(
+      (card) =>
+        isWildCard(card) ||
+        (!mergedRules.allowStartingActionCard && isActionCard(card)),
+    ).length + 1;
+  if (
+    playerNames.length * mergedRules.startingHandSize >
+    deck.length - openingReserve
+  ) {
+    throw new Error(
+      'Not enough cards for these starting hands. Choose fewer cards or players.',
+    );
+  }
   deck = shuffleDeck(deck);
 
   // ── 5. Deal starting hands ────────────────────────────────────────────────
@@ -159,6 +165,7 @@ export function initializeGame(
     activeColor,
     pendingDraw: startCard.value === 'draw2' ? 2 : 0,
     pendingDrawType: startCard.value === 'draw2' ? 'draw2' : null,
+    drawnThisTurn: false,
     winnerId: null,
     rules: mergedRules,
     turnCount: 0,

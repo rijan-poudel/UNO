@@ -34,6 +34,7 @@ export function advanceTurn(state: GameState, steps = 1): GameState {
     ...state,
     currentPlayerIndex: getNextPlayerIndex(state, steps),
     turnCount: state.turnCount + 1,
+    drawnThisTurn: false,
   };
 }
 

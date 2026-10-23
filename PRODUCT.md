@@ -1,5 +1,9 @@
 # Product
 
+## October 23 whole-site identity replacement
+
+The owner rejected the Microsoft AI Copilot feeling across the entire site and selected **Comic-card showdown** in the direction chooser, with a comp-led build, then delegated continuation. This replaces the prior visual identity across home, bot setup, online rooms, preferences, notifications, progress, results and arena chrome. Use confident black ink, warm-white panels, the native four-color palette, condensed italic display lettering, a new original comic cast and drawn ink accents. Preserve the existing engine, native card faces, held hand, direct play, accessible state, phone landscape gameplay, honest device-local history and immediate sound. This visual replacement supersedes previous palette, home artwork style and display-lettering constraints; it does not authorize changing game rules or replacing card handling.
+
 <!-- impeccable:product-schema 1 -->
 
 ## Platform
@@ -78,3 +82,7 @@ The owner rejected the shipped illustrated-room UI. Keep the selected room and n
 ## October 23 journey and handling correction
 
 The owner prioritizes the UI and the feeling of playing together. Landscape home must expose all three centered start actions alongside the complete original cast. The game menu should fit core decisions and Close on short screens; Close returns to play and Leave remains distinct. Keep native cards and the selected room while bringing desktop piles closer to the hand, strengthening static legal-card distinction, and making compact identities readable. Eligible missed-UNO catches belong to the player's badge instead of floating over piles. Gestures must preserve measured rendered pose through pickup/return and never suppress a later keyboard activation. This extends the existing world; it does not authorize a new theme or more decorative HUD.
+
+## October 23 arena background choice
+
+The owner rejected the room-image/blue-table split and explicitly chose “A colorful UNO-style arena without a room.” This supersedes the illustrated-room requirement for the live game background. Use a cohesive colorful arena with clear space for live cards; preserve the home artwork and game mechanics.

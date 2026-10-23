@@ -25,6 +25,7 @@ import { getPlayableCards } from './gameRules';
 export type BotAction =
   | { action: 'play'; cardId: string; chosenColor?: CardColor }
   | { action: 'draw' }
+  | { action: 'pass' }
   | { action: 'drawRequired' };
 
 // ── Color preference helper ───────────────────────────────────────────────────
@@ -131,7 +132,7 @@ export function getBotMove(state: GameState, playerIndex: number): BotAction {
   const playable = getPlayableCards(player.hand, state, playerIndex);
 
   if (playable.length === 0) {
-    return { action: 'draw' };
+    return { action: state.drawnThisTurn ? 'pass' : 'draw' };
   }
 
   // Sort descending by score and pick the best.

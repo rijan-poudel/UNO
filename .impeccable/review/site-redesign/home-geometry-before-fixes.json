@@ -1,0 +1,266 @@
+[
+  {
+    "name": "hero-repro",
+    "actions": [
+      {
+        "label": "Play with bots",
+        "rect": [
+          463,
+          674,
+          660,
+          64
+        ],
+        "visible": true
+      },
+      {
+        "label": "Create a room",
+        "rect": [
+          463,
+          748,
+          325,
+          55.75
+        ],
+        "visible": true
+      },
+      {
+        "label": "Join a room",
+        "rect": [
+          798,
+          748,
+          325,
+          55.75
+        ],
+        "visible": true
+      }
+    ],
+    "document": [
+      1586,
+      1016
+    ],
+    "imageReady": true,
+    "viewport": [
+      1586,
+      992
+    ]
+  },
+  {
+    "name": "desktop",
+    "actions": [
+      {
+        "label": "Play with bots",
+        "rect": [
+          390,
+          634,
+          660,
+          64
+        ],
+        "visible": true
+      },
+      {
+        "label": "Create a room",
+        "rect": [
+          390,
+          708,
+          325,
+          55.75
+        ],
+        "visible": true
+      },
+      {
+        "label": "Join a room",
+        "rect": [
+          725,
+          708,
+          325,
+          55.75
+        ],
+        "visible": true
+      }
+    ],
+    "document": [
+      1440,
+      924
+    ],
+    "imageReady": true,
+    "viewport": [
+      1440,
+      900
+    ]
+  },
+  {
+    "name": "user-1280",
+    "actions": [
+      {
+        "label": "Play with bots",
+        "rect": [
+          310,
+          454,
+          660,
+          64
+        ],
+        "visible": true
+      },
+      {
+        "label": "Create a room",
+        "rect": [
+          310,
+          528,
+          325,
+          55.75
+        ],
+        "visible": true
+      },
+      {
+        "label": "Join a room",
+        "rect": [
+          645,
+          528,
+          325,
+          55.75
+        ],
+        "visible": true
+      }
+    ],
+    "document": [
+      1280,
+      744
+    ],
+    "imageReady": true,
+    "viewport": [
+      1280,
+      720
+    ]
+  },
+  {
+    "name": "mobile",
+    "actions": [
+      {
+        "label": "Play with bots",
+        "rect": [
+          26,
+          447.40625,
+          338,
+          60.34375
+        ],
+        "visible": true
+      },
+      {
+        "label": "Create a room",
+        "rect": [
+          26,
+          517.75,
+          164,
+          77.59375
+        ],
+        "visible": true
+      },
+      {
+        "label": "Join a room",
+        "rect": [
+          200,
+          517.75,
+          164,
+          77.59375
+        ],
+        "visible": true
+      }
+    ],
+    "document": [
+      390,
+      854
+    ],
+    "imageReady": true,
+    "viewport": [
+      390,
+      844
+    ]
+  },
+  {
+    "name": "home-844",
+    "actions": [
+      {
+        "label": "Play with bots",
+        "rect": [
+          142,
+          214,
+          560,
+          46.4453125
+        ],
+        "visible": true
+      },
+      {
+        "label": "Create a room",
+        "rect": [
+          142,
+          266.4453125,
+          276,
+          46.4453125
+        ],
+        "visible": true
+      },
+      {
+        "label": "Join a room",
+        "rect": [
+          426,
+          266.4453125,
+          276,
+          46.4453125
+        ],
+        "visible": true
+      }
+    ],
+    "document": [
+      844,
+      398
+    ],
+    "imageReady": true,
+    "viewport": [
+      844,
+      390
+    ]
+  },
+  {
+    "name": "home-568",
+    "actions": [
+      {
+        "label": "Play with bots",
+        "rect": [
+          36,
+          144,
+          496,
+          46.4453125
+        ],
+        "visible": true
+      },
+      {
+        "label": "Create a room",
+        "rect": [
+          36,
+          196.4453125,
+          244,
+          46.4453125
+        ],
+        "visible": true
+      },
+      {
+        "label": "Join a room",
+        "rect": [
+          288,
+          196.4453125,
+          244,
+          46.4453125
+        ],
+        "visible": true
+      }
+    ],
+    "document": [
+      568,
+      328
+    ],
+    "imageReady": true,
+    "viewport": [
+      568,
+      320
+    ]
+  }
+]

@@ -49,6 +49,28 @@ async function main() {
       { roomId, playerName: 'Smoke guest', deviceId: guestDevice },
     );
     assert.equal(joined.room.players.length, 2);
+    for (const rules of [
+      { startingHandSize: 1e100 },
+      { stackDraw2: 'false' },
+      { maxPlayers: 100 },
+    ]) {
+      const rejected = (await host
+        .timeout(5000)
+        .emitWithAck('room:start', { roomId, rules })) as Ack<unknown>;
+      assert.equal(rejected.ok, false, 'Invalid rule payloads are rejected');
+    }
+    const unchanged = await request<{ room: RoomSnapshot }>(
+      guest,
+      'room:ready',
+      { roomId },
+    );
+    assert.equal(
+      unchanged.room.started,
+      false,
+      'Rejected starts leave the lobby intact',
+    );
+    assert.equal(unchanged.room.game, null);
+
     await request(host, 'room:add-bot', { roomId });
     // Remove a seat, then add a new one: room/game identifiers must still agree.
     await request(host, 'room:kick', {
@@ -104,10 +126,31 @@ async function main() {
     assert.ok(before);
     const currentId = before.players[before.currentPlayerIndex].id;
     const actor = currentId === rejoined.playerId ? guest : host;
+    const prematurePass = (await actor
+      .timeout(5000)
+      .emitWithAck('game:action', {
+        roomId,
+        action: { type: 'pass' },
+      })) as Ack<unknown>;
+    assert.equal(
+      prematurePass.ok,
+      false,
+      'Clients cannot pass without drawing',
+    );
     const drawn = await request<{ room: RoomSnapshot }>(actor, 'game:action', {
       roomId,
       action: { type: 'draw' },
     });
+    const repeatedDraw = (await actor.timeout(5000).emitWithAck('game:action', {
+      roomId,
+      action: { type: 'draw' },
+    })) as Ack<unknown>;
+    assert.equal(
+      repeatedDraw.ok,
+      false,
+      'Clients cannot draw twice on one turn',
+    );
+
     assert.equal(
       drawn.room.game?.lastAction.type,
       'draw',

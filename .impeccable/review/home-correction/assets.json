@@ -1,0 +1,64 @@
+{
+  "produce": [
+    {
+      "id": "opening-hand-cast",
+      "source_crop": ".impeccable/mocks/decision/home-correction/opening-hand.png (binding reference; no screenshot pixels shipped)",
+      "output_path": "public/artwork/opening-hand-cast.webp",
+      "strategy": "Faithful high-resolution transparent reference regeneration, two spacing-only corrections, lossless WebP conversion",
+      "prompt_used": {
+        "original": "Use case: compositing.\nAsset type: one clean transparent panoramic production illustration, not a website screenshot.\nUse the provided approved homepage comp as the binding visual reference for character identity, pose, grouping, silhouette, palette, lighting, material and hand-inked comic finish. Extract its visual ROLE through faithful new production rendering, not a literal screenshot crop.\nComposition and dimensions: extremely wide canvas around 2200 pixels wide by 700 pixels high, approximately 3.14:1. Two separate illustrated character clusters, with a huge completely EMPTY transparent center covering at least 45 percent of the total canvas width from x31 percent to x76 percent. At the far LEFT lower corner: the cobalt BLUE rabbit in RED hoodie, with long upright blue ears, white muzzle and cream sleeve stripe, beside the ORANGE RED PANDA in YELLOW hoodie with cream face patches and striped tail. The rabbit is at the outer left, panda just to its right; they laugh together while each holds a small fan of UNO card backs. At the far RIGHT lower corner: the vivid GREEN crocodile wearing BLUE hoodie, joyous open mouth and one raised fist, other hand holding a small fan of UNO card backs. Exactly this grouping and style from the approved comp, no redesign. Character clusters have comparable visual scale; their complete ears, heads, raised fist and card fans fit inside the top and side margins. Heads, hands and hoodies remain fully recognizable and readable at medium display size. The bodies terminate below the waist with expressive irregular BLACK COMIC BRUSH EDGES and a few short bristle strokes, never a straight rectangular bottom crop. These ink edges are intrinsic to the illustration.\nTransparency: genuine transparent alpha everywhere behind and between the characters, including all of the enormous empty central gap. No dark, white, cream or checkerboard background pixels. No floor, table, furniture, background rays, frame, colored swashes, UI, card-menu controls, captions, border, baked CSS shadow or broad padding. The two corner clusters occupy the canvas edges but stay completely visible except for the intentional rough waist-level brush finish. Leave thin transparent outer margins so full ears and fist are never cut off.\nStyle: preserve the reference's rich crisp hand-inked comic aesthetic, strong almost-black outlines, expressive hatching and angular fur, saturated native colors with controlled two-tone cel shading, original joyful competitive expressions. No clay, no plastic, no 3D, no airbrush. The reference is approved, not a suggestion to invent a different cartoon style.\nText: ONLY the tiny physical UNO wordmarks on the held native card backs are permitted: black card backs with light rim, red oval and small yellow UNO. No standalone title, tagline, menus, labels or watermarks.\nDo not add characters or objects. Do not close the center gap. Render a clean high resolution reusable cutout with true alpha.",
+        "spacingCorrection": "Use case: precise-object-edit. Use this transparent comic character asset as the exact edit target. Change ONLY layout scale and horizontal spacing: keep the exact same three characters, same poses, expression, color, clothing, linework, held UNO card backs, and rough black brush bottom edges. The LEFT cluster of blue rabbit in red hoodie and red panda in yellow hoodie must fit entirely within the leftmost 29 percent of the canvas width. The RIGHT green crocodile in blue hoodie must fit entirely within the rightmost 22 percent. The continuous middle 49 percent of total canvas width, from x29 percent through x78 percent, must be truly transparent alpha on every row, with zero illustration, streaks, shadow or tail in that center gap. Widen the composition or uniformly shrink the two existing clusters enough to achieve this exact empty gap. Keep their bases aligned along the lower edge and preserve the relative scale between the two clusters. Output extremely wide panoramic transparent asset around 2200x700 or equivalent 3.14:1 aspect. Preserve complete rabbit ears, red panda head and hands, crocodile raised fist, heads, hoodies and card fans within thin transparent outer margins. The bottom edge remains the SAME intentional rough brush-finish around the waist, not a straight rectangle. Do not add, remove or redesign any character or held cards. Do not add backgrounds, UI, menus, labels, title, buttons, frame, table, furniture, caption, floor, cast shadows or watermarks. TRUE transparent alpha including the huge center and all gaps. Keep exact approved comic inking, saturated flat palette, two-tone cel shading and expressive hatching. This is only a spacing correction.",
+        "finalSpacingCorrection": "Use case: precise-object-edit. SPACING CORRECTION ONLY, no redesign. Keep this exact transparent artwork with precisely the same three comic characters, poses, linework, brush edges, clothing colors and UNO card backs. Shrink both existing character groups by 25 percent uniformly. LEFT rabbit and red panda group must be anchored to the left edge and occupy only the leftmost QUARTER of canvas width. RIGHT crocodile group must be anchored to the right edge and occupy only the rightmost FIFTH of canvas width. Keep ALL THE MIDDLE 55 PERCENT COMPLETELY EMPTY AND TRANSPARENT, no strokes or artwork at all from x25% to x80%. Align lower edges of both groups with bottom of canvas, with a little margin to avoid clipping. Use an extremely wide approximately 2200x700 transparent canvas. Do not spread the characters back toward center. Rabbit+red panda remain grouped together, crocodile alone on the right. Preserve their complete ears, heads, hands, card fans, raised fist, and rough black brush finish below their waists. No straight rectangular crops. TRUE transparent alpha everywhere else. No background, frame, table, title, UI, lettering, shadow, extra marks or objects. Only shrink and separate the two clusters with a much larger transparent central gap."
+      },
+      "dimensions": [
+        2181,
+        721
+      ],
+      "format": "WebP lossless RGBA",
+      "transparency": true,
+      "deviations": [
+        "2181×721 instead of approximately 2200×700.",
+        "Very faint alpha=1 generator noise in otherwise visually empty center; not visible against ink background."
+      ],
+      "qa_status": "accepted",
+      "qa_notes": "Viewed approved comp and final WebP. Original blue rabbit/red hoodie + red panda/yellow hoodie are grouped left; green crocodile/blue hoodie alone right, holding native backs. Complete ears, heads, hands and raised fist, rough brush waist edges, no UI/table/background. Visible center gap is 53.6%; true RGBA extrema 0–255."
+    }
+  ],
+  "direct": [],
+  "semantic": [
+    {
+      "id": "home-brand",
+      "implementation": "Render semantic h1 UNO in Barlow Condensed extra-bold italic cream; supporting Outfit tagline in normal DOM. Compact shared top-left UnoWordmark and Settings button remain real controls.",
+      "notes": "No title, tagline or Settings lettering is included in the raster.",
+      "qa_status": "accepted"
+    },
+    {
+      "id": "opening-hand-menu",
+      "implementation": "Three actual button elements with independent card-face layers: warm cream rim, red/create left, blue/join right, foreground yellow/play center. CSS owns size, tilt, overlap, pressed/focus treatment and stock depth. Inline SVG owns native ellipse, zero indices and arrows; visible labels remain live text.",
+      "notes": "Use existing native card geometry as appropriate. Keep every label exposed; center primary action comes first in accessible order. This raster must never be used as interactive controls.",
+      "qa_status": "accepted"
+    },
+    {
+      "id": "supporting-actions",
+      "implementation": "DOM buttons or links for Set up bots and How to play using existing lucide icons, cream outlines/text and real focus rings. Bottom No signup copy remains semantic text.",
+      "notes": "Responsive layout exposes all actions; no raster lettering.",
+      "qa_status": "accepted"
+    },
+    {
+      "id": "lower-stage-composition",
+      "implementation": "One decorative img opening-hand-cast.webp with alt empty behind the semantic fan, pointer-events none. CSS owns bottom anchoring, width and responsive crop while preserving both character groups and central control clearance. Compose with existing comic-frame.webp and comic-energy.webp for brush swashes only if needed.",
+      "notes": "The asset’s visible middle gap runs x625–1795 of2181; scale and positioning can be adjusted without raster warping. Do not enlarge cast to dominate the menu.",
+      "qa_status": "accepted"
+    }
+  ],
+  "execution_order": [
+    "Produce and QA opening-hand-cast (complete).",
+    "Compose semantic title, native card menu and support controls above the raster."
+  ],
+  "blockers": [],
+  "assumptions": [
+    "The opening-hand comp is approved by explicit user selection b866813a.",
+    "Tiny UNO marks on physical held card backs are intrinsic physical printing and retained.",
+    "The cast is decorative. HTML/CSS/SVG owns the actual homepage UI."
+  ]
+}

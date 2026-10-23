@@ -1,9 +1,9 @@
-/* Illustrated UNO room. Native cards and controls remain live above the artwork.
-   This sheet owns viewport geometry, room cropping and state cues.
+/* Four-color UNO arena. Native cards and controls remain live above the field.
+   This sheet owns viewport geometry, arena framing and state cues.
    Contract: .impeccable/review/play-polish/contract.md. */
 .game-page {
-  --ui-bg: #111925;
-  --ui-surface: #1c293c;
+  --ui-bg: #15151b;
+  --ui-surface: #26262f;
   --ui-text: #ffffff;
   --ui-muted: #c2cedf;
   --ui-line: #3b4e66;
@@ -11,18 +11,20 @@
   --turn-accent: #ffe329;
   --hand-scale: 1.65;
   --pile-scale: 1.35;
-  --hand-height: 188px;
+  --hand-height: 228px;
+  --hand-headroom: 72px;
+  --hand-ready-lift: 48px;
+  --hand-inspect-lift: 60px;
+  --hand-fan-depth: 0.45;
+  --hand-fan-rotation: 1;
   height: 100dvh;
   min-height: 0;
   display: flex;
   flex-direction: column;
   overflow: clip;
   color-scheme: dark;
-  background-color: #082a3d;
-  background-image: url("/artwork/game-room-evening.webp");
-  background-size: cover;
-  background-position: center 30%;
-  background-repeat: no-repeat;
+  /* The ink field leaves the live cards and published player state in charge. */
+  background: #15151b;
 }
 .game-page :focus-visible {
   outline: 3px solid #ffe329;
@@ -41,8 +43,8 @@
   position: relative;
   z-index: 10;
   height: 60px;
-  /* Protect the logo when responsive room crops place the lamp behind it. */
-  background: linear-gradient(#061e2ddd, #061e2d99 65%, #061e2d00);
+  /* Keep the wordmark readable where the yellow corner meets the header. */
+  background: #15151b;
   justify-content: space-between;
   padding-inline: max(24px, env(safe-area-inset-left))
     max(24px, env(safe-area-inset-right));
@@ -98,26 +100,37 @@
 .game-main .table-center {
   /* Piles and the held hand share a close action lane. */
   top: auto;
-  bottom: 12px;
+  bottom: -12px;
   transform: translateX(-50%);
   padding: 0;
-  gap: 40px;
+  gap: clamp(28px, 4vw, 48px);
   align-items: flex-start;
 }
 .game-main .table-center .uno-card {
   --card-scale: var(--pile-scale) !important;
 }
 .game-main .pile-zone {
-  gap: 14px;
+  position: relative;
+  gap: 0;
+  /* Labels never change the alignment or position of the actual piles. */
+  padding-bottom: 30px;
 }
 .game-main .pile-label {
+  position: absolute;
+  top: calc(100% - 24px);
   height: 22px;
   font-size: 13px;
   font-weight: 700;
   color: #ffffff;
 }
 .game-main .draw-pile:not(:disabled) {
-  transform: translateY(-6px) rotate(-7deg);
+  transform: rotate(-5deg);
+}
+.game-main .draw-pile:disabled {
+  transform: rotate(-5deg);
+}
+.game-main .discard-pile {
+  transform: rotate(5deg);
 }
 .game-main .draw-pile .uno-card {
   box-shadow:
@@ -132,6 +145,8 @@
   box-shadow: var(--card-elevation);
 }
 .game-main .wild-color {
+  position: absolute;
+  top: calc(100% - 24px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -280,10 +295,10 @@
 .game-main .hand-scroll {
   /* Keep full faces inside the scrollport. The page clips the foreground,
      so native keyboard focus never scrolls this container vertically. */
-  height: calc(122px * var(--hand-scale) + 120px);
+  height: calc(122px * var(--hand-scale) + var(--hand-headroom) + 48px);
   min-height: 0;
   margin: 0 -24px;
-  padding: 42px 28px 0;
+  padding: var(--hand-headroom) 28px 0;
   overflow-x: auto;
   overflow-y: hidden;
   overscroll-behavior-x: contain;
@@ -301,11 +316,15 @@
   align-items: flex-start;
 }
 .game-main .hand-card {
-  --turn-lift: 0px;
+  --card-lift: 0px;
+  --card-growth: 1;
+  --card-angle: calc(var(--fan-angle) * var(--hand-fan-rotation));
   margin-left: -44px;
-  transform: translateY(calc(var(--fan-drop) * 0.45 - var(--turn-lift)))
-    rotate(var(--fan-angle));
-  transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateY(
+      calc(var(--fan-drop) * var(--hand-fan-depth) - var(--card-lift))
+    )
+    rotate(var(--card-angle)) scale(var(--card-growth));
+  transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 .game-main .hand-card:first-child {
   margin-left: 0;
@@ -313,13 +332,10 @@
 .game-main .hand-card .uno-card {
   --card-scale: var(--hand-scale) !important;
 }
-.game-main .hand-section.your-turn .hand-card {
-  --turn-lift: 8px;
-}
-.game-main .hand-section .hand-card.legal-card {
-  --turn-lift: 26px;
-  transform: translateY(calc(var(--fan-drop) * 0.45 - var(--turn-lift)))
-    rotate(var(--fan-angle)) scale(1.025);
+.game-main .hand-card.legal-card {
+  --card-lift: var(--hand-ready-lift);
+  --card-growth: 1.025;
+  z-index: 2;
 }
 .game-main .legal-card .uno-card::after {
   display: none;
@@ -335,8 +351,10 @@
 }
 .game-main .hand-card.inspected-card,
 .game-main .hand-card:focus-within {
+  --card-lift: var(--hand-inspect-lift);
+  --card-angle: 0deg;
+  --card-growth: 1.04;
   z-index: 60;
-  transform: translateY(-32px) rotate(0deg) scale(1.04);
 }
 .game-main .hand-card:is(:hover, :focus-within, .inspected-card) .uno-card {
   box-shadow:
@@ -537,18 +555,20 @@
 }
 @media (hover: hover) and (pointer: fine) {
   .game-main .hand-card:hover {
+    --card-lift: var(--hand-inspect-lift);
+    --card-angle: 0deg;
+    --card-growth: 1.04;
     z-index: 70;
-    transform: translateY(-34px) rotate(0deg) scale(1.04);
   }
   .game-main .draw-pile:not(:disabled):hover {
-    transform: translateY(-11px) rotate(-3deg);
+    transform: translateY(-4px) rotate(-3deg);
   }
 }
 @media (min-height: 900px) and (min-width: 701px) {
   .game-page {
     --hand-scale: 1.95;
     --pile-scale: 1.65;
-    --hand-height: 216px;
+    --hand-height: 256px;
   }
   .game-main .table-center {
     gap: 50px;
@@ -558,14 +578,11 @@
   .game-page {
     --hand-scale: 1.35;
     --pile-scale: 1.08;
-    --hand-height: 152px;
+    --hand-height: 192px;
   }
   .game-main .table-center {
-    bottom: 8px;
+    bottom: -12px;
     gap: 32px;
-  }
-  .game-main .hand-scroll {
-    padding-top: 36px;
   }
   .game-main .hand-card {
     margin-left: -34px;
@@ -581,7 +598,12 @@
   .game-page {
     --hand-scale: 1.08;
     --pile-scale: 0.86;
-    --hand-height: 140px;
+    --hand-height: 168px;
+    --hand-headroom: 52px;
+    --hand-ready-lift: 36px;
+    --hand-inspect-lift: 40px;
+    --hand-fan-depth: 0.2;
+    --hand-fan-rotation: 0.5;
   }
   .game-header {
     height: 44px;
@@ -658,7 +680,7 @@
     left: 90%;
   }
   .game-main .table-center {
-    bottom: 8px;
+    bottom: -12px;
     gap: 32px;
   }
   .game-main .seat-top .catch-button {
@@ -669,34 +691,23 @@
     display: none;
   }
   .game-main .pile-zone {
-    gap: 5px;
+    padding-bottom: 22px;
   }
   .game-main .pile-label,
   .game-main .wild-color {
     height: 14px;
     font-size: 11px;
   }
+  .game-main .pile-label,
+  .game-main .wild-color {
+    top: calc(100% - 18px);
+  }
   .game-main .hand-scroll {
     margin-inline: -16px;
-    padding: 30px 24px 0;
+    padding: var(--hand-headroom) 24px 0;
   }
   .game-main .hand-card {
     margin-left: -30px;
-    transform: translateY(calc(var(--fan-drop) * 0.2 - var(--turn-lift)))
-      rotate(calc(var(--fan-angle) * 0.5));
-  }
-  .game-main .hand-section .hand-card.legal-card {
-    transform: translateY(calc(var(--fan-drop) * 0.2 - var(--turn-lift)))
-      rotate(calc(var(--fan-angle) * 0.5)) scale(1.025);
-  }
-  .game-main .hand-section.your-turn .hand-card {
-    --turn-lift: 5px;
-  }
-  .game-main .hand-section .hand-card.legal-card {
-    --turn-lift: 20px;
-  }
-  .game-main .hand-card:is(.inspected-card, :focus-within) {
-    transform: translateY(-22px) rotate(0deg) scale(1.025);
   }
   .game-main .hand-uno {
     top: -12px;
@@ -723,8 +734,11 @@
 @media (max-height: 360px) and (min-width: 541px) {
   .game-page {
     --hand-scale: 0.88;
-    --pile-scale: 0.69;
-    --hand-height: 116px;
+    --pile-scale: 0.62;
+    --hand-height: 140px;
+    --hand-headroom: 44px;
+    --hand-ready-lift: 28px;
+    --hand-inspect-lift: 34px;
   }
   .game-main .opponent-label {
     min-height: 44px;
@@ -751,23 +765,11 @@
   .game-main .seat-right {
     top: 24px;
   }
-  .game-main .hand-scroll {
-    padding-top: 25px;
-  }
   .game-main .hand-card {
     margin-left: -21px;
   }
-  .game-main .hand-section.your-turn .hand-card {
-    --turn-lift: 4px;
-  }
-  .game-main .hand-section .hand-card.legal-card {
-    --turn-lift: 16px;
-  }
-  .game-main .hand-card:is(.inspected-card, :focus-within) {
-    transform: translateY(-18px) rotate(0deg) scale(1.025);
-  }
   .game-main .table-center {
-    bottom: 4px;
+    bottom: -16px;
   }
   .game-main .pile-label {
     position: absolute;

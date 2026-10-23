@@ -119,3 +119,37 @@ export default function UnoCard({
     </div>
   );
 }
+
+// Native card geometry also gives the title screen its real, semantic controls.
+export function UnoMenuCard({
+  color,
+  label,
+  children,
+  onClick,
+}: {
+  color: "red" | "yellow" | "blue";
+  label: string;
+  children: React.ReactNode;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      className={`${styles.menu} ${styles[color]}`}
+      aria-label={label}
+      onClick={onClick}
+    >
+      <span className={styles.menuIndex} aria-hidden="true">
+        0
+      </span>
+      <span className={styles.menuOval} aria-hidden="true" />
+      <span className={styles.menuLabel}>{children}</span>
+      <span
+        className={`${styles.menuIndex} ${styles.menuBottom}`}
+        aria-hidden="true"
+      >
+        0
+      </span>
+    </button>
+  );
+}

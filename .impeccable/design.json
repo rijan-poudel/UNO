@@ -1,407 +1,42 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-23T13:23:26.694322+00:00",
-  "title": "Design System: UNO \u2014 Card club and illustrated game room",
+  "generatedAt": "2026-10-23T13:45:33.212118+00:00",
+  "title": "Design System: UNO \u2014 Comic-card showdown",
   "extensions": {
     "colorMeta": {
-      "ui-bg": {
+      "club-ink": {
         "role": "neutral",
-        "displayName": "Ui Bg",
-        "canonical": "#fff8ec",
+        "displayName": "Club Ink",
+        "canonical": "#15151b",
         "tonalRamp": [
-          "oklch(15% 0.0175 81.33)",
-          "oklch(26% 0.0175 81.33)",
-          "oklch(38% 0.0175 81.33)",
-          "oklch(49% 0.0175 81.33)",
-          "oklch(61% 0.0175 81.33)",
-          "oklch(72% 0.0175 81.33)",
-          "oklch(84% 0.0175 81.33)",
-          "oklch(95% 0.0175 81.33)"
+          "oklch(15% 0.0119 285.26)",
+          "oklch(26% 0.0119 285.26)",
+          "oklch(38% 0.0119 285.26)",
+          "oklch(49% 0.0119 285.26)",
+          "oklch(61% 0.0119 285.26)",
+          "oklch(72% 0.0119 285.26)",
+          "oklch(84% 0.0119 285.26)",
+          "oklch(95% 0.0119 285.26)"
         ]
       },
-      "ui-surface": {
+      "club-paper": {
         "role": "neutral",
-        "displayName": "Ui Surface",
-        "canonical": "#fffcf5",
+        "displayName": "Club Paper",
+        "canonical": "#fff4d6",
         "tonalRamp": [
-          "oklch(15% 0.0098 87.47)",
-          "oklch(26% 0.0098 87.47)",
-          "oklch(38% 0.0098 87.47)",
-          "oklch(49% 0.0098 87.47)",
-          "oklch(61% 0.0098 87.47)",
-          "oklch(72% 0.0098 87.47)",
-          "oklch(84% 0.0098 87.47)",
-          "oklch(95% 0.0098 87.47)"
+          "oklch(15% 0.0409 90.24)",
+          "oklch(26% 0.0409 90.24)",
+          "oklch(38% 0.0409 90.24)",
+          "oklch(49% 0.0409 90.24)",
+          "oklch(61% 0.0409 90.24)",
+          "oklch(72% 0.0409 90.24)",
+          "oklch(84% 0.0409 90.24)",
+          "oklch(95% 0.0409 90.24)"
         ]
       },
-      "ui-text": {
-        "role": "neutral",
-        "displayName": "Ui Text",
-        "canonical": "#2c2c32",
-        "tonalRamp": [
-          "oklch(15% 0.0108 285.72)",
-          "oklch(26% 0.0108 285.72)",
-          "oklch(38% 0.0108 285.72)",
-          "oklch(49% 0.0108 285.72)",
-          "oklch(61% 0.0108 285.72)",
-          "oklch(72% 0.0108 285.72)",
-          "oklch(84% 0.0108 285.72)",
-          "oklch(95% 0.0108 285.72)"
-        ]
-      },
-      "ui-muted": {
-        "role": "neutral",
-        "displayName": "Ui Muted",
-        "canonical": "#706b65",
-        "tonalRamp": [
-          "oklch(15% 0.0112 72.57)",
-          "oklch(26% 0.0112 72.57)",
-          "oklch(38% 0.0112 72.57)",
-          "oklch(49% 0.0112 72.57)",
-          "oklch(61% 0.0112 72.57)",
-          "oklch(72% 0.0112 72.57)",
-          "oklch(84% 0.0112 72.57)",
-          "oklch(95% 0.0112 72.57)"
-        ]
-      },
-      "ui-line": {
-        "role": "neutral",
-        "displayName": "Ui Line",
-        "canonical": "#e3dbce",
-        "tonalRamp": [
-          "oklch(15% 0.0196 80.11)",
-          "oklch(26% 0.0196 80.11)",
-          "oklch(38% 0.0196 80.11)",
-          "oklch(49% 0.0196 80.11)",
-          "oklch(61% 0.0196 80.11)",
-          "oklch(72% 0.0196 80.11)",
-          "oklch(84% 0.0196 80.11)",
-          "oklch(95% 0.0196 80.11)"
-        ]
-      },
-      "ui-accent-red": {
+      "club-red": {
         "role": "primary",
-        "displayName": "Ui Accent Red",
-        "canonical": "#c74531",
-        "tonalRamp": [
-          "oklch(15% 0.1693 31.40)",
-          "oklch(26% 0.1693 31.40)",
-          "oklch(38% 0.1693 31.40)",
-          "oklch(49% 0.1693 31.40)",
-          "oklch(61% 0.1693 31.40)",
-          "oklch(72% 0.1693 31.40)",
-          "oklch(84% 0.1693 31.40)",
-          "oklch(95% 0.1693 31.40)"
-        ]
-      },
-      "ui-accent-blue": {
-        "role": "neutral",
-        "displayName": "Ui Accent Blue",
-        "canonical": "#3265a0",
-        "tonalRamp": [
-          "oklch(15% 0.1095 253.66)",
-          "oklch(26% 0.1095 253.66)",
-          "oklch(38% 0.1095 253.66)",
-          "oklch(49% 0.1095 253.66)",
-          "oklch(61% 0.1095 253.66)",
-          "oklch(72% 0.1095 253.66)",
-          "oklch(84% 0.1095 253.66)",
-          "oklch(95% 0.1095 253.66)"
-        ]
-      },
-      "midnight-bg": {
-        "role": "neutral",
-        "displayName": "Midnight Bg",
-        "canonical": "#24272e",
-        "tonalRamp": [
-          "oklch(15% 0.0137 267.06)",
-          "oklch(26% 0.0137 267.06)",
-          "oklch(38% 0.0137 267.06)",
-          "oklch(49% 0.0137 267.06)",
-          "oklch(61% 0.0137 267.06)",
-          "oklch(72% 0.0137 267.06)",
-          "oklch(84% 0.0137 267.06)",
-          "oklch(95% 0.0137 267.06)"
-        ]
-      },
-      "midnight-surface": {
-        "role": "neutral",
-        "displayName": "Midnight Surface",
-        "canonical": "#30343c",
-        "tonalRamp": [
-          "oklch(15% 0.0153 264.34)",
-          "oklch(26% 0.0153 264.34)",
-          "oklch(38% 0.0153 264.34)",
-          "oklch(49% 0.0153 264.34)",
-          "oklch(61% 0.0153 264.34)",
-          "oklch(72% 0.0153 264.34)",
-          "oklch(84% 0.0153 264.34)",
-          "oklch(95% 0.0153 264.34)"
-        ]
-      },
-      "midnight-text": {
-        "role": "neutral",
-        "displayName": "Midnight Text",
-        "canonical": "#fff8ec",
-        "tonalRamp": [
-          "oklch(15% 0.0175 81.33)",
-          "oklch(26% 0.0175 81.33)",
-          "oklch(38% 0.0175 81.33)",
-          "oklch(49% 0.0175 81.33)",
-          "oklch(61% 0.0175 81.33)",
-          "oklch(72% 0.0175 81.33)",
-          "oklch(84% 0.0175 81.33)",
-          "oklch(95% 0.0175 81.33)"
-        ]
-      },
-      "midnight-muted": {
-        "role": "neutral",
-        "displayName": "Midnight Muted",
-        "canonical": "#c5c3be",
-        "tonalRamp": [
-          "oklch(15% 0.0073 88.65)",
-          "oklch(26% 0.0073 88.65)",
-          "oklch(38% 0.0073 88.65)",
-          "oklch(49% 0.0073 88.65)",
-          "oklch(61% 0.0073 88.65)",
-          "oklch(72% 0.0073 88.65)",
-          "oklch(84% 0.0073 88.65)",
-          "oklch(95% 0.0073 88.65)"
-        ]
-      },
-      "midnight-line": {
-        "role": "neutral",
-        "displayName": "Midnight Line",
-        "canonical": "#4a4d54",
-        "tonalRamp": [
-          "oklch(15% 0.0122 267.23)",
-          "oklch(26% 0.0122 267.23)",
-          "oklch(38% 0.0122 267.23)",
-          "oklch(49% 0.0122 267.23)",
-          "oklch(61% 0.0122 267.23)",
-          "oklch(72% 0.0122 267.23)",
-          "oklch(84% 0.0122 267.23)",
-          "oklch(95% 0.0122 267.23)"
-        ]
-      },
-      "midnight-accent-red": {
-        "role": "primary",
-        "displayName": "Midnight Accent Red",
-        "canonical": "#f18c70",
-        "tonalRamp": [
-          "oklch(15% 0.1298 36.35)",
-          "oklch(26% 0.1298 36.35)",
-          "oklch(38% 0.1298 36.35)",
-          "oklch(49% 0.1298 36.35)",
-          "oklch(61% 0.1298 36.35)",
-          "oklch(72% 0.1298 36.35)",
-          "oklch(84% 0.1298 36.35)",
-          "oklch(95% 0.1298 36.35)"
-        ]
-      },
-      "forest-bg": {
-        "role": "neutral",
-        "displayName": "Forest Bg",
-        "canonical": "#e5eddb",
-        "tonalRamp": [
-          "oklch(15% 0.0254 126.56)",
-          "oklch(26% 0.0254 126.56)",
-          "oklch(38% 0.0254 126.56)",
-          "oklch(49% 0.0254 126.56)",
-          "oklch(61% 0.0254 126.56)",
-          "oklch(72% 0.0254 126.56)",
-          "oklch(84% 0.0254 126.56)",
-          "oklch(95% 0.0254 126.56)"
-        ]
-      },
-      "forest-surface": {
-        "role": "neutral",
-        "displayName": "Forest Surface",
-        "canonical": "#f3f6e9",
-        "tonalRamp": [
-          "oklch(15% 0.0174 117.29)",
-          "oklch(26% 0.0174 117.29)",
-          "oklch(38% 0.0174 117.29)",
-          "oklch(49% 0.0174 117.29)",
-          "oklch(61% 0.0174 117.29)",
-          "oklch(72% 0.0174 117.29)",
-          "oklch(84% 0.0174 117.29)",
-          "oklch(95% 0.0174 117.29)"
-        ]
-      },
-      "forest-text": {
-        "role": "neutral",
-        "displayName": "Forest Text",
-        "canonical": "#2d4032",
-        "tonalRamp": [
-          "oklch(15% 0.0343 152.52)",
-          "oklch(26% 0.0343 152.52)",
-          "oklch(38% 0.0343 152.52)",
-          "oklch(49% 0.0343 152.52)",
-          "oklch(61% 0.0343 152.52)",
-          "oklch(72% 0.0343 152.52)",
-          "oklch(84% 0.0343 152.52)",
-          "oklch(95% 0.0343 152.52)"
-        ]
-      },
-      "forest-muted": {
-        "role": "neutral",
-        "displayName": "Forest Muted",
-        "canonical": "#5c6d58",
-        "tonalRamp": [
-          "oklch(15% 0.0384 139.72)",
-          "oklch(26% 0.0384 139.72)",
-          "oklch(38% 0.0384 139.72)",
-          "oklch(49% 0.0384 139.72)",
-          "oklch(61% 0.0384 139.72)",
-          "oklch(72% 0.0384 139.72)",
-          "oklch(84% 0.0384 139.72)",
-          "oklch(95% 0.0384 139.72)"
-        ]
-      },
-      "forest-line": {
-        "role": "neutral",
-        "displayName": "Forest Line",
-        "canonical": "#c7d3bf",
-        "tonalRamp": [
-          "oklch(15% 0.0302 132.63)",
-          "oklch(26% 0.0302 132.63)",
-          "oklch(38% 0.0302 132.63)",
-          "oklch(49% 0.0302 132.63)",
-          "oklch(61% 0.0302 132.63)",
-          "oklch(72% 0.0302 132.63)",
-          "oklch(84% 0.0302 132.63)",
-          "oklch(95% 0.0302 132.63)"
-        ]
-      },
-      "sunset-bg": {
-        "role": "neutral",
-        "displayName": "Sunset Bg",
-        "canonical": "#f4dfd1",
-        "tonalRamp": [
-          "oklch(15% 0.0299 55.98)",
-          "oklch(26% 0.0299 55.98)",
-          "oklch(38% 0.0299 55.98)",
-          "oklch(49% 0.0299 55.98)",
-          "oklch(61% 0.0299 55.98)",
-          "oklch(72% 0.0299 55.98)",
-          "oklch(84% 0.0299 55.98)",
-          "oklch(95% 0.0299 55.98)"
-        ]
-      },
-      "sunset-surface": {
-        "role": "neutral",
-        "displayName": "Sunset Surface",
-        "canonical": "#fff1e6",
-        "tonalRamp": [
-          "oklch(15% 0.0211 60.75)",
-          "oklch(26% 0.0211 60.75)",
-          "oklch(38% 0.0211 60.75)",
-          "oklch(49% 0.0211 60.75)",
-          "oklch(61% 0.0211 60.75)",
-          "oklch(72% 0.0211 60.75)",
-          "oklch(84% 0.0211 60.75)",
-          "oklch(95% 0.0211 60.75)"
-        ]
-      },
-      "sunset-text": {
-        "role": "neutral",
-        "displayName": "Sunset Text",
-        "canonical": "#51372f",
-        "tonalRamp": [
-          "oklch(15% 0.0400 37.81)",
-          "oklch(26% 0.0400 37.81)",
-          "oklch(38% 0.0400 37.81)",
-          "oklch(49% 0.0400 37.81)",
-          "oklch(61% 0.0400 37.81)",
-          "oklch(72% 0.0400 37.81)",
-          "oklch(84% 0.0400 37.81)",
-          "oklch(95% 0.0400 37.81)"
-        ]
-      },
-      "sunset-muted": {
-        "role": "neutral",
-        "displayName": "Sunset Muted",
-        "canonical": "#795c4f",
-        "tonalRamp": [
-          "oklch(15% 0.0433 45.30)",
-          "oklch(26% 0.0433 45.30)",
-          "oklch(38% 0.0433 45.30)",
-          "oklch(49% 0.0433 45.30)",
-          "oklch(61% 0.0433 45.30)",
-          "oklch(72% 0.0433 45.30)",
-          "oklch(84% 0.0433 45.30)",
-          "oklch(95% 0.0433 45.30)"
-        ]
-      },
-      "sunset-line": {
-        "role": "neutral",
-        "displayName": "Sunset Line",
-        "canonical": "#dfc4b4",
-        "tonalRamp": [
-          "oklch(15% 0.0378 52.62)",
-          "oklch(26% 0.0378 52.62)",
-          "oklch(38% 0.0378 52.62)",
-          "oklch(49% 0.0378 52.62)",
-          "oklch(61% 0.0378 52.62)",
-          "oklch(72% 0.0378 52.62)",
-          "oklch(84% 0.0378 52.62)",
-          "oklch(95% 0.0378 52.62)"
-        ]
-      },
-      "arena-bg": {
-        "role": "neutral",
-        "displayName": "Arena UI background and scrollbar track",
-        "canonical": "#111925"
-      },
-      "arena-surface": {
-        "role": "neutral",
-        "displayName": "Arena Surface",
-        "canonical": "#1c293c"
-      },
-      "arena-text": {
-        "role": "neutral",
-        "displayName": "Arena Text",
-        "canonical": "#ffffff"
-      },
-      "arena-muted": {
-        "role": "neutral",
-        "displayName": "Arena Muted",
-        "canonical": "#c2cedf"
-      },
-      "arena-line": {
-        "role": "neutral",
-        "displayName": "Arena Line",
-        "canonical": "#3b4e66"
-      },
-      "arena-accent-red": {
-        "role": "neutral",
-        "displayName": "Arena Accent Red",
-        "canonical": "#ff536f"
-      },
-      "arena-dark-ink": {
-        "role": "neutral",
-        "displayName": "Arena Dark Ink",
-        "canonical": "#392700"
-      },
-      "move-action-ink": {
-        "role": "neutral",
-        "displayName": "Move action ink",
-        "canonical": "#392700",
-        "tonalRamp": [
-          "oklch(15% 0.0591 81.97)",
-          "oklch(26% 0.0591 81.97)",
-          "oklch(38% 0.0591 81.97)",
-          "oklch(49% 0.0591 81.97)",
-          "oklch(61% 0.0591 81.97)",
-          "oklch(72% 0.0591 81.97)",
-          "oklch(84% 0.0591 81.97)",
-          "oklch(95% 0.0591 81.97)"
-        ]
-      },
-      "card-red": {
-        "role": "secondary",
-        "displayName": "Printed crimson",
+        "displayName": "Club Red",
         "canonical": "#df0735",
         "tonalRamp": [
           "oklch(15% 0.2282 21.58)",
@@ -414,9 +49,9 @@
           "oklch(95% 0.2282 21.58)"
         ]
       },
-      "card-yellow": {
-        "role": "secondary",
-        "displayName": "Golden card shell",
+      "club-yellow": {
+        "role": "primary",
+        "displayName": "Club Yellow",
         "canonical": "#ffce00",
         "tonalRamp": [
           "oklch(15% 0.1777 91.31)",
@@ -429,24 +64,9 @@
           "oklch(95% 0.1777 91.31)"
         ]
       },
-      "card-green": {
+      "club-blue": {
         "role": "secondary",
-        "displayName": "Emerald card shell",
-        "canonical": "#00bc68",
-        "tonalRamp": [
-          "oklch(15% 0.1764 153.89)",
-          "oklch(26% 0.1764 153.89)",
-          "oklch(38% 0.1764 153.89)",
-          "oklch(49% 0.1764 153.89)",
-          "oklch(61% 0.1764 153.89)",
-          "oklch(72% 0.1764 153.89)",
-          "oklch(84% 0.1764 153.89)",
-          "oklch(95% 0.1764 153.89)"
-        ]
-      },
-      "card-blue": {
-        "role": "secondary",
-        "displayName": "Electric card blue",
+        "displayName": "Club Blue",
         "canonical": "#075bee",
         "tonalRamp": [
           "oklch(15% 0.2322 261.67)",
@@ -459,24 +79,339 @@
           "oklch(95% 0.2322 261.67)"
         ]
       },
-      "card-wild": {
+      "club-green": {
         "role": "secondary",
-        "displayName": "Card Wild",
-        "canonical": "#101d3a",
+        "displayName": "Club Green",
+        "canonical": "#00bc68",
         "tonalRamp": [
-          "oklch(15% 0.0587 264.23)",
-          "oklch(26% 0.0587 264.23)",
-          "oklch(38% 0.0587 264.23)",
-          "oklch(49% 0.0587 264.23)",
-          "oklch(61% 0.0587 264.23)",
-          "oklch(72% 0.0587 264.23)",
-          "oklch(84% 0.0587 264.23)",
-          "oklch(95% 0.0587 264.23)"
+          "oklch(15% 0.1764 153.89)",
+          "oklch(26% 0.1764 153.89)",
+          "oklch(38% 0.1764 153.89)",
+          "oklch(49% 0.1764 153.89)",
+          "oklch(61% 0.1764 153.89)",
+          "oklch(72% 0.1764 153.89)",
+          "oklch(84% 0.1764 153.89)",
+          "oklch(95% 0.1764 153.89)"
+        ]
+      },
+      "ui-surface": {
+        "role": "neutral",
+        "displayName": "Ui Surface",
+        "canonical": "#fff9e8",
+        "tonalRamp": [
+          "oklch(15% 0.0232 90.75)",
+          "oklch(26% 0.0232 90.75)",
+          "oklch(38% 0.0232 90.75)",
+          "oklch(49% 0.0232 90.75)",
+          "oklch(61% 0.0232 90.75)",
+          "oklch(72% 0.0232 90.75)",
+          "oklch(84% 0.0232 90.75)",
+          "oklch(95% 0.0232 90.75)"
+        ]
+      },
+      "ui-muted": {
+        "role": "neutral",
+        "displayName": "Ui Muted",
+        "canonical": "#57524a",
+        "tonalRamp": [
+          "oklch(15% 0.0144 79.71)",
+          "oklch(26% 0.0144 79.71)",
+          "oklch(38% 0.0144 79.71)",
+          "oklch(49% 0.0144 79.71)",
+          "oklch(61% 0.0144 79.71)",
+          "oklch(72% 0.0144 79.71)",
+          "oklch(84% 0.0144 79.71)",
+          "oklch(95% 0.0144 79.71)"
+        ]
+      },
+      "ui-line": {
+        "role": "neutral",
+        "displayName": "Ui Line",
+        "canonical": "#c6bfae",
+        "tonalRamp": [
+          "oklch(15% 0.0247 88.26)",
+          "oklch(26% 0.0247 88.26)",
+          "oklch(38% 0.0247 88.26)",
+          "oklch(49% 0.0247 88.26)",
+          "oklch(61% 0.0247 88.26)",
+          "oklch(72% 0.0247 88.26)",
+          "oklch(84% 0.0247 88.26)",
+          "oklch(95% 0.0247 88.26)"
+        ]
+      },
+      "ui-accent-red": {
+        "role": "primary",
+        "displayName": "Ui Accent Red",
+        "canonical": "#c50730",
+        "tonalRamp": [
+          "oklch(15% 0.2074 20.97)",
+          "oklch(26% 0.2074 20.97)",
+          "oklch(38% 0.2074 20.97)",
+          "oklch(49% 0.2074 20.97)",
+          "oklch(61% 0.2074 20.97)",
+          "oklch(72% 0.2074 20.97)",
+          "oklch(84% 0.2074 20.97)",
+          "oklch(95% 0.2074 20.97)"
+        ]
+      },
+      "ui-accent-green": {
+        "role": "secondary",
+        "displayName": "Ui Accent Green",
+        "canonical": "#007943",
+        "tonalRamp": [
+          "oklch(15% 0.1257 154.75)",
+          "oklch(26% 0.1257 154.75)",
+          "oklch(38% 0.1257 154.75)",
+          "oklch(49% 0.1257 154.75)",
+          "oklch(61% 0.1257 154.75)",
+          "oklch(72% 0.1257 154.75)",
+          "oklch(84% 0.1257 154.75)",
+          "oklch(95% 0.1257 154.75)"
+        ]
+      },
+      "midnight-surface": {
+        "role": "neutral",
+        "displayName": "Midnight Surface",
+        "canonical": "#26262f",
+        "tonalRamp": [
+          "oklch(15% 0.0166 285.25)",
+          "oklch(26% 0.0166 285.25)",
+          "oklch(38% 0.0166 285.25)",
+          "oklch(49% 0.0166 285.25)",
+          "oklch(61% 0.0166 285.25)",
+          "oklch(72% 0.0166 285.25)",
+          "oklch(84% 0.0166 285.25)",
+          "oklch(95% 0.0166 285.25)"
+        ]
+      },
+      "midnight-muted": {
+        "role": "neutral",
+        "displayName": "Midnight Muted",
+        "canonical": "#c8c4b9",
+        "tonalRamp": [
+          "oklch(15% 0.0158 90.26)",
+          "oklch(26% 0.0158 90.26)",
+          "oklch(38% 0.0158 90.26)",
+          "oklch(49% 0.0158 90.26)",
+          "oklch(61% 0.0158 90.26)",
+          "oklch(72% 0.0158 90.26)",
+          "oklch(84% 0.0158 90.26)",
+          "oklch(95% 0.0158 90.26)"
+        ]
+      },
+      "midnight-line": {
+        "role": "neutral",
+        "displayName": "Midnight Line",
+        "canonical": "#56565f",
+        "tonalRamp": [
+          "oklch(15% 0.0145 285.81)",
+          "oklch(26% 0.0145 285.81)",
+          "oklch(38% 0.0145 285.81)",
+          "oklch(49% 0.0145 285.81)",
+          "oklch(61% 0.0145 285.81)",
+          "oklch(72% 0.0145 285.81)",
+          "oklch(84% 0.0145 285.81)",
+          "oklch(95% 0.0145 285.81)"
+        ]
+      },
+      "midnight-accent-red": {
+        "role": "neutral",
+        "displayName": "Midnight Accent Red",
+        "canonical": "#ff637c",
+        "tonalRamp": [
+          "oklch(15% 0.1899 13.79)",
+          "oklch(26% 0.1899 13.79)",
+          "oklch(38% 0.1899 13.79)",
+          "oklch(49% 0.1899 13.79)",
+          "oklch(61% 0.1899 13.79)",
+          "oklch(72% 0.1899 13.79)",
+          "oklch(84% 0.1899 13.79)",
+          "oklch(95% 0.1899 13.79)"
+        ]
+      },
+      "midnight-accent-blue": {
+        "role": "neutral",
+        "displayName": "Midnight Accent Blue",
+        "canonical": "#83afff",
+        "tonalRamp": [
+          "oklch(15% 0.1254 261.80)",
+          "oklch(26% 0.1254 261.80)",
+          "oklch(38% 0.1254 261.80)",
+          "oklch(49% 0.1254 261.80)",
+          "oklch(61% 0.1254 261.80)",
+          "oklch(72% 0.1254 261.80)",
+          "oklch(84% 0.1254 261.80)",
+          "oklch(95% 0.1254 261.80)"
+        ]
+      },
+      "midnight-accent-green": {
+        "role": "neutral",
+        "displayName": "Midnight Accent Green",
+        "canonical": "#53dea0",
+        "tonalRamp": [
+          "oklch(15% 0.1502 160.66)",
+          "oklch(26% 0.1502 160.66)",
+          "oklch(38% 0.1502 160.66)",
+          "oklch(49% 0.1502 160.66)",
+          "oklch(61% 0.1502 160.66)",
+          "oklch(72% 0.1502 160.66)",
+          "oklch(84% 0.1502 160.66)",
+          "oklch(95% 0.1502 160.66)"
+        ]
+      },
+      "forest-bg": {
+        "role": "neutral",
+        "displayName": "Forest Bg",
+        "canonical": "#e8f6e9",
+        "tonalRamp": [
+          "oklch(15% 0.0227 147.45)",
+          "oklch(26% 0.0227 147.45)",
+          "oklch(38% 0.0227 147.45)",
+          "oklch(49% 0.0227 147.45)",
+          "oklch(61% 0.0227 147.45)",
+          "oklch(72% 0.0227 147.45)",
+          "oklch(84% 0.0227 147.45)",
+          "oklch(95% 0.0227 147.45)"
+        ]
+      },
+      "forest-surface": {
+        "role": "neutral",
+        "displayName": "Forest Surface",
+        "canonical": "#f5fff3",
+        "tonalRamp": [
+          "oklch(15% 0.0189 140.50)",
+          "oklch(26% 0.0189 140.50)",
+          "oklch(38% 0.0189 140.50)",
+          "oklch(49% 0.0189 140.50)",
+          "oklch(61% 0.0189 140.50)",
+          "oklch(72% 0.0189 140.50)",
+          "oklch(84% 0.0189 140.50)",
+          "oklch(95% 0.0189 140.50)"
+        ]
+      },
+      "forest-text": {
+        "role": "neutral",
+        "displayName": "Forest Text",
+        "canonical": "#14271e",
+        "tonalRamp": [
+          "oklch(15% 0.0305 162.66)",
+          "oklch(26% 0.0305 162.66)",
+          "oklch(38% 0.0305 162.66)",
+          "oklch(49% 0.0305 162.66)",
+          "oklch(61% 0.0305 162.66)",
+          "oklch(72% 0.0305 162.66)",
+          "oklch(84% 0.0305 162.66)",
+          "oklch(95% 0.0305 162.66)"
+        ]
+      },
+      "forest-muted": {
+        "role": "neutral",
+        "displayName": "Forest Muted",
+        "canonical": "#4e6256",
+        "tonalRamp": [
+          "oklch(15% 0.0310 158.64)",
+          "oklch(26% 0.0310 158.64)",
+          "oklch(38% 0.0310 158.64)",
+          "oklch(49% 0.0310 158.64)",
+          "oklch(61% 0.0310 158.64)",
+          "oklch(72% 0.0310 158.64)",
+          "oklch(84% 0.0310 158.64)",
+          "oklch(95% 0.0310 158.64)"
+        ]
+      },
+      "forest-line": {
+        "role": "neutral",
+        "displayName": "Forest Line",
+        "canonical": "#adbfad",
+        "tonalRamp": [
+          "oklch(15% 0.0320 145.26)",
+          "oklch(26% 0.0320 145.26)",
+          "oklch(38% 0.0320 145.26)",
+          "oklch(49% 0.0320 145.26)",
+          "oklch(61% 0.0320 145.26)",
+          "oklch(72% 0.0320 145.26)",
+          "oklch(84% 0.0320 145.26)",
+          "oklch(95% 0.0320 145.26)"
+        ]
+      },
+      "sunset-bg": {
+        "role": "neutral",
+        "displayName": "Sunset Bg",
+        "canonical": "#ffe7df",
+        "tonalRamp": [
+          "oklch(15% 0.0285 39.35)",
+          "oklch(26% 0.0285 39.35)",
+          "oklch(38% 0.0285 39.35)",
+          "oklch(49% 0.0285 39.35)",
+          "oklch(61% 0.0285 39.35)",
+          "oklch(72% 0.0285 39.35)",
+          "oklch(84% 0.0285 39.35)",
+          "oklch(95% 0.0285 39.35)"
+        ]
+      },
+      "sunset-surface": {
+        "role": "neutral",
+        "displayName": "Sunset Surface",
+        "canonical": "#fff5ed",
+        "tonalRamp": [
+          "oklch(15% 0.0151 61.35)",
+          "oklch(26% 0.0151 61.35)",
+          "oklch(38% 0.0151 61.35)",
+          "oklch(49% 0.0151 61.35)",
+          "oklch(61% 0.0151 61.35)",
+          "oklch(72% 0.0151 61.35)",
+          "oklch(84% 0.0151 61.35)",
+          "oklch(95% 0.0151 61.35)"
+        ]
+      },
+      "sunset-text": {
+        "role": "neutral",
+        "displayName": "Sunset Text",
+        "canonical": "#321a20",
+        "tonalRamp": [
+          "oklch(15% 0.0391 4.11)",
+          "oklch(26% 0.0391 4.11)",
+          "oklch(38% 0.0391 4.11)",
+          "oklch(49% 0.0391 4.11)",
+          "oklch(61% 0.0391 4.11)",
+          "oklch(72% 0.0391 4.11)",
+          "oklch(84% 0.0391 4.11)",
+          "oklch(95% 0.0391 4.11)"
+        ]
+      },
+      "sunset-muted": {
+        "role": "neutral",
+        "displayName": "Sunset Muted",
+        "canonical": "#6e4c50",
+        "tonalRamp": [
+          "oklch(15% 0.0465 11.29)",
+          "oklch(26% 0.0465 11.29)",
+          "oklch(38% 0.0465 11.29)",
+          "oklch(49% 0.0465 11.29)",
+          "oklch(61% 0.0465 11.29)",
+          "oklch(72% 0.0465 11.29)",
+          "oklch(84% 0.0465 11.29)",
+          "oklch(95% 0.0465 11.29)"
+        ]
+      },
+      "sunset-line": {
+        "role": "neutral",
+        "displayName": "Sunset Line",
+        "canonical": "#d7b2ad",
+        "tonalRamp": [
+          "oklch(15% 0.0437 27.10)",
+          "oklch(26% 0.0437 27.10)",
+          "oklch(38% 0.0437 27.10)",
+          "oklch(49% 0.0437 27.10)",
+          "oklch(61% 0.0437 27.10)",
+          "oklch(72% 0.0437 27.10)",
+          "oklch(84% 0.0437 27.10)",
+          "oklch(95% 0.0437 27.10)"
         ]
       },
       "card-paper": {
         "role": "neutral",
-        "displayName": "Pure white stock",
+        "displayName": "Card Paper",
         "canonical": "#ffffff",
         "tonalRamp": [
           "oklch(15% 0.0000 89.88)",
@@ -487,36 +422,6 @@
           "oklch(72% 0.0000 89.88)",
           "oklch(84% 0.0000 89.88)",
           "oklch(95% 0.0000 89.88)"
-        ]
-      },
-      "card-yellow-ink": {
-        "role": "neutral",
-        "displayName": "Small gold index ink",
-        "canonical": "#482f00",
-        "tonalRamp": [
-          "oklch(15% 0.0684 76.82)",
-          "oklch(26% 0.0684 76.82)",
-          "oklch(38% 0.0684 76.82)",
-          "oklch(49% 0.0684 76.82)",
-          "oklch(61% 0.0684 76.82)",
-          "oklch(72% 0.0684 76.82)",
-          "oklch(84% 0.0684 76.82)",
-          "oklch(95% 0.0684 76.82)"
-        ]
-      },
-      "card-yellow-value": {
-        "role": "neutral",
-        "displayName": "Gold center rank ink",
-        "canonical": "#805100",
-        "tonalRamp": [
-          "oklch(15% 0.1025 71.17)",
-          "oklch(26% 0.1025 71.17)",
-          "oklch(38% 0.1025 71.17)",
-          "oklch(49% 0.1025 71.17)",
-          "oklch(61% 0.1025 71.17)",
-          "oklch(72% 0.1025 71.17)",
-          "oklch(84% 0.1025 71.17)",
-          "oklch(95% 0.1025 71.17)"
         ]
       },
       "card-back": {
@@ -534,309 +439,9 @@
           "oklch(95% 0.0587 264.23)"
         ]
       },
-      "active-red": {
-        "role": "secondary",
-        "displayName": "Active Red",
-        "canonical": "#ff727a",
-        "tonalRamp": [
-          "oklch(15% 0.1721 18.98)",
-          "oklch(26% 0.1721 18.98)",
-          "oklch(38% 0.1721 18.98)",
-          "oklch(49% 0.1721 18.98)",
-          "oklch(61% 0.1721 18.98)",
-          "oklch(72% 0.1721 18.98)",
-          "oklch(84% 0.1721 18.98)",
-          "oklch(95% 0.1721 18.98)"
-        ]
-      },
-      "active-blue": {
-        "role": "secondary",
-        "displayName": "Active Blue",
-        "canonical": "#79b5ff",
-        "tonalRamp": [
-          "oklch(15% 0.1240 254.32)",
-          "oklch(26% 0.1240 254.32)",
-          "oklch(38% 0.1240 254.32)",
-          "oklch(49% 0.1240 254.32)",
-          "oklch(61% 0.1240 254.32)",
-          "oklch(72% 0.1240 254.32)",
-          "oklch(84% 0.1240 254.32)",
-          "oklch(95% 0.1240 254.32)"
-        ]
-      },
-      "active-green": {
-        "role": "secondary",
-        "displayName": "Active Green",
-        "canonical": "#5adeaa",
-        "tonalRamp": [
-          "oklch(15% 0.1388 164.09)",
-          "oklch(26% 0.1388 164.09)",
-          "oklch(38% 0.1388 164.09)",
-          "oklch(49% 0.1388 164.09)",
-          "oklch(61% 0.1388 164.09)",
-          "oklch(72% 0.1388 164.09)",
-          "oklch(84% 0.1388 164.09)",
-          "oklch(95% 0.1388 164.09)"
-        ]
-      },
-      "active-yellow": {
-        "role": "secondary",
-        "displayName": "Active Yellow",
-        "canonical": "#f7d86a",
-        "tonalRamp": [
-          "oklch(15% 0.1336 93.78)",
-          "oklch(26% 0.1336 93.78)",
-          "oklch(38% 0.1336 93.78)",
-          "oklch(49% 0.1336 93.78)",
-          "oklch(61% 0.1336 93.78)",
-          "oklch(72% 0.1336 93.78)",
-          "oklch(84% 0.1336 93.78)",
-          "oklch(95% 0.1336 93.78)"
-        ]
-      },
-      "action-light-ink": {
+      "card-green-index": {
         "role": "neutral",
-        "displayName": "Action Light Ink",
-        "canonical": "#fffaf1",
-        "tonalRamp": [
-          "oklch(15% 0.0130 82.40)",
-          "oklch(26% 0.0130 82.40)",
-          "oklch(38% 0.0130 82.40)",
-          "oklch(49% 0.0130 82.40)",
-          "oklch(61% 0.0130 82.40)",
-          "oklch(72% 0.0130 82.40)",
-          "oklch(84% 0.0130 82.40)",
-          "oklch(95% 0.0130 82.40)"
-        ]
-      },
-      "avatar-red": {
-        "role": "secondary",
-        "displayName": "Avatar Red",
-        "canonical": "#ff6942",
-        "tonalRamp": [
-          "oklch(15% 0.1912 35.56)",
-          "oklch(26% 0.1912 35.56)",
-          "oklch(38% 0.1912 35.56)",
-          "oklch(49% 0.1912 35.56)",
-          "oklch(61% 0.1912 35.56)",
-          "oklch(72% 0.1912 35.56)",
-          "oklch(84% 0.1912 35.56)",
-          "oklch(95% 0.1912 35.56)"
-        ]
-      },
-      "avatar-blue": {
-        "role": "secondary",
-        "displayName": "Avatar Blue",
-        "canonical": "#4892ff",
-        "tonalRamp": [
-          "oklch(15% 0.1779 258.21)",
-          "oklch(26% 0.1779 258.21)",
-          "oklch(38% 0.1779 258.21)",
-          "oklch(49% 0.1779 258.21)",
-          "oklch(61% 0.1779 258.21)",
-          "oklch(72% 0.1779 258.21)",
-          "oklch(84% 0.1779 258.21)",
-          "oklch(95% 0.1779 258.21)"
-        ]
-      },
-      "avatar-yellow": {
-        "role": "secondary",
-        "displayName": "Avatar Yellow",
-        "canonical": "#ffcf18",
-        "tonalRamp": [
-          "oklch(15% 0.1747 91.35)",
-          "oklch(26% 0.1747 91.35)",
-          "oklch(38% 0.1747 91.35)",
-          "oklch(49% 0.1747 91.35)",
-          "oklch(61% 0.1747 91.35)",
-          "oklch(72% 0.1747 91.35)",
-          "oklch(84% 0.1747 91.35)",
-          "oklch(95% 0.1747 91.35)"
-        ]
-      },
-      "avatar-green": {
-        "role": "secondary",
-        "displayName": "Avatar Green",
-        "canonical": "#43ce7d",
-        "tonalRamp": [
-          "oklch(15% 0.1664 153.60)",
-          "oklch(26% 0.1664 153.60)",
-          "oklch(38% 0.1664 153.60)",
-          "oklch(49% 0.1664 153.60)",
-          "oklch(61% 0.1664 153.60)",
-          "oklch(72% 0.1664 153.60)",
-          "oklch(84% 0.1664 153.60)",
-          "oklch(95% 0.1664 153.60)"
-        ]
-      },
-      "avatar-lilac": {
-        "role": "secondary",
-        "displayName": "Avatar Lilac",
-        "canonical": "#a67aff",
-        "tonalRamp": [
-          "oklch(15% 0.1906 296.25)",
-          "oklch(26% 0.1906 296.25)",
-          "oklch(38% 0.1906 296.25)",
-          "oklch(49% 0.1906 296.25)",
-          "oklch(61% 0.1906 296.25)",
-          "oklch(72% 0.1906 296.25)",
-          "oklch(84% 0.1906 296.25)",
-          "oklch(95% 0.1906 296.25)"
-        ]
-      },
-      "avatar-peach": {
-        "role": "secondary",
-        "displayName": "Avatar Peach",
-        "canonical": "#ffae36",
-        "tonalRamp": [
-          "oklch(15% 0.1572 71.72)",
-          "oklch(26% 0.1572 71.72)",
-          "oklch(38% 0.1572 71.72)",
-          "oklch(49% 0.1572 71.72)",
-          "oklch(61% 0.1572 71.72)",
-          "oklch(72% 0.1572 71.72)",
-          "oklch(84% 0.1572 71.72)",
-          "oklch(95% 0.1572 71.72)"
-        ]
-      },
-      "launch-bg": {
-        "role": "neutral",
-        "displayName": "Card club navy",
-        "canonical": "#0b2038",
-        "tonalRamp": [
-          "oklch(15% 0.0535 253.50)",
-          "oklch(26% 0.0535 253.50)",
-          "oklch(38% 0.0535 253.50)",
-          "oklch(49% 0.0535 253.50)",
-          "oklch(61% 0.0535 253.50)",
-          "oklch(72% 0.0535 253.50)",
-          "oklch(84% 0.0535 253.50)",
-          "oklch(95% 0.0535 253.50)"
-        ]
-      },
-      "launch-paper": {
-        "role": "neutral",
-        "displayName": "Club ivory",
-        "canonical": "#f9f2df",
-        "tonalRamp": [
-          "oklch(15% 0.0261 90.10)",
-          "oklch(26% 0.0261 90.10)",
-          "oklch(38% 0.0261 90.10)",
-          "oklch(49% 0.0261 90.10)",
-          "oklch(61% 0.0261 90.10)",
-          "oklch(72% 0.0261 90.10)",
-          "oklch(84% 0.0261 90.10)",
-          "oklch(95% 0.0261 90.10)"
-        ]
-      },
-      "launch-ink": {
-        "role": "neutral",
-        "displayName": "Club action ink",
-        "canonical": "#392700",
-        "tonalRamp": [
-          "oklch(15% 0.0591 81.97)",
-          "oklch(26% 0.0591 81.97)",
-          "oklch(38% 0.0591 81.97)",
-          "oklch(49% 0.0591 81.97)",
-          "oklch(61% 0.0591 81.97)",
-          "oklch(72% 0.0591 81.97)",
-          "oklch(84% 0.0591 81.97)",
-          "oklch(95% 0.0591 81.97)"
-        ]
-      },
-      "launch-yellow": {
-        "role": "primary",
-        "displayName": "Club play yellow",
-        "canonical": "#ffd64a",
-        "tonalRamp": [
-          "oklch(15% 0.1576 92.18)",
-          "oklch(26% 0.1576 92.18)",
-          "oklch(38% 0.1576 92.18)",
-          "oklch(49% 0.1576 92.18)",
-          "oklch(61% 0.1576 92.18)",
-          "oklch(72% 0.1576 92.18)",
-          "oklch(84% 0.1576 92.18)",
-          "oklch(95% 0.1576 92.18)"
-        ]
-      },
-      "launch-surface": {
-        "role": "neutral",
-        "displayName": "Club utility surface",
-        "canonical": "#132e4f",
-        "tonalRamp": [
-          "oklch(15% 0.0686 254.82)",
-          "oklch(26% 0.0686 254.82)",
-          "oklch(38% 0.0686 254.82)",
-          "oklch(49% 0.0686 254.82)",
-          "oklch(61% 0.0686 254.82)",
-          "oklch(72% 0.0686 254.82)",
-          "oklch(84% 0.0686 254.82)",
-          "oklch(95% 0.0686 254.82)"
-        ]
-      },
-      "launch-muted": {
-        "role": "neutral",
-        "displayName": "Club secondary copy",
-        "canonical": "#d5e3dd",
-        "tonalRamp": [
-          "oklch(15% 0.0170 168.46)",
-          "oklch(26% 0.0170 168.46)",
-          "oklch(38% 0.0170 168.46)",
-          "oklch(49% 0.0170 168.46)",
-          "oklch(61% 0.0170 168.46)",
-          "oklch(72% 0.0170 168.46)",
-          "oklch(84% 0.0170 168.46)",
-          "oklch(95% 0.0170 168.46)"
-        ]
-      },
-      "launch-quiet": {
-        "role": "neutral",
-        "displayName": "Club quiet copy",
-        "canonical": "#a9c2c1",
-        "tonalRamp": [
-          "oklch(15% 0.0272 193.67)",
-          "oklch(26% 0.0272 193.67)",
-          "oklch(38% 0.0272 193.67)",
-          "oklch(49% 0.0272 193.67)",
-          "oklch(61% 0.0272 193.67)",
-          "oklch(72% 0.0272 193.67)",
-          "oklch(84% 0.0272 193.67)",
-          "oklch(95% 0.0272 193.67)"
-        ]
-      },
-      "turn-yellow": {
-        "role": "primary",
-        "displayName": "Bright turn yellow",
-        "canonical": "#ffe329",
-        "tonalRamp": [
-          "oklch(15% 0.1817 99.72)",
-          "oklch(26% 0.1817 99.72)",
-          "oklch(38% 0.1817 99.72)",
-          "oklch(49% 0.1817 99.72)",
-          "oklch(61% 0.1817 99.72)",
-          "oklch(72% 0.1817 99.72)",
-          "oklch(84% 0.1817 99.72)",
-          "oklch(95% 0.1817 99.72)"
-        ]
-      },
-      "action-yellow": {
-        "role": "primary",
-        "displayName": "Pressed action yellow",
-        "canonical": "#ffd000",
-        "tonalRamp": [
-          "oklch(15% 0.1786 92.23)",
-          "oklch(26% 0.1786 92.23)",
-          "oklch(38% 0.1786 92.23)",
-          "oklch(49% 0.1786 92.23)",
-          "oklch(61% 0.1786 92.23)",
-          "oklch(72% 0.1786 92.23)",
-          "oklch(84% 0.1786 92.23)",
-          "oklch(95% 0.1786 92.23)"
-        ]
-      },
-      "card-green-ink": {
-        "role": "secondary",
-        "displayName": "Small emerald index ink",
+        "displayName": "Card Green Index",
         "canonical": "#00321e",
         "tonalRamp": [
           "oklch(15% 0.0629 160.40)",
@@ -850,8 +455,8 @@
         ]
       },
       "card-green-value": {
-        "role": "secondary",
-        "displayName": "Emerald center rank ink",
+        "role": "neutral",
+        "displayName": "Card Green Value",
         "canonical": "#00894a",
         "tonalRamp": [
           "oklch(15% 0.1399 153.82)",
@@ -864,1016 +469,286 @@
           "oklch(95% 0.1399 153.82)"
         ]
       },
-      "launch-create-blue": {
-        "role": "primary",
-        "displayName": "Create blue",
-        "canonical": "#1757df",
-        "tonalRamp": [
-          "oklch(15% 0.2166 262.60)",
-          "oklch(26% 0.2166 262.60)",
-          "oklch(38% 0.2166 262.60)",
-          "oklch(49% 0.2166 262.60)",
-          "oklch(61% 0.2166 262.60)",
-          "oklch(72% 0.2166 262.60)",
-          "oklch(84% 0.2166 262.60)",
-          "oklch(95% 0.2166 262.60)"
-        ]
-      },
-      "launch-join-red": {
-        "role": "primary",
-        "displayName": "Join crimson",
-        "canonical": "#e71c3b",
-        "tonalRamp": [
-          "oklch(15% 0.2279 21.77)",
-          "oklch(26% 0.2279 21.77)",
-          "oklch(38% 0.2279 21.77)",
-          "oklch(49% 0.2279 21.77)",
-          "oklch(61% 0.2279 21.77)",
-          "oklch(72% 0.2279 21.77)",
-          "oklch(84% 0.2279 21.77)",
-          "oklch(95% 0.2279 21.77)"
-        ]
-      },
-      "milestone-yellow": {
-        "role": "primary",
-        "displayName": "Supporting earned-card yellow",
-        "canonical": "#f7c934",
-        "tonalRamp": [
-          "oklch(15% 0.1610 90.32)",
-          "oklch(26% 0.1610 90.32)",
-          "oklch(38% 0.1610 90.32)",
-          "oklch(49% 0.1610 90.32)",
-          "oklch(61% 0.1610 90.32)",
-          "oklch(72% 0.1610 90.32)",
-          "oklch(84% 0.1610 90.32)",
-          "oklch(95% 0.1610 90.32)"
-        ]
-      },
-      "milestone-ink": {
+      "card-yellow-index": {
         "role": "neutral",
-        "displayName": "Supporting earned-card ink",
-        "canonical": "#332810",
+        "displayName": "Card Yellow Index",
+        "canonical": "#482f00",
         "tonalRamp": [
-          "oklch(15% 0.0412 84.99)",
-          "oklch(26% 0.0412 84.99)",
-          "oklch(38% 0.0412 84.99)",
-          "oklch(49% 0.0412 84.99)",
-          "oklch(61% 0.0412 84.99)",
-          "oklch(72% 0.0412 84.99)",
-          "oklch(84% 0.0412 84.99)",
-          "oklch(95% 0.0412 84.99)"
+          "oklch(15% 0.0684 76.82)",
+          "oklch(26% 0.0684 76.82)",
+          "oklch(38% 0.0684 76.82)",
+          "oklch(49% 0.0684 76.82)",
+          "oklch(61% 0.0684 76.82)",
+          "oklch(72% 0.0684 76.82)",
+          "oklch(84% 0.0684 76.82)",
+          "oklch(95% 0.0684 76.82)"
         ]
       },
-      "milestone-border": {
+      "card-yellow-value": {
         "role": "neutral",
-        "displayName": "Supporting earned-card border",
-        "canonical": "#8b600b",
+        "displayName": "Card Yellow Value",
+        "canonical": "#805100",
         "tonalRamp": [
-          "oklch(15% 0.1055 77.02)",
-          "oklch(26% 0.1055 77.02)",
-          "oklch(38% 0.1055 77.02)",
-          "oklch(49% 0.1055 77.02)",
-          "oklch(61% 0.1055 77.02)",
-          "oklch(72% 0.1055 77.02)",
-          "oklch(84% 0.1055 77.02)",
-          "oklch(95% 0.1055 77.02)"
+          "oklch(15% 0.1025 71.17)",
+          "oklch(26% 0.1025 71.17)",
+          "oklch(38% 0.1025 71.17)",
+          "oklch(49% 0.1025 71.17)",
+          "oklch(61% 0.1025 71.17)",
+          "oklch(72% 0.1025 71.17)",
+          "oklch(84% 0.1025 71.17)",
+          "oklch(95% 0.1025 71.17)"
         ]
       },
-      "choice-blue": {
-        "role": "secondary",
-        "displayName": "Labeled choice blue",
-        "canonical": "#095be5",
+      "turn-yellow": {
+        "role": "neutral",
+        "displayName": "Turn Yellow",
+        "canonical": "#ffe329",
         "tonalRamp": [
-          "oklch(15% 0.2210 261.27)",
-          "oklch(26% 0.2210 261.27)",
-          "oklch(38% 0.2210 261.27)",
-          "oklch(49% 0.2210 261.27)",
-          "oklch(61% 0.2210 261.27)",
-          "oklch(72% 0.2210 261.27)",
-          "oklch(84% 0.2210 261.27)",
-          "oklch(95% 0.2210 261.27)"
+          "oklch(15% 0.1817 99.72)",
+          "oklch(26% 0.1817 99.72)",
+          "oklch(38% 0.1817 99.72)",
+          "oklch(49% 0.1817 99.72)",
+          "oklch(61% 0.1817 99.72)",
+          "oklch(72% 0.1817 99.72)",
+          "oklch(84% 0.1817 99.72)",
+          "oklch(95% 0.1817 99.72)"
         ]
-      },
-      "choice-green": {
-        "role": "secondary",
-        "displayName": "Labeled choice green",
-        "canonical": "#008749",
-        "tonalRamp": [
-          "oklch(15% 0.1383 153.88)",
-          "oklch(26% 0.1383 153.88)",
-          "oklch(38% 0.1383 153.88)",
-          "oklch(49% 0.1383 153.88)",
-          "oklch(61% 0.1383 153.88)",
-          "oklch(72% 0.1383 153.88)",
-          "oklch(84% 0.1383 153.88)",
-          "oklch(95% 0.1383 153.88)"
-        ]
-      },
-      "arena-menu": {
-        "role": "neutral",
-        "displayName": "Midnight menu control",
-        "canonical": "#1e2c42"
-      },
-      "arena-shadow-ink": {
-        "role": "neutral",
-        "displayName": "Neutral arena cast ink",
-        "canonical": "#030912"
-      },
-      "arena-menu-hover": {
-        "role": "neutral",
-        "displayName": "Midnight menu hover",
-        "canonical": "#2a3b54"
-      },
-      "arena-room-fallback": {
-        "role": "neutral",
-        "displayName": "Petrol room fallback",
-        "canonical": "#082a3d",
-        "tonalRamp": [
-          "oklch(15% 0.0518 237.89)",
-          "oklch(26% 0.0518 237.89)",
-          "oklch(38% 0.0518 237.89)",
-          "oklch(49% 0.0518 237.89)",
-          "oklch(61% 0.0518 237.89)",
-          "oklch(72% 0.0518 237.89)",
-          "oklch(84% 0.0518 237.89)",
-          "oklch(95% 0.0518 237.89)"
-        ]
-      },
-      "arena-identity": {
-        "role": "neutral",
-        "displayName": "Opaque petrol identity",
-        "canonical": "#102e37",
-        "tonalRamp": [
-          "oklch(15% 0.0390 220.47)",
-          "oklch(26% 0.0390 220.47)",
-          "oklch(38% 0.0390 220.47)",
-          "oklch(49% 0.0390 220.47)",
-          "oklch(61% 0.0390 220.47)",
-          "oklch(72% 0.0390 220.47)",
-          "oklch(84% 0.0390 220.47)",
-          "oklch(95% 0.0390 220.47)"
-        ]
-      },
-      "arena-header-scrim": {
-        "role": "neutral",
-        "displayName": "Header contrast tint",
-        "canonical": "#061e2d",
-        "tonalRamp": [
-          "oklch(15% 0.0418 239.46)",
-          "oklch(26% 0.0418 239.46)",
-          "oklch(38% 0.0418 239.46)",
-          "oklch(49% 0.0418 239.46)",
-          "oklch(61% 0.0418 239.46)",
-          "oklch(72% 0.0418 239.46)",
-          "oklch(84% 0.0418 239.46)",
-          "oklch(95% 0.0418 239.46)"
-        ]
-      },
-      "arena-menu-command": {
-        "role": "neutral",
-        "displayName": "Game menu command surface",
-        "canonical": "#263a50",
-        "purpose": "Repeated native game-menu command tiles only; not a global dialog surface."
-      },
-      "arena-menu-leave": {
-        "role": "secondary",
-        "displayName": "Game menu leave ink",
-        "canonical": "#ffb1bd",
-        "purpose": "Leave table command only; not a global danger palette."
       }
     },
     "typographyMeta": {
-      "display": {
-        "displayName": "Home title",
-        "purpose": "Centered 48px Outfit title, 42px phone and 36px narrow phone."
-      },
       "headline": {
-        "displayName": "Headline",
-        "purpose": "Observed headline role; responsive variants are recorded in DESIGN.md."
+        "displayName": "Condensed italic headline",
+        "purpose": "Setup and room page titles; italic uppercase Barlow Condensed."
       },
       "dialog-title": {
-        "displayName": "Dialog Title",
-        "purpose": "Observed dialog title role; responsive variants are recorded in DESIGN.md."
+        "displayName": "Dialog heading",
+        "purpose": "Compact paper dialog headings; responsive phone sizes are in club.css."
+      },
+      "title": {
+        "displayName": "Section heading",
+        "purpose": "Supporting page sections."
       },
       "body": {
-        "displayName": "Body",
-        "purpose": "Observed body role; responsive variants are recorded in DESIGN.md."
-      },
-      "body-muted": {
-        "displayName": "Body Muted",
-        "purpose": "Observed body muted role; responsive variants are recorded in DESIGN.md."
+        "displayName": "Interface body",
+        "purpose": "Outfit reading copy and names."
       },
       "label": {
-        "displayName": "Label",
-        "purpose": "Observed label role; responsive variants are recorded in DESIGN.md."
+        "displayName": "Field label",
+        "purpose": "Explicit readable labels."
       },
-      "table-label": {
-        "displayName": "Table Label",
-        "purpose": "Observed table label role; responsive variants are recorded in DESIGN.md."
+      "control": {
+        "displayName": "Shared control",
+        "purpose": "Dense supporting-page action labels."
       },
-      "button": {
-        "displayName": "Button",
-        "purpose": "Observed button role; responsive variants are recorded in DESIGN.md."
-      },
-      "wordmark": {
-        "displayName": "Wordmark",
-        "purpose": "Observed wordmark role; responsive variants are recorded in DESIGN.md."
-      },
-      "card-value": {
-        "displayName": "Card Value",
-        "purpose": "Scaled italic native card-face graphic; not an interface text level."
-      },
-      "card-index": {
-        "displayName": "Card Index",
-        "purpose": "Scaled italic native card-face graphic; not an interface text level."
-      },
-      "card-action": {
-        "displayName": "Card Action",
-        "purpose": "Scaled italic native card-face graphic; not an interface text level."
-      },
-      "caption": {
-        "displayName": "Caption",
-        "purpose": "Observed recurring caption role; responsive variants are recorded in DESIGN.md."
-      },
-      "body-large": {
-        "displayName": "Body Large",
-        "purpose": "Observed recurring body large role; responsive variants are recorded in DESIGN.md."
-      },
-      "dialog-title-phone": {
-        "displayName": "Dialog Title Phone",
-        "purpose": "Observed recurring dialog title phone role; responsive variants are recorded in DESIGN.md."
-      },
-      "wordmark-phone": {
-        "displayName": "Wordmark Phone",
-        "purpose": "Observed recurring wordmark phone role; responsive variants are recorded in DESIGN.md."
-      },
-      "launch-primary": {
-        "displayName": "Home Play",
-        "purpose": "24px/800 primary action, 22px on phones."
-      },
-      "launch-secondary": {
-        "displayName": "Home room actions",
-        "purpose": "18px/700, reducing to 16px phone and 15px narrow phone."
+      "launch-control": {
+        "displayName": "Home start action",
+        "purpose": "Condensed italic home-specific actions."
       }
     },
     "shadows": [
       {
-        "name": "surface",
-        "value": "var(--ui-shadow,0 18px 60px #1b29251c)",
-        "purpose": "Theme-aware ambient dialog elevation."
+        "name": "pressed-control",
+        "value": "inset 0 -3px 0 #15151b35",
+        "purpose": "Functional bottom lip; two-pixel downward active movement reduces it to one pixel."
       },
       {
-        "name": "card",
+        "name": "native-card-stock",
         "value": "inset 0 1px 2px #ffffffb0, inset 0 -1px 1px #17234145, 0 1px 1px #c4ccdf, 0 3px 1px #68748e, 0 8px 12px #02071880",
-        "purpose": "Thin laminate and stock layers shared by face and cloned motion cards."
+        "purpose": "Shared native card face; preserve for hand, piles and travel."
       },
       {
-        "name": "inspected",
-        "value": "inset 0 1px 2px #ffffffb0, 0 1px 1px #c4ccdf, 0 3px 1px #68748e, -3px 15px 20px #03091280",
-        "purpose": "Directional elevation for hovered, focused and inspected hand faces."
-      },
-      {
-        "name": "draw-stack",
-        "value": "inset 0 1px 2px #ffffffb0, 1px 3px 1px #d5dcec, 3px 6px 1px #7d8ba8, 4px 10px 1px #35435e, 4px 17px 18px #03091270",
-        "purpose": "Physical deck layers."
-      },
-      {
-        "name": "primary-control",
-        "value": "inset 0 -4px 0 #15292626, 0 5px 9px #15292620",
-        "purpose": "Inherited primary action elevation on supporting screens."
-      },
-      {
-        "name": "control-pressed",
-        "value": "inset 0 -1px 0 #15292626, 0 1px 3px #15292620",
-        "purpose": "Compressed inset and soft contact depth on activation."
-      },
-      {
-        "name": "launch-primary",
-        "value": "inset 0 2px 2px #ffffff70, inset 0 -4px 2px #bd7600, 0 6px 16px #04191d70",
-        "purpose": "Yellow Play bevel and soft lift."
-      },
-      {
-        "name": "launch-secondary",
-        "value": "inset 0 1px 2px #ffffff60, inset 0 -3px 2px var(--action-edge, #06339c), 0 5px 10px #02071870",
-        "purpose": "Blue Create and crimson Join, whose edge is #9a0c24."
-      },
-      {
-        "name": "launch-pressed",
-        "value": "inset 0 -1px 1px #bd7600, 0 1px 4px #04191d50",
-        "purpose": "Play contact depth; room controls use their own blue/crimson edge."
-      },
-      {
-        "name": "color-choice",
-        "value": "inset 0 2px 2px #ffffff40, inset 0 -4px 3px #00000028, 0 5px 10px #02071820",
-        "purpose": "Vivid native color-choice surfaces."
-      },
-      {
-        "name": "opponent-backing",
-        "value": "0 5px 9px #03091270",
-        "purpose": "Shallow opaque backing behind the protruding native character and count."
-      },
-      {
-        "name": "opponent-character",
-        "value": "inset 0 1px 1px #ffffff80, 1px 3px 1px #748a97, 0 6px 9px #03091270",
-        "purpose": "Ivory-edged native card character; local stock depth."
-      },
-      {
-        "name": "opponent-count",
-        "value": "2px 2px 1px #748a97, 3px 5px 6px #03091266",
-        "purpose": "Separate actual-count card tile; local stock depth, not a container shadow."
+        "name": "native-dialog",
+        "value": "0 16px 48px #00000066",
+        "purpose": "Ambient paper dialog separation above an unblurred dark backdrop."
       }
     ],
     "motion": [
       {
         "name": "ease-out",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Card response and shared bounded motion; no overshooting bounce."
+      },
+      {
+        "name": "ease-out-standard",
         "value": "cubic-bezier(0.2, 0.8, 0.2, 1)",
-        "purpose": "Shared quick settling."
+        "purpose": "Home control and native dialog entry."
       },
       {
-        "name": "hand-settle",
-        "value": "200ms cubic-bezier(0.16, 1, 0.3, 1)",
-        "purpose": "Arena hand turn/legal/inspection/reflow transform; static lift and growth remain when reduced motion removes the transition."
+        "name": "home-control",
+        "value": "140ms",
+        "purpose": "Immediate press and hover response."
       },
       {
-        "name": "drag-return",
-        "value": "180ms cubic-bezier(.16,1,.3,1)",
-        "purpose": "Unsuccessful/cancelled drag returns from pointer-down pose to current measured face center, composed rotation and uniform scale; zero travel under reduced motion. Shared readCardPose also supplies snapshot presentation. Keyboard detail 0 clears stale suppression; resize/blur/cancellation restore the native face."
-      },
-      {
-        "name": "play-flight",
-        "value": "190\u2013262ms cubic-bezier(.16,1,.3,1)",
-        "purpose": "Move the native discard face from the actual release pose or a visible opponent fan card to the pile; compact landscape falls back to a visible avatar pose without cloning the avatar. Hidden pages and reduced motion suppress flights; new snapshots, visibility loss, unmount and reduced-motion changes interrupt and clean up. Neither flight nor sound gates a turn."
-      },
-      {
-        "name": "draw-flight",
-        "value": "190\u2013262ms cubic-bezier(.16,1,.3,1)",
-        "purpose": "Clone the face-down deck for opponent draws and scale dimensions and card lettering into a visible fan-card pose, falling back to a visible avatar pose on compact landscape; never clone the avatar. One flight per opponent receiving cards, with existing six-representative local arrivals and 25ms stagger. Shared bounded geometry, suppression and cleanup never gate turns or audio."
-      },
-      {
-        "name": "hand-reflow",
-        "value": "200ms cubic-bezier(0.16, 1, 0.3, 1)",
-        "purpose": "Arena hand turn/legal/inspection/reflow transform; static lift and growth remain when reduced motion removes the transition."
-      },
-      {
-        "name": "special-reaction",
-        "value": "650ms",
-        "purpose": "Brief live-table action signal; no turn waits for it."
-      },
-      {
-        "name": "victory",
-        "value": "1300ms",
-        "purpose": "Bounded completion burst."
-      },
-      {
-        "name": "last-card-settle",
-        "value": "240ms cubic-bezier(0.16, 1, 0.3, 1)",
-        "purpose": "One bounded last-card marker stamp; static under reduced motion. Never gates a turn."
-      },
-      {
-        "name": "reduced-action-feedback",
-        "value": "900ms opacity only",
-        "purpose": "Retain a meaningful action cue under reduced motion without spatial movement."
-      },
-      {
-        "name": "player-expression",
-        "value": "260ms cubic-bezier(0.2, 0.8, 0.2, 1)",
-        "purpose": "One opponent reaction per expression change, including consecutive non-neutral states; expression-keyed decorative subtree prevents replay on unrelated snapshots. Spatial animation only with no reduced-motion preference."
-      },
-      {
-        "name": "control-press",
-        "value": "120ms cubic-bezier(0.2, 0.8, 0.2, 1)",
-        "purpose": "Compress shared primary and color-choice inset surfaces; native controls remain immediate."
-      },
-      {
-        "name": "launch-press",
-        "value": "130ms cubic-bezier(0.16, 1, 0.3, 1)",
-        "purpose": "Home 2px hover lift and press feedback; reduced motion removes transitions and travel."
-      },
-      {
-        "name": "face-hover-tilt",
-        "value": "130ms cubic-bezier(0.16, 1, 0.3, 1); perspective(650px) rotateX(5deg) rotateY(-5deg)",
-        "purpose": "CSS only; fine hover pointer and no reduced-motion preference. Active contact settles immediately before source-pose capture."
-      },
-      {
-        "name": "laminate-glint",
-        "value": "180ms cubic-bezier(0.16, 1, 0.3, 1); opacity 130ms",
-        "purpose": "Bounded highlight from translateX(-35%) to translateX(18%) on hover; no loop or pointer tracking. Same fine-pointer/no-reduced-motion guard; active removes sheen."
-      },
-      {
-        "name": "turn-and-legal-lift",
-        "value": "turn 8px; legal 26px and scale(1.025); short landscape 5/20px; shortest 4/16px",
-        "purpose": "Published static local-turn/legal cues; uninspected/unfocused nonmatches quiet only on local turn with brightness(.86) saturate(.93). 200ms transition removed under reduced motion; no idle loop."
-      },
-      {
-        "name": "opponent-count",
-        "value": "160ms cubic-bezier(0.16, 1, 0.3, 1) transform; 160ms background/color",
-        "purpose": "Local exact-count state response; reduced motion removes transitions and preserves active contrast."
+        "name": "dialog-enter",
+        "value": "180ms",
+        "purpose": "Eight-pixel native dialog entry, disabled under reduced motion."
       }
     ],
     "breakpoints": [
       {
-        "name": "launch-medium",
-        "value": "min-width: 701px and max-width: 1250px"
+        "name": "narrow-entry-and-support",
+        "value": "700px"
       },
       {
-        "name": "launch-phone",
-        "value": "max-width: 700px"
+        "name": "short-entry-landscape",
+        "value": "(orientation: landscape) and (max-height: 540px) and (min-width: 541px)"
       },
       {
-        "name": "launch-narrow",
-        "value": "max-width: 360px"
-      },
-      {
-        "name": "arena-large",
-        "value": "min-width: 701px and min-height: 900px"
-      },
-      {
-        "name": "arena-short",
-        "value": "max-height: 680px"
-      },
-      {
-        "name": "arena-landscape-short",
-        "value": "min-width: 541px and max-height: 460px"
-      },
-      {
-        "name": "arena-landscape-small",
-        "value": "min-width: 541px and max-height: 360px"
-      },
-      {
-        "name": "arena-portrait-gate",
-        "value": "orientation: portrait and max-width: 700px"
-      },
-      {
-        "name": "wild-color-landscape",
-        "value": "orientation: landscape and max-height: 460px"
-      },
-      {
-        "name": "launch-landscape-short",
-        "value": "orientation: landscape and max-height: 540px and min-width: 541px"
-      },
-      {
-        "name": "menu-landscape-short",
-        "value": "orientation: landscape and max-height: 460px"
+        "name": "compact-game-dialogs",
+        "value": "(orientation: landscape) and (max-height: 460px)"
       }
-    ],
-    "materials": {
-      "liveRoom": {
-        "asset": "public/artwork/game-room-evening.webp",
-        "provenance": "public/artwork/game-room-evening.webp.json",
-        "width": 1672,
-        "height": 941,
-        "bytes": 63838,
-        "transparency": false,
-        "animated": false,
-        "sourceCrop": false,
-        "sourceResize": false,
-        "conversion": "cwebp -q 82 -m 6",
-        "backgroundSize": "cover",
-        "backgroundPosition": "center 30%",
-        "backgroundRepeat": "no-repeat",
-        "fallbackToken": "arena-room-fallback",
-        "identityToken": "arena-identity",
-        "headerScrim": "linear-gradient(#061e2ddd, #061e2d99 65%, #061e2d00)",
-        "scope": "Static setting only; semantic live cards, seats, piles and controls remain independent. No background motion or blocking load.",
-        "evidence": ".impeccable/review/illustrated-room/assets.md"
-      },
-      "historical": {
-        "quietStage": ".impeccable/review/quiet-stage/contract.md",
-        "status": "Superseded working assumption; radial lighting and transparent inactive identities are not current authority.",
-        "textures": [
-          "public/textures/green-baize.jpg",
-          "public/textures/padded-leather.jpg"
-        ],
-        "preserveProvenance": true
-      }
-    },
-    "recordScope": {
-      "contract": ".impeccable/review/opponent-badges/contract.md",
-      "baselineReview": ".impeccable/review/opponent-badges/baseline-review.md",
-      "verification": ".impeccable/review/opponent-badges/verification.md",
-      "verdict": ".impeccable/review/opponent-badges/finish-verdict.md",
-      "metrics": ".impeccable/review/opponent-badges/metrics.json",
-      "confirmationMetrics": ".impeccable/review/opponent-badges/confirmation-metrics.json",
-      "inheritedSeed": "457003dd",
-      "approvedComp": false,
-      "independentQualityBarSupplied": false,
-      "reviewOutcome": "Both scored baseline fixes resolved; ship at their scope, not the whole surface.",
-      "captures": [
-        "after-desktop.png",
-        "after-owner.png",
-        "after-six-owner.png",
-        "after-six-phone-844.png",
-        "after-six-phone-568.png",
-        "after-states-844.png",
-        "after-states-568.png",
-        "after-active.png",
-        "after-active-reduced.png"
-      ],
-      "evidenceCrop": "Initial tight detail crop excluded from viewport/clipping evidence; verification records a padded replacement and bounded focus/Catch confirmation separately.",
-      "checks": "Reported passing production build, lint, strict types, game/audio/multiplayer assertions and formatting. Existing raster provenance: 4 assets / 0 missing; no new raster. Documentation formatting checked separately.",
-      "detector": "One pass: 7 palette/type advisories. Local badge materials and compact density do not create generic tokens, ignores or broad exemptions.",
-      "boundary": "Production-browser geometry, keyboard Catch and reduced-motion evidence plus assertions; no physical-phone, speaker, exhaustive accessibility or whole-surface certification.",
-      "notCanonized": "Superseded enclosed tiny avatars, full-yellow active labels and Layers/count metadata; detector advisories and unrelated primary-checkout arena/global/table/feedback experiments are not design rules.",
-      "previousRecord": {
-        "contract": ".impeccable/review/play-polish/contract.md",
-        "baselineReview": ".impeccable/review/play-polish/baseline-review.md",
-        "verification": ".impeccable/review/play-polish/verification.md",
-        "verdict": ".impeccable/review/play-polish/verdict.md",
-        "finalVerdict": ".impeccable/review/play-polish/final-verdict.md",
-        "inheritedSeeds": {
-          "home": "2e1e4271",
-          "play": "457003dd"
-        },
-        "approvedComp": false,
-        "independentQualityBarSupplied": false,
-        "captures": [
-          "after-desktop-home.png",
-          "after-desktop-menu.png",
-          "after-desktop-play.png",
-          "after-desktop-wild.png",
-          "after-hover-848.png",
-          "after-large-568.png",
-          "after-large-844.png",
-          "after-owner-home.png",
-          "after-owner-menu.png",
-          "after-owner-play.png",
-          "after-owner-wild.png",
-          "after-pass-568.png",
-          "after-pass-844.png",
-          "after-pass-848.png",
-          "after-phone-568-home.png",
-          "after-phone-568-menu.png",
-          "after-phone-568-play.png",
-          "after-phone-568-wild.png",
-          "after-phone-844-home.png",
-          "after-phone-844-menu.png",
-          "after-phone-844-play.png",
-          "after-phone-844-wild.png",
-          "after-reduced-home.png",
-          "after-reduced-menu.png",
-          "after-reduced-play.png",
-          "after-reduced-wild.png",
-          "after-seats-568.png",
-          "after-seats-844.png"
-        ],
-        "heldTouchFrames": ["phone-drag-cancel.png", "phone-drag-return.png"],
-        "reviewOutcome": "Seven baseline fixes: verdict resolves six, player clarity partial; final verdict resolves remaining Offline label and assigns ship at scored-fix scope only.",
-        "metrics": {
-          "productionCases": 12,
-          "productionFailures": 0,
-          "reconnectCases": 2,
-          "reconnectFailures": 0,
-          "normalDesktopCardPileGap": "about 70\u201373px, formerly 110\u2013120px"
-        },
-        "checks": "Reported passing lint, strict types, game/audio/multiplayer assertions, production build and formatting; raster scan 4 assets / 0 missing provenance. No detector or screenshot rerun during documentation.",
-        "detector": "One changed-target pass: 17 palette/type/radius advisories, 0 errors, no ignores. Menu command/Leave roles recorded at actual scope; historical advisories not canonized.",
-        "boundary": "Browser geometry, keyboard and emulated held touch plus source guards; loopback-only synthetic long-name/offline/angle cases. No whole-surface, physical-handset, speaker listening, exhaustive accessibility or independent quality-bar certification.",
-        "notCanonized": "Offscreen start actions, seven-row menu, old desktop pile offsets/lift, undersized badges/clipped reconnect text, floating Catch, reconstructed pickup geometry and stale keyboard suppression; detector advisories do not become blanket tokens.",
-        "previousRecord": {
-          "contract": ".impeccable/review/closer-table/contract.md",
-          "baselineReview": ".impeccable/review/closer-table/baseline-review.md",
-          "layoutVerdict": ".impeccable/review/closer-table/layout-verdict.md",
-          "finishReview": ".impeccable/review/closer-table/finish-review.md",
-          "inheritedSeed": "457003dd",
-          "ownerChoice": "Correct the rejected shipped layout inside the selected illustrated game-room setting.",
-          "approvedComp": false,
-          "independentQualityBarSupplied": false,
-          "captures": [
-            "desktop-1440.png",
-            "user-848.png",
-            "hover-848.png",
-            "wild-848.png",
-            "landscape-844-rest.png",
-            "landscape-844-focus.png",
-            "landscape-568-rest.png",
-            "landscape-568-focus.png",
-            "phone-fan-844.png",
-            "phone-pass-844.png",
-            "phone-uno-568.png",
-            "phone-wild-568.png",
-            "phone-wild-844.png",
-            "portrait-gate.png",
-            "reduced-844.png"
-          ],
-          "reviewOutcome": "Four scored layout fixes cleared in layout-verdict.md; the subsequent full finish review required a complete short-landscape color decision and this design refresh. Final production verification records fifteen opened captures after the scoped dialog correction; both phone wild states show complete controls without scrolling. Final disposition belongs to the review packet.",
-          "checks": "Reported passing lint, strict types, game/audio/multiplayer assertions and production build. Existing raster scan: four assets, zero missing provenance records.",
-          "boundary": "Browser geometry and keyboard/mouse evidence plus source guards only. No independent quality-bar, whole-app, public-deployment, physical-phone touch, speaker quality or exhaustive accessibility certification.",
-          "notCanonized": "Superseded independent pile centering, former phone hand rows and hidden avatars, scrolling phone wild decision, incidental response values and historical scan advisories do not become broad tokens or exemptions.",
-          "detector": "Baseline scoped mechanical layout scan reported no findings; no new detector run for this documentation pass.",
-          "previousRecord": {
-            "contract": ".impeccable/review/illustrated-room/contract.md",
-            "verification": ".impeccable/review/illustrated-room/verification.md",
-            "finishReview": ".impeccable/review/illustrated-room/finish-review.md",
-            "inheritedSeed": "457003dd",
-            "ownerChoice": "An illustrated game-room setting",
-            "approvedComp": false,
-            "independentQualityBarSupplied": false,
-            "captures": [
-              "desktop-1440.jpg",
-              "user-848.jpg",
-              "landscape-844.jpg",
-              "landscape-568.jpg",
-              "portrait-gate.jpg"
-            ],
-            "boundary": "Final captures validated; browser geometry and keyboard evidence only. No physical-phone touch, speaker quality, exhaustive accessibility or whole-app certification.",
-            "notCanonized": "Detector advisories, inherited landing radius, incidental colors and compact text do not become new reusable tokens or exemptions. Quiet radial stage and transparent inactive badges are historical only.",
-            "detector": "One pass before header-only scrim correction; no rerun. Intentional shipped material colors recorded from source."
-          },
-          "verification": ".impeccable/review/closer-table/verification.md",
-          "wildDecisionEvidence": {
-            "viewports": ["568x320", "844x390"],
-            "dialogClientHeight": 246,
-            "dialogScrollHeight": 246,
-            "colorTargetHeight": 72,
-            "closeAndKeepTargetHeight": 44,
-            "internalScrollingRequired": false,
-            "source": ".impeccable/review/closer-table/verification.md"
-          }
-        }
-      },
-      "confirmation": "Three cases, zero failures; actual 3px focus-visible outline and keyboard Catch at both phone sizes; updated detail and owner captures validated."
-    },
-    "arenaGeometry": {
-      "source": "app/arena.css",
-      "pileAnchor": "bottom of upper playing region; top auto; horizontally centered",
-      "ordinary": {
-        "handScale": 1.65,
-        "pileScale": 1.35,
-        "handRow": "188px",
-        "pileBottom": "12px",
-        "pileGap": "40px"
-      },
-      "tall": {
-        "query": "min-height: 900px and min-width: 701px",
-        "handScale": 1.95,
-        "pileScale": 1.65,
-        "handRow": "216px",
-        "pileBottom": "12px",
-        "pileGap": "50px"
-      },
-      "short": {
-        "query": "max-height: 680px",
-        "handScale": 1.35,
-        "pileScale": 1.08,
-        "handRow": "152px",
-        "pileBottom": "8px",
-        "pileGap": "32px"
-      },
-      "landscapePhone": {
-        "query": "max-height: 460px and min-width: 541px",
-        "handScale": 1.08,
-        "pileScale": 0.86,
-        "handRow": "140px",
-        "pileBottom": "8px",
-        "pileGap": "32px",
-        "fanRotationMultiplier": 0.5,
-        "fanDropMultiplier": 0.2,
-        "badgeWidth": "128px",
-        "badgeMinHeight": "44px",
-        "avatar": "30px 36px",
-        "seatTop": "28px",
-        "nameSize": "12px",
-        "countStatusSize": "11px status; separate 22px count",
-        "textStack": "name/status column; 1px gap",
-        "legalLift": "20px",
-        "identitySource": "components/OpponentSeat.module.css",
-        "countTile": "24px 30px",
-        "countSize": "22px"
-      },
-      "shortestLandscapePhone": {
-        "query": "max-height: 360px and min-width: 541px",
-        "handScale": 0.88,
-        "pileScale": 0.69,
-        "handRow": "116px",
-        "pileBottom": "4px",
-        "badgeWidth": "102px",
-        "badgeMinHeight": "44px",
-        "avatar": "26px 32px",
-        "seatTop": "24px",
-        "nameSize": "12px",
-        "countStatusSize": "11px status; separate 20px count",
-        "legalLift": "16px",
-        "identitySource": "components/OpponentSeat.module.css",
-        "countTile": "22px 28px",
-        "countSize": "20px"
-      },
-      "opponents": {
-        "desktopWidth": "160px",
-        "desktopAvatar": "44px 52px",
-        "desktopBackFan": "96px 66px at scale 0.5",
-        "phoneGrid": "30px minmax(0, 1fr) 24px; shortest 26px minmax(0, 1fr) 22px",
-        "phoneAvatarsRemainVisible": true,
-        "catch": "Eligible native 44px-minimum phone badge button retains Catch!, exact count and full action name. Offline retains Reconnecting semantics; declared UNO persists at one card.",
-        "source": "components/OpponentSeat.tsx + components/OpponentSeat.module.css",
-        "placementSource": "app/arena.css",
-        "desktopMinHeight": "54px",
-        "desktopName": "Outfit 16px / 750 / 1.2",
-        "desktopCount": "26px 34px tile; Barlow Condensed 24px / 800; actual hand length",
-        "active": "Yellow character outline and yellow dark-ink count; shallow backing remains navy. Accessible Current turn.",
-        "nameOverflow": "Bounded ellipsis; full name remains in DOM and title.",
-        "scope": "Module overrides inherited arena badge recipes; seat placement and back-fan geometry remain in app/arena.css."
-      },
-      "contextualLane": {
-        "right": "16px",
-        "left": "auto",
-        "transform": "none",
-        "maxWidth": "min(240px, calc(100% - 24px))",
-        "bottom": "calc(100% + 10px)",
-        "phoneBottom": "calc(100% + 4px)",
-        "actionMinHeight": "44px"
-      },
-      "wildColorLandscape": {
-        "query": "orientation: landscape and max-height: 460px",
-        "width": "min(680px, calc(100vw - 32px))",
-        "maxHeight": "calc(100dvh - 24px)",
-        "contentPadding": "16px",
-        "contentGap": "12px",
-        "titleSize": "24px",
-        "colorColumns": 4,
-        "colorGap": "10px",
-        "colorMinHeight": "72px",
-        "cancelMinHeight": "44px",
-        "scope": "color-picker-modal only"
-      },
-      "scope": "Observed responsive arena geometry, not new global primitive tokens. Preserve complete internal card boxes, foreground page crop, horizontal hand scrolling, focus clearance, native dialog and portrait gate.",
-      "gameMenu": {
-        "columns": 2,
-        "commands": 6,
-        "commandMinHeight": "56px",
-        "shortQuery": "orientation: landscape and max-height: 460px",
-        "shortWidth": "min(720px, calc(100vw - 24px))",
-        "shortMaxHeight": "calc(100dvh - 24px)",
-        "shortContentPadding": "12px",
-        "shortCommandMinHeight": "44px",
-        "shortCommandGap": "6px 8px",
-        "scope": "Game menu only; native Close restores opener focus; no duplicate Back row. Sort by color pressed state; distinct Leave. Online room copy remains reachable without scrolling."
-      }
-    },
-    "launchGeometry": {
-      "source": "app/home.css",
-      "query": "orientation: landscape and max-height: 540px and min-width: 541px",
-      "sceneHeight": "clamp(80px, calc(100dvh - 210px), 320px)",
-      "sceneWidth": "min(740px, 94vw)",
-      "headerHeight": "44px",
-      "actionMinHeight": "44px",
-      "heading": "Visually clipped, accessible heading retained",
-      "scene": "Complete cast, object-fit contain",
-      "scope": "Short landscape only; desktop unchanged, centered Play/Create/Join preserved."
-    }
+    ]
   },
   "components": [
     {
-      "name": "Primary button",
+      "name": "Deal cards button",
       "kind": "button",
       "refersTo": "button-primary",
-      "description": "Theme-aware supporting action.",
-      "html": "<button class=\"ds-primary\">Deal cards</button>",
-      "css": ".ds-primary{font-family:var(--font-body,Outfit),sans-serif;display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:50px;padding:14px 22px;border:1px solid transparent;border-radius:14px;font-size:14px;font-weight:800;line-height:1.25;cursor:pointer;transition:background 160ms,color 160ms,transform 120ms var(--ease-out,cubic-bezier(.2,.8,.2,1));background:var(--ui-accent-red,#c74531);color:var(--ui-bg,#fff8ec);box-shadow:inset 0 -4px 0 #15292626,0 5px 9px #15292620;}.ds-primary:focus-visible{outline:3px solid var(--ui-accent-blue,#3265a0);outline-offset:4px}.ds-primary:active:not(:disabled){transform:translateY(3px);box-shadow:inset 0 -1px 0 #15292626,0 1px 3px #15292620}@media(hover:hover){.ds-primary:hover{background:color-mix(in srgb,var(--ui-accent-red,#c74531) 85%,var(--ui-text,#2c2c32));}}@media(prefers-reduced-motion:reduce){.ds-primary{transition:none}.ds-primary:active:not(:disabled){transform:none}}:host-context(:root:not([data-theme=\"midnight\"])) .ds-primary{color:#fffaf1}"
+      "description": "Shared primary action; secondary text and surface follow supporting-page appearance.",
+      "html": "<button type=\"button\" class=\"ds-button-primary\">Deal cards</button>",
+      "css": ".ds-button-primary{display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:48px;padding:14px 22px;border:2px solid var(--club-ink,#15151b);border-radius:8px;background:var(--club-yellow,#ffce00);color:var(--club-ink,#15151b);font-family:var(--font-body,Outfit),sans-serif;font-size:14px;font-weight:750;line-height:1.25;box-shadow:inset 0 -3px 0 #15151b35;cursor:pointer;transition:background 160ms,transform 120ms cubic-bezier(.16,1,.3,1)}.ds-button-primary:hover:not(:disabled){background:#ffdc36}.ds-button-primary:focus-visible{outline:3px solid var(--ui-accent-blue,#075bee);outline-offset:4px}.ds-button-primary:active:not(:disabled){transform:translateY(2px);box-shadow:inset 0 -1px 0 #15151b35}.ds-button-primary:disabled{opacity:.5;box-shadow:none}@media(prefers-reduced-motion:reduce){.ds-button-primary{transition:none}.ds-button-primary:active:not(:disabled){transform:none}}"
     },
     {
-      "name": "Secondary button",
+      "name": "Back button",
       "kind": "button",
       "refersTo": "button-secondary",
-      "description": "Theme-aware supporting action.",
-      "html": "<button class=\"ds-secondary\">Done</button>",
-      "css": ".ds-secondary{font-family:var(--font-body,Outfit),sans-serif;display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:50px;padding:14px 22px;border:1px solid transparent;border-radius:14px;font-size:14px;font-weight:800;line-height:1.25;cursor:pointer;transition:background 160ms,color 160ms,transform 120ms var(--ease-out,cubic-bezier(.2,.8,.2,1));background:transparent;color:var(--ui-text,#2c2c32);border-color:var(--ui-line,#e3dbce);}.ds-secondary:focus-visible{outline:3px solid var(--ui-accent-blue,#3265a0);outline-offset:4px}.ds-secondary:active{transform:translateY(3px) scale(.985);box-shadow:none}@media(hover:hover){.ds-secondary:hover{background:color-mix(in srgb,var(--ui-text,#2c2c32) 5%,transparent);}}@media(prefers-reduced-motion:reduce){.ds-secondary{transition:none}.ds-secondary:active{transform:none}}"
+      "description": "Shared secondary action; secondary text and surface follow supporting-page appearance.",
+      "html": "<button type=\"button\" class=\"ds-button-secondary\">Back</button>",
+      "css": ".ds-button-secondary{display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:48px;padding:14px 22px;border:2px solid var(--ui-line,#c6bfae);border-radius:8px;background:transparent;color:var(--ui-text,#15151b);font-family:var(--font-body,Outfit),sans-serif;font-size:14px;font-weight:750;line-height:1.25;box-shadow:none;cursor:pointer;transition:background 160ms,transform 120ms cubic-bezier(.16,1,.3,1)}.ds-button-secondary:hover:not(:disabled){background:#ffce0020}.ds-button-secondary:focus-visible{outline:3px solid var(--ui-accent-blue,#075bee);outline-offset:4px}.ds-button-secondary:active:not(:disabled){transform:translateY(2px);box-shadow:inset 0 -1px 0 #15151b35}.ds-button-secondary:disabled{opacity:.5;box-shadow:none}@media(prefers-reduced-motion:reduce){.ds-button-secondary{transition:none}.ds-button-secondary:active:not(:disabled){transform:none}}"
     },
     {
-      "name": "Text button",
+      "name": "Play with bots",
       "kind": "button",
-      "refersTo": "button-text",
-      "description": "Quiet inline action.",
-      "html": "<button class=\"ds-text\">Back to home</button>",
-      "css": ".ds-text{font-family:var(--font-body,Outfit),sans-serif;display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:4px 0;border:0;background:transparent;color:var(--ui-text,#2c2c32);font-size:13px;font-weight:500;text-underline-offset:4px;cursor:pointer}.ds-text:focus-visible{outline:3px solid var(--ui-accent-blue,#3265a0);outline-offset:4px}@media(hover:hover){.ds-text:hover{text-decoration:underline}}.ds-text:active{opacity:.8}"
+      "refersTo": "launch-primary",
+      "description": "Home-specific condensed italic start action.",
+      "html": "<button type=\"button\" class=\"ds-launch-primary\">Play with bots</button>",
+      "css": ".ds-launch-primary{display:flex;align-items:center;justify-content:center;width:100%;min-height:76px;padding:10px 18px 13px;border:3px solid var(--club-ink,#15151b);border-radius:8px;background:var(--club-yellow,#ffce00);color:var(--club-ink,#15151b);box-shadow:inset 0 -3px 0 #15151b35;font-family:var(--font-card,\"Barlow Condensed\"),sans-serif;font-style:italic;font-weight:800;text-transform:uppercase;font-size:40px;line-height:1.15;cursor:pointer;transition:transform 140ms cubic-bezier(.2,.8,.2,1),box-shadow 140ms}.ds-launch-primary:hover{transform:translateY(-2px);box-shadow:inset 0 -4px 0 #15151b35}.ds-launch-primary:focus-visible{outline:3px solid var(--ui-accent-blue,#075bee);outline-offset:4px}.ds-launch-primary:active{transform:translateY(2px);box-shadow:inset 0 -1px 0 #15151b35}.ds-launch-primary:disabled{opacity:.5;box-shadow:none}@media(prefers-reduced-motion:reduce){.ds-launch-primary{transition:none}.ds-launch-primary:hover,.ds-launch-primary:active{transform:none}}"
     },
     {
-      "name": "Contextual move dock",
-      "kind": "custom",
-      "refersTo": "button-play-selected",
-      "description": "Right-side contextual decision lane above the held fan, clear of central piles. Draw stays on the physical deck; eligible UNO stays at hand level.",
-      "html": "<div class=\"ds-hand-controls\"><button class=\"ds-move ds-uno\">UNO!</button><div class=\"ds-dock\"><p class=\"ds-hint\" role=\"status\">Ready to play. You can also drag it onto the table.</p><div class=\"ds-moves\"><button class=\"ds-move ds-play\"><span>Play green Discard all</span><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M5 12h14m-6-6 6 6-6 6\"/></svg></button></div></div></div>",
-      "css": ".ds-hand-controls{position:relative;height:44px;margin-top:160px;background:#082a3d;color:#ffffff;font-family:var(--font-body,Outfit),sans-serif}.ds-dock{position:absolute;right:16px;left:auto;bottom:calc(100% + 10px);transform:none;width:max-content;max-width:min(240px,calc(100% - 24px));display:flex;align-items:center;justify-content:center;gap:8px;padding:0;min-height:0;flex-direction:column}.ds-hint{margin:0;max-width:42ch;min-width:0;color:#ffffff;background:#1c293c;padding:6px 10px;border-radius:6px;font-size:12px;line-height:1.3;text-align:center}.ds-moves{display:flex;max-width:100%;gap:8px}.ds-move{font-family:inherit;display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:44px;min-width:0;padding:7px 14px;border:1px solid transparent;border-radius:14px;font-size:14px;font-weight:800;line-height:1.25;cursor:pointer;transition:transform 120ms cubic-bezier(.2,.8,.2,1),box-shadow 120ms}.ds-play{background:#ffd000;color:#392700;box-shadow:inset 0 -3px 2px #bd7600,0 4px 8px #03091260}.ds-uno{position:absolute;right:12px;top:-15px;background:#ffd000;color:#392700}.ds-move:hover{filter:brightness(1.07)}.ds-move:focus-visible{outline:3px solid #ffe329;outline-offset:4px}.ds-move:active{transform:translateY(3px);box-shadow:inset 0 -1px 0 #15292626,0 1px 3px #15292620}@media(prefers-reduced-motion:reduce){.ds-move{transition:none}.ds-move:active{transform:none}}@media(max-height:460px) and (min-width:541px){.ds-dock{bottom:calc(100% + 4px)}.ds-uno{right:4px;top:-12px}.ds-hint{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}}"
+      "name": "Create a room",
+      "kind": "button",
+      "refersTo": "launch-create",
+      "description": "Home-specific condensed italic start action.",
+      "html": "<button type=\"button\" class=\"ds-launch-create\">Create a room</button>",
+      "css": ".ds-launch-create{display:flex;align-items:center;justify-content:center;width:100%;min-height:64px;padding:10px 18px 13px;border:3px solid var(--club-ink,#15151b);border-radius:8px;background:var(--club-red,#df0735);color:#ffffff;box-shadow:inset 0 -3px 0 #15151b35;font-family:var(--font-card,\"Barlow Condensed\"),sans-serif;font-style:italic;font-weight:800;text-transform:uppercase;font-size:32px;line-height:1.15;cursor:pointer;transition:transform 140ms cubic-bezier(.2,.8,.2,1),box-shadow 140ms}.ds-launch-create:hover{transform:translateY(-2px);box-shadow:inset 0 -4px 0 #15151b35}.ds-launch-create:focus-visible{outline:3px solid var(--ui-accent-blue,#075bee);outline-offset:4px}.ds-launch-create:active{transform:translateY(2px);box-shadow:inset 0 -1px 0 #15151b35}.ds-launch-create:disabled{opacity:.5;box-shadow:none}@media(prefers-reduced-motion:reduce){.ds-launch-create{transition:none}.ds-launch-create:hover,.ds-launch-create:active{transform:none}}"
     },
     {
-      "name": "Text field",
+      "name": "Join a room",
+      "kind": "button",
+      "refersTo": "launch-join",
+      "description": "Home-specific condensed italic start action.",
+      "html": "<button type=\"button\" class=\"ds-launch-join\">Join a room</button>",
+      "css": ".ds-launch-join{display:flex;align-items:center;justify-content:center;width:100%;min-height:64px;padding:10px 18px 13px;border:3px solid var(--club-ink,#15151b);border-radius:8px;background:var(--club-blue,#075bee);color:#ffffff;box-shadow:inset 0 -3px 0 #15151b35;font-family:var(--font-card,\"Barlow Condensed\"),sans-serif;font-style:italic;font-weight:800;text-transform:uppercase;font-size:32px;line-height:1.15;cursor:pointer;transition:transform 140ms cubic-bezier(.2,.8,.2,1),box-shadow 140ms}.ds-launch-join:hover{transform:translateY(-2px);box-shadow:inset 0 -4px 0 #15151b35}.ds-launch-join:focus-visible{outline:3px solid var(--ui-accent-blue,#075bee);outline-offset:4px}.ds-launch-join:active{transform:translateY(2px);box-shadow:inset 0 -1px 0 #15151b35}.ds-launch-join:disabled{opacity:.5;box-shadow:none}@media(prefers-reduced-motion:reduce){.ds-launch-join{transition:none}.ds-launch-join:hover,.ds-launch-join:active{transform:none}}"
+    },
+    {
+      "name": "Room code field",
       "kind": "input",
-      "refersTo": "field",
-      "description": "Compact grouped human-name label and native field.",
-      "html": "<div class=\"ds-name-field\"><label class=\"ds-label\" for=\"ds-player-name\">Your name</label><input class=\"ds-field\" id=\"ds-player-name\" value=\"You\" autocomplete=\"nickname\" maxlength=\"18\"/></div>",
-      "css": ".ds-label{font-family:var(--font-body,Outfit),sans-serif;display:block;margin-bottom:8px;color:var(--ui-text,#2c2c32);font-size:13px;font-weight:600}.ds-field{font-family:var(--font-body,Outfit),sans-serif;box-sizing:border-box;width:100%;height:50px;padding:12px 15px;border:1px solid var(--ui-line,#e3dbce);border-radius:10px;background:var(--ui-surface,#fffcf5);color:var(--ui-text,#2c2c32);font-size:15px;caret-color:var(--ui-accent-red,#c74531);transition:border-color 150ms}.ds-field::placeholder{color:var(--ui-muted,#706b65);opacity:1}.ds-field:focus{border-color:var(--ui-text,#2c2c32)}.ds-field:focus-visible{outline:3px solid var(--ui-accent-blue,#3265a0);outline-offset:4px}.ds-name-field{display:grid;gap:8px}@media(max-width:800px){.ds-field{font-size:16px}}"
+      "refersTo": "input",
+      "description": "Theme-aware field with explicit label and invalid/focus states.",
+      "html": "<label class=\"ds-field\">Room code<input placeholder=\"ABC123\" aria-label=\"Room code\" /></label>",
+      "css": ".ds-field{display:grid;gap:8px;font-family:var(--font-body,Outfit),sans-serif;font-size:14px;font-weight:750;color:var(--ui-text,#15151b)}.ds-field input{min-height:50px;padding:12px 15px;border:2px solid var(--ui-line,#c6bfae);border-radius:6px;background:var(--ui-surface,#fff9e8);color:var(--ui-text,#15151b);font:inherit;font-weight:400;transition:border-color 150ms}.ds-field input::placeholder{color:var(--ui-muted,#57524a)}.ds-field input:focus{border-color:var(--ui-text,#15151b)}.ds-field input:focus-visible{outline:3px solid var(--ui-accent-blue,#075bee);outline-offset:4px}.ds-field input[aria-invalid=\"true\"]{border-color:var(--ui-accent-red,#c50730)}"
     },
     {
       "name": "Settings tabs",
       "kind": "nav",
-      "refersTo": "button-text",
-      "description": "Equal text tabs with selected underline.",
-      "html": "<div class=\"ds-tabs\" role=\"tablist\" aria-label=\"Settings\"><button role=\"tab\" aria-selected=\"true\">Profile</button><button role=\"tab\" aria-selected=\"false\">Rules</button><button role=\"tab\" aria-selected=\"false\">Audio</button><button role=\"tab\" aria-selected=\"false\">Look</button></div>",
-      "css": ".ds-tabs{display:flex;border-bottom:1px solid var(--ui-line,#e3dbce);gap:12px}.ds-tabs button{font-family:var(--font-body,Outfit),sans-serif;flex:1;border:0;border-bottom:2px solid transparent;background:transparent;padding:13px 3px;color:var(--ui-muted,#706b65);font-size:13px;cursor:pointer}.ds-tabs button[aria-selected=\"true\"]{color:var(--ui-text,#2c2c32);border-bottom-color:var(--ui-accent-red,#c74531);font-weight:600}.ds-tabs button:focus-visible{outline:3px solid var(--ui-accent-blue,#3265a0);outline-offset:4px}.ds-tabs button:hover{color:var(--ui-text,#2c2c32)}.ds-tabs button:active{opacity:.8}"
+      "refersTo": "settings-navigation",
+      "description": "Outlined compact navigation; selected state is explicit.",
+      "html": "<nav class=\"ds-tabs\" aria-label=\"Preferences\"><button aria-current=\"page\">Controls</button><button>Sound</button><button>Appearance</button></nav>",
+      "css": ".ds-tabs{display:flex;border:2px solid var(--club-ink,#15151b);border-radius:6px;overflow:hidden}.ds-tabs button{flex:1;min-height:48px;padding:9px 6px;border:0;background:transparent;color:var(--ui-text,#15151b);font-family:var(--font-body,Outfit),sans-serif;font-size:14px;cursor:pointer}.ds-tabs button[aria-current=\"page\"]{background:var(--club-ink,#15151b);color:var(--club-paper,#fff4d6)}.ds-tabs button:hover{background:#ffce0020}.ds-tabs button[aria-current=\"page\"]:hover{background:var(--club-ink,#15151b)}.ds-tabs button:focus-visible{outline:3px solid var(--ui-accent-blue,#075bee);outline-offset:-4px}.ds-tabs button:active{transform:translateY(1px)}"
     },
     {
-      "name": "Home Play",
-      "kind": "button",
-      "refersTo": "launch-primary",
-      "description": "Centered primary action starts saved bot play immediately. Short landscape retains a centered 44px minimum target below the complete contained cast; accessible heading persists.",
-      "html": "<button class=\"ds-launch ds-launch-main\">Play with bots <svg width=\"23\" height=\"23\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M5 12h14m-6-6 6 6-6 6\"/></svg></button>",
-      "css": ".ds-launch{display:flex;align-items:center;justify-content:center;gap:14px;width:100%;min-height:54px;padding:14px 20px 16px;border:0;border-radius:6px;background:var(--action-fill,#1757df);color:var(--action-ink,#ffffff);box-shadow:inset 0 1px 2px #ffffff60,inset 0 -3px 2px var(--action-edge,#06339c),0 5px 10px #02071870;font-family:var(--font-body,Outfit),sans-serif;font-size:18px;font-weight:700;line-height:1.25;cursor:pointer;transition:transform 130ms cubic-bezier(.16,1,.3,1),background 130ms,box-shadow 130ms}.ds-launch:focus-visible{outline:3px solid #ffd64a;outline-offset:5px}.ds-launch:active:not(:disabled){transform:translateY(2px);box-shadow:inset 0 -1px 1px var(--action-edge,#06339c),0 1px 4px #04191d50}.ds-launch:disabled{opacity:.5;cursor:default}@media(hover:hover) and (pointer:fine){.ds-launch:hover:not(:disabled){transform:translateY(-2px);background:var(--action-hover,#2167f0)}.ds-launch:active:not(:disabled){transform:translateY(2px)}}@media(prefers-reduced-motion:reduce){.ds-launch{transition:none}.ds-launch:hover,.ds-launch:active:not(:disabled){transform:none}}.ds-launch-main{--action-fill:#ffd000;--action-ink:#392700;--action-edge:#bd7600;min-height:64px;box-shadow:inset 0 2px 2px #ffffff70,inset 0 -4px 2px #bd7600,0 6px 16px #04191d70;font-size:24px;font-weight:800}.ds-launch-main:focus-visible{outline-color:#f9f2df}.ds-launch-main:active:not(:disabled){box-shadow:inset 0 -1px 1px #bd7600,0 1px 4px #04191d50}@media(hover:hover) and (pointer:fine){.ds-launch-main:hover:not(:disabled){background:#ffdf26}}@media(orientation:landscape) and (max-height:540px) and (min-width:541px){.ds-launch{min-height:44px;padding:10px 12px 12px;font-size:15px}.ds-launch-main{min-height:44px;padding:10px 16px 12px;font-size:19px}}"
+      "name": "Rule preset row",
+      "kind": "chip",
+      "refersTo": "rule-preset",
+      "description": "Flat divider row, yellow pressed selection and explicit check; native card marker is decorative.",
+      "html": "<button class=\"ds-preset\" aria-pressed=\"true\"><span class=\"ds-preset-card\" aria-hidden=\"true\">7</span><strong>Classic</strong><small>The familiar four-color game.</small><svg class=\"ds-preset-check\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"m20 6-11 11-5-5\"/></svg></button>",
+      "css": ".ds-preset{display:grid;grid-template-columns:32px minmax(0,1fr) 24px;grid-template-rows:auto auto;align-items:center;column-gap:16px;row-gap:2px;min-height:76px;width:100%;padding:14px 16px;border:0;border-block:1px solid var(--ui-line,#c6bfae);border-radius:0;background:transparent;color:var(--ui-text,#15151b);text-align:left;font-family:var(--font-body,Outfit),sans-serif;cursor:pointer}.ds-preset strong{font-size:16px;font-weight:750}.ds-preset small{grid-column:2;font-size:13px;line-height:1.4}.ds-preset[aria-pressed=\"true\"]{background:var(--club-yellow,#ffce00);color:var(--club-ink,#15151b)}.ds-preset[aria-pressed=\"true\"] small{color:#514500}.ds-preset-card{grid-row:1/3;display:grid;place-items:center;width:25px;height:36px;border:3px solid #fff8ec;outline:1px solid var(--club-red,#df0735);border-radius:6px;transform:rotate(-8deg);background:var(--club-red,#df0735);color:#fff8ec;font-family:var(--font-card,\"Barlow Condensed\"),sans-serif;font-style:italic;font-weight:800;text-transform:uppercase;font-size:19px}.ds-preset-check{grid-column:3;grid-row:1/3}.ds-preset:hover{background:var(--ui-bg,#fff4d6)}.ds-preset[aria-pressed=\"true\"]:hover{background:#ffdc36}.ds-preset:focus-visible{outline:3px solid var(--ui-accent-blue,#075bee);outline-offset:4px}.ds-preset:active{transform:none}"
     },
     {
-      "name": "Home Create",
-      "kind": "button",
-      "refersTo": "launch-create",
-      "description": "Blue room creation action, equal in size to Join, following centered Play. Short landscape retains a centered 44px minimum target below the complete contained cast; accessible heading persists.",
-      "html": "<button class=\"ds-launch\">Create a room</button>",
-      "css": ".ds-launch{display:flex;align-items:center;justify-content:center;gap:14px;width:100%;min-height:54px;padding:14px 20px 16px;border:0;border-radius:6px;background:var(--action-fill,#1757df);color:var(--action-ink,#ffffff);box-shadow:inset 0 1px 2px #ffffff60,inset 0 -3px 2px var(--action-edge,#06339c),0 5px 10px #02071870;font-family:var(--font-body,Outfit),sans-serif;font-size:18px;font-weight:700;line-height:1.25;cursor:pointer;transition:transform 130ms cubic-bezier(.16,1,.3,1),background 130ms,box-shadow 130ms}.ds-launch:focus-visible{outline:3px solid #ffd64a;outline-offset:5px}.ds-launch:active:not(:disabled){transform:translateY(2px);box-shadow:inset 0 -1px 1px var(--action-edge,#06339c),0 1px 4px #04191d50}.ds-launch:disabled{opacity:.5;cursor:default}@media(hover:hover) and (pointer:fine){.ds-launch:hover:not(:disabled){transform:translateY(-2px);background:var(--action-hover,#2167f0)}.ds-launch:active:not(:disabled){transform:translateY(2px)}}@media(prefers-reduced-motion:reduce){.ds-launch{transition:none}.ds-launch:hover,.ds-launch:active:not(:disabled){transform:none}}@media(orientation:landscape) and (max-height:540px) and (min-width:541px){.ds-launch{min-height:44px;padding:10px 12px 12px;font-size:15px}.ds-launch-main{min-height:44px;padding:10px 16px 12px;font-size:19px}}"
-    },
-    {
-      "name": "Home Join",
-      "kind": "button",
-      "refersTo": "launch-join",
-      "description": "Crimson room joining action, equal in size to Create. Short landscape retains a centered 44px minimum target below the complete contained cast; accessible heading persists.",
-      "html": "<button class=\"ds-launch ds-join\">Join a room</button>",
-      "css": ".ds-launch{display:flex;align-items:center;justify-content:center;gap:14px;width:100%;min-height:54px;padding:14px 20px 16px;border:0;border-radius:6px;background:var(--action-fill,#1757df);color:var(--action-ink,#ffffff);box-shadow:inset 0 1px 2px #ffffff60,inset 0 -3px 2px var(--action-edge,#06339c),0 5px 10px #02071870;font-family:var(--font-body,Outfit),sans-serif;font-size:18px;font-weight:700;line-height:1.25;cursor:pointer;transition:transform 130ms cubic-bezier(.16,1,.3,1),background 130ms,box-shadow 130ms}.ds-launch:focus-visible{outline:3px solid #ffd64a;outline-offset:5px}.ds-launch:active:not(:disabled){transform:translateY(2px);box-shadow:inset 0 -1px 1px var(--action-edge,#06339c),0 1px 4px #04191d50}.ds-launch:disabled{opacity:.5;cursor:default}@media(hover:hover) and (pointer:fine){.ds-launch:hover:not(:disabled){transform:translateY(-2px);background:var(--action-hover,#2167f0)}.ds-launch:active:not(:disabled){transform:translateY(2px)}}@media(prefers-reduced-motion:reduce){.ds-launch{transition:none}.ds-launch:hover,.ds-launch:active:not(:disabled){transform:none}}.ds-join{--action-fill:#e71c3b;--action-edge:#9a0c24;--action-hover:#da0d31}@media(orientation:landscape) and (max-height:540px) and (min-width:541px){.ds-launch{min-height:44px;padding:10px 12px 12px;font-size:15px}.ds-launch-main{min-height:44px;padding:10px 16px 12px;font-size:19px}}"
-    },
-    {
-      "name": "Opponent player token and accessible turn",
-      "kind": "custom",
-      "refersTo": "opponent-badge-active",
-      "description": "Protruding ivory-edged native character, shallow opaque backing, Outfit name and separate Barlow exact-count tile. Active outline/count remain distinct without motion; eligible Catch is a complete native button. Scoped module owns finish and responsive dimensions; arena owns seat placement.",
-      "html": "<div class=\"ds-status\"><div class=\"ds-opponent ds-active\"><div class=\"ds-label\"><span class=\"ds-seat-avatar\" style=\"--avatar-color:#ff6942\" aria-hidden=\"true\"><i></i><i></i></span><span class=\"ds-name\"><strong title=\"Cleo\">Cleo</strong></span><span class=\"ds-count\" role=\"img\" aria-label=\"12 cards\"><span aria-hidden=\"true\">12</span></span><span class=\"ds-sr-only\">Current turn</span></div></div><div class=\"ds-opponent \"><div class=\"ds-label\"><span class=\"ds-seat-avatar\" style=\"--avatar-color:#4892ff\" aria-hidden=\"true\"><i></i><i></i></span><span class=\"ds-name\"><strong title=\"Sam\">Sam</strong><small aria-label=\"Reconnecting\">Offline</small></span><span class=\"ds-count\" role=\"img\" aria-label=\"24 cards\"><span aria-hidden=\"true\">24</span></span></div></div><div class=\"ds-opponent ds-last-card\"><button class=\"ds-label ds-catch\" type=\"button\" aria-label=\"Catch Robin\u2019s missed UNO\"><span class=\"ds-seat-avatar\" style=\"--avatar-color:#43ce7d\" aria-hidden=\"true\"><i></i><i></i></span><span class=\"ds-name\"><strong title=\"Robin\">Robin</strong><small>Catch!</small></span><span class=\"ds-count\" role=\"img\" aria-label=\"1 card\"><span aria-hidden=\"true\">1</span></span></button></div></div>",
-      "css": ".ds-status{display:flex;gap:18px;flex-wrap:wrap;padding:18px;background:#082a3d;font-family:var(--font-body,Outfit),sans-serif}.ds-label strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ds-label{font-family:inherit;text-align:left}.ds-seat-avatar{position:relative;display:inline-flex;flex-shrink:0;--avatar-color:#ff6942}.ds-seat-avatar i{position:absolute;top:33%;width:14%;height:16%;border-radius:50%;background:#323139}.ds-seat-avatar i:first-child{left:22%}.ds-seat-avatar i:last-child{right:22%}.ds-seat-avatar:after{content:\"\";position:absolute;left:35%;top:56%;width:32%;height:15%;border:2px solid #323139;border-top:0;border-radius:0 0 10px 10px}.ds-sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}\n.ds-opponent .ds-label {\n  position: relative;\n  isolation: isolate;\n  display: grid;\n  grid-template-columns: 44px minmax(0, 1fr) 26px;\n  align-items: center;\n  justify-content: normal;\n  width: 160px;\n  max-width: 160px;\n  min-height: 54px;\n  padding: 6px 8px 6px 0;\n  gap: 8px;\n  border: 0;\n  border-radius: 7px;\n  background: transparent;\n  color: #ffffff;\n  box-shadow: none;\n  transform: none;\n}\n.ds-opponent .ds-label::before {\n  content: \"\";\n  position: absolute;\n  z-index: -1;\n  inset: 7px 0 4px 18px;\n  border-radius: 6px;\n  background: #102e37;\n  box-shadow: 0 5px 9px #03091270;\n}\n.ds-opponent .ds-label .ds-seat-avatar {\n  width: 44px;\n  height: 52px;\n  margin-block: -7px -3px;\n  border: 3px solid #fff8ec;\n  border-radius: 8px;\n  background:\n    linear-gradient(145deg, #ffffff30, transparent 55%, #00000015),\n    var(--avatar-color);\n  box-shadow:\n    inset 0 1px 1px #ffffff80,\n    1px 3px 1px #748a97,\n    0 6px 9px #03091270;\n  transform: rotate(var(--avatar-tilt, -8deg));\n}\n.ds-opponent .ds-label .ds-name {\n  display: flex;\n  flex-direction: column;\n  align-items: flex-start;\n  justify-content: center;\n  min-width: 0;\n  gap: 2px;\n}\n.ds-opponent .ds-label strong {\n  max-width: 100%;\n  font-size: 16px;\n  font-weight: 750;\n  line-height: 1.2;\n  color: inherit;\n}\n.ds-opponent .ds-label small {\n  max-width: 100%;\n  color: #c2cedf;\n  font-size: 12px;\n  line-height: 1.2;\n  white-space: nowrap;\n}\n.ds-opponent .ds-label .ds-count {\n  display: grid;\n  place-items: center;\n  width: 26px;\n  height: 34px;\n  border: 2px solid #fff8ec;\n  border-radius: 4px;\n  background: #0b2038;\n  color: #ffffff;\n  box-shadow:\n    2px 2px 1px #748a97,\n    3px 5px 6px #03091266;\n  transform: rotate(8deg);\n  font-family: var(--font-card, \"Barlow Condensed\"), sans-serif;\n  font-size: 24px;\n  font-weight: 800;\n  font-variant-numeric: tabular-nums;\n  line-height: 1;\n  pointer-events: none;\n  transition:\n    transform 160ms cubic-bezier(0.16, 1, 0.3, 1),\n    background 160ms,\n    color 160ms;\n}\n.ds-opponent .ds-label .ds-count[data-wide] {\n  font-size: 18px;\n}\n.ds-opponent.ds-last-card .ds-count {\n  border-color: #ffe329;\n  color: #ffe329;\n}\n.ds-opponent.ds-active .ds-label::before {\n  background: #173b4c;\n}\n.ds-opponent.ds-active .ds-label .ds-seat-avatar {\n  outline: 3px solid #ffe329;\n  outline-offset: 2px;\n}\n.ds-opponent.ds-active .ds-count {\n  background: #ffe329;\n  color: #392700;\n  border-color: #fff8ec;\n  transform: translateY(-2px) rotate(0deg);\n}\n.ds-opponent .ds-label.ds-catch {\n  color: #392700;\n  cursor: pointer;\n}\n.ds-opponent .ds-label.ds-catch::before {\n  background: #ffd000;\n}\n.ds-opponent .ds-label.ds-catch small {\n  color: #514100;\n}\n.ds-opponent .ds-label.ds-catch .ds-count {\n  background: #392700;\n  color: #ffe329;\n}\n.ds-opponent .ds-label:focus-visible {\n  outline: 3px solid #ffe329;\n  outline-offset: 4px;\n}\n.ds-opponent .ds-label.ds-catch:active {\n  transform: translateY(1px);\n}\n@media (max-height: 460px) and (min-width: 541px) {\n  .ds-opponent .ds-label {\n    width: 128px;\n    max-width: 128px;\n    min-height: 44px;\n    grid-template-columns: 30px minmax(0, 1fr) 24px;\n    gap: 6px;\n    padding: 4px 6px 4px 0;\n  }\n  .ds-opponent .ds-label::before {\n    inset: 4px 0 4px 12px;\n  }\n  .ds-opponent .ds-label .ds-seat-avatar {\n    width: 30px;\n    height: 36px;\n    margin: 0;\n    border-width: 2px;\n    border-radius: 6px;\n  }\n  .ds-opponent .ds-label .ds-name {\n    gap: 1px;\n  }\n  .ds-opponent .ds-label strong {\n    font-size: 12px;\n  }\n  .ds-opponent .ds-label small {\n    font-size: 11px;\n  }\n  .ds-opponent .ds-label .ds-count {\n    width: 24px;\n    height: 30px;\n    font-size: 22px;\n  }\n  .ds-opponent .ds-label .ds-count[data-wide] {\n    font-size: 16px;\n  }\n}\n@media (max-height: 360px) and (min-width: 541px) {\n  .ds-opponent .ds-label {\n    width: 102px;\n    max-width: 102px;\n    grid-template-columns: 26px minmax(0, 1fr) 22px;\n    gap: 4px;\n    padding-right: 4px;\n  }\n  .ds-opponent .ds-label .ds-seat-avatar {\n    width: 26px;\n    height: 32px;\n  }\n  .ds-opponent .ds-label .ds-count {\n    width: 22px;\n    height: 28px;\n    font-size: 20px;\n  }\n  .ds-opponent .ds-label .ds-count[data-wide] {\n    font-size: 14px;\n  }\n}\n@media (prefers-reduced-motion: reduce) {\n  .ds-opponent .ds-label,\n  .ds-opponent .ds-label .ds-count {\n    transition: none;\n  }\n}\n"
-    },
-    {
-      "name": "UNO card",
+      "name": "Native dialog surface",
       "kind": "card",
-      "refersTo": "uno-card",
-      "description": "White laminated native face and full-color Wild+4 fan. Shared scoped finish travels with flight clones. Fine-pointer hover tilts the face; active contact settles before gesture geometry. Reduced motion preserves static material.",
-      "html": "<div class=\"ds-cards\"><button type=\"button\" class=\"ds-card\" aria-label=\"Play red nine\"><span class=\"ds-index ds-top\">9</span><span class=\"ds-orbit\" aria-hidden=\"true\"></span><span class=\"ds-value\">9</span><span class=\"ds-index ds-bottom\">9</span><span class=\"ds-finish\" aria-hidden=\"true\"></span></button><div class=\"ds-card ds-wild\" role=\"img\" aria-label=\"Wild draw four\"><span class=\"ds-index ds-top\">+4</span><span class=\"ds-orbit\" aria-hidden=\"true\"></span><span class=\"ds-value\"><span class=\"ds-four\" aria-hidden=\"true\"><i></i><i></i><i></i><i></i></span></span><span class=\"ds-index ds-bottom\">+4</span><span class=\"ds-finish\" aria-hidden=\"true\"></span></div></div>",
-      "css": ".ds-cards{display:flex;gap:18px;padding:20px}.ds-card{box-sizing:border-box;--card-color:#df0735;--card-ink:#ffffff;--card-value-ink:var(--card-color);position:relative;isolation:isolate;display:inline-block;width:82px;height:122px;overflow:hidden;padding:0;border:3px solid #ffffff;border-radius:6px;background:linear-gradient(145deg,#ffffff12,transparent 45%,#00000012),var(--card-color);color:var(--card-ink);font-family:var(--font-card,\"Barlow Condensed\"),sans-serif;box-shadow:inset 0 1px 2px #ffffffb0,inset 0 -1px 1px #17234145,0 1px 1px #c4ccdf,0 3px 1px #68748e,0 8px 12px #02071880;backface-visibility:hidden;transform:perspective(650px) rotateX(0deg) rotateY(0deg);transition:transform 130ms cubic-bezier(.16,1,.3,1);user-select:none}.ds-card:focus-visible{outline:2px solid #ffe329;outline-offset:4px}.ds-wild{--card-color:#101d3a}.ds-orbit{position:absolute;width:116%;height:64%;left:-8%;top:18%;background:#ffffff;border-radius:50%;transform:rotate(-34deg);box-shadow:0 1px 3px #06123024}.ds-index{position:absolute;z-index:2;display:grid;place-items:center;min-width:19px;height:22px;font-size:19px;font-weight:800;font-style:italic;line-height:1;color:var(--card-ink)}.ds-top{top:3px;left:3px}.ds-bottom{bottom:3px;right:3px;transform:rotate(180deg)}.ds-value{position:absolute;inset:16% 0;display:flex;align-items:center;justify-content:center;color:var(--card-value-ink);font-size:70px;font-weight:800;font-style:italic;letter-spacing:-.03em;line-height:1;transform:rotate(-10deg)}.ds-finish{position:absolute;inset:18% 0;z-index:4;border-radius:inherit;pointer-events:none;background:linear-gradient(115deg,transparent 32%,#ffffff35 50%,transparent 68%);transform:translateX(-35%);opacity:0;transition:transform 180ms cubic-bezier(.16,1,.3,1),opacity 130ms}.ds-four{position:relative;width:76%;height:66%;transform:rotate(8deg)}.ds-four i{box-sizing:border-box;position:absolute;top:8%;left:2%;width:42%;height:77%;border:2px solid #ffffff;border-radius:3px;box-shadow:-1px 3px 4px #06123050;transform:rotate(-22deg);transform-origin:50% 100%;background:#df0735}.ds-four i:nth-child(2){left:20%;top:2%;transform:rotate(-8deg);background:#075bee}.ds-four i:nth-child(3){left:38%;top:4%;transform:rotate(8deg);background:#ffce00}.ds-four i:nth-child(4){left:56%;top:12%;transform:rotate(22deg);background:#00bc68}@media(hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference){.ds-card:hover{transform:perspective(650px) rotateX(5deg) rotateY(-5deg)}.ds-card:hover .ds-finish{transform:translateX(18%);opacity:1}.ds-card:active{transform:perspective(650px) rotateX(0deg) rotateY(0deg);transition:none}.ds-card:active .ds-finish{opacity:0;transition:none}}@media(prefers-reduced-motion:reduce){.ds-card,.ds-finish{transition:none}}"
+      "refersTo": "dialog",
+      "description": "Paper scope remains constant across saved appearances; native dialog provides focus and dismissal in the app.",
+      "html": "<section class=\"ds-dialog\" aria-label=\"Your table\"><h2>Your table.</h2><p>Choose how to continue.</p><button type=\"button\" class=\"ds-dialog-close\">Close</button></section>",
+      "css": ".ds-dialog{display:grid;gap:20px;padding:28px;border:2px solid var(--club-ink,#15151b);border-radius:12px;background:#fff9e8;color:#15151b;box-shadow:0 16px 48px #00000066;font-family:var(--font-body,Outfit),sans-serif;}.ds-dialog::before{content:\"\";width:84px;height:6px;background:linear-gradient(to right,var(--club-red,#df0735) 25%,var(--club-yellow,#ffce00) 25% 50%,var(--club-green,#00bc68) 50% 75%,var(--club-blue,#075bee) 75%)}.ds-dialog h2{margin:0;font-family:var(--font-card,\"Barlow Condensed\"),sans-serif;font-style:italic;font-weight:800;text-transform:uppercase;font-size:36px;line-height:1;letter-spacing:-.01em}.ds-dialog p{margin:0;font-size:15px;line-height:1.5}.ds-dialog-close{min-height:44px;padding:10px 15px;border:2px solid #c6bfae;border-radius:8px;background:transparent;color:#15151b;font:inherit;cursor:pointer}.ds-dialog-close:hover{background:#ffce0020}.ds-dialog-close:focus-visible{outline:3px solid #075bee;outline-offset:4px}.ds-dialog-close:active{transform:translateY(2px)}"
     },
     {
-      "name": "Illustrated live game room",
+      "name": "Player identity badge",
       "kind": "custom",
-      "description": "Static original warm lounge above a clear petrol tabletop; cover center 30%, opaque identities and a header-only scrim preserve live layer contrast. Native held cards remain separate.",
-      "html": "<div class=\"ds-arena\" role=\"img\" aria-label=\"Illustrated evening lounge above an empty petrol tabletop\"><div class=\"ds-room-header\"></div></div>",
-      "css": ".ds-arena{position:relative;isolation:isolate;height:240px;overflow:clip;background-color:#082a3d;background-image:url(\"/artwork/game-room-evening.webp\");background-size:cover;background-position:center 30%;background-repeat:no-repeat}.ds-room-header{height:60px;background:linear-gradient(#061e2ddd,#061e2d99 65%,#061e2d00)}"
-    },
-    {
-      "name": "Earned round and milestone collection",
-      "kind": "custom",
-      "refersTo": "milestone-stamp-earned",
-      "description": "Illustrative one-round/one-win terminal facts and native optional disclosure. Production uses actual seat order, completed device history and existing rematch handlers; this specimen writes no history.",
-      "html": "<div class=\"ds-earned-round\"><div class=\"ds-finish-heading\"><span>At the finish</span><small>Cards left</small></div><div class=\"ds-finish-row\"><span>You</span><strong>0</strong></div><div class=\"ds-finish-row\"><span>Alex</span><strong>4</strong></div><div class=\"ds-progress-record\"><span>1 round</span><span>1 win</span><small>On this device</small></div><details class=\"ds-collection\"><summary><span class=\"ds-collection-fan\" aria-hidden=\"true\"><i></i><i></i><i></i><i></i></span><span>1 of 4 milestones</span><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"m6 9 6 6 6-6\"/></svg></summary><div class=\"ds-milestones\"><div class=\"ds-milestone ds-earned\"><svg width=\"25\" height=\"25\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M8 3h8v5a4 4 0 0 1-8 0V3ZM8 5H5v3a4 4 0 0 0 4 4m7-7h3v3a4 4 0 0 1-4 4m-3 0v7m-4 2h8\"/></svg><strong>First win</strong><span><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-label=\"Collected\"><path d=\"m5 12 4 4L19 6\"/></svg></span><small>Win a round</small></div><div class=\"ds-milestone\"><svg width=\"25\" height=\"25\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M8 3h8v5a4 4 0 0 1-8 0V3ZM8 5H5v3a4 4 0 0 0 4 4m7-7h3v3a4 4 0 0 1-4 4m-3 0v7m-4 2h8\"/></svg><strong>Hat trick</strong><span>1/3</span><small>Win 3 rounds</small></div><div class=\"ds-milestone\"><svg width=\"25\" height=\"25\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M8 3h8v5a4 4 0 0 1-8 0V3ZM8 5H5v3a4 4 0 0 0 4 4m7-7h3v3a4 4 0 0 1-4 4m-3 0v7m-4 2h8\"/></svg><strong>Table regular</strong><span>1/10</span><small>Finish 10 rounds</small></div><div class=\"ds-milestone\"><svg width=\"25\" height=\"25\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M8 3h8v5a4 4 0 0 1-8 0V3ZM8 5H5v3a4 4 0 0 0 4 4m7-7h3v3a4 4 0 0 1-4 4m-3 0v7m-4 2h8\"/></svg><strong>On fire</strong><span>1/3</span><small>Win 3 in a row</small></div></div></details></div>",
-      "css": ".ds-earned-round{font-family:var(--font-body,Outfit),sans-serif;color:var(--ui-text,#2c2c32);background:var(--ui-surface,#fffcf5);max-width:440px}.ds-finish-heading{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding-bottom:6px;font-size:14px;font-weight:500}.ds-finish-heading small{font-size:11px;color:var(--ui-muted,#706b65)}.ds-finish-row{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:43px;padding:6px 8px;border-bottom:1px solid var(--ui-line,#e3dbce);font-size:13px}.ds-finish-row strong{font-size:17px;font-weight:600;font-variant-numeric:tabular-nums}.ds-progress-record{display:flex;align-items:center;flex-wrap:wrap;gap:7px 14px;margin-top:20px;font-size:12px;font-weight:600}.ds-progress-record small{color:var(--ui-muted,#706b65);font-size:11px;font-weight:400}.ds-collection summary{display:flex;align-items:center;gap:10px;min-height:44px;width:fit-content;cursor:pointer;color:var(--ui-muted,#706b65);font-size:12px;list-style:none}.ds-collection summary::-webkit-details-marker{display:none}.ds-collection summary:focus-visible{outline:2px solid var(--ui-accent-red,#c74531);outline-offset:4px;border-radius:4px}.ds-collection summary>svg{transition:transform 150ms var(--ease-out,cubic-bezier(.2,.8,.2,1))}.ds-collection[open] summary>svg{transform:rotate(180deg)}.ds-collection-fan{position:relative;width:57px;height:34px;flex-shrink:0}.ds-collection-fan i{position:absolute;top:4px;width:22px;height:29px;border:1px solid var(--ui-line,#e3dbce);border-radius:3px;background:var(--ui-surface,#fffcf5)}.ds-collection-fan i:nth-child(1){left:0;transform:rotate(-12deg);background:#f7c934;border-color:#8b600b}.ds-collection-fan i:nth-child(2){left:11px;transform:rotate(-4deg)}.ds-collection-fan i:nth-child(3){left:22px;transform:rotate(4deg)}.ds-collection-fan i:nth-child(4){left:33px;transform:rotate(12deg)}.ds-milestones{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;padding-block:8px}.ds-milestone{display:flex;flex-direction:column;align-items:center;gap:7px;padding:12px 5px 9px;border:1px solid var(--ui-line,#e3dbce);border-radius:6px;color:var(--ui-muted,#706b65);text-align:center}.ds-milestone>svg{flex-shrink:0}.ds-milestone strong{font-size:12px;line-height:1.2;min-height:29px;font-weight:600}.ds-milestone>span{display:grid;place-items:center;height:16px;font-size:12px;font-variant-numeric:tabular-nums}.ds-milestone small{font-size:10px;line-height:1.4}.ds-milestone.ds-earned{background:#f7c934;border-color:transparent;color:#332810}@media(max-width:380px){.ds-milestones{gap:5px}.ds-milestone strong{font-size:11px}}@media(prefers-reduced-motion:reduce){.ds-collection summary>svg{transition:none}}"
-    },
-    {
-      "name": "Original player expressions",
-      "kind": "custom",
-      "refersTo": "player-character",
-      "description": "Small native card characters express published player state in seat badges and results; reactions restart only on expression change. Home uses a separate flat transparent narrative scene.",
-      "html": "<span class=\"ds-avatar\" data-expression=\"happy\" aria-hidden=\"true\"><span class=\"ds-eyes\"><i></i><i></i></span><span class=\"ds-smile\"></span></span>",
-      "css": ".ds-avatar{--avatar-color:#ff6942;position:relative;display:inline-flex;width:33px;height:41px;flex-shrink:0;background:var(--avatar-color);border:2px solid #323139;border-radius:8px;box-shadow:inset 0 1px 1px #ffffffa0,0 3px 3px #02071870;transform:rotate(-8deg)}.ds-eyes{position:absolute;top:33%;left:22%;right:22%;height:16%;display:flex;justify-content:space-between}.ds-eyes i{width:24%;height:100%;border-radius:50%;background:#323139}.ds-smile{position:absolute;left:35%;top:56%;width:32%;height:15%;border:2px solid #323139;border-top:0;border-radius:0 0 10px 10px}.ds-avatar[data-expression=\"thinking\"] .ds-eyes{transform:translateX(8%)}.ds-avatar[data-expression=\"thinking\"] .ds-eyes i:first-child{transform:translateY(-25%)}.ds-avatar[data-expression=\"thinking\"] .ds-smile{width:23%;left:44%;height:7%;transform:rotate(-12deg)}.ds-avatar[data-expression=\"happy\"] .ds-smile,.ds-avatar[data-expression=\"celebrate\"] .ds-smile{width:40%;height:23%;left:30%;top:54%;background:#323139}.ds-avatar[data-expression=\"surprised\"] .ds-smile{width:21%;height:23%;left:40%;top:57%;border-radius:50%;border-top:2px solid #323139}.ds-avatar[data-expression=\"surprised\"] .ds-eyes{top:25%;height:23%}.ds-avatar[data-expression=\"celebrate\"] .ds-eyes i{background:none;border:2px solid #323139;border-bottom:0;border-radius:50% 50% 0 0;transform:translateY(-10%)}@media(prefers-reduced-motion:no-preference){.ds-avatar:not([data-expression=\"neutral\"]){animation:ds-player-react 260ms var(--ease-out,cubic-bezier(.2,.8,.2,1)) both}@keyframes ds-player-react{0%{transform:rotate(-5deg) scale(.9)}55%{transform:rotate(3deg) scale(1.08)}100%{transform:rotate(-5deg) scale(1)}}}"
-    },
-    {
-      "name": "Native wild color choices",
-      "kind": "button",
-      "refersTo": "color-choice-red",
-      "description": "Native named wild decision: four complete targets and keep-card action fit together in short landscape, using a color-picker-specific four-column composition without shrinking shared dialogs.",
-      "html": "<div class=\"ds-color-picker\"><div class=\"ds-color-heading\"><h2>Your wild. Your color.</h2><button class=\"ds-color-close\" aria-label=\"Close dialog\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"m18 6-12 12M6 6l12 12\"/></svg></button></div><p class=\"ds-color-guidance\">Choose the color for the next play.</p><div class=\"ds-choices\"><button class=\"ds-choice ds-red\">Red</button><button class=\"ds-choice ds-yellow\">Yellow</button><button class=\"ds-choice ds-green\">Green</button><button class=\"ds-choice ds-blue\">Blue</button></div><button class=\"ds-color-cancel\">Keep the wild card</button></div>",
-      "css": ".ds-choices{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.ds-choice{min-height:88px;border:0;display:flex;align-items:center;justify-content:center;gap:10px;text-transform:capitalize;border-radius:6px;font-family:var(--font-body,Outfit),sans-serif;font-size:15px;font-weight:600;cursor:pointer;box-shadow:inset 0 2px 2px #ffffff40,inset 0 -4px 3px #00000028,0 5px 10px #02071820;transition:transform 120ms cubic-bezier(.2,.8,.2,1),box-shadow 120ms}.ds-red{background:#e71c3b;color:#ffffff}.ds-blue{background:#095be5;color:#ffffff}.ds-green{background:#008749;color:#ffffff}.ds-yellow{background:#ffd000;color:#392700}.ds-choice:focus-visible{outline:2px solid var(--ui-accent-blue,#3265a0);outline-offset:4px}.ds-choice:active{transform:translateY(3px);box-shadow:inset 0 -1px 0 #15292626,0 1px 3px #15292620}.ds-color-picker{display:grid;gap:22px;max-width:100%;padding:28px;background:var(--ui-surface,#fffcf5);color:var(--ui-text,#2c2c32);border-radius:16px;font-family:var(--font-body,Outfit),sans-serif}.ds-color-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:15px}.ds-color-heading h2{margin:0;font-size:29px;font-weight:600;line-height:1.2;letter-spacing:-.03em}.ds-color-close{display:grid;place-items:center;width:44px;height:44px;padding:0;border:0;border-radius:10px;color:inherit;background:transparent}.ds-color-guidance{margin:0;color:var(--ui-muted,#706b65);font-size:14px;line-height:1.6}.ds-color-cancel{justify-self:start;min-height:44px;padding:4px 0;border:0;background:transparent;color:inherit;font:inherit}@media(hover:hover) and (pointer:fine){.ds-color-close:hover{background:color-mix(in srgb,var(--ui-text,#2c2c32) 7%,transparent)}.ds-color-cancel:hover{text-decoration:underline}}.ds-color-close:focus-visible,.ds-color-cancel:focus-visible{outline:2px solid var(--ui-accent-blue,#3265a0);outline-offset:4px}@media(orientation:landscape) and (max-height:460px){.ds-color-picker{width:min(680px,calc(100vw - 32px));max-height:calc(100dvh - 24px);padding:16px;gap:12px}.ds-color-heading{align-items:center}.ds-color-heading h2{font-size:24px}.ds-color-guidance{font-size:13px;line-height:1.35}.ds-choices{grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.ds-choice{min-height:72px;padding:12px 6px;font-size:14px}}"
-    },
-    {
-      "name": "Arena menu",
-      "kind": "nav",
-      "refersTo": "arena-menu",
-      "description": "44px header trigger plus native six-command/two-column menu. Native Close restores opener focus; Sort by color exposes pressed state and Leave remains distinct. Short-landscape controls and room copy fit without scrolling.",
-      "html": "<button class=\"ds-arena-menu\" aria-label=\"Game menu\"><svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.8\" aria-hidden=\"true\"><path d=\"M4 6h16M4 12h16M4 18h16\"/></svg></button><section class=\"ds-game-menu\" aria-label=\"Your table\"><header><h2>Your table.</h2><button type=\"button\" class=\"ds-menu-close\" aria-label=\"Close\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"m18 6-12 12M6 6l12 12\"/></svg></button></header><div class=\"ds-menu-context\"><p>Turn order: clockwise. Next: Alex.</p><button type=\"button\" class=\"ds-room-copy\">Copy room code: ABC123</button></div><nav class=\"ds-menu-commands\"><button type=\"button\" aria-pressed=\"true\">Sound <b>On</b></button><button type=\"button\" aria-pressed=\"true\">Sort by color <svg width=\"17\" height=\"17\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"m9 12 2 2 4-4\"/></svg></button><button type=\"button\">How to play</button><button type=\"button\">Settings &amp; house rules</button><button type=\"button\">Table activity</button><button type=\"button\" class=\"ds-menu-leave\">Leave table</button></nav></section>",
-      "css": ".ds-arena-menu{width:44px;height:44px;padding:0;display:grid;place-items:center;border:0;border-radius:8px;background:#1e2c42;color:#ffffff;cursor:pointer;box-shadow:inset 0 1px 1px #ffffff30,0 3px 4px #071d6950}.ds-arena-menu:hover{background:#2a3b54}.ds-arena-menu:focus-visible{outline:3px solid #ffe329;outline-offset:4px}.ds-arena-menu:active{transform:translateY(2px)}.ds-game-menu{width:min(640px,calc(100vw - 32px));padding:24px;background:#111925;color:#fff;border-radius:16px;font-family:var(--font-body,Outfit),sans-serif;display:grid;gap:16px}.ds-game-menu header{display:flex;align-items:flex-start;justify-content:space-between}.ds-game-menu h2{margin:0;font-size:29px;font-weight:600;line-height:1.2;letter-spacing:-.03em}.ds-menu-close{width:44px;height:44px;display:grid;place-items:center;background:transparent;color:inherit;border:0;border-radius:10px;cursor:pointer}.ds-menu-context{display:flex;align-items:center;justify-content:space-between;gap:12px}.ds-menu-context p{font-size:13px;margin:0}.ds-room-copy{min-height:44px;border:0;background:transparent;color:inherit;font:inherit;flex-shrink:0;cursor:pointer}.ds-menu-commands{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.ds-menu-commands>button{display:flex;align-items:center;justify-content:space-between;min-height:56px;padding:10px 12px;gap:10px;border:0;border-radius:6px;background:#263a50;color:#fff;font-family:inherit;font-size:14px;font-weight:650;text-align:left;cursor:pointer}.ds-menu-commands>.ds-menu-leave{color:#ffb1bd}.ds-menu-commands>button:focus-visible,.ds-menu-close:focus-visible,.ds-room-copy:focus-visible{outline:3px solid #ffe329;outline-offset:2px}.ds-menu-commands>button:active{transform:translateY(1px)}@media(orientation:landscape) and (max-height:460px){.ds-game-menu{width:min(720px,calc(100vw - 24px));max-height:calc(100dvh - 24px);padding:12px;gap:8px}.ds-game-menu header{align-items:center}.ds-game-menu h2{font-size:24px}.ds-menu-commands{gap:6px 8px}.ds-menu-commands>button{min-height:44px;padding:6px 10px;font-size:13px}.ds-menu-context p{font-size:12px}}"
+      "refersTo": "opponent-label",
+      "description": "Opaque paper identity; active/catchable state uses yellow while preserving name and count.",
+      "html": "<div class=\"ds-seat ds-seat-active\"><strong>Alex</strong><small>3 cards</small></div>",
+      "css": ".ds-seat{display:grid;gap:2px;padding:7px 10px;border:2px solid var(--club-ink,#15151b);border-radius:6px;background:var(--club-paper,#fff4d6);color:var(--club-ink,#15151b);font-family:var(--font-body,Outfit),sans-serif;}.ds-seat strong{font-size:14px;font-weight:650}.ds-seat small{color:var(--ui-muted,#57524a);font-size:12px}.ds-seat-active{background:var(--club-yellow,#ffce00);box-shadow:inset 0 -2px 0 #15151b30}.ds-seat-active small{color:#514500}"
     }
   ],
   "narrative": {
-    "northStar": "The illustrated game room and after-hours card club",
-    "overview": "UNO feels like a held hand of vivid real cards in an illustrated evening game room. Warm lounge furniture occupies the upper band while a clear petrol-blue tabletop recedes behind expressive players and nearby central piles. The piles and foreground hand form one close play group, with graphical opponents around it. Cards are the controls: a legal face plays on its first activation; the foreground fan comes from below the viewport and makes pickup and deliberate upward release tangible.\n\nHome remains a centered illustrated after-hours card club: a flat transparent original rabbit, red panda and crocodile scene sits directly on navy, with yellow Play and full-color blue Create and crimson Join actions. Settings and setup retain theme-aware supporting surfaces. Live play uses a static original room illustration, opaque petrol player identities, white lettering and yellow action/active-seat feedback. Outfit UI and Barlow Condensed card lettering remain the two pinned families. Small native card characters express published player state.",
+    "northStar": "Comic-card showdown",
+    "overview": "UNO feels like a shared competitive card night, expressed through confident comic print. Almost-black ink, warm paper, vivid native card colors and condensed italic headings carry one identity across entry, setup, rooms, preferences, notifications, results and live play. Outlined controls press into their bottom edge; original expressive characters provide energy without competing with decisions.\n\nThis records the shipped whole-site identity replacement selected by the owner on October 23. The approved panel comp establishes the home composition; its illustration and oversized UNO graphic are specific to that surface. Supporting screens inherit the ink, paper, lettering and control grammar. Live play keeps a calm ink field, opaque player identities and the existing vivid native deck. The archived prior system is at `.impeccable/review/site-redesign/DESIGN.before.md`.",
     "keyCharacteristics": [
-      "A centered flat illustrated card-club welcome with complete silhouettes and visibly primary Play.",
-      "One shared native card face across the live hand, piles and motion.",
-      "Outfit interface lettering paired with Barlow Condensed card numerals.",
-      "Fixed navy home, theme-aware settings/setup and an illustrated warm lounge above a clear petrol live tabletop.",
-      "First-activation legal play, nonmatching-card inspection and deliberate upward release.",
-      "Close central piles and a viewport-edge cropped held fan, bounded horizontal hand scrolling, a separate right-side decision lane and paper/contact feedback that never delays a turn.",
-      "Real round outcomes and optional device-local milestone cards.",
-      "Original card characters with truthful expressions, bounded reactions and pressed control surfaces."
+      "Warm paper against almost-black ink, with native red, yellow, green and blue as purposeful accents.",
+      "Barlow Condensed italic display lettering paired with Outfit interface text.",
+      "Crisp outlines, restrained corners and shallow pressed control lips.",
+      "Original comic artwork with full silhouettes, real raster ink swashes and recorded provenance.",
+      "A bottom-cropped held hand, nearby piles and immediate legal-card play.",
+      "Real published game state, bounded reactions and sound that never delays a turn."
     ],
     "rules": [
       {
-        "name": "The Scoped Worlds Rule",
-        "body": "Keep home in its fixed navy/ivory/full-color club palette, honor appearance variables in settings and setup, and scope the illustrated lounge, opaque identities, white lettering and yellow state feedback to live play. The native deck remains stable across appearances.",
+        "name": "The Paper Scope Rule",
+        "body": "Home, native dialogs, toasts and live player badges retain the comic paper/ink palette. Supporting setup and room content honors the saved appearance; the native deck stays unchanged.",
         "section": "colors"
       },
       {
+        "name": "The Published Color Rule",
+        "body": "A selected yellow row, active badge, chosen wild color or penalty cue describes real state. Do not use color as the only label for a decision.",
+        "section": "colors"
+      },
+      {
+        "name": "The Brand Graphic Rule",
+        "body": "The home UNO word is a surface-specific brand graphic, not a general display scale: tall desktop uses a 144\u2013208px clamp, shorter desktop 128px and narrow entry 112px, with outline, stretched lettering and seven-pixel desktop ink shadow. Keep those rules in the home brief; do not apply them to forms or dialogs.",
+        "section": "typography"
+      },
+      {
         "name": "The Deck Lettering Rule",
-        "body": "Use Outfit for UI, headings and the card-back wordmark; reserve Barlow Condensed for indexed card faces and opponent card-count tiles. Preserve italic numerals and the shared face proportions when scaling.",
+        "body": "Preserve Barlow Condensed native face numerals, Outfit card-back lettering, italic indices and the shared card proportions. The retained native card-back wordmark is separate from the uppercase UNO brand wordmark in page chrome.",
         "section": "typography"
       },
       {
         "name": "The Hand Owns Its Width Rule",
-        "body": "Keep overflow inside the hand, preserve corner identity and focus clearance, and bound the fan arc as the card count grows.",
+        "body": "Bound the fan arc and keep large-hand overflow inside the hand, preserving corner identity, focus clearance and usable card size.",
         "section": "layout"
       },
       {
-        "name": "The Paper Lift Rule",
-        "body": "A moving or inspected card changes its own depth and reveals its face. Keep unrelated chrome quiet and reserve short stock layers for physical cards and piles.",
-        "section": "elevation"
-      },
-      {
         "name": "The Contact Before Flight Rule",
-        "body": "Settle hover tilt on contact before capturing drag or flight geometry; preserve readable static color, edge and focus when spatial motion is disabled.",
-        "section": "elevation"
+        "body": "Settle hover tilt on contact before capturing drag or flight geometry. Preserve scale and composed rotation through pickup/return; clean up interrupted copies and retain readable static color, edge and focus when spatial motion is disabled.",
+        "section": "elevation & depth"
       },
       {
-        "name": "The Central Play Rule",
-        "body": "Keep Play on the home\u2019s center axis ahead of room actions and secondary help; preserve the complete flat transparent scene and real, immediately available controls.",
-        "section": "components"
-      },
-      {
-        "name": "The Clear Tabletop Rule",
-        "body": "Keep furnishings in the illustrated upper band, piles on uninterrupted petrol tabletop and runtime cards, labels and controls in independent live layers. Protect identities with opaque backing and limit the contrast scrim to the header.",
-        "section": "components"
-      },
-      {
-        "name": "The Player Token Rule",
-        "body": "Keep recognition, remaining cards and Catch on the same identity. Give the native character and exact-count tile their own card silhouettes, retain opaque name backing and preserve all five graphical seats with complete native Catch targets at compact sizes.",
-        "section": "components"
-      },
-      {
-        "name": "The Honest Expression Rule",
-        "body": "Derive player reactions from published game facts, restart the decorative one-shot only when expression changes, and preserve readable state without spatial animation under reduced motion.",
-        "section": "components"
-      },
-      {
-        "name": "The Earned History Rule",
-        "body": "Show rewards only from validated completed rounds. Keep best-streak collectibles earned after a loss, keep current streak separate, and present terminal hand counts without inferred points or finishing ranks.",
-        "section": "components"
-      },
-      {
-        "name": "The Measured Pose Rule",
-        "body": "Pick up from the pointer-down printed pose and return to the current face\u2019s composed pose. Preserve scale and rotation, clean up interrupted copies, and treat keyboard activation as a new intent after a cancelled pointer gesture.",
-        "section": "components"
-      },
-      {
-        "name": "The Direct Move Rule",
-        "body": "Play a legal face on its first activation. Keep nonmatching inspection and the full named fallback for a pre-inspected card that becomes legal. Reveal actual new local draws without forcing selection; every gesture, shortcut and hint follows current legal-action state.",
-        "section": "components"
-      },
-      {
-        "name": "The Play Comes First Rule",
-        "body": "Motion and sound explain the current action without blocking controls, queuing stale actions or changing turn timing.",
-        "section": "components"
-      },
-      {
-        "name": "The Visible Seat Rule",
-        "body": "Anchor opponent card travel to a visible native fan card; when compact landscape hides that fan, use the visible avatar only for its center, width and composed rotation. A play moves the native discard face to the pile. An opponent draw clones the face-down deck, scaling its dimensions and card lettering into the destination pose; the avatar itself never becomes the flying card. Each opponent receiving cards gets one representative flight per published snapshot, within the existing bounded timing and interruption rules.",
-        "section": "components"
+        "name": "The Printed Edge Rule",
+        "body": "Use a control's bottom lip to acknowledge pressing. Keep information containers flat; physical card stock and the authored title graphic retain their own depth language.",
+        "section": "shapes"
       }
     ],
     "dos": [
-      "Do use the same authored native face for the hand, piles and card motion.",
-      "Do keep home Play central, Create/Join paired, sharper 6px action corners and complete flat transparent silhouettes with their prompt provenance.",
-      "Do preserve vivid deck colors, white faces, distinct dark green/yellow index and center inks, and a written chosen-color label for wild top discards.",
-      "Do retain the fixed home club palette, scoped illustrated room and theme-aware settings/setup.",
-      "Do preserve the room raster\u2019s prompt provenance, cover crop, solid fallback, opaque identities and header-only contrast scrim.",
-      "Do keep one clipped viewport with nearby bottom-anchored central piles and a bottom-cropped fan, complete internal card boxes, top focus clearance and independent horizontal large-hand scrolling.",
-      "Do retain graphical identities for all five opponents on six-seat landscape phones, the separate right-side contextual lane, and the portrait rotate gate, local pause and online-continuation disclosure.",
-      "Do play legal cards on first activation and keep nonmatching inspection, turn state and situational actions clear with touch and keyboard.",
-      "Do keep the full named Play action, selected card and current hint in agreement; retain dark ink on yellow.",
-      "Do reveal actual new local draws without selecting them and preserve horizontal position on unrelated updates.",
-      "Do keep Draw on the deck, eligible UNO at hand level, and the dock limited to contextual Pass and the pre-inspected-card Play fallback; give button and keyboard the same availability rules.",
-      "Do put Set up bots and How to play after Play/Create/Join, and keep optional bot/friend details in disclosures.",
-      "Do keep face tilt and sheen within fine-pointer/no-reduced-motion guards, settle on contact before gesture capture, and honor mute, audio readiness and interrupted gesture cleanup.",
-      "Do keep presentation responsive to the current published state without delaying play.",
-      "Do derive optional milestone cards from completed device-local rounds and keep result actions reachable inside the native dialog.",
-      "Do attach pressure cues to their actual opponent hand or penalty deck and retain full accessible names.",
-      "Do use original expressive card characters, preserve compact phone identities, and restart their bounded reaction only on a real expression change.",
-      "Do fit all four complete wild-color targets and the keep-card action together in short landscape using the color-picker-specific responsive composition.",
-      "Do acknowledge actual card activation with immediate pickup while keeping horizontal scroll silent.",
-      "Do keep all three centered home start actions and the complete cast reachable in short landscape, preserving the accessible heading.",
-      "Do fit the six-command game menu, native Close and online room copy without short-landscape scrolling; expose sorting state and distinguish Leave.",
-      "Do keep five compact identities at least 44px high, with protruding characters, stacked readable names/status, separate exact-count tiles and Catch on the eligible player\u2019s badge.",
-      "Do measure pickup/return poses and settle only the destination wrapper\u2019s reflow before keyboard reveal."
+      "Do use cream paper, black ink, native four-color accents and one shared comic control grammar across the journey.",
+      "Do pair condensed italic display lettering with Outfit interface text, preserving native deck lettering.",
+      "Do honor saved appearance on supporting pages while keeping native dialogs, toasts and live identity badges in their explicit paper scope.",
+      "Do retain the complete original comic cast, real ink artwork and exact prompt provenance.",
+      "Do preserve nearby piles, a bottom-cropped held fan, independent hand scrolling and readable six-seat phone identities.",
+      "Do keep legal-card activation immediate and give touch, drag and keyboard the same current availability rules.",
+      "Do retain a written chosen-color marker for wild discards and accessible routine turn/color announcements without a visible routine HUD.",
+      "Do keep motion, sound, reactions and earned history tied to actual published or completed game state.",
+      "Do use the native Modal, visible Close, reachable short-landscape decisions and the established SVG icon system."
     ],
     "donts": [
-      "Don't restore the rejected home side column, floating card-face fan/stickers, plain cream field, arbitrary decorative 7 or broad rounded action tiles.",
-      "Don't restore clay hero art, Fredoka, a third font family or a parallel component library.",
-      "Don't replace the held fan with a flat shrinking row or let large hands overflow the page.",
-      "Don't restore the separate local-hand toolbar, standalone direction arrow, portrait phone gameplay or side-by-side landscape table/hand.",
-      "Don't crop the flat home silhouettes or restore cinematic scenery and a boxed or patched background on home.",
-      "Don't restore the rejected giant blue ovals or electric-blue background planes in live play.",
-      "Don't restore poker furniture, felt/leather live backgrounds, a remaining-deck badge, header sound controls or a routine visible turn/color HUD.",
-      "Don't show UNO when ineligible, duplicate Draw in the dock or turn sorting into a permanent table control.",
-      "Don't use Unicode glyph icons in place of the established SVG icon system.",
-      "Don't give information containers decorative block shadows; thin card-stock edges and pressed control bevels remain native to this tactile world.",
-      "Don't queue narration, wait for sound or animation, or add a blocking splash.",
-      "Don't copy a reference mascot, add idle character loops or replay reactions on unrelated snapshots.",
-      "Don't infer points or finishing ranks from cards left, grant rewards per click, or claim a milestone is new without before/after evidence."
+      "Don't restore the rejected assistant-like identity, navy title screen, side-column start actions or feature-tile grid.",
+      "Don't apply the home title's stretched size or ink shadow to routine content headings.",
+      "Don't restore poker felt/rails, illustrated room backgrounds, electric-blue orbit planes or decoration behind the central piles.",
+      "Don't replace the held fan with a flat shrinking row, let large hands overflow the page or add portrait phone gameplay.",
+      "Don't add a third font family, Unicode glyph icons, a parallel component library or idle character loops.",
+      "Don't add decorative hard offset shadows to information containers; preserve native stock edges, pressed control lips and the approved title graphic.",
+      "Don't add blocking splashes, queue stale sound/reactions or let presentation control turn timing.",
+      "Don't infer points, finishing ranks or new rewards without completed-round evidence."
     ]
   }
 }

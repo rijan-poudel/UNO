@@ -12,12 +12,12 @@ export const RULE_PRESETS = [
     id: 'stack',
     label: 'Stack party',
     symbol: '+2',
-    description: 'Stack +2s and +4s. Pass the trouble.',
+    description: 'Stack +2 on +2 and +4 on +4. Pass the trouble.',
     rules: {
       ...defaultRules,
       stackDraw2: true,
       stackWild4: true,
-      allowWild4OnDraw2: true,
+      allowWild4OnDraw2: false,
     },
   },
   {

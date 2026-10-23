@@ -1,0 +1,75 @@
+{
+  "title": "A better first hand",
+  "question": "Which home screen should I build? You can also describe a change below.",
+  "options": [
+    {
+      "id": "opening-hand",
+      "label": "The opening hand",
+      "kicker": "THE ROLL",
+      "thesis": "Choose how to play from a hand of oversized interactive cards.",
+      "palette": [
+        "#15151b",
+        "#fff4d6",
+        "#df0735",
+        "#ffce00",
+        "#075bee",
+        "#00bc68"
+      ],
+      "materials": [
+        "comic ink",
+        "native UNO cards"
+      ],
+      "viewport": "A compact UNO title above three fanned card controls; Play sits forward.",
+      "risk": "Expressive card controls need excellent labels on small screens.",
+      "comp": ".impeccable/mocks/decision/home-correction/opening-hand.png"
+    },
+    {
+      "id": "club-lobby",
+      "label": "The club lobby",
+      "kicker": "",
+      "thesis": "A clear play menu beside the full comic cast.",
+      "palette": [
+        "#15151b",
+        "#fff4d6",
+        "#df0735",
+        "#ffce00",
+        "#075bee",
+        "#00bc68"
+      ],
+      "materials": [
+        "comic ink",
+        "native UNO cards"
+      ],
+      "viewport": "Large title and Play on the left; friends and the cast own the right.",
+      "risk": "More familiar composition, with less of a signature gesture.",
+      "comp": ".impeccable/mocks/decision/home-correction/club-lobby.png"
+    },
+    {
+      "id": "comic-triptych",
+      "label": "The comic triptych",
+      "kicker": "",
+      "thesis": "Three equal comic panels make every way to play obvious.",
+      "palette": [
+        "#15151b",
+        "#fff4d6",
+        "#df0735",
+        "#ffce00",
+        "#075bee",
+        "#00bc68"
+      ],
+      "materials": [
+        "comic ink",
+        "native UNO cards"
+      ],
+      "viewport": "Play, Create and Join become bold illustrated columns below UNO.",
+      "risk": "Equal panels can weaken the priority of instant play.",
+      "comp": ".impeccable/mocks/decision/home-correction/comic-triptych.png"
+    }
+  ],
+  "reroll": true,
+  "steer": true,
+  "buildPath": {
+    "value": "comp",
+    "toggle": true
+  }
+}

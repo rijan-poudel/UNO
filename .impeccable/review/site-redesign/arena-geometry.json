@@ -1,0 +1,194 @@
+[
+  {
+    "name": "arena-desktop",
+    "cards": 20,
+    "document": [
+      1440,
+      900
+    ],
+    "hand": {
+      "scrollWidth": 2497,
+      "width": 1440
+    },
+    "identities": [
+      {
+        "rect": [
+          77.2734375,
+          384.1953125,
+          144,
+          60
+        ],
+        "text": "Alexandria7 cards"
+      },
+      {
+        "rect": [
+          300,
+          249.875,
+          144,
+          60
+        ],
+        "text": "Maximilian7 cards"
+      },
+      {
+        "rect": [
+          661.2734375,
+          249.875,
+          117.453125,
+          60
+        ],
+        "text": "Robin7 cards"
+      },
+      {
+        "rect": [
+          1003.2265625,
+          249.875,
+          129.5390625,
+          60
+        ],
+        "text": "Frankie7 cards"
+      },
+      {
+        "rect": [
+          1238.6328125,
+          384.1953125,
+          104.1640625,
+          60
+        ],
+        "text": "Lou7 cards"
+      }
+    ],
+    "opponents": 5,
+    "viewport": [
+      1440,
+      900
+    ]
+  },
+  {
+    "name": "arena-844",
+    "cards": 20,
+    "document": [
+      844,
+      390
+    ],
+    "hand": {
+      "scrollWidth": 1305,
+      "width": 844
+    },
+    "identities": [
+      {
+        "rect": [
+          33.1953125,
+          48.25,
+          128,
+          47.5
+        ],
+        "text": "Alexandria7 cards"
+      },
+      {
+        "rect": [
+          195.59375,
+          48.25,
+          128,
+          47.5
+        ],
+        "text": "Maximilian7 cards"
+      },
+      {
+        "rect": [
+          358,
+          48.25,
+          128,
+          47.5
+        ],
+        "text": "Robin7 cards"
+      },
+      {
+        "rect": [
+          520.3984375,
+          48.25,
+          128,
+          47.5
+        ],
+        "text": "Frankie7 cards"
+      },
+      {
+        "rect": [
+          682.796875,
+          48.25,
+          128,
+          47.5
+        ],
+        "text": "Lou7 cards"
+      }
+    ],
+    "opponents": 5,
+    "viewport": [
+      844,
+      390
+    ]
+  },
+  {
+    "name": "arena-568",
+    "cards": 20,
+    "document": [
+      568,
+      320
+    ],
+    "hand": {
+      "scrollWidth": 1148,
+      "width": 568
+    },
+    "identities": [
+      {
+        "rect": [
+          20.59375,
+          44.25,
+          98,
+          47.5
+        ],
+        "text": "Alexandria7 cards"
+      },
+      {
+        "rect": [
+          127.796875,
+          44.25,
+          98,
+          47.5
+        ],
+        "text": "Maximilian7 cards"
+      },
+      {
+        "rect": [
+          235,
+          44.25,
+          98,
+          47.5
+        ],
+        "text": "Robin7 cards"
+      },
+      {
+        "rect": [
+          342.1953125,
+          44.25,
+          98,
+          47.5
+        ],
+        "text": "Frankie7 cards"
+      },
+      {
+        "rect": [
+          449.3984375,
+          44.25,
+          98,
+          47.5
+        ],
+        "text": "Lou7 cards"
+      }
+    ],
+    "opponents": 5,
+    "viewport": [
+      568,
+      320
+    ]
+  }
+]

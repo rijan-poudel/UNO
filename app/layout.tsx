@@ -5,6 +5,7 @@ import "./globals.css";
 import "./table.css";
 import "./arena.css";
 import "./home.css";
+import "./club.css";
 
 const bodyFont = Outfit({
   variable: "--font-body",
@@ -28,7 +29,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#fff8ec",
+  themeColor: "#15151b",
 };
 
 export default function RootLayout({
@@ -44,33 +45,16 @@ export default function RootLayout({
         />
       </head>
       <body className={`${bodyFont.variable} ${cardFont.variable}`}>
-        <span hidden data-design-contract="centered-home-2e1e4271">
-          THESIS: Playing owns the center, replacing the rejected side-column
-          landing page. OWN-WORLD: An illustrated after-hours card club, deep
-          teal ink, warm ivory, yellow play, six-pixel controls, Outfit
-          lettering. STORY: Enter the card scene, then play with bots or
-          create/join a private room. FIRST VIEWPORT: Centered title above
-          original panoramic artwork; a centered foreground action group with
-          visible Play, Create and Join. Short landscape keeps the complete cast
-          and all three start actions in reach. FORM: Owner-pinned game title
-          screen; code-led surface direction6, seed2e1e4271. The five browser
-          corrections supersede the prior home verdict. FINISH: unreviewed and
-          undocumented is unfinished; this build ends with the finish review,
-          the verdict, DESIGN.md, and every shipping raster carrying its
-          provenance
-        </span>
-        <span hidden data-design-contract="uno-play-field">
-          THESIS: Vivid held cards in an illustrated game room. OWN-WORLD: Warm
-          lounge furniture above a clear petrol tabletop, vivid deck inks.
-          STORY: Lifted playable cards invite a direct tap or flick; secondary
-          controls live in Menu. FIRST VIEWPORT: Close piles and a held hand,
-          graphical opponents and a quiet header; no casino rail. FORM:
-          Owner-pinned UNO play field, code-led, inherited seed457003dd. See
-          .impeccable/review/opponent-badges/contract.md. Opponent flights
-          connect to visible fans or compact graphical seats. FINISH: unreviewed
-          and undocumented is unfinished; this build ends with the finish
-          review, the verdict, DESIGN.md, and every shipping raster carrying its
-          provenance
+        <div className="club-frame" aria-hidden="true" />
+        <span hidden data-design-contract="comic-card-showdown">
+          THESIS: One comic-card world across home, setup, rooms, preferences
+          and play. OWN-WORLD: Crisp dark ink, warm white, native four-color
+          graphics, Barlow Condensed display and Outfit UI. FIRST VIEWPORT:
+          Centered UNO, original comic cast, clear Play/Create/Join. Live cards
+          lead a calm arena with direct play and a cropped held hand. FORM:
+          Owner-selected Comic-card showdown, seed 5f8e7c72; comp-led panel
+          composition chosen under delegated continuation. Contract:
+          .impeccable/review/site-redesign/contract.md.
         </span>
         {children}
         <Toaster

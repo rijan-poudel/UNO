@@ -2,6 +2,258 @@ import './check-gesture';
 import { getCardFlight } from '../lib/cardMotion';
 // Framework-free engine smoke check. Run with npm run check:game.
 import assert from 'node:assert/strict';
+import { defaultRules } from '../types/rules';
+import {
+  DEFAULT_TABLE_RULES,
+  parseRulePreferences,
+  RULES_VERSION,
+} from '../lib/rulePreferences';
+import { validateGameRules } from '../lib/validateGameRules';
+import type { Card } from '../types/card';
+import type { GameState } from '../types/game';
+
+// Regressions: shared defaults, cross-color stacking, and every action path.
+{
+  assert.ok(DEFAULT_TABLE_RULES.stackDraw2 && DEFAULT_TABLE_RULES.stackWild4);
+  assert.equal(DEFAULT_TABLE_RULES.allowWild4OnDraw2, false);
+  assert.equal(matchesPreset(DEFAULT_TABLE_RULES, RULE_PRESETS[1].rules), true);
+  assert.ok(parseRulePreferences(null, null).stackDraw2);
+  assert.ok(
+    parseRulePreferences(JSON.stringify(defaultRules), null).stackDraw2,
+    'Old defaults migrate once',
+  );
+  assert.equal(
+    parseRulePreferences(JSON.stringify(defaultRules), RULES_VERSION)
+      .stackDraw2,
+    false,
+    'Explicit Classic persists',
+  );
+  for (const raw of [
+    'null',
+    '[]',
+    'broken',
+    '{"stackDraw2":"false"}',
+    '{"startingHandSize":1e100}',
+  ]) {
+    assert.deepEqual(
+      parseRulePreferences(raw, RULES_VERSION),
+      DEFAULT_TABLE_RULES,
+    );
+  }
+  for (const input of [
+    null,
+    [],
+    { stackDraw2: 'false' },
+    { startingHandSize: Infinity },
+    { startingHandSize: -2 },
+    { startingHandSize: 1.5 },
+    { maxPlayers: 100 },
+  ]) {
+    assert.throws(() => validateGameRules(input));
+  }
+  assert.throws(
+    () => initializeGame(Array(10).fill('Player'), { startingHandSize: 20 }),
+    /[Nn]ot enough cards/,
+  );
+  const base = initializeGame(['You', 'Cleo', 'Jules'], {
+    ...DEFAULT_TABLE_RULES,
+    allowStartingActionCard: false,
+  });
+  const draw2: Card = { id: 'blue-two', color: 'blue', value: 'draw2' };
+  const wild4: Card = { id: 'wild-four', color: 'wild', value: 'wild4' };
+  const number: Card = { id: 'red-seven', color: 'red', value: '7' };
+  const penalty: GameState = {
+    ...base,
+    currentPlayerIndex: 0,
+    activeColor: 'green',
+    pendingDraw: 2,
+    pendingDrawType: 'draw2',
+    discardPile: [{ id: 'green-two', color: 'green', value: 'draw2' }],
+    players: base.players.map((player, index) =>
+      index === 0 ? { ...player, hand: [draw2, number] } : player,
+    ),
+  };
+  assert.ok(canPlayCard(draw2, penalty, 0), 'A blue +2 stacks on a green +2');
+  const stacked = playCard(penalty, 0, draw2.id);
+  assert.equal(stacked.pendingDraw, 4);
+  assert.equal(stacked.currentPlayerIndex, 1);
+  assert.equal(penalty.pendingDraw, 2, 'Stacking leaves its input intact');
+  assert.equal(
+    canPlayCard(wild4, penalty, 0),
+    false,
+    'Mixed stacks remain an explicit house rule',
+  );
+  const fourPenalty: GameState = {
+    ...penalty,
+    pendingDraw: 4,
+    pendingDrawType: 'wild4',
+    players: penalty.players.map((player, index) =>
+      index === 0 ? { ...player, hand: [wild4, number] } : player,
+    ),
+  };
+  assert.equal(playCard(fourPenalty, 0, wild4.id, 'blue').pendingDraw, 8);
+  const classic = {
+    ...penalty,
+    rules: { ...penalty.rules, stackDraw2: false },
+  };
+  assert.equal(canPlayCard(draw2, classic, 0), false);
+  assert.equal(drawRequiredCards(classic, 0).players[0].hand.length, 4);
+  for (const card of [draw2, wild4]) {
+    const lastAction: GameState = {
+      ...penalty,
+      pendingDraw: card.value === 'draw2' ? 2 : 4,
+      pendingDrawType: card.value === 'draw2' ? 'draw2' : 'wild4',
+      rules: { ...penalty.rules, canFinishWithActionCard: false },
+      players: penalty.players.map((player, index) =>
+        index === 0 ? { ...player, hand: [card] } : player,
+      ),
+    };
+    assert.equal(
+      canPlayCard(card, lastAction, 0),
+      false,
+      'Final action restriction applies to stacks',
+    );
+    assert.throws(
+      () => playCard(lastAction, 0, card.id, 'blue'),
+      /cannot be played/,
+    );
+  }
+  const jumpWild: Card = { id: 'jump-wild', color: 'wild', value: 'wild' };
+  const jump: GameState = {
+    ...base,
+    currentPlayerIndex: 1,
+    activeColor: 'red',
+    discardPile: [{ ...jumpWild, id: 'prior-wild' }],
+    rules: { ...base.rules, allowJumpIn: true },
+    players: base.players.map((player, index) =>
+      index === 0 ? { ...player, hand: [jumpWild, number] } : player,
+    ),
+  };
+  assert.ok(canPlayCard(jumpWild, jump, 0));
+  assert.equal(
+    playCard(jump, 0, jumpWild.id, 'green').activeColor,
+    'green',
+    'Wild jump-in uses the jumping player',
+  );
+  const lastJump: GameState = {
+    ...jump,
+    rules: { ...jump.rules, canFinishWithActionCard: false },
+    players: jump.players.map((player, index) =>
+      index === 0 ? { ...player, hand: [jumpWild] } : player,
+    ),
+  };
+  assert.equal(
+    canPlayCard(jumpWild, lastJump, 0),
+    false,
+    'Final action restriction also applies out of turn',
+  );
+  const discard: Card = {
+    id: 'discard-all',
+    color: 'red',
+    value: 'discardAll',
+  };
+  const discardFinish: GameState = {
+    ...base,
+    currentPlayerIndex: 0,
+    activeColor: 'red',
+    rules: {
+      ...base.rules,
+      allowDiscardAll: true,
+      canFinishWithActionCard: false,
+    },
+    players: base.players.map((player, index) =>
+      index === 0 ? { ...player, hand: [discard, number] } : player,
+    ),
+  };
+  assert.equal(
+    canPlayCard(discard, discardFinish, 0),
+    false,
+    'Discard All cannot bypass the finish restriction',
+  );
+  const turn: GameState = {
+    ...base,
+    currentPlayerIndex: 0,
+    pendingDraw: 0,
+    pendingDrawType: null,
+  };
+  assert.throws(() => passTurn(turn, 0), /Draw before passing/);
+  const afterDraw = drawOneCard(turn, 0);
+  assert.ok(afterDraw.drawnThisTurn);
+  assert.throws(() => drawOneCard(afterDraw, 0), /already drawn/);
+  const afterMeta = declareUno(
+    {
+      ...afterDraw,
+      players: afterDraw.players.map((player, index) =>
+        index === 0 ? { ...player, hand: player.hand.slice(0, 2) } : player,
+      ),
+    },
+    0,
+  );
+  assert.equal(
+    passTurn(afterMeta, 0).drawnThisTurn,
+    false,
+    'UNO metadata does not lose draw sequencing',
+  );
+  const declared = {
+    ...turn,
+    players: turn.players.map((player, index) =>
+      index === 0 ? { ...player, saidUno: true } : player,
+    ),
+  };
+  assert.equal(
+    drawOneCard(declared, 0).players[0].saidUno,
+    false,
+    'Drawing resets a previous UNO declaration',
+  );
+  const disconnectedDraw = {
+    ...afterDraw,
+    activeColor: 'green' as const,
+    discardPile: [
+      { id: 'green-five', color: 'green' as const, value: '5' as const },
+    ],
+    players: afterDraw.players.map((player, index) =>
+      index === 0 ? { ...player, hand: [number] } : player,
+    ),
+  };
+  assert.equal(
+    getBotMove(disconnectedDraw, 0).action,
+    'pass',
+    'Offline bots finish an already-drawn turn instead of drawing again',
+  );
+  const drawnWild: GameState = {
+    ...turn,
+    rules: {
+      ...turn.rules,
+      canFinishWithActionCard: false,
+      drawUntilPlayable: true,
+    },
+    players: turn.players.map((player, index) =>
+      index === 0 ? { ...player, hand: [number] } : player,
+    ),
+    drawPile: [wild4, jumpWild],
+  };
+  assert.equal(drawOneCard(drawnWild, 0).lastAction.type, 'draw');
+  assert.equal(
+    drawOneCard(drawnWild, 0).players[0].hand.length,
+    2,
+    'Drawing a wild is playable with the resulting two-card hand',
+  );
+
+  const empty = { ...turn, drawPile: [], discardPile: [turn.discardPile[0]] };
+  assert.notEqual(
+    drawOneCard(empty, 0).currentPlayerIndex,
+    0,
+    'An exhausted deck advances once',
+  );
+  const won = { ...turn, winnerId: turn.players[1].id };
+  assert.equal(canPlayCard(number, won, 0), false);
+  assert.throws(() => declareUno(won, 0), /already over/);
+  assert.throws(() => callOutUno(turn, 0, 0), /yourself/);
+  console.log(
+    'Rule migration, same-type stacking, finish restrictions, jump-ins and draw sequencing passed.',
+  );
+}
+
 import {
   getPlayerName,
   getSavedPlayerNames,
@@ -134,6 +386,7 @@ for (const extraRules of [
       const i = game.currentPlayerIndex;
       const move = getBotMove(game, i);
       if (move.action === 'drawRequired') game = drawRequiredCards(game, i);
+      else if (move.action === 'pass') game = passTurn(game, i);
       else if (move.action === 'play')
         game = playCard(game, i, move.cardId, move.chosenColor);
       else {

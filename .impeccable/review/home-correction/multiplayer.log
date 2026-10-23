@@ -1,0 +1,5 @@
+
+> uno@0.1.0 check:multiplayer
+> tsx scripts/check-multiplayer.ts
+
+Passed: create/join/kick, six seats, stable IDs, separate bot broadcasts, turn pacing, reconnect, last-human refresh, and overlapping connection handoff.

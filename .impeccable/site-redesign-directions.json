@@ -1,0 +1,42 @@
+{
+  "title": "A new UNO identity",
+  "question": "Choose the style to carry through the entire game.",
+  "options": [
+    {
+      "id": "comic-card",
+      "label": "Comic-card showdown",
+      "kicker": "A BOLDER DIRECTION",
+      "lineage": "Comic-strip panels and competitive card-night banter",
+      "thesis": "A lively card game with decisive lettering, strong outlines and four-color accents.",
+      "palette": ["#15151b", "#fff4d6", "#e7203f", "#ffd326", "#1261e8", "#00a963"],
+      "materials": ["flat printed ink", "crisp panel edges", "native UNO cards"],
+      "viewport": "UNO owns the center above three clear play choices; compact original characters frame the action.",
+      "risk": "Heavy outlines can become noisy; keep forms and the live play field quiet.",
+      "case": "Setup becomes a clear roster, menus use compact panels, and real game events trigger brief graphic reactions. Outfit and Barlow stay readable; no copied characters or decorative fake controls."
+    },
+    {
+      "id": "four-color",
+      "label": "Four-color card club",
+      "kicker": "RECOMMENDED",
+      "lineage": "UNO deck packaging and bold tabletop-game graphics",
+      "thesis": "The entire site speaks the same vivid, confident visual language as the cards.",
+      "palette": ["#13151b", "#ffffff", "#df0735", "#ffce00", "#075bee", "#00bc68"],
+      "materials": ["solid color fields", "card-stock edges", "pressed game controls"],
+      "viewport": "A large UNO title, complete original cast and a centered yellow Play action with distinct Create and Join choices.",
+      "risk": "The familiar card-game language needs disciplined composition to feel distinctive.",
+      "case": "One family of buttons, roster seats, rule selectors and dialogs carries from home into a clear dark arena. Native cards remain the focal point; turn cues and card motion supply the energy."
+    }
+  ],
+  "reroll": { "registers": ["safer", "bolder"] },
+  "buildPath": { "value": "comp", "toggle": true },
+  "canon": true,
+  "canonCard": {
+    "label": "Classic game lobby",
+    "thesis": "A conventional game menu with a hero scene and straightforward play buttons.",
+    "palette": ["#17202e", "#ffffff", "#ffd326", "#df0735"],
+    "materials": ["clean panels", "solid backgrounds", "standard game controls"],
+    "viewport": "A familiar centered menu with play modes, settings and a restrained illustrated scene.",
+    "risk": "Clear and familiar, but less distinctive than the two proposed identities."
+  },
+  "steer": true
+}

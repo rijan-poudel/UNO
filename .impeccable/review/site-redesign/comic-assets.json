@@ -1,0 +1,94 @@
+{
+  "produce": [
+    {
+      "id": "card-night-comic",
+      "source_crop": ".impeccable/mocks/site-redesign/panel.png (reference only; not cropped)",
+      "output_path": "public/artwork/card-night-comic.webp",
+      "strategy": "Faithful reference regeneration, then one framing correction with built-in image_gen; lossless WebP conversion.",
+      "prompt_used": {
+        "original": "Use case: illustration-story.\nAsset type: production transparent panoramic illustration for the UNO web game's home screen.\nInput images: Image 1 (.impeccable/mocks/site-redesign/panel.png) is the approved comic visual reference, specifically the three friends, hoodies, card backs and wood tabletop. Its page chrome, lettering, action buttons, background speed lines and layout are NOT part of this asset. Image 2 (public/artwork/card-night-flat.webp) is identity reference for the original blue rabbit, red panda and green crocodile only; do not copy its flat rounded animation style or teal table.\nPrimary request: Regenerate the central comic cast from Image 1 as one clean reusable cutout with TRUE transparent alpha. Three expressive original friends share a lively UNO game: cobalt blue rabbit on the left wearing a vivid red hoodie with cream sleeve stripe; orange-red red panda in the middle wearing a vivid yellow hoodie, cream face markings and a striped curled tail; vivid green crocodile on the right wearing a rich blue hoodie, laughing with one raised celebratory fist. Each friend holds a small fan of native UNO card BACKS: black backs, white rim, red oval and yellow UNO lettering. These physical card marks are the only text allowed. Place a small stacked deck and a single wild card flat on the wood table, as in Image 1.\nStyle/medium: Faithfully match Image 1's confident hand-inked comic finish: thick almost-black outlines with thinner expressive interior hatching, crisp flat saturated color fills, controlled two-tone cel shading, angular fur tufts, strong eyebrows, joy and competitive energy. Premium finished 2D comic art, not a cute clay rendition. Retain the illustrated wood grain and warm amber table surface of Image 1.\nComposition/framing: Wide horizontal panoramic artwork around 2.2:1, target 2200 by 1000 pixels or higher equivalent resolution. Three friends at equal readable scale behind one complete shallow oval wooden tabletop, composition matching Image 1's left/center/right balance. The whole scene is isolated: complete rabbit ears, crocodile fist, every head, hands, sleeves, panda tail, chair edges and complete table perimeter fully within the image. Keep generous genuinely transparent margin around all sides, especially above rabbit ears and beside outer sleeves. Table is the foreground base, low enough that faces and card fans remain clear. Preserve natural scene perspective from the reference; this is physical tabletop perspective, no transformed page or card framing. No subject touches any image edge.\nBackground: Absolutely transparent alpha, including gaps between characters and furniture. No colored background or baked checkerboard, no floor or cast shadow outside the objects.\nConstraints: Produce new original high-resolution pixels; do not crop the approved comp. Do not redesign the characters, garments, palette, camera angle or comic style. Do not add characters or objects. Remove every page heading, navigation, button, tagline, watermark, UI frame, rounded clipping, border, caption band, layout background and background speed line. No standalone UNO heading/logo; only UNO printed on the physical card backs. No floating confetti or rays. Avoid 3D, soft toy shapes, glossy plastic, clay, airbrush, gradients, photographic fur, excessive textures and blurred contours.",
+        "framingCorrection": "Use case: precise-object-edit.\nUse this generated comic illustration as the edit target. Change ONLY framing: re-render the exact same image, subject, style and composition at smaller scale within a wider transparent canvas, with at least 6 percent genuinely empty alpha space around the complete artwork on all four sides. In particular finish the entire oval wooden table's bottom edge and right outer chair/sleeve, then leave generous transparent margin below and to the right. Keep the full rabbit ears, raised crocodile fist, all three friends, wood table, hands, cards and chair edges completely visible. The full picture must remain around 2.2:1 panoramic, at least 1860 pixels wide. Preserve the exact vivid comic ink style, strong black outlines, hatching, cel shading, expressive faces, garments, palette, UNO physical card marks and wood texture. Background must remain TRUE transparent alpha, including all gaps. Do not add any objects, characters, text, backdrop, speed lines, shadow, page chrome, heading, button, borders or UI. Do not cut off any art at the canvas edge. Do not change character poses, proportions or artwork style. Every artwork pixel must fit inside the transparent margins."
+      },
+      "dimensions": [
+        1860,
+        846
+      ],
+      "format": "WebP lossless RGBA",
+      "transparency": true,
+      "alpha": {
+        "boundsAnyNonzero": [
+          29,
+          38,
+          1836,
+          846
+        ],
+        "boundsAbove1of255": [
+          98,
+          63,
+          1713,
+          779
+        ],
+        "boundsAbove128of255": [
+          101,
+          66,
+          1711,
+          775
+        ],
+        "extrema": [
+          0,
+          255
+        ],
+        "note": "Generator includes very faint alpha=1 noise beyond the visible silhouette, including the final row. Full visible artwork has clear margin; original alpha is preserved."
+      },
+      "deviations": [
+        "1860\u00d7846 instead of requested aspirational 2200\u00d71000; exceeds assigned minimum width 1600 and matches target aspect ratio.",
+        "Faint alpha=1 generator noise extends past visible margin; no visible crop."
+      ],
+      "qa_status": "accepted"
+    },
+    {
+      "id": "comic-frame",
+      "output_path": "public/artwork/comic-frame.webp",
+      "strategy": "Fresh raster generation, lossless RGBA WebP conversion; no comp crop",
+      "prompt_used": "Use case: illustration-story. Asset type: transparent production border decoration for the UNO Comic-card showdown website. Generate a landscape 1600x1000 transparent alpha canvas containing ONLY four bold tapered comic brush swashes emerging from the OUTER edges: crimson red #df0735 from upper left edge between y8% and35%; golden yellow #ffce00 from upper right edge between y8% and40%; vivid green #00bc68 from lower left edge between y58% and90%; vivid blue #075bee from lower right edge between y60% and98%. Each swash is made of 3-5 energetic long angular painted ink streaks with rough bristle edges, tiny natural skips and slender almost-black hatch cuts, not geometric polygon blocks. They stay within the outermost12 percent of the canvas at left/right; the central76 percent is genuinely empty transparent alpha. Premium hand-inked comic screenprint marks, saturated flat ink with bristle texture, no gradient or airbrush. Fully transparent background, including gaps. This will sit behind a large cream game panel, only the outermost portions show. No UI, frame rectangle, text, numbers, cards, table, characters, symbols, stars, confetti, glow, checkerboard or solid background. Do not fill the center. This is a reusable crisp border-ink asset, not a picture of a page.",
+      "dimensions": [
+        1586,
+        992
+      ],
+      "transparency": true,
+      "qa_status": "accepted after inline generation display inspection"
+    },
+    {
+      "id": "comic-energy",
+      "output_path": "public/artwork/comic-energy.webp",
+      "strategy": "Fresh raster generation, lossless RGBA WebP conversion; no comp crop",
+      "prompt_used": "Use case: illustration-story. Asset type: small transparent comic energy marks to surround three existing UNO characters in a web hero. Generate a wide transparent canvas 1600x650, central80 percent empty. Draw two separate clusters of 5-7 crisp almost-black #15151b hand-inked tapered short expressive rays: left cluster around x12% y45%, and right cluster around x88% y40%. Each cluster fans outward, like authentic comic laughter/motion emphasis marks. Slight irregular pressure and tapered bristle ends; strong elegant ink, not messy splatter. The left rays sweep toward the upper-left, right rays upper-right. Sparse light composition, each cluster fits within10% of canvas width and35% height. TRUE transparent alpha everywhere else, no cream or white baked backing. ONLY these two isolated ink-ray groups. No people, animals, UI, text, symbols, cards, panels, speech bubbles, border, stars, dots, glow, background or checkerboard. Match a premium hand-inked comic book's expressive black gestures. Production-ready crisp high-resolution cutout; no subject beyond the rays.",
+      "dimensions": [
+        1967,
+        800
+      ],
+      "transparency": true,
+      "qa_status": "accepted after inline generation display inspection"
+    }
+  ],
+  "direct": [],
+  "semantic": [
+    {
+      "id": "home-artwork-composition",
+      "implementation": "Render the transparent WebP in a semantic img with accurate width/height and a concise alt description. CSS owns responsive contain sizing and all background, framing, shadows, headings and controls. Keep the complete silhouette visible across desktop and phone landscape/portrait.",
+      "notes": "Aspect ratio 310:141. Visible silhouette spans x98\u20131713,y63\u2013779. Reference contains title/buttons/speed lines; those are intentionally absent from the raster and remain code-owned.",
+      "qa_status": "accepted"
+    }
+  ],
+  "execution_order": [
+    "Regenerate comic illustration from approved panel and original character identities.",
+    "Correct framing to preserve complete silhouettes.",
+    "Encode lossless RGBA WebP, embed prompt/provenance and verify alpha/visual result."
+  ],
+  "blockers": [],
+  "assumptions": [
+    "Physical UNO card-back marks belong to the illustration.",
+    "Wood tabletop, deck, wild card and chair portions are part of the approved physical scene.",
+    "No implementation code modified; prior card-night-flat.webp remains intact."
+  ]
+}

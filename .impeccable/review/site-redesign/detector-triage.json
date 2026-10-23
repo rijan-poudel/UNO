@@ -1,0 +1,3461 @@
+[
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/arena.css",
+    "line": 27,
+    "snippet": "Undocumented color #15151b is outside DESIGN.md colors",
+    "ignoreValue": "#15151b",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Retained arena geometry or approved ink/palette role. Record current shared system; preserve card handling and responsive measurements."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/arena.css",
+    "line": 47,
+    "snippet": "Undocumented color #15151b is outside DESIGN.md colors",
+    "ignoreValue": "#15151b",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Retained arena geometry or approved ink/palette role. Record current shared system; preserve card handling and responsive measurements."
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/arena.css",
+    "line": 168,
+    "snippet": "border-radius: 24px is outside the DESIGN.md rounded scale",
+    "ignoreValue": "24px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Retained arena geometry or approved ink/palette role. Record current shared system; preserve card handling and responsive measurements."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/arena.css",
+    "line": 249,
+    "snippet": "Undocumented color #514100 is outside DESIGN.md colors",
+    "ignoreValue": "#514100",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Retained arena geometry or approved ink/palette role. Record current shared system; preserve card handling and responsive measurements."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/arena.css",
+    "line": 265,
+    "snippet": "Undocumented color #514100 is outside DESIGN.md colors",
+    "ignoreValue": "#514100",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Retained arena geometry or approved ink/palette role. Record current shared system; preserve card handling and responsive measurements."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/arena.css",
+    "line": 268,
+    "snippet": "Undocumented color #514100 is outside DESIGN.md colors",
+    "ignoreValue": "#514100",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Retained arena geometry or approved ink/palette role. Record current shared system; preserve card handling and responsive measurements."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/arena.css",
+    "line": 532,
+    "snippet": "font-size: 32px is off the DESIGN.md type ramp",
+    "ignoreValue": "32px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Retained arena geometry or approved ink/palette role. Record current shared system; preserve card handling and responsive measurements."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/arena.css",
+    "line": 539,
+    "snippet": "font-size: 16px is off the DESIGN.md type ramp",
+    "ignoreValue": "16px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Retained arena geometry or approved ink/palette role. Record current shared system; preserve card handling and responsive measurements."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/arena.css",
+    "line": 614,
+    "snippet": "font-size: 28px is off the DESIGN.md type ramp",
+    "ignoreValue": "28px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Retained arena geometry or approved ink/palette role. Record current shared system; preserve card handling and responsive measurements."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/club.css",
+    "line": 108,
+    "snippet": "font-size: 38px is off the DESIGN.md type ramp",
+    "ignoreValue": "38px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Intentional replacement-world token/brand role; new DESIGN.md and sidecar record canonical shipped values rather than old-world limits. Advisory is from the pre-fix scan, not a final rescan."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/club.css",
+    "line": 153,
+    "snippet": "Undocumented color #15151b35 is outside DESIGN.md colors",
+    "ignoreValue": "#15151b35",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Intentional replacement-world token/brand role; new DESIGN.md and sidecar record canonical shipped values rather than old-world limits. Advisory is from the pre-fix scan, not a final rescan."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/club.css",
+    "line": 166,
+    "snippet": "Undocumented color #15151b35 is outside DESIGN.md colors",
+    "ignoreValue": "#15151b35",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Intentional replacement-world token/brand role; new DESIGN.md and sidecar record canonical shipped values rather than old-world limits. Advisory is from the pre-fix scan, not a final rescan."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/club.css",
+    "line": 205,
+    "snippet": "font-size: 20px is off the DESIGN.md type ramp",
+    "ignoreValue": "20px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Intentional replacement-world token/brand role; new DESIGN.md and sidecar record canonical shipped values rather than old-world limits. Advisory is from the pre-fix scan, not a final rescan."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/club.css",
+    "line": 230,
+    "snippet": "Undocumented color #fff4d64d is outside DESIGN.md colors",
+    "ignoreValue": "#fff4d64d",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Intentional replacement-world token/brand role; new DESIGN.md and sidecar record canonical shipped values rather than old-world limits. Advisory is from the pre-fix scan, not a final rescan."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/club.css",
+    "line": 262,
+    "snippet": "font-size: clamp(42px, 6vw, 64px) has fluid endpoint 64px off the DESIGN.md type ramp",
+    "ignoreValue": "64px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Intentional replacement-world token/brand role; new DESIGN.md and sidecar record canonical shipped values rather than old-world limits. Advisory is from the pre-fix scan, not a final rescan."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/club.css",
+    "line": 273,
+    "snippet": "font-size: 16px is off the DESIGN.md type ramp",
+    "ignoreValue": "16px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Intentional replacement-world token/brand role; new DESIGN.md and sidecar record canonical shipped values rather than old-world limits. Advisory is from the pre-fix scan, not a final rescan."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/club.css",
+    "line": 277,
+    "snippet": "font-size: 28px is off the DESIGN.md type ramp",
+    "ignoreValue": "28px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Intentional replacement-world token/brand role; new DESIGN.md and sidecar record canonical shipped values rather than old-world limits. Advisory is from the pre-fix scan, not a final rescan."
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/club.css",
+    "line": 295,
+    "snippet": "border-radius: 5px is outside the DESIGN.md rounded scale",
+    "ignoreValue": "5px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Intentional replacement-world token/brand role; new DESIGN.md and sidecar record canonical shipped values rather than old-world limits. Advisory is from the pre-fix scan, not a final rescan."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/club.css",
+    "line": 299,
+    "snippet": "font-size: 20px is off the DESIGN.md type ramp",
+    "ignoreValue": "20px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Intentional replacement-world token/brand role; new DESIGN.md and sidecar record canonical shipped values rather than old-world limits. Advisory is from the pre-fix scan, not a final rescan."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/club.css",
+    "line": 363,
+    "snippet": "Undocumented color #15151b50 is outside DESIGN.md colors",
+    "ignoreValue": "#15151b50",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Intentional replacement-world token/brand role; new DESIGN.md and sidecar record canonical shipped values rather than old-world limits. Advisory is from the pre-fix scan, not a final rescan."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/club.css",
+    "line": 368,
+    "snippet": "font-size: 16px is off the DESIGN.md type ramp",
+    "ignoreValue": "16px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Intentional replacement-world token/brand role; new DESIGN.md and sidecar record canonical shipped values rather than old-world limits. Advisory is from the pre-fix scan, not a final rescan."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/club.css",
+    "line": 379,
+    "snippet": "Undocumented color #514500 is outside DESIGN.md colors",
+    "ignoreValue": "#514500",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Intentional replacement-world token/brand role; new DESIGN.md and sidecar record canonical shipped values rather than old-world limits. Advisory is from the pre-fix scan, not a final rescan."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/club.css",
+    "line": 480,
+    "snippet": "Undocumented color #c50730 is outside DESIGN.md colors",
+    "ignoreValue": "#c50730",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Intentional replacement-world token/brand role; new DESIGN.md and sidecar record canonical shipped values rather than old-world limits. Advisory is from the pre-fix scan, not a final rescan."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/club.css",
+    "line": 482,
+    "snippet": "Undocumented color #ffe1e7 is outside DESIGN.md colors",
+    "ignoreValue": "#ffe1e7",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Intentional replacement-world token/brand role; new DESIGN.md and sidecar record canonical shipped values rather than old-world limits. Advisory is from the pre-fix scan, not a final rescan."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/club.css",
+    "line": 483,
+    "snippet": "Undocumented color #8b0526 is outside DESIGN.md colors",
+    "ignoreValue": "#8b0526",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Intentional replacement-world token/brand role; new DESIGN.md and sidecar record canonical shipped values rather than old-world limits. Advisory is from the pre-fix scan, not a final rescan."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/club.css",
+    "line": 498,
+    "snippet": "Undocumented color #00000066 is outside DESIGN.md colors",
+    "ignoreValue": "#00000066",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Intentional replacement-world token/brand role; new DESIGN.md and sidecar record canonical shipped values rather than old-world limits. Advisory is from the pre-fix scan, not a final rescan."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/club.css",
+    "line": 555,
+    "snippet": "Undocumented color #777267 is outside DESIGN.md colors",
+    "ignoreValue": "#777267",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Intentional replacement-world token/brand role; new DESIGN.md and sidecar record canonical shipped values rather than old-world limits. Advisory is from the pre-fix scan, not a final rescan."
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/club.css",
+    "line": 562,
+    "snippet": "border-radius: 2px is outside the DESIGN.md rounded scale",
+    "ignoreValue": "2px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Intentional replacement-world token/brand role; new DESIGN.md and sidecar record canonical shipped values rather than old-world limits. Advisory is from the pre-fix scan, not a final rescan."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/club.css",
+    "line": 563,
+    "snippet": "Undocumented color #777267 is outside DESIGN.md colors",
+    "ignoreValue": "#777267",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Intentional replacement-world token/brand role; new DESIGN.md and sidecar record canonical shipped values rather than old-world limits. Advisory is from the pre-fix scan, not a final rescan."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/club.css",
+    "line": 591,
+    "snippet": "Undocumented color #fff4d6 is outside DESIGN.md colors",
+    "ignoreValue": "#fff4d6",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Intentional replacement-world token/brand role; new DESIGN.md and sidecar record canonical shipped values rather than old-world limits. Advisory is from the pre-fix scan, not a final rescan."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/club.css",
+    "line": 605,
+    "snippet": "Undocumented color #15151b35 is outside DESIGN.md colors",
+    "ignoreValue": "#15151b35",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Intentional replacement-world token/brand role; new DESIGN.md and sidecar record canonical shipped values rather than old-world limits. Advisory is from the pre-fix scan, not a final rescan."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/club.css",
+    "line": 607,
+    "snippet": "font-size: 28px is off the DESIGN.md type ramp",
+    "ignoreValue": "28px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Intentional replacement-world token/brand role; new DESIGN.md and sidecar record canonical shipped values rather than old-world limits. Advisory is from the pre-fix scan, not a final rescan."
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/club.css",
+    "line": 612,
+    "snippet": "border-radius: 3px is outside the DESIGN.md rounded scale",
+    "ignoreValue": "3px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Intentional replacement-world token/brand role; new DESIGN.md and sidecar record canonical shipped values rather than old-world limits. Advisory is from the pre-fix scan, not a final rescan."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/club.css",
+    "line": 649,
+    "snippet": "font-size: 16px is off the DESIGN.md type ramp",
+    "ignoreValue": "16px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Intentional replacement-world token/brand role; new DESIGN.md and sidecar record canonical shipped values rather than old-world limits. Advisory is from the pre-fix scan, not a final rescan."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/club.css",
+    "line": 661,
+    "snippet": "Undocumented color #007943 is outside DESIGN.md colors",
+    "ignoreValue": "#007943",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Intentional replacement-world token/brand role; new DESIGN.md and sidecar record canonical shipped values rather than old-world limits. Advisory is from the pre-fix scan, not a final rescan."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/club.css",
+    "line": 699,
+    "snippet": "Undocumented color #fff4d6 is outside DESIGN.md colors",
+    "ignoreValue": "#fff4d6",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Intentional replacement-world token/brand role; new DESIGN.md and sidecar record canonical shipped values rather than old-world limits. Advisory is from the pre-fix scan, not a final rescan."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/club.css",
+    "line": 705,
+    "snippet": "Undocumented color #57524a is outside DESIGN.md colors",
+    "ignoreValue": "#57524a",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Intentional replacement-world token/brand role; new DESIGN.md and sidecar record canonical shipped values rather than old-world limits. Advisory is from the pre-fix scan, not a final rescan."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/club.css",
+    "line": 711,
+    "snippet": "Undocumented color #15151b30 is outside DESIGN.md colors",
+    "ignoreValue": "#15151b30",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Intentional replacement-world token/brand role; new DESIGN.md and sidecar record canonical shipped values rather than old-world limits. Advisory is from the pre-fix scan, not a final rescan."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/club.css",
+    "line": 718,
+    "snippet": "Undocumented color #514500 is outside DESIGN.md colors",
+    "ignoreValue": "#514500",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Intentional replacement-world token/brand role; new DESIGN.md and sidecar record canonical shipped values rather than old-world limits. Advisory is from the pre-fix scan, not a final rescan."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/club.css",
+    "line": 727,
+    "snippet": "Undocumented color #57524a is outside DESIGN.md colors",
+    "ignoreValue": "#57524a",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Intentional replacement-world token/brand role; new DESIGN.md and sidecar record canonical shipped values rather than old-world limits. Advisory is from the pre-fix scan, not a final rescan."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/club.css",
+    "line": 730,
+    "snippet": "Undocumented color #c50730 is outside DESIGN.md colors",
+    "ignoreValue": "#c50730",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Intentional replacement-world token/brand role; new DESIGN.md and sidecar record canonical shipped values rather than old-world limits. Advisory is from the pre-fix scan, not a final rescan."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/club.css",
+    "line": 735,
+    "snippet": "Undocumented color #57524a is outside DESIGN.md colors",
+    "ignoreValue": "#57524a",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Intentional replacement-world token/brand role; new DESIGN.md and sidecar record canonical shipped values rather than old-world limits. Advisory is from the pre-fix scan, not a final rescan."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/club.css",
+    "line": 771,
+    "snippet": "Undocumented color #ffdc36 is outside DESIGN.md colors",
+    "ignoreValue": "#ffdc36",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Intentional replacement-world token/brand role; new DESIGN.md and sidecar record canonical shipped values rather than old-world limits. Advisory is from the pre-fix scan, not a final rescan."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/club.css",
+    "line": 782,
+    "snippet": "Undocumented color #ffdc36 is outside DESIGN.md colors",
+    "ignoreValue": "#ffdc36",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Intentional replacement-world token/brand role; new DESIGN.md and sidecar record canonical shipped values rather than old-world limits. Advisory is from the pre-fix scan, not a final rescan."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/club.css",
+    "line": 808,
+    "snippet": "font-size: 25px is off the DESIGN.md type ramp",
+    "ignoreValue": "25px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Intentional replacement-world token/brand role; new DESIGN.md and sidecar record canonical shipped values rather than old-world limits. Advisory is from the pre-fix scan, not a final rescan."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/club.css",
+    "line": 829,
+    "snippet": "font-size: 32px is off the DESIGN.md type ramp",
+    "ignoreValue": "32px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Intentional replacement-world token/brand role; new DESIGN.md and sidecar record canonical shipped values rather than old-world limits. Advisory is from the pre-fix scan, not a final rescan."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/club.css",
+    "line": 842,
+    "snippet": "font-size: 28px is off the DESIGN.md type ramp",
+    "ignoreValue": "28px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Intentional replacement-world token/brand role; new DESIGN.md and sidecar record canonical shipped values rather than old-world limits. Advisory is from the pre-fix scan, not a final rescan."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/club.css",
+    "line": 863,
+    "snippet": "font-size: 28px is off the DESIGN.md type ramp",
+    "ignoreValue": "28px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Intentional replacement-world token/brand role; new DESIGN.md and sidecar record canonical shipped values rather than old-world limits. Advisory is from the pre-fix scan, not a final rescan."
+  },
+  {
+    "antipattern": "bounce-easing",
+    "name": "Bounce or elastic easing",
+    "description": "Bounce and elastic easing feel dated and tacky. Real objects decelerate smoothly \u2014 use exponential easing (ease-out-quart/quint/expo) instead.",
+    "severity": "warning",
+    "category": "slop",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 26,
+    "snippet": "cubic-bezier(0.34, 1.56, 0.64, 1)",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Fixed: root --ease-out now cubic-bezier(0.16,1,0.3,1)."
+  },
+  {
+    "antipattern": "side-tab",
+    "name": "Side-tab accent border",
+    "description": "Thick colored border on one side of a card \u2014 the most recognizable tell of AI-generated UIs. Use a subtler accent or remove it entirely.",
+    "severity": "warning",
+    "category": "slop",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 1104,
+    "snippet": ".choose-red \u2014 inset box-shadow 5px stripe (bottom)",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Sanctioned false positive: functional pressed bottom lip, with narrow rule+file ignore recorded in .impeccable/config.json."
+  },
+  {
+    "antipattern": "side-tab",
+    "name": "Side-tab accent border",
+    "description": "Thick colored border on one side of a card \u2014 the most recognizable tell of AI-generated UIs. Use a subtler accent or remove it entirely.",
+    "severity": "warning",
+    "category": "slop",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 1110,
+    "snippet": ".choose-yellow \u2014 inset box-shadow 5px stripe (bottom)",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Sanctioned false positive: functional pressed bottom lip, with narrow rule+file ignore recorded in .impeccable/config.json."
+  },
+  {
+    "antipattern": "side-tab",
+    "name": "Side-tab accent border",
+    "description": "Thick colored border on one side of a card \u2014 the most recognizable tell of AI-generated UIs. Use a subtler accent or remove it entirely.",
+    "severity": "warning",
+    "category": "slop",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 1117,
+    "snippet": ".choose-green \u2014 inset box-shadow 5px stripe (bottom)",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Sanctioned false positive: functional pressed bottom lip, with narrow rule+file ignore recorded in .impeccable/config.json."
+  },
+  {
+    "antipattern": "side-tab",
+    "name": "Side-tab accent border",
+    "description": "Thick colored border on one side of a card \u2014 the most recognizable tell of AI-generated UIs. Use a subtler accent or remove it entirely.",
+    "severity": "warning",
+    "category": "slop",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 1123,
+    "snippet": ".choose-blue \u2014 inset box-shadow 5px stripe (bottom)",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Sanctioned false positive: functional pressed bottom lip, with narrow rule+file ignore recorded in .impeccable/config.json."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 244,
+    "snippet": "font-size: 64px is off the DESIGN.md type ramp",
+    "ignoreValue": "64px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 271,
+    "snippet": "border-radius: 20px is outside the DESIGN.md rounded scale",
+    "ignoreValue": "20px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 273,
+    "snippet": "font-size: 10px is off the DESIGN.md type ramp",
+    "ignoreValue": "10px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 305,
+    "snippet": "font-size: clamp(54px, 5.8vw, 86px) has fluid endpoints 54px and 86px off the DESIGN.md type ramp",
+    "ignoreValue": "54px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 485,
+    "snippet": "Undocumented color #38835d is outside DESIGN.md colors",
+    "ignoreValue": "#38835d",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 560,
+    "snippet": "border-radius: 999px is outside the DESIGN.md rounded scale",
+    "ignoreValue": "999px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 587,
+    "snippet": "font-size: 16px is off the DESIGN.md type ramp",
+    "ignoreValue": "16px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 621,
+    "snippet": "Undocumented color #e4b7a1 is outside DESIGN.md colors",
+    "ignoreValue": "#e4b7a1",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 622,
+    "snippet": "Undocumented color #593327 is outside DESIGN.md colors",
+    "ignoreValue": "#593327",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 625,
+    "snippet": "Undocumented color #c9d6b4 is outside DESIGN.md colors",
+    "ignoreValue": "#c9d6b4",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 626,
+    "snippet": "Undocumented color #3d512a is outside DESIGN.md colors",
+    "ignoreValue": "#3d512a",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 630,
+    "snippet": "Undocumented color #324d66 is outside DESIGN.md colors",
+    "ignoreValue": "#324d66",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 633,
+    "snippet": "Undocumented color #e5d8a7 is outside DESIGN.md colors",
+    "ignoreValue": "#e5d8a7",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 634,
+    "snippet": "Undocumented color #655325 is outside DESIGN.md colors",
+    "ignoreValue": "#655325",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 637,
+    "snippet": "Undocumented color #d4c5db is outside DESIGN.md colors",
+    "ignoreValue": "#d4c5db",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 638,
+    "snippet": "Undocumented color #5d406a is outside DESIGN.md colors",
+    "ignoreValue": "#5d406a",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 642,
+    "snippet": "Undocumented color #5e4934 is outside DESIGN.md colors",
+    "ignoreValue": "#5e4934",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 676,
+    "snippet": "border-radius: 999px is outside the DESIGN.md rounded scale",
+    "ignoreValue": "999px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 677,
+    "snippet": "Undocumented color #0000000d is outside DESIGN.md colors",
+    "ignoreValue": "#0000000d",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 684,
+    "snippet": "border-radius: 999px is outside the DESIGN.md rounded scale",
+    "ignoreValue": "999px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 694,
+    "snippet": "Undocumented color #00000018 is outside DESIGN.md colors",
+    "ignoreValue": "#00000018",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 796,
+    "snippet": "Undocumented color #8b2f20 is outside DESIGN.md colors",
+    "ignoreValue": "#8b2f20",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 921,
+    "snippet": "Undocumented color #c9d6b4 is outside DESIGN.md colors",
+    "ignoreValue": "#c9d6b4",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 924,
+    "snippet": "Undocumented color #d6b5a1 is outside DESIGN.md colors",
+    "ignoreValue": "#d6b5a1",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 1000,
+    "snippet": "border-radius: 20px is outside the DESIGN.md rounded scale",
+    "ignoreValue": "20px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 1013,
+    "snippet": "Undocumented color #0002 is outside DESIGN.md colors",
+    "ignoreValue": "#0002",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 1105,
+    "snippet": "Undocumented color #bf422e is outside DESIGN.md colors",
+    "ignoreValue": "#bf422e",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 1111,
+    "snippet": "Undocumented color #ecc04c is outside DESIGN.md colors",
+    "ignoreValue": "#ecc04c",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 1112,
+    "snippet": "Undocumented color #292b27 is outside DESIGN.md colors",
+    "ignoreValue": "#292b27",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 1118,
+    "snippet": "Undocumented color #317257 is outside DESIGN.md colors",
+    "ignoreValue": "#317257",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 1231,
+    "snippet": "font-size: 62px is off the DESIGN.md type ramp",
+    "ignoreValue": "62px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 1319,
+    "snippet": "font-size: 10px is off the DESIGN.md type ramp",
+    "ignoreValue": "10px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 1327,
+    "snippet": "font-size: 35px is off the DESIGN.md type ramp",
+    "ignoreValue": "35px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 1343,
+    "snippet": "font-size: 28px is off the DESIGN.md type ramp",
+    "ignoreValue": "28px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 1441,
+    "snippet": "font-size: clamp(56px, 6.1vw, 88px) has fluid endpoints 56px and 88px off the DESIGN.md type ramp",
+    "ignoreValue": "56px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 1462,
+    "snippet": "border-radius: 21px is outside the DESIGN.md rounded scale",
+    "ignoreValue": "21px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 1465,
+    "snippet": "Undocumented color #c9dcb4 is outside DESIGN.md colors",
+    "ignoreValue": "#c9dcb4",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 1466,
+    "snippet": "Undocumented color #2c3430 is outside DESIGN.md colors",
+    "ignoreValue": "#2c3430",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 1476,
+    "snippet": "font-size: 23px is off the DESIGN.md type ramp",
+    "ignoreValue": "23px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 1481,
+    "snippet": "Undocumented color #4e5d47 is outside DESIGN.md colors",
+    "ignoreValue": "#4e5d47",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 1487,
+    "snippet": "Undocumented color #f1c95b is outside DESIGN.md colors",
+    "ignoreValue": "#f1c95b",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 1492,
+    "snippet": "Undocumented color #655425 is outside DESIGN.md colors",
+    "ignoreValue": "#655425",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 1514,
+    "snippet": "Undocumented color #a33829 is outside DESIGN.md colors",
+    "ignoreValue": "#a33829",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 1517,
+    "snippet": "Undocumented color #a33829 is outside DESIGN.md colors",
+    "ignoreValue": "#a33829",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 1520,
+    "snippet": "font-size: 25px is off the DESIGN.md type ramp",
+    "ignoreValue": "25px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 1563,
+    "snippet": "border-radius: 11px is outside the DESIGN.md rounded scale",
+    "ignoreValue": "11px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 1800,
+    "snippet": "Undocumented color #bd4936 is outside DESIGN.md colors",
+    "ignoreValue": "#bd4936",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 1803,
+    "snippet": "Undocumented color #bd4936 is outside DESIGN.md colors",
+    "ignoreValue": "#bd4936",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 1807,
+    "snippet": "font-size: 23px is off the DESIGN.md type ramp",
+    "ignoreValue": "23px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 1808,
+    "snippet": "Undocumented color #292b2728 is outside DESIGN.md colors",
+    "ignoreValue": "#292b2728",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 1811,
+    "snippet": "Undocumented color #3f71b3 is outside DESIGN.md colors",
+    "ignoreValue": "#3f71b3",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 1816,
+    "snippet": "Undocumented color #6f58a0 is outside DESIGN.md colors",
+    "ignoreValue": "#6f58a0",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 1834,
+    "snippet": "border-radius: 24px is outside the DESIGN.md rounded scale",
+    "ignoreValue": "24px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 1835,
+    "snippet": "Undocumented color #f5cb55 is outside DESIGN.md colors",
+    "ignoreValue": "#f5cb55",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 1840,
+    "snippet": "font-size: 44px is off the DESIGN.md type ramp",
+    "ignoreValue": "44px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 1851,
+    "snippet": "Undocumented color #c8b4e2 is outside DESIGN.md colors",
+    "ignoreValue": "#c8b4e2",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 1867,
+    "snippet": "Undocumented color #e46c51 is outside DESIGN.md colors",
+    "ignoreValue": "#e46c51",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 1870,
+    "snippet": "Undocumented color #ecd065 is outside DESIGN.md colors",
+    "ignoreValue": "#ecd065",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 1873,
+    "snippet": "Undocumented color #84a5d6 is outside DESIGN.md colors",
+    "ignoreValue": "#84a5d6",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 1876,
+    "snippet": "Undocumented color #a6c58b is outside DESIGN.md colors",
+    "ignoreValue": "#a6c58b",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 1900,
+    "snippet": "border-radius: 3px is outside the DESIGN.md rounded scale",
+    "ignoreValue": "3px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 1944,
+    "snippet": "Undocumented color #d9e6c9 is outside DESIGN.md colors",
+    "ignoreValue": "#d9e6c9",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 1948,
+    "snippet": "Undocumented color #f7d775 is outside DESIGN.md colors",
+    "ignoreValue": "#f7d775",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 1956,
+    "snippet": "font-size: 60px is off the DESIGN.md type ramp",
+    "ignoreValue": "60px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 1962,
+    "snippet": "font-size: 20px is off the DESIGN.md type ramp",
+    "ignoreValue": "20px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 1991,
+    "snippet": "font-size: clamp(47px, 11vw, 68px) has fluid endpoints 47px and 68px off the DESIGN.md type ramp",
+    "ignoreValue": "47px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 2008,
+    "snippet": "border-radius: 18px is outside the DESIGN.md rounded scale",
+    "ignoreValue": "18px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 2012,
+    "snippet": "font-size: 22px is off the DESIGN.md type ramp",
+    "ignoreValue": "22px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 2034,
+    "snippet": "font-size: 10px is off the DESIGN.md type ramp",
+    "ignoreValue": "10px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 2042,
+    "snippet": "font-size: 32px is off the DESIGN.md type ramp",
+    "ignoreValue": "32px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 2043,
+    "snippet": "border-radius: 18px is outside the DESIGN.md rounded scale",
+    "ignoreValue": "18px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 2061,
+    "snippet": "font-size: 16px is off the DESIGN.md type ramp",
+    "ignoreValue": "16px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 2066,
+    "snippet": "font-size: 45px is off the DESIGN.md type ramp",
+    "ignoreValue": "45px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 2069,
+    "snippet": "font-size: 20px is off the DESIGN.md type ramp",
+    "ignoreValue": "20px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 2169,
+    "snippet": "border-radius: 3px is outside the DESIGN.md rounded scale",
+    "ignoreValue": "3px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 2212,
+    "snippet": "font-size: 10px is off the DESIGN.md type ramp",
+    "ignoreValue": "10px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 2301,
+    "snippet": "border-radius: 5px is outside the DESIGN.md rounded scale",
+    "ignoreValue": "5px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 2384,
+    "snippet": "border-radius: 999px is outside the DESIGN.md rounded scale",
+    "ignoreValue": "999px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 2405,
+    "snippet": "Undocumented color #00000014 is outside DESIGN.md colors",
+    "ignoreValue": "#00000014",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/globals.css",
+    "line": 2491,
+    "snippet": "font-size: 16px is off the DESIGN.md type ramp",
+    "ignoreValue": "16px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/home.css",
+    "line": 10,
+    "snippet": "Undocumented color #15151b is outside DESIGN.md colors",
+    "ignoreValue": "#15151b",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Intentional replacement-world token/brand role; new DESIGN.md and sidecar record canonical shipped values rather than old-world limits. Advisory is from the pre-fix scan, not a final rescan."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/home.css",
+    "line": 12,
+    "snippet": "Undocumented color #fff4d6 is outside DESIGN.md colors",
+    "ignoreValue": "#fff4d6",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Intentional replacement-world token/brand role; new DESIGN.md and sidecar record canonical shipped values rather than old-world limits. Advisory is from the pre-fix scan, not a final rescan."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/home.css",
+    "line": 13,
+    "snippet": "Undocumented color #15151b is outside DESIGN.md colors",
+    "ignoreValue": "#15151b",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Intentional replacement-world token/brand role; new DESIGN.md and sidecar record canonical shipped values rather than old-world limits. Advisory is from the pre-fix scan, not a final rescan."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/home.css",
+    "line": 38,
+    "snippet": "font-size: clamp(112px, 13vw, 184px) has fluid endpoints 112px and 184px off the DESIGN.md type ramp",
+    "ignoreValue": "112px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Intentional replacement-world token/brand role; new DESIGN.md and sidecar record canonical shipped values rather than old-world limits. Advisory is from the pre-fix scan, not a final rescan."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/home.css",
+    "line": 45,
+    "snippet": "Undocumented color #15151b is outside DESIGN.md colors",
+    "ignoreValue": "#15151b",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Intentional replacement-world token/brand role; new DESIGN.md and sidecar record canonical shipped values rather than old-world limits. Advisory is from the pre-fix scan, not a final rescan."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/home.css",
+    "line": 85,
+    "snippet": "Undocumented color #15151b is outside DESIGN.md colors",
+    "ignoreValue": "#15151b",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Intentional replacement-world token/brand role; new DESIGN.md and sidecar record canonical shipped values rather than old-world limits. Advisory is from the pre-fix scan, not a final rescan."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/home.css",
+    "line": 89,
+    "snippet": "Undocumented color #15151b35 is outside DESIGN.md colors",
+    "ignoreValue": "#15151b35",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Intentional replacement-world token/brand role; new DESIGN.md and sidecar record canonical shipped values rather than old-world limits. Advisory is from the pre-fix scan, not a final rescan."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/home.css",
+    "line": 91,
+    "snippet": "font-size: 25px is off the DESIGN.md type ramp",
+    "ignoreValue": "25px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Intentional replacement-world token/brand role; new DESIGN.md and sidecar record canonical shipped values rather than old-world limits. Advisory is from the pre-fix scan, not a final rescan."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/home.css",
+    "line": 106,
+    "snippet": "font-size: 32px is off the DESIGN.md type ramp",
+    "ignoreValue": "32px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Intentional replacement-world token/brand role; new DESIGN.md and sidecar record canonical shipped values rather than old-world limits. Advisory is from the pre-fix scan, not a final rescan."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/home.css",
+    "line": 121,
+    "snippet": "Undocumented color #15151b is outside DESIGN.md colors",
+    "ignoreValue": "#15151b",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Intentional replacement-world token/brand role; new DESIGN.md and sidecar record canonical shipped values rather than old-world limits. Advisory is from the pre-fix scan, not a final rescan."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/home.css",
+    "line": 132,
+    "snippet": "Undocumented color #15151b35 is outside DESIGN.md colors",
+    "ignoreValue": "#15151b35",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Intentional replacement-world token/brand role; new DESIGN.md and sidecar record canonical shipped values rather than old-world limits. Advisory is from the pre-fix scan, not a final rescan."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/home.css",
+    "line": 180,
+    "snippet": "font-size: clamp(112px, 17dvh, 168px) has fluid endpoints 112px and 168px off the DESIGN.md type ramp",
+    "ignoreValue": "112px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Intentional replacement-world token/brand role; new DESIGN.md and sidecar record canonical shipped values rather than old-world limits. Advisory is from the pre-fix scan, not a final rescan."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/home.css",
+    "line": 193,
+    "snippet": "Undocumented color #15151b35 is outside DESIGN.md colors",
+    "ignoreValue": "#15151b35",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Intentional replacement-world token/brand role; new DESIGN.md and sidecar record canonical shipped values rather than old-world limits. Advisory is from the pre-fix scan, not a final rescan."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/home.css",
+    "line": 201,
+    "snippet": "Undocumented color #15151b35 is outside DESIGN.md colors",
+    "ignoreValue": "#15151b35",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Intentional replacement-world token/brand role; new DESIGN.md and sidecar record canonical shipped values rather than old-world limits. Advisory is from the pre-fix scan, not a final rescan."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/home.css",
+    "line": 219,
+    "snippet": "font-size: 112px is off the DESIGN.md type ramp",
+    "ignoreValue": "112px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Intentional replacement-world token/brand role; new DESIGN.md and sidecar record canonical shipped values rather than old-world limits. Advisory is from the pre-fix scan, not a final rescan."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/home.css",
+    "line": 242,
+    "snippet": "font-size: 20px is off the DESIGN.md type ramp",
+    "ignoreValue": "20px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Intentional replacement-world token/brand role; new DESIGN.md and sidecar record canonical shipped values rather than old-world limits. Advisory is from the pre-fix scan, not a final rescan."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/home.css",
+    "line": 262,
+    "snippet": "font-size: 96px is off the DESIGN.md type ramp",
+    "ignoreValue": "96px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Intentional replacement-world token/brand role; new DESIGN.md and sidecar record canonical shipped values rather than old-world limits. Advisory is from the pre-fix scan, not a final rescan."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/home.css",
+    "line": 266,
+    "snippet": "font-size: 20px is off the DESIGN.md type ramp",
+    "ignoreValue": "20px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Intentional replacement-world token/brand role; new DESIGN.md and sidecar record canonical shipped values rather than old-world limits. Advisory is from the pre-fix scan, not a final rescan."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/home.css",
+    "line": 280,
+    "snippet": "font-size: 20px is off the DESIGN.md type ramp",
+    "ignoreValue": "20px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Intentional replacement-world token/brand role; new DESIGN.md and sidecar record canonical shipped values rather than old-world limits. Advisory is from the pre-fix scan, not a final rescan."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/home.css",
+    "line": 283,
+    "snippet": "font-size: 16px is off the DESIGN.md type ramp",
+    "ignoreValue": "16px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Intentional replacement-world token/brand role; new DESIGN.md and sidecar record canonical shipped values rather than old-world limits. Advisory is from the pre-fix scan, not a final rescan."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/home.css",
+    "line": 324,
+    "snippet": "font-size: 23px is off the DESIGN.md type ramp",
+    "ignoreValue": "23px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Intentional replacement-world token/brand role; new DESIGN.md and sidecar record canonical shipped values rather than old-world limits. Advisory is from the pre-fix scan, not a final rescan."
+  },
+  {
+    "antipattern": "side-tab",
+    "name": "Side-tab accent border",
+    "description": "Thick colored border on one side of a card \u2014 the most recognizable tell of AI-generated UIs. Use a subtler accent or remove it entirely.",
+    "severity": "warning",
+    "category": "slop",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 714,
+    "snippet": ".uno-button \u2014 inset box-shadow 4px stripe (bottom)",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Sanctioned false positive: functional pressed bottom lip, with narrow rule+file ignore recorded in .impeccable/config.json."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 121,
+    "snippet": "Undocumented color #e73442 is outside DESIGN.md colors",
+    "ignoreValue": "#e73442",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 124,
+    "snippet": "Undocumented color #2474df is outside DESIGN.md colors",
+    "ignoreValue": "#2474df",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 130,
+    "snippet": "Undocumented color #159768 is outside DESIGN.md colors",
+    "ignoreValue": "#159768",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 142,
+    "snippet": "Undocumented color #e73442 is outside DESIGN.md colors",
+    "ignoreValue": "#e73442",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 155,
+    "snippet": "Undocumented color #65111a80 is outside DESIGN.md colors",
+    "ignoreValue": "#65111a80",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 173,
+    "snippet": "Undocumented color #23332e is outside DESIGN.md colors",
+    "ignoreValue": "#23332e",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 173,
+    "snippet": "Undocumented color #101c1c is outside DESIGN.md colors",
+    "ignoreValue": "#101c1c",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 179,
+    "snippet": "Undocumented color #d8ed82 is outside DESIGN.md colors",
+    "ignoreValue": "#d8ed82",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 180,
+    "snippet": "Undocumented color #172130 is outside DESIGN.md colors",
+    "ignoreValue": "#172130",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 183,
+    "snippet": "Undocumented color #d8ed82 is outside DESIGN.md colors",
+    "ignoreValue": "#d8ed82",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 210,
+    "snippet": "Undocumented color #d8ed82 is outside DESIGN.md colors",
+    "ignoreValue": "#d8ed82",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 257,
+    "snippet": "border-radius: 150px is outside the DESIGN.md rounded scale",
+    "ignoreValue": "150px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 270,
+    "snippet": "Undocumented color #245b49 is outside DESIGN.md colors",
+    "ignoreValue": "#245b49",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 272,
+    "snippet": "Undocumented color #061e2160 is outside DESIGN.md colors",
+    "ignoreValue": "#061e2160",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 285,
+    "snippet": "border-radius: 80px is outside the DESIGN.md rounded scale",
+    "ignoreValue": "80px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 291,
+    "snippet": "Undocumented color #eff5ca is outside DESIGN.md colors",
+    "ignoreValue": "#eff5ca",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 298,
+    "snippet": "Undocumented color #e5f3b9b0 is outside DESIGN.md colors",
+    "ignoreValue": "#e5f3b9b0",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 299,
+    "snippet": "Undocumented color #e5f3b912 is outside DESIGN.md colors",
+    "ignoreValue": "#e5f3b912",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 302,
+    "snippet": "Undocumented color #173d31 is outside DESIGN.md colors",
+    "ignoreValue": "#173d31",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 314,
+    "snippet": "Undocumented color #8ba1bd is outside DESIGN.md colors",
+    "ignoreValue": "#8ba1bd",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 316,
+    "snippet": "font-size: 10px is off the DESIGN.md type ramp",
+    "ignoreValue": "10px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 325,
+    "snippet": "Undocumented color #b1bfd2 is outside DESIGN.md colors",
+    "ignoreValue": "#b1bfd2",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 382,
+    "snippet": "Undocumented color #172130 is outside DESIGN.md colors",
+    "ignoreValue": "#172130",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 389,
+    "snippet": "Undocumented color #b1bfd2 is outside DESIGN.md colors",
+    "ignoreValue": "#b1bfd2",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 394,
+    "snippet": "Undocumented color #d8ed82 is outside DESIGN.md colors",
+    "ignoreValue": "#d8ed82",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 401,
+    "snippet": "Undocumented color #080f1e80 is outside DESIGN.md colors",
+    "ignoreValue": "#080f1e80",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 410,
+    "snippet": "Undocumented color #b1bfd2 is outside DESIGN.md colors",
+    "ignoreValue": "#b1bfd2",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 440,
+    "snippet": "Undocumented color #b1bfd2 is outside DESIGN.md colors",
+    "ignoreValue": "#b1bfd2",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 459,
+    "snippet": "Undocumented color #b1bfd2 is outside DESIGN.md colors",
+    "ignoreValue": "#b1bfd2",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 475,
+    "snippet": "Undocumented color #d8ed82 is outside DESIGN.md colors",
+    "ignoreValue": "#d8ed82",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 495,
+    "snippet": "Undocumented color #d8ed8280 is outside DESIGN.md colors",
+    "ignoreValue": "#d8ed8280",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 590,
+    "snippet": "Undocumented color #b1bfd2 is outside DESIGN.md colors",
+    "ignoreValue": "#b1bfd2",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 603,
+    "snippet": "Undocumented color #d8ed82 is outside DESIGN.md colors",
+    "ignoreValue": "#d8ed82",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 606,
+    "snippet": "Undocumented color #d8ed82 is outside DESIGN.md colors",
+    "ignoreValue": "#d8ed82",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 607,
+    "snippet": "Undocumented color #172130 is outside DESIGN.md colors",
+    "ignoreValue": "#172130",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 617,
+    "snippet": "Undocumented color #3f5023 is outside DESIGN.md colors",
+    "ignoreValue": "#3f5023",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 620,
+    "snippet": "Undocumented color #3f5023 is outside DESIGN.md colors",
+    "ignoreValue": "#3f5023",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 626,
+    "snippet": "border-radius: 999px is outside the DESIGN.md rounded scale",
+    "ignoreValue": "999px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 697,
+    "snippet": "Undocumented color #b1bfd2 is outside DESIGN.md colors",
+    "ignoreValue": "#b1bfd2",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 712,
+    "snippet": "Undocumented color #d8ed82 is outside DESIGN.md colors",
+    "ignoreValue": "#d8ed82",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 721,
+    "snippet": "border-radius: 999px is outside the DESIGN.md rounded scale",
+    "ignoreValue": "999px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 768,
+    "snippet": "Undocumented color #d8ed82 is outside DESIGN.md colors",
+    "ignoreValue": "#d8ed82",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 787,
+    "snippet": "border-radius: 2px is outside the DESIGN.md rounded scale",
+    "ignoreValue": "2px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 806,
+    "snippet": "Undocumented color #b1bfd2 is outside DESIGN.md colors",
+    "ignoreValue": "#b1bfd2",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 856,
+    "snippet": "Undocumented color #d8ed82 is outside DESIGN.md colors",
+    "ignoreValue": "#d8ed82",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 925,
+    "snippet": "Undocumented color #233249 is outside DESIGN.md colors",
+    "ignoreValue": "#233249",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 988,
+    "snippet": "font-size: 30px is off the DESIGN.md type ramp",
+    "ignoreValue": "30px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 1015,
+    "snippet": "border-radius: 130px is outside the DESIGN.md rounded scale",
+    "ignoreValue": "130px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 1029,
+    "snippet": "font-size: 8px is off the DESIGN.md type ramp",
+    "ignoreValue": "8px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 1050,
+    "snippet": "font-size: 16px is off the DESIGN.md type ramp",
+    "ignoreValue": "16px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 1068,
+    "snippet": "border-radius: 9px is outside the DESIGN.md rounded scale",
+    "ignoreValue": "9px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 1168,
+    "snippet": "font-size: 10px is off the DESIGN.md type ramp",
+    "ignoreValue": "10px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 1260,
+    "snippet": "border-radius: 18px is outside the DESIGN.md rounded scale",
+    "ignoreValue": "18px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 1394,
+    "snippet": "Undocumented color #e73442 is outside DESIGN.md colors",
+    "ignoreValue": "#e73442",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 1397,
+    "snippet": "Undocumented color #2474df is outside DESIGN.md colors",
+    "ignoreValue": "#2474df",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 1403,
+    "snippet": "Undocumented color #159768 is outside DESIGN.md colors",
+    "ignoreValue": "#159768",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 1451,
+    "snippet": "Undocumented color #173d31 is outside DESIGN.md colors",
+    "ignoreValue": "#173d31",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 1456,
+    "snippet": "font-size: 38px is off the DESIGN.md type ramp",
+    "ignoreValue": "38px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 1503,
+    "snippet": "font-size: 22px is off the DESIGN.md type ramp",
+    "ignoreValue": "22px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 1530,
+    "snippet": "font-size: 56px is off the DESIGN.md type ramp",
+    "ignoreValue": "56px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 1533,
+    "snippet": "Undocumented color #071717 is outside DESIGN.md colors",
+    "ignoreValue": "#071717",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 1697,
+    "snippet": "border-radius: 5px is outside the DESIGN.md rounded scale",
+    "ignoreValue": "5px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 1709,
+    "snippet": "font-size: 10px is off the DESIGN.md type ramp",
+    "ignoreValue": "10px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 1724,
+    "snippet": "Undocumented color #d8ed82 is outside DESIGN.md colors",
+    "ignoreValue": "#d8ed82",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 1802,
+    "snippet": "font-size: 28px is off the DESIGN.md type ramp",
+    "ignoreValue": "28px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 1825,
+    "snippet": "border-radius: 100px is outside the DESIGN.md rounded scale",
+    "ignoreValue": "100px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 1845,
+    "snippet": "font-size: 10px is off the DESIGN.md type ramp",
+    "ignoreValue": "10px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 1869,
+    "snippet": "border-radius: 5px is outside the DESIGN.md rounded scale",
+    "ignoreValue": "5px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 1876,
+    "snippet": "font-size: 10px is off the DESIGN.md type ramp",
+    "ignoreValue": "10px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 1980,
+    "snippet": "font-size: 40px is off the DESIGN.md type ramp",
+    "ignoreValue": "40px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/table.css",
+    "line": 2063,
+    "snippet": "font-size: 30px is off the DESIGN.md type ramp",
+    "ignoreValue": "30px",
+    "importedBy": [
+      "layout.tsx"
+    ],
+    "triage": "Left standing as inherited source advisory. Source contains legacy declarations and domain-specific native-card values; final runtime chrome is owned by club.css. No blanket suppression or claim that every declaration is dormant."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/components/UnoCard.module.css",
+    "line": 11,
+    "snippet": "Undocumented color #00000012 is outside DESIGN.md colors",
+    "ignoreValue": "#00000012",
+    "importedBy": [
+      "UnoCard.tsx"
+    ],
+    "triage": "Preserved native physical card material/scale as required by PRODUCT.md; not a new general UI token."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/components/UnoCard.module.css",
+    "line": 40,
+    "snippet": "Undocumented color #06123024 is outside DESIGN.md colors",
+    "ignoreValue": "#06123024",
+    "importedBy": [
+      "UnoCard.tsx"
+    ],
+    "triage": "Preserved native physical card material/scale as required by PRODUCT.md; not a new general UI token."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/components/UnoCard.module.css",
+    "line": 54,
+    "snippet": "Undocumented color #800622 is outside DESIGN.md colors",
+    "ignoreValue": "#800622",
+    "importedBy": [
+      "UnoCard.tsx"
+    ],
+    "triage": "Preserved native physical card material/scale as required by PRODUCT.md; not a new general UI token."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/components/UnoCard.module.css",
+    "line": 57,
+    "snippet": "Undocumented color #06123030 is outside DESIGN.md colors",
+    "ignoreValue": "#06123030",
+    "importedBy": [
+      "UnoCard.tsx"
+    ],
+    "triage": "Preserved native physical card material/scale as required by PRODUCT.md; not a new general UI token."
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/components/UnoCard.module.css",
+    "line": 107,
+    "snippet": "Undocumented color #06123050 is outside DESIGN.md colors",
+    "ignoreValue": "#06123050",
+    "importedBy": [
+      "UnoCard.tsx"
+    ],
+    "triage": "Preserved native physical card material/scale as required by PRODUCT.md; not a new general UI token."
+  }
+]

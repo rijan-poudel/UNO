@@ -1,0 +1,38 @@
+// Synthetic visual evidence only: six seats and20cards; no progress is recorded.
+'use client';
+import { useState, useSyncExternalStore } from 'react';
+import GameBoard from '../../../components/GameBoard';
+import Modal from '../../../components/Modal';
+import RoundSummary from '../../../components/RoundSummary';
+import SettingsModal from '../../../components/SettingsModal';
+import { useUnoGame } from '../../../hooks/useUnoGame';
+import { initializeGame } from '../../../lib/gameSetup';
+import { getPlayableCards } from '../../../lib/gameRules';
+import type { Card } from '../../../types/card';
+
+const subscribe = () => () => {};
+export default function Fixture() {
+  const mounted = useSyncExternalStore(subscribe, () => true, () => false);
+  return mounted ? <FixtureContent /> : null;
+}
+function FixtureContent() {
+  const api = useUnoGame(true);
+  const [screen] = useState(() => new URLSearchParams(window.location.search).get('screen'));
+  const [settings, setSettings] = useState(false);
+  const [game] = useState(() => {
+    const initial = initializeGame(['Preview','Alexandria','Maximilian','Robin','Frankie','Lou'], { maxPlayers:6, allowStartingActionCard:false }, [false,true,true,true,true,true]);
+    const extra = initial.drawPile.slice(0,13);
+    const players = initial.players.map((p,i) => i === 0 ? {...p,hand:[...p.hand,...extra]} : p);
+    const state = {...initial,players,drawPile:initial.drawPile.slice(13)};
+    if (screen === 'result') {
+      return {...state,winnerId:players[1].id,players:players.map((p,i)=>i===1?{...p,hand:[]}:p),drawPile:[...state.drawPile,...players[1].hand]};
+    }
+    return state;
+  });
+  const [wild,setWild] = useState<Card|null>(() => screen === 'wild' ? {id:'preview-wild',color:'wild',value:'wild'} : null);
+  if (screen === 'result') return <main className="game-page"><Modal title="Alexandria wins." className="winner-modal"><RoundSummary game={game} localPlayerId={game.players[0].id}/><div className="dialog-actions round-actions"><button className="button primary" onClick={()=>location.assign('/')}>One more round</button><button className="button secondary" onClick={()=>location.assign('/')}>Back to home</button></div></Modal></main>;
+  return <>
+    <GameBoard gameApi={{...api,game,localPlayerIndex:0,localPlayer:game.players[0],currentPlayer:game.players[0],isLocalTurn:true,playableCardIds:new Set(getPlayableCards(game.players[0].hand,game,0).map(c=>c.id)),pendingWild:wild,cancelWild:()=>setWild(null),confirmWildColor:()=>setWild(null)}} onReset={()=>location.assign('/')} onDealAgain={()=>location.assign('/')} onOpenSettings={()=>setSettings(true)} />
+    <SettingsModal open={settings} rules={game.rules} onChange={()=>{}} onClose={()=>setSettings(false)} />
+  </>;
+}

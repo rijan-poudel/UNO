@@ -1,0 +1,5 @@
+
+> uno@0.1.0 check:audio
+> tsx scripts/check-audio.ts
+
+Audio checks passed: unlock race, offline fallback, mute, hidden tab, expiry, no backlog. Blocked storage and prompt sample onset passed. Card sample peak 0.85, RMS 0.093.

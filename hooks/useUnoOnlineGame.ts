@@ -390,14 +390,12 @@ export function useUnoOnlineGame() {
                 room: ack.data.room,
                 game: ack.data.room.game,
                 playerId: ack.data.playerId,
-                drawnThisTurn:
-                  ack.data.room.game?.lastAction.type === 'draw' &&
-                  ack.data.room.game.lastAction.playerId ===
-                    ack.data.playerId &&
-                  ack.data.room.game.pendingDraw === 0 &&
+                drawnThisTurn: Boolean(
+                  ack.data.room.game?.drawnThisTurn &&
                   ack.data.room.game.players[
                     ack.data.room.game.currentPlayerIndex
                   ]?.id === ack.data.playerId,
+                ),
                 error: null,
               }));
             },
@@ -434,25 +432,10 @@ export function useUnoOnlineGame() {
           ].slice(0, 30);
         }
 
-        // Derive drawnThisTurn purely from server state to avoid desync
-        let drawnThisTurn =
-          prev.drawnThisTurn &&
-          room.game?.turnCount === prev.game?.turnCount &&
-          room.game?.currentPlayerIndex === prev.game?.currentPlayerIndex;
-        if (room.game && prev.playerId) {
-          const localIndex = room.game.players.findIndex(
-            (p) => p.id === prev.playerId,
-          );
-          if (
-            localIndex >= 0 &&
-            room.game.lastAction.type === 'draw' &&
-            room.game.lastAction.playerId === prev.playerId &&
-            room.game.pendingDraw === 0 &&
-            room.game.currentPlayerIndex === localIndex
-          ) {
-            drawnThisTurn = true;
-          }
-        }
+        const drawnThisTurn = Boolean(
+          room.game?.drawnThisTurn &&
+          room.game.players[room.game.currentPlayerIndex]?.id === prev.playerId,
+        );
 
         return {
           ...prev,

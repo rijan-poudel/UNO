@@ -1,0 +1,81 @@
+
+> uno@0.1.0 format
+> prettier --write app components hooks lib server scripts types docs .github *.json *.ts *.mjs *.md
+
+app/arena.css 67ms (unchanged)
+app/club.css 57ms (unchanged)
+app/globals.css 94ms (unchanged)
+app/home.css 14ms
+app/layout.tsx 38ms (unchanged)
+app/loading.tsx 2ms (unchanged)
+app/page.tsx 35ms
+app/table.css 94ms (unchanged)
+components/ChoiceDialog.tsx 5ms (unchanged)
+components/ColorPicker.tsx 6ms (unchanged)
+components/GameBoard.tsx 117ms (unchanged)
+components/GameFeedback.tsx 10ms (unchanged)
+components/GameSetup.tsx 20ms (unchanged)
+components/HandCard.tsx 23ms (unchanged)
+components/home/HomeScreen.tsx 8ms
+components/Modal.tsx 5ms (unchanged)
+components/NotificationPanel.tsx 11ms (unchanged)
+components/OnlineLobby.tsx 44ms (unchanged)
+components/PlayerAvatar.tsx 4ms (unchanged)
+components/PlayerProgress.tsx 7ms (unchanged)
+components/RoundSummary.tsx 6ms (unchanged)
+components/RulePresets.tsx 4ms (unchanged)
+components/SettingsModal.tsx 43ms (unchanged)
+components/SetupShell.tsx 3ms (unchanged)
+components/TableRules.tsx 4ms (unchanged)
+components/ui/PageChrome.tsx 9ms (unchanged)
+components/UnoCard.module.css 19ms
+components/UnoCard.tsx 11ms
+hooks/useAudioManager.ts 8ms (unchanged)
+hooks/useGamePresentation.ts 44ms (unchanged)
+hooks/usePhonePortrait.ts 2ms (unchanged)
+hooks/useUnoGame.ts 55ms
+hooks/useUnoOnlineGame.ts 111ms
+lib/audioSettings.ts 19ms (unchanged)
+lib/audiosRegistry.ts 7ms (unchanged)
+lib/botSupport.ts 15ms (unchanged)
+lib/cardGesture.ts 2ms (unchanged)
+lib/cardMotion.ts 5ms (unchanged)
+lib/cardPose.ts 5ms (unchanged)
+lib/deck.ts 26ms (unchanged)
+lib/gameActions.ts 92ms
+lib/gameLimits.ts 2ms (unchanged)
+lib/gameRules.ts 13ms
+lib/gameSetup.ts 10ms
+lib/playerExpression.ts 2ms (unchanged)
+lib/playerNames.ts 4ms (unchanged)
+lib/playerProgress.ts 9ms (unchanged)
+lib/roomCodes.ts 2ms (unchanged)
+lib/rulePreferences.ts 4ms
+lib/rulePresets.ts 3ms (unchanged)
+lib/socketConnection.ts 2ms (unchanged)
+lib/tableChimes.ts 16ms (unchanged)
+lib/turns.ts 6ms (unchanged)
+lib/utils.ts 2ms (unchanged)
+lib/validateGameRules.ts 4ms
+lib/voiceAnnouncer.ts 22ms (unchanged)
+server/socketServer.ts 69ms
+scripts/check-audio.ts 16ms (unchanged)
+scripts/check-game.ts 34ms
+scripts/check-gesture.ts 3ms (unchanged)
+scripts/check-multiplayer.ts 16ms
+scripts/prepare-audio.mjs 27ms (unchanged)
+types/card.ts 5ms (unchanged)
+types/game.ts 4ms (unchanged)
+types/multiplayer.ts 11ms (unchanged)
+types/rules.ts 4ms (unchanged)
+docs/ARCHITECTURE.md 282ms (unchanged)
+.github/workflows/ci.yml 24ms (unchanged)
+package.json 3ms (unchanged)
+tsconfig.json 2ms (unchanged)
+next.config.ts 4ms (unchanged)
+eslint.config.mjs 4ms (unchanged)
+postcss.config.mjs 2ms (unchanged)
+AGENTS.md 37ms (unchanged)
+DESIGN.md 65ms (unchanged)
+PRODUCT.md 20ms (unchanged)
+README.md 32ms (unchanged)

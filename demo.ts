@@ -78,6 +78,8 @@ function runBotTurn(state: GameState): GameState {
     return state;
   }
 
+  if (move.action === 'pass') return passTurn(state, playerIndex);
+
   if (move.action === 'draw') {
     state = drawOneCard(state, playerIndex);
     // Check if the newly drawn card is playable — if so, the bot plays it.

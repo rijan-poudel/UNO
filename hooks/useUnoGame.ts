@@ -252,7 +252,7 @@ export function useUnoGame(paused = false) {
       try {
         const next = enginePlayCard(
           game,
-          game.currentPlayerIndex,
+          localPlayerIndex,
           pendingWild.id,
           color,
         );
@@ -261,7 +261,7 @@ export function useUnoGame(paused = false) {
         reportHookError('confirmWildColor error', e);
       }
     },
-    [game, pendingWild],
+    [game, pendingWild, localPlayerIndex],
   );
 
   const cancelWild = useCallback(() => dispatch({ type: 'CANCEL_WILD' }), []);
@@ -285,7 +285,10 @@ export function useUnoGame(paused = false) {
       // auto-pass after a short delay once the drawn card is visible.
       try {
         const afterDraw = drawOneCard(game, idx);
-        dispatch({ type: 'DRAW_ONE', game: afterDraw });
+        dispatch({
+          type: afterDraw.currentPlayerIndex === idx ? 'DRAW_ONE' : 'PLAY',
+          game: afterDraw,
+        });
       } catch (e) {
         reportHookError('drawOneCard error', e);
       }
@@ -369,12 +372,16 @@ export function useUnoGame(paused = false) {
 
         if (move.action === 'drawRequired') {
           next = drawRequiredCards(botState, botIndex);
+        } else if (move.action === 'pass') {
+          next = passTurn(botState, botIndex);
         } else if (move.action === 'draw') {
           const afterDraw = drawOneCard(botState, botIndex);
           const updatedHand = afterDraw.players[botIndex].hand;
           const drawnCard = updatedHand[updatedHand.length - 1];
 
-          if (drawnCard && canPlayCard(drawnCard, afterDraw, botIndex)) {
+          if (afterDraw.currentPlayerIndex !== botIndex) {
+            next = afterDraw;
+          } else if (drawnCard && canPlayCard(drawnCard, afterDraw, botIndex)) {
             const color =
               drawnCard.color === 'wild'
                 ? ((move as { chosenColor?: CardColor }).chosenColor ?? 'red')

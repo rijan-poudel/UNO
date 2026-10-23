@@ -2,10 +2,11 @@
 "use client";
 import { useState } from "react";
 import Image from "next/image";
-import { ArrowRight, ChevronDown } from "lucide-react";
+import { ArrowRight, Bot, ChevronDown, BookOpen } from "lucide-react";
 import type { FriendInvite } from "../../types/multiplayer";
 import NotificationPanel from "../NotificationPanel";
 import PlayerProgress from "../PlayerProgress";
+import { UnoMenuCard } from "../UnoCard";
 
 interface Props {
   themeLabel: string;
@@ -25,10 +26,7 @@ interface Props {
 export default function HomeScreen(props: Props) {
   const [help, setHelp] = useState(false);
   return (
-    <div
-      className="launch-screen"
-      data-design-contract="centered-home-2e1e4271"
-    >
+    <div className="launch-screen" data-design-contract="comic-card-showdown">
       <div className="launch-header">
         <NotificationPanel
           {...props}
@@ -37,38 +35,66 @@ export default function HomeScreen(props: Props) {
       </div>
       <main className="launch-main">
         <div className="launch-heading">
-          <h1>Deal yourself in.</h1>
+          <h1 aria-label="UNO — Deal yourself in.">UNO</h1>
           <p>Your table. Your rules.</p>
         </div>
-        <figure className="launch-scene">
-          <Image
-            src="/artwork/card-night-flat.webp"
-            width={1729}
-            height={910}
-            alt="A laughing red panda slaps down a reverse card while a blue rabbit and green crocodile hold their cards around the table."
-            sizes="(max-width: 700px) 100vw, (max-width: 1250px) 740px, 820px"
-            unoptimized
-            preload
-          />
-        </figure>
-        <section className="launch-play" aria-label="Choose how to play">
-          <button
-            className="launch-action launch-action-main"
-            onClick={props.onQuickPlay}
-          >
-            Play with bots <ArrowRight size={23} aria-hidden="true" />
-          </button>
-          <div className="launch-online">
-            <button className="launch-action" onClick={props.onFriends}>
-              Create a room
-            </button>
-            <button className="launch-action" onClick={props.onJoin}>
-              Join a room
-            </button>
+        <section className="launch-stage" aria-label="Choose how to play">
+          <figure className="launch-cast" aria-hidden="true">
+            <Image
+              src="/artwork/opening-hand-cast.webp"
+              width={2200}
+              height={700}
+              alt=""
+              sizes="100vw"
+              unoptimized
+              preload
+            />
+          </figure>
+          <div className="launch-hand">
+            <div className="launch-card launch-card-main">
+              <UnoMenuCard
+                color="yellow"
+                label="Play with bots"
+                onClick={props.onQuickPlay}
+              >
+                <span>
+                  Play
+                  <br />
+                  with bots
+                </span>
+                <ArrowRight aria-hidden="true" />
+              </UnoMenuCard>
+            </div>
+            <div className="launch-card launch-card-create">
+              <UnoMenuCard
+                color="red"
+                label="Create a room"
+                onClick={props.onFriends}
+              >
+                <span>
+                  Create
+                  <br />a room
+                </span>
+              </UnoMenuCard>
+            </div>
+            <div className="launch-card launch-card-join">
+              <UnoMenuCard
+                color="blue"
+                label="Join a room"
+                onClick={props.onJoin}
+              >
+                <span>
+                  Join
+                  <br />a room
+                </span>
+              </UnoMenuCard>
+            </div>
           </div>
+        </section>
+        <section className="launch-play" aria-label="More ways to play">
           <div className="launch-extras">
             <button className="launch-text-action" onClick={props.onComputer}>
-              Set up bots
+              <Bot size={18} aria-hidden="true" /> Set up bots
             </button>
             <button
               className="launch-text-action"
@@ -76,7 +102,8 @@ export default function HomeScreen(props: Props) {
               aria-expanded={help}
               aria-controls="launch-quick-rules"
             >
-              How to play <ChevronDown size={16} aria-hidden="true" />
+              <BookOpen size={18} aria-hidden="true" /> How to play{" "}
+              <ChevronDown size={16} aria-hidden="true" />
             </button>
           </div>
           {help && (

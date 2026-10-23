@@ -17,15 +17,21 @@ import HomeScreen from "../components/home/HomeScreen";
 import OnlineLobby from "../components/OnlineLobby";
 import NotificationPanel from "../components/NotificationPanel";
 import SettingsModal from "../components/SettingsModal";
+import { UnoWordmark } from "../components/ui/PageChrome";
 import { getSavedPlayerNames } from "../lib/playerNames";
 import { toast } from "sonner";
 
 const subscribeToClient = () => () => {};
-const SHARED_RULES_KEY = "uno.shared.rules";
+import {
+  DEFAULT_TABLE_RULES,
+  parseRulePreferences,
+  SHARED_RULES_KEY,
+  RULES_VERSION_KEY,
+  RULES_VERSION,
+} from "../lib/rulePreferences";
 const PREFERRED_THEME_KEY = "uno.preferred.theme";
 
 const ONLINE_PLAYER_NAME_KEY = "uno.online.playerName";
-const MIN_SUPPORTED_MAX_PLAYERS = 6;
 
 type ThemeName = "paper" | "midnight" | "forest" | "sunset";
 
@@ -36,46 +42,15 @@ const THEMES: Record<ThemeName, { label: string }> = {
   sunset: { label: "Clay" },
 };
 
-const DEFAULT_RULES: Partial<GameRules> = {
-  stackDraw2: false,
-  stackWild4: false,
-  allowWild4OnDraw2: false,
-  drawUntilPlayable: false,
-  reverseActsAsSkipInTwoPlayer: true,
-  mustDeclareUno: true,
-  allowStartingActionCard: true,
-  allowDiscardAll: false,
-  allowShuffleCard: false,
-  allowDoublePlaySameNumber: false,
-  maxPlayers: MIN_SUPPORTED_MAX_PLAYERS,
-};
-
-function getInitialRules(): Partial<GameRules> {
-  if (typeof window === "undefined") return DEFAULT_RULES;
+function getInitialRules(): GameRules {
+  if (typeof window === "undefined") return { ...DEFAULT_TABLE_RULES };
   try {
-    const raw = window.localStorage.getItem(SHARED_RULES_KEY);
-    if (!raw) return DEFAULT_RULES;
-    const parsed = JSON.parse(raw) as Partial<GameRules> & {
-      shuffleHandsOnZero?: boolean;
-    };
-    const normalizedMaxPlayers = Math.max(
-      MIN_SUPPORTED_MAX_PLAYERS,
-      parsed.maxPlayers ??
-        DEFAULT_RULES.maxPlayers ??
-        MIN_SUPPORTED_MAX_PLAYERS,
+    return parseRulePreferences(
+      window.localStorage.getItem(SHARED_RULES_KEY),
+      window.localStorage.getItem(RULES_VERSION_KEY),
     );
-
-    return {
-      ...DEFAULT_RULES,
-      ...parsed,
-      maxPlayers: normalizedMaxPlayers,
-      allowShuffleCard:
-        parsed.allowShuffleCard ??
-        parsed.shuffleHandsOnZero ??
-        DEFAULT_RULES.allowShuffleCard,
-    };
   } catch {
-    return DEFAULT_RULES;
+    return { ...DEFAULT_TABLE_RULES };
   }
 }
 
@@ -144,6 +119,7 @@ export default function Home() {
     if (mounted) {
       try {
         window.localStorage.setItem(SHARED_RULES_KEY, JSON.stringify(rules));
+        window.localStorage.setItem(RULES_VERSION_KEY, RULES_VERSION);
       } catch {}
     }
   }, [rules, mounted]);
@@ -242,9 +218,7 @@ export default function Home() {
 
   let content: ReactNode = (
     <main className="loading-screen">
-      <span className="wordmark">
-        uno<span>.</span>
-      </span>
+      <UnoWordmark />
       <p>Getting the table ready…</p>
     </main>
   );

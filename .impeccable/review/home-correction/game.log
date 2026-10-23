@@ -1,0 +1,11 @@
+
+> uno@0.1.0 check:game
+> tsx scripts/check-game.ts
+
+Gesture checks passed: upward release, scrolling, small lifts and invalid input.
+Rule migration, same-type stacking, finish restrictions, jump-ins and draw sequencing passed.
+Passed: 60 complete rounds, deck conservation, immutable inputs, serialization, wild validation, and UNO call-out.
+Progress and supported rule presets passed.
+Public socket configuration and local preview endpoints passed.
+Shared player-name persistence, notifications, invalid data and blocked storage passed.
+Card motion source pose, pile landing and bounded timing passed.

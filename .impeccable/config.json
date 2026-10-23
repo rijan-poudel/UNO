@@ -1,0 +1,26 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "side-tab",
+        "value": "*",
+        "files": [
+          "app/globals.css"
+        ],
+        "createdAt": "2026-10-23T13:32:03.009Z",
+        "reason": "UNO functional pressed button lips, inherited color-choice rules overridden by the approved comic control grammar in app/club.css; these are bottom control edges, not decorative side tabs."
+      },
+      {
+        "rule": "side-tab",
+        "value": "*",
+        "files": [
+          "app/table.css"
+        ],
+        "createdAt": "2026-10-23T13:32:03.071Z",
+        "reason": "UNO physical UNO action button: its bottom inset lip communicates a pressed game control, not a decorative information-container side stripe; preserved by the selected comic-card world."
+      }
+    ]
+  }
+}

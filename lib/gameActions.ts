@@ -276,6 +276,7 @@ export function playCard(
     : state;
 
   const player = state.players[playerIndex];
+  if (!player) throw new Error('Player not found.');
 
   // Remove the card from hand — throws if not found.
   const { card, newHand } = removeCardById(player.hand, cardId);
@@ -408,6 +409,9 @@ export function drawOneCard(state: GameState, playerIndex: number): GameState {
   }
 
   const player = state.players[playerIndex];
+  if (!player) throw new Error('Player not found.');
+  if (state.drawnThisTurn)
+    throw new Error('You have already drawn. Play a card or pass.');
   const drawn: Card[] = [];
   let afterDraw = state;
 
@@ -426,7 +430,15 @@ export function drawOneCard(state: GameState, playerIndex: number): GameState {
     while (drawn.length > 0 && draws < MAX_DRAW_UNTIL_PLAYABLE) {
       draws++;
       const latestCard = drawn[drawn.length - 1];
-      if (canPlayCard(latestCard, afterDraw, playerIndex)) {
+      if (
+        canPlayCard(
+          latestCard,
+          updatePlayer(afterDraw, playerIndex, {
+            hand: [...player.hand, ...drawn],
+          }),
+          playerIndex,
+        )
+      ) {
         break;
       }
       const beforeCount = drawn.length;
@@ -447,10 +459,14 @@ export function drawOneCard(state: GameState, playerIndex: number): GameState {
 
   const newHand = [...player.hand, ...drawn];
 
-  let updated = updatePlayer(afterDraw, playerIndex, { hand: newHand });
+  let updated = updatePlayer(afterDraw, playerIndex, {
+    hand: newHand,
+    saidUno: false,
+  });
   updated = {
     ...updated,
     lastAction: { type: 'draw', playerId: player.id, count: drawn.length },
+    drawnThisTurn: true,
   };
 
   return updated;
@@ -478,6 +494,7 @@ export function drawRequiredCards(
   }
 
   const player = state.players[playerIndex];
+  if (!player) throw new Error('Player not found.');
   const { drawn, state: afterDraw } = drawCardsFromPile(
     state,
     state.pendingDraw,
@@ -485,7 +502,10 @@ export function drawRequiredCards(
 
   const newHand = [...player.hand, ...drawn];
 
-  let updated = updatePlayer(afterDraw, playerIndex, { hand: newHand });
+  let updated = updatePlayer(afterDraw, playerIndex, {
+    hand: newHand,
+    saidUno: false,
+  });
   updated = {
     ...updated,
     pendingDraw: 0,
@@ -504,8 +524,7 @@ export function drawRequiredCards(
  * Only valid after the player has already drawn their one voluntary card
  * (drawOneCard) and chosen not to play it.
  *
- * In most implementations the UI prevents calling passTurn() before drawing.
- * Here we trust the caller to enforce that sequencing.
+ * The snapshot tracks voluntary draws so this is enforced for every caller.
  */
 export function passTurn(state: GameState, playerIndex: number): GameState {
   if (state.winnerId) throw new Error('Game is already over.');
@@ -513,7 +532,12 @@ export function passTurn(state: GameState, playerIndex: number): GameState {
     throw new Error(`It is not player ${playerIndex}'s turn.`);
   }
 
+  if (state.pendingDraw > 0 || !state.drawnThisTurn) {
+    throw new Error('Draw before passing your turn.');
+  }
+
   const player = state.players[playerIndex];
+  if (!player) throw new Error('Player not found.');
   const withAction: GameState = {
     ...state,
     lastAction: { type: 'pass', playerId: player.id },
@@ -537,7 +561,9 @@ export function passTurn(state: GameState, playerIndex: number): GameState {
  * in practice — callers only trigger this for the relevant player).
  */
 export function declareUno(state: GameState, playerIndex: number): GameState {
+  if (state.winnerId) throw new Error('Game is already over.');
   const player = state.players[playerIndex];
+  if (!player) throw new Error('Player not found.');
 
   if (player.hand.length > 2 || player.hand.length < 1) {
     // Only allow UNO declaration at 2 cards (pre-declare) or 1 card (standard).
@@ -569,8 +595,12 @@ export function callOutUno(
   callerIndex: number,
   targetIndex: number,
 ): GameState {
+  if (state.winnerId) throw new Error('Game is already over.');
   const target = state.players[targetIndex];
   const caller = state.players[callerIndex];
+  if (!target || !caller) throw new Error('Player not found.');
+  if (callerIndex === targetIndex)
+    throw new Error('You cannot call yourself out.');
 
   // Determine whether the call-out is valid.
   const isValidCallOut = target.hand.length === 1 && !target.saidUno;

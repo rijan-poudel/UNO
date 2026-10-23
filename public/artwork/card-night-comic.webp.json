@@ -1,0 +1,76 @@
+{
+  "prompt": "Use case: precise-object-edit.\nUse this generated comic illustration as the edit target. Change ONLY framing: re-render the exact same image, subject, style and composition at smaller scale within a wider transparent canvas, with at least 6 percent genuinely empty alpha space around the complete artwork on all four sides. In particular finish the entire oval wooden table's bottom edge and right outer chair/sleeve, then leave generous transparent margin below and to the right. Keep the full rabbit ears, raised crocodile fist, all three friends, wood table, hands, cards and chair edges completely visible. The full picture must remain around 2.2:1 panoramic, at least 1860 pixels wide. Preserve the exact vivid comic ink style, strong black outlines, hatching, cel shading, expressive faces, garments, palette, UNO physical card marks and wood texture. Background must remain TRUE transparent alpha, including all gaps. Do not add any objects, characters, text, backdrop, speed lines, shadow, page chrome, heading, button, borders or UI. Do not cut off any art at the canvas edge. Do not change character poses, proportions or artwork style. Every artwork pixel must fit inside the transparent margins.\n",
+  "createdAt": "2026-10-23T06:48:25.577Z",
+  "id": "card-night-comic",
+  "tool": "image_gen.imagegen (built-in)",
+  "useCase": "illustration-story",
+  "sourceReferences": [
+    {
+      "path": ".impeccable/mocks/site-redesign/panel.png",
+      "role": "Approved comic style, clothing, color, composition and wood table reference; no pixels cropped or shipped."
+    },
+    {
+      "path": "public/artwork/card-night-flat.webp",
+      "role": "Existing original three-character identities."
+    }
+  ],
+  "generations": [
+    {
+      "prompt": "Use case: illustration-story.\nAsset type: production transparent panoramic illustration for the UNO web game's home screen.\nInput images: Image 1 (.impeccable/mocks/site-redesign/panel.png) is the approved comic visual reference, specifically the three friends, hoodies, card backs and wood tabletop. Its page chrome, lettering, action buttons, background speed lines and layout are NOT part of this asset. Image 2 (public/artwork/card-night-flat.webp) is identity reference for the original blue rabbit, red panda and green crocodile only; do not copy its flat rounded animation style or teal table.\nPrimary request: Regenerate the central comic cast from Image 1 as one clean reusable cutout with TRUE transparent alpha. Three expressive original friends share a lively UNO game: cobalt blue rabbit on the left wearing a vivid red hoodie with cream sleeve stripe; orange-red red panda in the middle wearing a vivid yellow hoodie, cream face markings and a striped curled tail; vivid green crocodile on the right wearing a rich blue hoodie, laughing with one raised celebratory fist. Each friend holds a small fan of native UNO card BACKS: black backs, white rim, red oval and yellow UNO lettering. These physical card marks are the only text allowed. Place a small stacked deck and a single wild card flat on the wood table, as in Image 1.\nStyle/medium: Faithfully match Image 1's confident hand-inked comic finish: thick almost-black outlines with thinner expressive interior hatching, crisp flat saturated color fills, controlled two-tone cel shading, angular fur tufts, strong eyebrows, joy and competitive energy. Premium finished 2D comic art, not a cute clay rendition. Retain the illustrated wood grain and warm amber table surface of Image 1.\nComposition/framing: Wide horizontal panoramic artwork around 2.2:1, target 2200 by 1000 pixels or higher equivalent resolution. Three friends at equal readable scale behind one complete shallow oval wooden tabletop, composition matching Image 1's left/center/right balance. The whole scene is isolated: complete rabbit ears, crocodile fist, every head, hands, sleeves, panda tail, chair edges and complete table perimeter fully within the image. Keep generous genuinely transparent margin around all sides, especially above rabbit ears and beside outer sleeves. Table is the foreground base, low enough that faces and card fans remain clear. Preserve natural scene perspective from the reference; this is physical tabletop perspective, no transformed page or card framing. No subject touches any image edge.\nBackground: Absolutely transparent alpha, including gaps between characters and furniture. No colored background or baked checkerboard, no floor or cast shadow outside the objects.\nConstraints: Produce new original high-resolution pixels; do not crop the approved comp. Do not redesign the characters, garments, palette, camera angle or comic style. Do not add characters or objects. Remove every page heading, navigation, button, tagline, watermark, UI frame, rounded clipping, border, caption band, layout background and background speed line. No standalone UNO heading/logo; only UNO printed on the physical card backs. No floating confetti or rays. Avoid 3D, soft toy shapes, glossy plastic, clay, airbrush, gradients, photographic fur, excessive textures and blurred contours.",
+      "referenced_image_paths": [
+        "/Users/rizx/projects/UNO/.impeccable/mocks/site-redesign/panel.png",
+        "/Users/rizx/projects/UNO/public/artwork/card-night-flat.webp"
+      ],
+      "transparent_background": true,
+      "generatedSource": "/Users/rizx/.codex/generated_images/01a16780-b3ba-72a1-a6d4-5c17faa407ef/exec-efed844a-b204-49f8-9c29-f0b147e2beef.png",
+      "archivedSource": ".impeccable/review/site-redesign/comic-sources/comic-first-generation.png"
+    },
+    {
+      "prompt": "Use case: precise-object-edit.\nUse this generated comic illustration as the edit target. Change ONLY framing: re-render the exact same image, subject, style and composition at smaller scale within a wider transparent canvas, with at least 6 percent genuinely empty alpha space around the complete artwork on all four sides. In particular finish the entire oval wooden table's bottom edge and right outer chair/sleeve, then leave generous transparent margin below and to the right. Keep the full rabbit ears, raised crocodile fist, all three friends, wood table, hands, cards and chair edges completely visible. The full picture must remain around 2.2:1 panoramic, at least 1860 pixels wide. Preserve the exact vivid comic ink style, strong black outlines, hatching, cel shading, expressive faces, garments, palette, UNO physical card marks and wood texture. Background must remain TRUE transparent alpha, including all gaps. Do not add any objects, characters, text, backdrop, speed lines, shadow, page chrome, heading, button, borders or UI. Do not cut off any art at the canvas edge. Do not change character poses, proportions or artwork style. Every artwork pixel must fit inside the transparent margins.",
+      "referenced_image_paths": [
+        "/Users/rizx/.codex/generated_images/01a16780-b3ba-72a1-a6d4-5c17faa407ef/exec-efed844a-b204-49f8-9c29-f0b147e2beef.png"
+      ],
+      "transparent_background": true,
+      "generatedSource": "/Users/rizx/.codex/generated_images/01a16780-b3ba-72a1-a6d4-5c17faa407ef/exec-18885e59-add6-4e6b-8a5d-604f260d6a27.png",
+      "archivedSource": ".impeccable/review/site-redesign/comic-sources/comic-framing-generation.png"
+    }
+  ],
+  "processing": "Lossless cwebp -lossless -exact -m 6; no resampling or pixel cleanup; true generated RGBA preserved.",
+  "dimensions": {
+    "width": 1860,
+    "height": 846
+  },
+  "format": "WebP (lossless RGBA)",
+  "transparency": true,
+  "alpha": {
+    "boundsAnyNonzero": [
+      29,
+      38,
+      1836,
+      846
+    ],
+    "boundsAbove1of255": [
+      98,
+      63,
+      1713,
+      779
+    ],
+    "boundsAbove128of255": [
+      101,
+      66,
+      1711,
+      775
+    ],
+    "extrema": [
+      0,
+      255
+    ],
+    "note": "Generator includes very faint alpha=1 noise beyond the visible silhouette, including the final row. Full visible artwork has clear margin; original alpha is preserved."
+  },
+  "qa_status": "accepted",
+  "qa_notes": "Compared generated source and final WebP with approved panel: comic ink, flat saturated cel shading, specified cast/hoodies, complete ears/heads/hands/table, native UNO backs and no UI/page chrome. No clay styling. Original artwork retained.",
+  "deviations": [
+    "1860\u00d7846 instead of requested aspirational 2200\u00d71000; exceeds assigned minimum width 1600 and matches target aspect ratio.",
+    "Faint alpha=1 generator noise extends past visible margin; no visible crop."
+  ]
+}
