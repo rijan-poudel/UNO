@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-23T06:16:56Z",
-  "title": "Design System: UNO — Card club and illustrated game room",
+  "generatedAt": "2026-10-23T13:23:26.694322+00:00",
+  "title": "Design System: UNO \u2014 Card club and illustrated game room",
   "extensions": {
     "colorMeta": {
       "ui-bg": {
@@ -1166,6 +1166,21 @@
         "name": "color-choice",
         "value": "inset 0 2px 2px #ffffff40, inset 0 -4px 3px #00000028, 0 5px 10px #02071820",
         "purpose": "Vivid native color-choice surfaces."
+      },
+      {
+        "name": "opponent-backing",
+        "value": "0 5px 9px #03091270",
+        "purpose": "Shallow opaque backing behind the protruding native character and count."
+      },
+      {
+        "name": "opponent-character",
+        "value": "inset 0 1px 1px #ffffff80, 1px 3px 1px #748a97, 0 6px 9px #03091270",
+        "purpose": "Ivory-edged native card character; local stock depth."
+      },
+      {
+        "name": "opponent-count",
+        "value": "2px 2px 1px #748a97, 3px 5px 6px #03091266",
+        "purpose": "Separate actual-count card tile; local stock depth, not a container shadow."
       }
     ],
     "motion": [
@@ -1186,12 +1201,12 @@
       },
       {
         "name": "play-flight",
-        "value": "190–262ms cubic-bezier(.16,1,.3,1)",
+        "value": "190\u2013262ms cubic-bezier(.16,1,.3,1)",
         "purpose": "Move the native discard face from the actual release pose or a visible opponent fan card to the pile; compact landscape falls back to a visible avatar pose without cloning the avatar. Hidden pages and reduced motion suppress flights; new snapshots, visibility loss, unmount and reduced-motion changes interrupt and clean up. Neither flight nor sound gates a turn."
       },
       {
         "name": "draw-flight",
-        "value": "190–262ms cubic-bezier(.16,1,.3,1)",
+        "value": "190\u2013262ms cubic-bezier(.16,1,.3,1)",
         "purpose": "Clone the face-down deck for opponent draws and scale dimensions and card lettering into a visible fan-card pose, falling back to a visible avatar pose on compact landscape; never clone the avatar. One flight per opponent receiving cards, with existing six-representative local arrivals and 25ms stagger. Shared bounded geometry, suppression and cleanup never gate turns or audio."
       },
       {
@@ -1248,6 +1263,11 @@
         "name": "turn-and-legal-lift",
         "value": "turn 8px; legal 26px and scale(1.025); short landscape 5/20px; shortest 4/16px",
         "purpose": "Published static local-turn/legal cues; uninspected/unfocused nonmatches quiet only on local turn with brightness(.86) saturate(.93). 200ms transition removed under reduced motion; no idle loop."
+      },
+      {
+        "name": "opponent-count",
+        "value": "160ms cubic-bezier(0.16, 1, 0.3, 1) transform; 160ms background/color",
+        "purpose": "Local exact-count state response; reduced motion removes transitions and preserves active contrast."
       }
     ],
     "breakpoints": [
@@ -1328,127 +1348,150 @@
       }
     },
     "recordScope": {
-      "contract": ".impeccable/review/play-polish/contract.md",
-      "baselineReview": ".impeccable/review/play-polish/baseline-review.md",
-      "verification": ".impeccable/review/play-polish/verification.md",
-      "verdict": ".impeccable/review/play-polish/verdict.md",
-      "finalVerdict": ".impeccable/review/play-polish/final-verdict.md",
-      "inheritedSeeds": {
-        "home": "2e1e4271",
-        "play": "457003dd"
-      },
+      "contract": ".impeccable/review/opponent-badges/contract.md",
+      "baselineReview": ".impeccable/review/opponent-badges/baseline-review.md",
+      "verification": ".impeccable/review/opponent-badges/verification.md",
+      "verdict": ".impeccable/review/opponent-badges/finish-verdict.md",
+      "metrics": ".impeccable/review/opponent-badges/metrics.json",
+      "confirmationMetrics": ".impeccable/review/opponent-badges/confirmation-metrics.json",
+      "inheritedSeed": "457003dd",
       "approvedComp": false,
       "independentQualityBarSupplied": false,
+      "reviewOutcome": "Both scored baseline fixes resolved; ship at their scope, not the whole surface.",
       "captures": [
-        "after-desktop-home.png",
-        "after-desktop-menu.png",
-        "after-desktop-play.png",
-        "after-desktop-wild.png",
-        "after-hover-848.png",
-        "after-large-568.png",
-        "after-large-844.png",
-        "after-owner-home.png",
-        "after-owner-menu.png",
-        "after-owner-play.png",
-        "after-owner-wild.png",
-        "after-pass-568.png",
-        "after-pass-844.png",
-        "after-pass-848.png",
-        "after-phone-568-home.png",
-        "after-phone-568-menu.png",
-        "after-phone-568-play.png",
-        "after-phone-568-wild.png",
-        "after-phone-844-home.png",
-        "after-phone-844-menu.png",
-        "after-phone-844-play.png",
-        "after-phone-844-wild.png",
-        "after-reduced-home.png",
-        "after-reduced-menu.png",
-        "after-reduced-play.png",
-        "after-reduced-wild.png",
-        "after-seats-568.png",
-        "after-seats-844.png"
+        "after-desktop.png",
+        "after-owner.png",
+        "after-six-owner.png",
+        "after-six-phone-844.png",
+        "after-six-phone-568.png",
+        "after-states-844.png",
+        "after-states-568.png",
+        "after-active.png",
+        "after-active-reduced.png"
       ],
-      "heldTouchFrames": [
-        "phone-drag-cancel.png",
-        "phone-drag-return.png"
-      ],
-      "reviewOutcome": "Seven baseline fixes: verdict resolves six, player clarity partial; final verdict resolves remaining Offline label and assigns ship at scored-fix scope only.",
-      "metrics": {
-        "productionCases": 12,
-        "productionFailures": 0,
-        "reconnectCases": 2,
-        "reconnectFailures": 0,
-        "normalDesktopCardPileGap": "about 70–73px, formerly 110–120px"
-      },
-      "checks": "Reported passing lint, strict types, game/audio/multiplayer assertions, production build and formatting; raster scan 4 assets / 0 missing provenance. No detector or screenshot rerun during documentation.",
-      "detector": "One changed-target pass: 17 palette/type/radius advisories, 0 errors, no ignores. Menu command/Leave roles recorded at actual scope; historical advisories not canonized.",
-      "boundary": "Browser geometry, keyboard and emulated held touch plus source guards; loopback-only synthetic long-name/offline/angle cases. No whole-surface, physical-handset, speaker listening, exhaustive accessibility or independent quality-bar certification.",
-      "notCanonized": "Offscreen start actions, seven-row menu, old desktop pile offsets/lift, undersized badges/clipped reconnect text, floating Catch, reconstructed pickup geometry and stale keyboard suppression; detector advisories do not become blanket tokens.",
+      "evidenceCrop": "Initial tight detail crop excluded from viewport/clipping evidence; verification records a padded replacement and bounded focus/Catch confirmation separately.",
+      "checks": "Reported passing production build, lint, strict types, game/audio/multiplayer assertions and formatting. Existing raster provenance: 4 assets / 0 missing; no new raster. Documentation formatting checked separately.",
+      "detector": "One pass: 7 palette/type advisories. Local badge materials and compact density do not create generic tokens, ignores or broad exemptions.",
+      "boundary": "Production-browser geometry, keyboard Catch and reduced-motion evidence plus assertions; no physical-phone, speaker, exhaustive accessibility or whole-surface certification.",
+      "notCanonized": "Superseded enclosed tiny avatars, full-yellow active labels and Layers/count metadata; detector advisories and unrelated primary-checkout arena/global/table/feedback experiments are not design rules.",
       "previousRecord": {
-        "contract": ".impeccable/review/closer-table/contract.md",
-        "baselineReview": ".impeccable/review/closer-table/baseline-review.md",
-        "layoutVerdict": ".impeccable/review/closer-table/layout-verdict.md",
-        "finishReview": ".impeccable/review/closer-table/finish-review.md",
-        "inheritedSeed": "457003dd",
-        "ownerChoice": "Correct the rejected shipped layout inside the selected illustrated game-room setting.",
+        "contract": ".impeccable/review/play-polish/contract.md",
+        "baselineReview": ".impeccable/review/play-polish/baseline-review.md",
+        "verification": ".impeccable/review/play-polish/verification.md",
+        "verdict": ".impeccable/review/play-polish/verdict.md",
+        "finalVerdict": ".impeccable/review/play-polish/final-verdict.md",
+        "inheritedSeeds": {
+          "home": "2e1e4271",
+          "play": "457003dd"
+        },
         "approvedComp": false,
         "independentQualityBarSupplied": false,
         "captures": [
-          "desktop-1440.png",
-          "user-848.png",
-          "hover-848.png",
-          "wild-848.png",
-          "landscape-844-rest.png",
-          "landscape-844-focus.png",
-          "landscape-568-rest.png",
-          "landscape-568-focus.png",
-          "phone-fan-844.png",
-          "phone-pass-844.png",
-          "phone-uno-568.png",
-          "phone-wild-568.png",
-          "phone-wild-844.png",
-          "portrait-gate.png",
-          "reduced-844.png"
+          "after-desktop-home.png",
+          "after-desktop-menu.png",
+          "after-desktop-play.png",
+          "after-desktop-wild.png",
+          "after-hover-848.png",
+          "after-large-568.png",
+          "after-large-844.png",
+          "after-owner-home.png",
+          "after-owner-menu.png",
+          "after-owner-play.png",
+          "after-owner-wild.png",
+          "after-pass-568.png",
+          "after-pass-844.png",
+          "after-pass-848.png",
+          "after-phone-568-home.png",
+          "after-phone-568-menu.png",
+          "after-phone-568-play.png",
+          "after-phone-568-wild.png",
+          "after-phone-844-home.png",
+          "after-phone-844-menu.png",
+          "after-phone-844-play.png",
+          "after-phone-844-wild.png",
+          "after-reduced-home.png",
+          "after-reduced-menu.png",
+          "after-reduced-play.png",
+          "after-reduced-wild.png",
+          "after-seats-568.png",
+          "after-seats-844.png"
         ],
-        "reviewOutcome": "Four scored layout fixes cleared in layout-verdict.md; the subsequent full finish review required a complete short-landscape color decision and this design refresh. Final production verification records fifteen opened captures after the scoped dialog correction; both phone wild states show complete controls without scrolling. Final disposition belongs to the review packet.",
-        "checks": "Reported passing lint, strict types, game/audio/multiplayer assertions and production build. Existing raster scan: four assets, zero missing provenance records.",
-        "boundary": "Browser geometry and keyboard/mouse evidence plus source guards only. No independent quality-bar, whole-app, public-deployment, physical-phone touch, speaker quality or exhaustive accessibility certification.",
-        "notCanonized": "Superseded independent pile centering, former phone hand rows and hidden avatars, scrolling phone wild decision, incidental response values and historical scan advisories do not become broad tokens or exemptions.",
-        "detector": "Baseline scoped mechanical layout scan reported no findings; no new detector run for this documentation pass.",
+        "heldTouchFrames": ["phone-drag-cancel.png", "phone-drag-return.png"],
+        "reviewOutcome": "Seven baseline fixes: verdict resolves six, player clarity partial; final verdict resolves remaining Offline label and assigns ship at scored-fix scope only.",
+        "metrics": {
+          "productionCases": 12,
+          "productionFailures": 0,
+          "reconnectCases": 2,
+          "reconnectFailures": 0,
+          "normalDesktopCardPileGap": "about 70\u201373px, formerly 110\u2013120px"
+        },
+        "checks": "Reported passing lint, strict types, game/audio/multiplayer assertions, production build and formatting; raster scan 4 assets / 0 missing provenance. No detector or screenshot rerun during documentation.",
+        "detector": "One changed-target pass: 17 palette/type/radius advisories, 0 errors, no ignores. Menu command/Leave roles recorded at actual scope; historical advisories not canonized.",
+        "boundary": "Browser geometry, keyboard and emulated held touch plus source guards; loopback-only synthetic long-name/offline/angle cases. No whole-surface, physical-handset, speaker listening, exhaustive accessibility or independent quality-bar certification.",
+        "notCanonized": "Offscreen start actions, seven-row menu, old desktop pile offsets/lift, undersized badges/clipped reconnect text, floating Catch, reconstructed pickup geometry and stale keyboard suppression; detector advisories do not become blanket tokens.",
         "previousRecord": {
-          "contract": ".impeccable/review/illustrated-room/contract.md",
-          "verification": ".impeccable/review/illustrated-room/verification.md",
-          "finishReview": ".impeccable/review/illustrated-room/finish-review.md",
+          "contract": ".impeccable/review/closer-table/contract.md",
+          "baselineReview": ".impeccable/review/closer-table/baseline-review.md",
+          "layoutVerdict": ".impeccable/review/closer-table/layout-verdict.md",
+          "finishReview": ".impeccable/review/closer-table/finish-review.md",
           "inheritedSeed": "457003dd",
-          "ownerChoice": "An illustrated game-room setting",
+          "ownerChoice": "Correct the rejected shipped layout inside the selected illustrated game-room setting.",
           "approvedComp": false,
           "independentQualityBarSupplied": false,
           "captures": [
-            "desktop-1440.jpg",
-            "user-848.jpg",
-            "landscape-844.jpg",
-            "landscape-568.jpg",
-            "portrait-gate.jpg"
+            "desktop-1440.png",
+            "user-848.png",
+            "hover-848.png",
+            "wild-848.png",
+            "landscape-844-rest.png",
+            "landscape-844-focus.png",
+            "landscape-568-rest.png",
+            "landscape-568-focus.png",
+            "phone-fan-844.png",
+            "phone-pass-844.png",
+            "phone-uno-568.png",
+            "phone-wild-568.png",
+            "phone-wild-844.png",
+            "portrait-gate.png",
+            "reduced-844.png"
           ],
-          "boundary": "Final captures validated; browser geometry and keyboard evidence only. No physical-phone touch, speaker quality, exhaustive accessibility or whole-app certification.",
-          "notCanonized": "Detector advisories, inherited landing radius, incidental colors and compact text do not become new reusable tokens or exemptions. Quiet radial stage and transparent inactive badges are historical only.",
-          "detector": "One pass before header-only scrim correction; no rerun. Intentional shipped material colors recorded from source."
-        },
-        "verification": ".impeccable/review/closer-table/verification.md",
-        "wildDecisionEvidence": {
-          "viewports": [
-            "568x320",
-            "844x390"
-          ],
-          "dialogClientHeight": 246,
-          "dialogScrollHeight": 246,
-          "colorTargetHeight": 72,
-          "closeAndKeepTargetHeight": 44,
-          "internalScrollingRequired": false,
-          "source": ".impeccable/review/closer-table/verification.md"
+          "reviewOutcome": "Four scored layout fixes cleared in layout-verdict.md; the subsequent full finish review required a complete short-landscape color decision and this design refresh. Final production verification records fifteen opened captures after the scoped dialog correction; both phone wild states show complete controls without scrolling. Final disposition belongs to the review packet.",
+          "checks": "Reported passing lint, strict types, game/audio/multiplayer assertions and production build. Existing raster scan: four assets, zero missing provenance records.",
+          "boundary": "Browser geometry and keyboard/mouse evidence plus source guards only. No independent quality-bar, whole-app, public-deployment, physical-phone touch, speaker quality or exhaustive accessibility certification.",
+          "notCanonized": "Superseded independent pile centering, former phone hand rows and hidden avatars, scrolling phone wild decision, incidental response values and historical scan advisories do not become broad tokens or exemptions.",
+          "detector": "Baseline scoped mechanical layout scan reported no findings; no new detector run for this documentation pass.",
+          "previousRecord": {
+            "contract": ".impeccable/review/illustrated-room/contract.md",
+            "verification": ".impeccable/review/illustrated-room/verification.md",
+            "finishReview": ".impeccable/review/illustrated-room/finish-review.md",
+            "inheritedSeed": "457003dd",
+            "ownerChoice": "An illustrated game-room setting",
+            "approvedComp": false,
+            "independentQualityBarSupplied": false,
+            "captures": [
+              "desktop-1440.jpg",
+              "user-848.jpg",
+              "landscape-844.jpg",
+              "landscape-568.jpg",
+              "portrait-gate.jpg"
+            ],
+            "boundary": "Final captures validated; browser geometry and keyboard evidence only. No physical-phone touch, speaker quality, exhaustive accessibility or whole-app certification.",
+            "notCanonized": "Detector advisories, inherited landing radius, incidental colors and compact text do not become new reusable tokens or exemptions. Quiet radial stage and transparent inactive badges are historical only.",
+            "detector": "One pass before header-only scrim correction; no rerun. Intentional shipped material colors recorded from source."
+          },
+          "verification": ".impeccable/review/closer-table/verification.md",
+          "wildDecisionEvidence": {
+            "viewports": ["568x320", "844x390"],
+            "dialogClientHeight": 246,
+            "dialogScrollHeight": 246,
+            "colorTargetHeight": 72,
+            "closeAndKeepTargetHeight": 44,
+            "internalScrollingRequired": false,
+            "source": ".impeccable/review/closer-table/verification.md"
+          }
         }
-      }
+      },
+      "confirmation": "Three cases, zero failures; actual 3px focus-visible outline and keyboard Catch at both phone sizes; updated detail and owner captures validated."
     },
     "arenaGeometry": {
       "source": "app/arena.css",
@@ -1487,12 +1530,15 @@
         "fanDropMultiplier": 0.2,
         "badgeWidth": "128px",
         "badgeMinHeight": "44px",
-        "avatar": "26px 30px",
+        "avatar": "30px 36px",
         "seatTop": "28px",
         "nameSize": "12px",
-        "countStatusSize": "11px",
-        "textStack": "column; 1px gap",
-        "legalLift": "20px"
+        "countStatusSize": "11px status; separate 22px count",
+        "textStack": "name/status column; 1px gap",
+        "legalLift": "20px",
+        "identitySource": "components/OpponentSeat.module.css",
+        "countTile": "24px 30px",
+        "countSize": "22px"
       },
       "shortestLandscapePhone": {
         "query": "max-height: 360px and min-width: 541px",
@@ -1500,21 +1546,32 @@
         "pileScale": 0.69,
         "handRow": "116px",
         "pileBottom": "4px",
-        "badgeWidth": "98px",
+        "badgeWidth": "102px",
         "badgeMinHeight": "44px",
-        "avatar": "22px 26px",
+        "avatar": "26px 32px",
         "seatTop": "24px",
         "nameSize": "12px",
-        "countStatusSize": "11px",
-        "legalLift": "16px"
+        "countStatusSize": "11px status; separate 20px count",
+        "legalLift": "16px",
+        "identitySource": "components/OpponentSeat.module.css",
+        "countTile": "22px 28px",
+        "countSize": "20px"
       },
       "opponents": {
-        "desktopWidth": "144px",
-        "desktopAvatar": "36px 42px",
+        "desktopWidth": "160px",
+        "desktopAvatar": "44px 52px",
         "desktopBackFan": "96px 66px at scale 0.5",
-        "phoneGrid": "auto minmax(0, 1fr) auto",
+        "phoneGrid": "30px minmax(0, 1fr) 24px; shortest 26px minmax(0, 1fr) 22px",
         "phoneAvatarsRemainVisible": true,
-        "catch": "Eligible player identity becomes native 44px-minimum badge button with visible Catch! and full accessible name; disconnected visible Offline / aria Reconnecting."
+        "catch": "Eligible native 44px-minimum phone badge button retains Catch!, exact count and full action name. Offline retains Reconnecting semantics; declared UNO persists at one card.",
+        "source": "components/OpponentSeat.tsx + components/OpponentSeat.module.css",
+        "placementSource": "app/arena.css",
+        "desktopMinHeight": "54px",
+        "desktopName": "Outfit 16px / 750 / 1.2",
+        "desktopCount": "26px 34px tile; Barlow Condensed 24px / 800; actual hand length",
+        "active": "Yellow character outline and yellow dark-ink count; shallow backing remains navy. Accessible Current turn.",
+        "nameOverflow": "Bounded ellipsis; full name remains in DOM and title.",
+        "scope": "Module overrides inherited arena badge recipes; seat placement and back-fan geometry remain in app/arena.css."
       },
       "contextualLane": {
         "right": "16px",
@@ -1638,12 +1695,12 @@
       "css": ".ds-launch{display:flex;align-items:center;justify-content:center;gap:14px;width:100%;min-height:54px;padding:14px 20px 16px;border:0;border-radius:6px;background:var(--action-fill,#1757df);color:var(--action-ink,#ffffff);box-shadow:inset 0 1px 2px #ffffff60,inset 0 -3px 2px var(--action-edge,#06339c),0 5px 10px #02071870;font-family:var(--font-body,Outfit),sans-serif;font-size:18px;font-weight:700;line-height:1.25;cursor:pointer;transition:transform 130ms cubic-bezier(.16,1,.3,1),background 130ms,box-shadow 130ms}.ds-launch:focus-visible{outline:3px solid #ffd64a;outline-offset:5px}.ds-launch:active:not(:disabled){transform:translateY(2px);box-shadow:inset 0 -1px 1px var(--action-edge,#06339c),0 1px 4px #04191d50}.ds-launch:disabled{opacity:.5;cursor:default}@media(hover:hover) and (pointer:fine){.ds-launch:hover:not(:disabled){transform:translateY(-2px);background:var(--action-hover,#2167f0)}.ds-launch:active:not(:disabled){transform:translateY(2px)}}@media(prefers-reduced-motion:reduce){.ds-launch{transition:none}.ds-launch:hover,.ds-launch:active:not(:disabled){transform:none}}.ds-join{--action-fill:#e71c3b;--action-edge:#9a0c24;--action-hover:#da0d31}@media(orientation:landscape) and (max-height:540px) and (min-width:541px){.ds-launch{min-height:44px;padding:10px 12px 12px;font-size:15px}.ds-launch-main{min-height:44px;padding:10px 16px 12px;font-size:19px}}"
     },
     {
-      "name": "Active opponent and accessible turn",
-      "kind": "chip",
+      "name": "Opponent player token and accessible turn",
+      "kind": "custom",
       "refersTo": "opponent-badge-active",
-      "description": "Opaque 128px/98px compact identities remain at least 44px high with stacked 12px names and 11px counts/status. Visible Offline retains Reconnecting semantics. Eligible Catch is the native badge button; routine turn/color remain accessible-only.",
-      "html": "<div class=\"ds-status\"><span class=\"ds-seat ds-inactive\"><span class=\"ds-seat-avatar\" aria-hidden=\"true\"><i></i><i></i></span><span><strong>Sam</strong><small aria-label=\"Reconnecting\">Offline</small></span></span><span class=\"ds-seat\"><span class=\"ds-seat-avatar\" aria-hidden=\"true\"><i></i><i></i></span><span><strong>Alex</strong><small>4 cards</small></span><i class=\"ds-turn\" aria-hidden=\"true\"></i></span><button type=\"button\" class=\"ds-seat ds-catch\" aria-label=\"Catch Robin’s missed UNO\"><span><strong>Robin</strong><small>Catch!</small></span></button><div class=\"ds-sr-only\"><h1>Alex’s turn</h1><span>Active color: red</span></div></div>",
-      "css": ".ds-status{display:flex;gap:12px;flex-wrap:wrap;padding:18px;background:#082a3d;font-family:var(--font-body,Outfit),sans-serif}.ds-seat{display:flex;align-items:center;justify-content:center;gap:8px;padding:7px 10px;max-width:144px;border-radius:7px;background:#ffe329;color:#392700;box-shadow:inset 0 -2px 1px #b39000,0 4px 7px #03091250}.ds-seat>span:nth-child(2){min-width:0}.ds-seat strong{display:block;max-width:88px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px;font-weight:650}.ds-seat small{display:flex;align-items:center;gap:3px;font-size:12px;color:#514100}.ds-turn{width:5px;height:5px;border-radius:50%;background:#514100}.ds-sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}.ds-seat.ds-inactive{background:#102e37;color:#ffffff;box-shadow:none}.ds-inactive small{color:#c2cedf}.ds-seat-avatar{position:relative;display:inline-flex;flex-shrink:0;width:36px;height:42px;transform:rotate(-5deg);border:2px solid #323139;border-radius:7px;background:#ff6942;box-shadow:inset 0 1px 1px #ffffffa0,0 3px 3px #02071870}.ds-seat-avatar i{position:absolute;top:33%;width:14%;height:16%;border-radius:50%;background:#323139}.ds-seat-avatar i:first-child{left:22%}.ds-seat-avatar i:last-child{right:22%}.ds-seat-avatar:after{content:\"\";position:absolute;left:35%;top:56%;width:32%;height:15%;border:2px solid #323139;border-top:0;border-radius:0 0 10px 10px}@media(max-height:460px) and (min-width:541px){.ds-seat{display:grid;grid-template-columns:auto minmax(0,1fr) auto;width:128px;max-width:128px;min-height:44px;gap:5px;padding:4px 8px}.ds-seat>span:nth-child(2){display:flex;flex-direction:column;align-items:flex-start;gap:1px}.ds-seat-avatar{width:26px;height:30px}.ds-seat strong{max-width:100%;font-size:12px}.ds-seat small{font-size:11px}}@media(max-height:360px) and (min-width:541px){.ds-seat{width:98px;max-width:98px;min-height:44px;padding:4px 6px;gap:4px}.ds-seat>span:nth-child(2){gap:1px}.ds-seat-avatar{width:22px;height:26px}.ds-seat strong{max-width:100%;font-size:12px}}.ds-catch{min-height:44px;border:0;background:#ffd000;color:#392700;text-align:left;font-family:inherit;cursor:pointer;box-shadow:inset 0 -2px 1px #bd7600,0 4px 7px #03091250}.ds-catch:focus-visible{outline:3px solid #ffe329;outline-offset:4px}.ds-catch:active{transform:translateY(1px)}"
+      "description": "Protruding ivory-edged native character, shallow opaque backing, Outfit name and separate Barlow exact-count tile. Active outline/count remain distinct without motion; eligible Catch is a complete native button. Scoped module owns finish and responsive dimensions; arena owns seat placement.",
+      "html": "<div class=\"ds-status\"><div class=\"ds-opponent ds-active\"><div class=\"ds-label\"><span class=\"ds-seat-avatar\" style=\"--avatar-color:#ff6942\" aria-hidden=\"true\"><i></i><i></i></span><span class=\"ds-name\"><strong title=\"Cleo\">Cleo</strong></span><span class=\"ds-count\" role=\"img\" aria-label=\"12 cards\"><span aria-hidden=\"true\">12</span></span><span class=\"ds-sr-only\">Current turn</span></div></div><div class=\"ds-opponent \"><div class=\"ds-label\"><span class=\"ds-seat-avatar\" style=\"--avatar-color:#4892ff\" aria-hidden=\"true\"><i></i><i></i></span><span class=\"ds-name\"><strong title=\"Sam\">Sam</strong><small aria-label=\"Reconnecting\">Offline</small></span><span class=\"ds-count\" role=\"img\" aria-label=\"24 cards\"><span aria-hidden=\"true\">24</span></span></div></div><div class=\"ds-opponent ds-last-card\"><button class=\"ds-label ds-catch\" type=\"button\" aria-label=\"Catch Robin\u2019s missed UNO\"><span class=\"ds-seat-avatar\" style=\"--avatar-color:#43ce7d\" aria-hidden=\"true\"><i></i><i></i></span><span class=\"ds-name\"><strong title=\"Robin\">Robin</strong><small>Catch!</small></span><span class=\"ds-count\" role=\"img\" aria-label=\"1 card\"><span aria-hidden=\"true\">1</span></span></button></div></div>",
+      "css": ".ds-status{display:flex;gap:18px;flex-wrap:wrap;padding:18px;background:#082a3d;font-family:var(--font-body,Outfit),sans-serif}.ds-label strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ds-label{font-family:inherit;text-align:left}.ds-seat-avatar{position:relative;display:inline-flex;flex-shrink:0;--avatar-color:#ff6942}.ds-seat-avatar i{position:absolute;top:33%;width:14%;height:16%;border-radius:50%;background:#323139}.ds-seat-avatar i:first-child{left:22%}.ds-seat-avatar i:last-child{right:22%}.ds-seat-avatar:after{content:\"\";position:absolute;left:35%;top:56%;width:32%;height:15%;border:2px solid #323139;border-top:0;border-radius:0 0 10px 10px}.ds-sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}\n.ds-opponent .ds-label {\n  position: relative;\n  isolation: isolate;\n  display: grid;\n  grid-template-columns: 44px minmax(0, 1fr) 26px;\n  align-items: center;\n  justify-content: normal;\n  width: 160px;\n  max-width: 160px;\n  min-height: 54px;\n  padding: 6px 8px 6px 0;\n  gap: 8px;\n  border: 0;\n  border-radius: 7px;\n  background: transparent;\n  color: #ffffff;\n  box-shadow: none;\n  transform: none;\n}\n.ds-opponent .ds-label::before {\n  content: \"\";\n  position: absolute;\n  z-index: -1;\n  inset: 7px 0 4px 18px;\n  border-radius: 6px;\n  background: #102e37;\n  box-shadow: 0 5px 9px #03091270;\n}\n.ds-opponent .ds-label .ds-seat-avatar {\n  width: 44px;\n  height: 52px;\n  margin-block: -7px -3px;\n  border: 3px solid #fff8ec;\n  border-radius: 8px;\n  background:\n    linear-gradient(145deg, #ffffff30, transparent 55%, #00000015),\n    var(--avatar-color);\n  box-shadow:\n    inset 0 1px 1px #ffffff80,\n    1px 3px 1px #748a97,\n    0 6px 9px #03091270;\n  transform: rotate(var(--avatar-tilt, -8deg));\n}\n.ds-opponent .ds-label .ds-name {\n  display: flex;\n  flex-direction: column;\n  align-items: flex-start;\n  justify-content: center;\n  min-width: 0;\n  gap: 2px;\n}\n.ds-opponent .ds-label strong {\n  max-width: 100%;\n  font-size: 16px;\n  font-weight: 750;\n  line-height: 1.2;\n  color: inherit;\n}\n.ds-opponent .ds-label small {\n  max-width: 100%;\n  color: #c2cedf;\n  font-size: 12px;\n  line-height: 1.2;\n  white-space: nowrap;\n}\n.ds-opponent .ds-label .ds-count {\n  display: grid;\n  place-items: center;\n  width: 26px;\n  height: 34px;\n  border: 2px solid #fff8ec;\n  border-radius: 4px;\n  background: #0b2038;\n  color: #ffffff;\n  box-shadow:\n    2px 2px 1px #748a97,\n    3px 5px 6px #03091266;\n  transform: rotate(8deg);\n  font-family: var(--font-card, \"Barlow Condensed\"), sans-serif;\n  font-size: 24px;\n  font-weight: 800;\n  font-variant-numeric: tabular-nums;\n  line-height: 1;\n  pointer-events: none;\n  transition:\n    transform 160ms cubic-bezier(0.16, 1, 0.3, 1),\n    background 160ms,\n    color 160ms;\n}\n.ds-opponent .ds-label .ds-count[data-wide] {\n  font-size: 18px;\n}\n.ds-opponent.ds-last-card .ds-count {\n  border-color: #ffe329;\n  color: #ffe329;\n}\n.ds-opponent.ds-active .ds-label::before {\n  background: #173b4c;\n}\n.ds-opponent.ds-active .ds-label .ds-seat-avatar {\n  outline: 3px solid #ffe329;\n  outline-offset: 2px;\n}\n.ds-opponent.ds-active .ds-count {\n  background: #ffe329;\n  color: #392700;\n  border-color: #fff8ec;\n  transform: translateY(-2px) rotate(0deg);\n}\n.ds-opponent .ds-label.ds-catch {\n  color: #392700;\n  cursor: pointer;\n}\n.ds-opponent .ds-label.ds-catch::before {\n  background: #ffd000;\n}\n.ds-opponent .ds-label.ds-catch small {\n  color: #514100;\n}\n.ds-opponent .ds-label.ds-catch .ds-count {\n  background: #392700;\n  color: #ffe329;\n}\n.ds-opponent .ds-label:focus-visible {\n  outline: 3px solid #ffe329;\n  outline-offset: 4px;\n}\n.ds-opponent .ds-label.ds-catch:active {\n  transform: translateY(1px);\n}\n@media (max-height: 460px) and (min-width: 541px) {\n  .ds-opponent .ds-label {\n    width: 128px;\n    max-width: 128px;\n    min-height: 44px;\n    grid-template-columns: 30px minmax(0, 1fr) 24px;\n    gap: 6px;\n    padding: 4px 6px 4px 0;\n  }\n  .ds-opponent .ds-label::before {\n    inset: 4px 0 4px 12px;\n  }\n  .ds-opponent .ds-label .ds-seat-avatar {\n    width: 30px;\n    height: 36px;\n    margin: 0;\n    border-width: 2px;\n    border-radius: 6px;\n  }\n  .ds-opponent .ds-label .ds-name {\n    gap: 1px;\n  }\n  .ds-opponent .ds-label strong {\n    font-size: 12px;\n  }\n  .ds-opponent .ds-label small {\n    font-size: 11px;\n  }\n  .ds-opponent .ds-label .ds-count {\n    width: 24px;\n    height: 30px;\n    font-size: 22px;\n  }\n  .ds-opponent .ds-label .ds-count[data-wide] {\n    font-size: 16px;\n  }\n}\n@media (max-height: 360px) and (min-width: 541px) {\n  .ds-opponent .ds-label {\n    width: 102px;\n    max-width: 102px;\n    grid-template-columns: 26px minmax(0, 1fr) 22px;\n    gap: 4px;\n    padding-right: 4px;\n  }\n  .ds-opponent .ds-label .ds-seat-avatar {\n    width: 26px;\n    height: 32px;\n  }\n  .ds-opponent .ds-label .ds-count {\n    width: 22px;\n    height: 28px;\n    font-size: 20px;\n  }\n  .ds-opponent .ds-label .ds-count[data-wide] {\n    font-size: 14px;\n  }\n}\n@media (prefers-reduced-motion: reduce) {\n  .ds-opponent .ds-label,\n  .ds-opponent .ds-label .ds-count {\n    transition: none;\n  }\n}\n"
     },
     {
       "name": "UNO card",
@@ -1714,7 +1771,7 @@
       },
       {
         "name": "The Deck Lettering Rule",
-        "body": "Use Outfit for UI, headings and the card-back wordmark; reserve Barlow Condensed for indexed card faces. Preserve italic numerals and the shared face proportions when scaling.",
+        "body": "Use Outfit for UI, headings and the card-back wordmark; reserve Barlow Condensed for indexed card faces and opponent card-count tiles. Preserve italic numerals and the shared face proportions when scaling.",
         "section": "typography"
       },
       {
@@ -1734,12 +1791,17 @@
       },
       {
         "name": "The Central Play Rule",
-        "body": "Keep Play on the home’s center axis ahead of room actions and secondary help; preserve the complete flat transparent scene and real, immediately available controls.",
+        "body": "Keep Play on the home\u2019s center axis ahead of room actions and secondary help; preserve the complete flat transparent scene and real, immediately available controls.",
         "section": "components"
       },
       {
         "name": "The Clear Tabletop Rule",
         "body": "Keep furnishings in the illustrated upper band, piles on uninterrupted petrol tabletop and runtime cards, labels and controls in independent live layers. Protect identities with opaque backing and limit the contrast scrim to the header.",
+        "section": "components"
+      },
+      {
+        "name": "The Player Token Rule",
+        "body": "Keep recognition, remaining cards and Catch on the same identity. Give the native character and exact-count tile their own card silhouettes, retain opaque name backing and preserve all five graphical seats with complete native Catch targets at compact sizes.",
         "section": "components"
       },
       {
@@ -1754,7 +1816,7 @@
       },
       {
         "name": "The Measured Pose Rule",
-        "body": "Pick up from the pointer-down printed pose and return to the current face’s composed pose. Preserve scale and rotation, clean up interrupted copies, and treat keyboard activation as a new intent after a cancelled pointer gesture.",
+        "body": "Pick up from the pointer-down printed pose and return to the current face\u2019s composed pose. Preserve scale and rotation, clean up interrupted copies, and treat keyboard activation as a new intent after a cancelled pointer gesture.",
         "section": "components"
       },
       {
@@ -1778,7 +1840,7 @@
       "Do keep home Play central, Create/Join paired, sharper 6px action corners and complete flat transparent silhouettes with their prompt provenance.",
       "Do preserve vivid deck colors, white faces, distinct dark green/yellow index and center inks, and a written chosen-color label for wild top discards.",
       "Do retain the fixed home club palette, scoped illustrated room and theme-aware settings/setup.",
-      "Do preserve the room raster’s prompt provenance, cover crop, solid fallback, opaque identities and header-only contrast scrim.",
+      "Do preserve the room raster\u2019s prompt provenance, cover crop, solid fallback, opaque identities and header-only contrast scrim.",
       "Do keep one clipped viewport with nearby bottom-anchored central piles and a bottom-cropped fan, complete internal card boxes, top focus clearance and independent horizontal large-hand scrolling.",
       "Do retain graphical identities for all five opponents on six-seat landscape phones, the separate right-side contextual lane, and the portrait rotate gate, local pause and online-continuation disclosure.",
       "Do play legal cards on first activation and keep nonmatching inspection, turn state and situational actions clear with touch and keyboard.",
@@ -1795,8 +1857,8 @@
       "Do acknowledge actual card activation with immediate pickup while keeping horizontal scroll silent.",
       "Do keep all three centered home start actions and the complete cast reachable in short landscape, preserving the accessible heading.",
       "Do fit the six-command game menu, native Close and online room copy without short-landscape scrolling; expose sorting state and distinguish Leave.",
-      "Do keep five compact identities at least 44px high, with stacked readable names/status and Catch on the eligible player’s badge.",
-      "Do measure pickup/return poses and settle only the destination wrapper’s reflow before keyboard reveal."
+      "Do keep five compact identities at least 44px high, with protruding characters, stacked readable names/status, separate exact-count tiles and Catch on the eligible player\u2019s badge.",
+      "Do measure pickup/return poses and settle only the destination wrapper\u2019s reflow before keyboard reveal."
     ],
     "donts": [
       "Don't restore the rejected home side column, floating card-face fan/stickers, plain cream field, arbitrary decorative 7 or broad rounded action tiles.",

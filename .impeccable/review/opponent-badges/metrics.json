@@ -1,0 +1,1468 @@
+{
+  "results": [
+    {
+      "name": "desktop",
+      "document": [
+        1440,
+        900
+      ],
+      "viewport": [
+        1440,
+        900
+      ],
+      "seats": [
+        {
+          "name": "Cleo",
+          "count": "6 cards",
+          "countText": "6",
+          "rect": {
+            "x": 292,
+            "y": 265.671875,
+            "right": 452,
+            "bottom": 319.671875,
+            "width": 160,
+            "height": 54
+          },
+          "avatar": {
+            "x": 288.5956115722656,
+            "y": 261.86309814453125,
+            "right": 339.4043884277344,
+            "bottom": 319.48065185546875,
+            "width": 50.80877685546875,
+            "height": 57.6175537109375
+          },
+          "number": {
+            "x": 415.76055908203125,
+            "y": 274.028076171875,
+            "right": 446.23944091796875,
+            "bottom": 311.315673828125,
+            "width": 30.4788818359375,
+            "height": 37.28759765625
+          },
+          "statusFits": true,
+          "nameTruncated": false,
+          "active": false,
+          "accessibleTurn": false,
+          "transition": "0.16s, 0.16s, 0.16s"
+        },
+        {
+          "name": "Jules",
+          "count": "6 cards",
+          "countText": "6",
+          "rect": {
+            "x": 988,
+            "y": 265.671875,
+            "right": 1148,
+            "bottom": 319.671875,
+            "width": 160,
+            "height": 54
+          },
+          "avatar": {
+            "x": 984.5955810546875,
+            "y": 261.86309814453125,
+            "right": 1035.4044189453125,
+            "bottom": 319.48065185546875,
+            "width": 50.808837890625,
+            "height": 57.6175537109375
+          },
+          "number": {
+            "x": 1111.7606201171875,
+            "y": 274.028076171875,
+            "right": 1142.2393798828125,
+            "bottom": 311.315673828125,
+            "width": 30.478759765625,
+            "height": 37.28759765625
+          },
+          "statusFits": true,
+          "nameTruncated": false,
+          "active": false,
+          "accessibleTurn": false,
+          "transition": "0.16s, 0.16s, 0.16s"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "name": "owner",
+      "document": [
+        845,
+        765
+      ],
+      "viewport": [
+        845,
+        765
+      ],
+      "seats": [
+        {
+          "name": "Cleo",
+          "count": "6 cards",
+          "countText": "6",
+          "rect": {
+            "x": 143.25,
+            "y": 231.4375,
+            "right": 303.25,
+            "bottom": 285.4375,
+            "width": 160,
+            "height": 54
+          },
+          "avatar": {
+            "x": 139.84561157226562,
+            "y": 227.62872314453125,
+            "right": 190.65440368652344,
+            "bottom": 285.24627685546875,
+            "width": 50.80879211425781,
+            "height": 57.6175537109375
+          },
+          "number": {
+            "x": 267.01055908203125,
+            "y": 239.793701171875,
+            "right": 297.48944091796875,
+            "bottom": 277.081298828125,
+            "width": 30.4788818359375,
+            "height": 37.28759765625
+          },
+          "statusFits": true,
+          "nameTruncated": false,
+          "active": false,
+          "accessibleTurn": false,
+          "transition": "0.16s, 0.16s, 0.16s"
+        },
+        {
+          "name": "Jules",
+          "count": "6 cards",
+          "countText": "6",
+          "rect": {
+            "x": 541.75,
+            "y": 231.4375,
+            "right": 701.75,
+            "bottom": 285.4375,
+            "width": 160,
+            "height": 54
+          },
+          "avatar": {
+            "x": 538.3455810546875,
+            "y": 227.62872314453125,
+            "right": 589.1544189453125,
+            "bottom": 285.24627685546875,
+            "width": 50.808837890625,
+            "height": 57.6175537109375
+          },
+          "number": {
+            "x": 665.5105590820312,
+            "y": 239.793701171875,
+            "right": 695.9894409179688,
+            "bottom": 277.081298828125,
+            "width": 30.4788818359375,
+            "height": 37.28759765625
+          },
+          "statusFits": true,
+          "nameTruncated": false,
+          "active": false,
+          "accessibleTurn": false,
+          "transition": "0.16s, 0.16s, 0.16s"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "name": "six-owner",
+      "document": [
+        845,
+        765
+      ],
+      "viewport": [
+        845,
+        765
+      ],
+      "seats": [
+        {
+          "name": "Cleo",
+          "count": "12 cards",
+          "countText": "12",
+          "rect": {
+            "x": 15.71875,
+            "y": 350.34375,
+            "right": 175.71875,
+            "bottom": 404.34375,
+            "width": 160,
+            "height": 54
+          },
+          "avatar": {
+            "x": 12.314352035522461,
+            "y": 346.53497314453125,
+            "right": 63.123151779174805,
+            "bottom": 404.15252685546875,
+            "width": 50.808799743652344,
+            "height": 57.6175537109375
+          },
+          "number": {
+            "x": 139.4793243408203,
+            "y": 358.699951171875,
+            "right": 169.9581756591797,
+            "bottom": 395.987548828125,
+            "width": 30.478851318359375,
+            "height": 37.28759765625
+          },
+          "statusFits": true,
+          "nameTruncated": false,
+          "active": false,
+          "accessibleTurn": false,
+          "transition": "0.16s, 0.16s, 0.16s"
+        },
+        {
+          "name": "Jules",
+          "count": "24 cards",
+          "countText": "24",
+          "rect": {
+            "x": 143.25,
+            "y": 231.4375,
+            "right": 303.25,
+            "bottom": 285.4375,
+            "width": 160,
+            "height": 54
+          },
+          "avatar": {
+            "x": 139.84561157226562,
+            "y": 227.62872314453125,
+            "right": 190.65440368652344,
+            "bottom": 285.24627685546875,
+            "width": 50.80879211425781,
+            "height": 57.6175537109375
+          },
+          "number": {
+            "x": 267.01055908203125,
+            "y": 239.793701171875,
+            "right": 297.48944091796875,
+            "bottom": 277.081298828125,
+            "width": 30.4788818359375,
+            "height": 37.28759765625
+          },
+          "statusFits": true,
+          "nameTruncated": false,
+          "active": false,
+          "accessibleTurn": false,
+          "transition": "0.16s, 0.16s, 0.16s"
+        },
+        {
+          "name": "Robin",
+          "status": "UNO!",
+          "count": "1 card",
+          "countText": "1",
+          "rect": {
+            "x": 342.5,
+            "y": 231.4375,
+            "right": 502.5,
+            "bottom": 285.4375,
+            "width": 160,
+            "height": 54
+          },
+          "avatar": {
+            "x": 339.0956115722656,
+            "y": 227.62872314453125,
+            "right": 389.9043884277344,
+            "bottom": 285.24627685546875,
+            "width": 50.80877685546875,
+            "height": 57.6175537109375
+          },
+          "number": {
+            "x": 466.26055908203125,
+            "y": 239.793701171875,
+            "right": 496.73944091796875,
+            "bottom": 277.081298828125,
+            "width": 30.4788818359375,
+            "height": 37.28759765625
+          },
+          "statusFits": true,
+          "nameTruncated": false,
+          "active": false,
+          "accessibleTurn": false,
+          "transition": "0.16s, 0.16s, 0.16s"
+        },
+        {
+          "name": "Frankie",
+          "count": "7 cards",
+          "countText": "7",
+          "rect": {
+            "x": 541.75,
+            "y": 231.4375,
+            "right": 701.75,
+            "bottom": 285.4375,
+            "width": 160,
+            "height": 54
+          },
+          "avatar": {
+            "x": 538.3455810546875,
+            "y": 227.62872314453125,
+            "right": 589.1544189453125,
+            "bottom": 285.24627685546875,
+            "width": 50.808837890625,
+            "height": 57.6175537109375
+          },
+          "number": {
+            "x": 665.5105590820312,
+            "y": 239.793701171875,
+            "right": 695.9894409179688,
+            "bottom": 277.081298828125,
+            "width": 30.4788818359375,
+            "height": 37.28759765625
+          },
+          "statusFits": true,
+          "nameTruncated": false,
+          "active": false,
+          "accessibleTurn": false,
+          "transition": "0.16s, 0.16s, 0.16s"
+        },
+        {
+          "name": "Lou",
+          "count": "7 cards",
+          "countText": "7",
+          "rect": {
+            "x": 669.265625,
+            "y": 350.34375,
+            "right": 829.265625,
+            "bottom": 404.34375,
+            "width": 160,
+            "height": 54
+          },
+          "avatar": {
+            "x": 665.8612060546875,
+            "y": 346.53497314453125,
+            "right": 716.6700439453125,
+            "bottom": 404.15252685546875,
+            "width": 50.808837890625,
+            "height": 57.6175537109375
+          },
+          "number": {
+            "x": 793.0261840820312,
+            "y": 358.699951171875,
+            "right": 823.5050659179688,
+            "bottom": 395.987548828125,
+            "width": 30.4788818359375,
+            "height": 37.28759765625
+          },
+          "statusFits": true,
+          "nameTruncated": false,
+          "active": false,
+          "accessibleTurn": false,
+          "transition": "0.16s, 0.16s, 0.16s"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "name": "six-phone-844",
+      "document": [
+        844,
+        390
+      ],
+      "viewport": [
+        844,
+        390
+      ],
+      "seats": [
+        {
+          "name": "Cleo",
+          "count": "12 cards",
+          "countText": "12",
+          "rect": {
+            "x": 33.1875,
+            "y": 50,
+            "right": 161.1875,
+            "bottom": 94,
+            "width": 128,
+            "height": 44
+          },
+          "avatar": {
+            "x": 30.8283634185791,
+            "y": 52.08757781982422,
+            "right": 65.54664039611816,
+            "bottom": 91.91242218017578,
+            "width": 34.71827697753906,
+            "height": 39.82484436035156
+          },
+          "number": {
+            "x": 129.21669006347656,
+            "y": 55.47590255737305,
+            "right": 157.15830993652344,
+            "bottom": 88.52409362792969,
+            "width": 27.941619873046875,
+            "height": 33.04819107055664
+          },
+          "statusFits": true,
+          "nameTruncated": false,
+          "active": false,
+          "accessibleTurn": false,
+          "transition": "0.16s, 0.16s, 0.16s"
+        },
+        {
+          "name": "Jules",
+          "count": "24 cards",
+          "countText": "24",
+          "rect": {
+            "x": 195.59375,
+            "y": 50,
+            "right": 323.59375,
+            "bottom": 94,
+            "width": 128,
+            "height": 44
+          },
+          "avatar": {
+            "x": 193.234619140625,
+            "y": 52.08757781982422,
+            "right": 227.952880859375,
+            "bottom": 91.91242218017578,
+            "width": 34.71826171875,
+            "height": 39.82484436035156
+          },
+          "number": {
+            "x": 291.6229248046875,
+            "y": 55.47590255737305,
+            "right": 319.5645751953125,
+            "bottom": 88.52409362792969,
+            "width": 27.941650390625,
+            "height": 33.04819107055664
+          },
+          "statusFits": true,
+          "nameTruncated": false,
+          "active": false,
+          "accessibleTurn": false,
+          "transition": "0.16s, 0.16s, 0.16s"
+        },
+        {
+          "name": "Robin",
+          "status": "UNO!",
+          "count": "1 card",
+          "countText": "1",
+          "rect": {
+            "x": 358,
+            "y": 50,
+            "right": 486,
+            "bottom": 94,
+            "width": 128,
+            "height": 44
+          },
+          "avatar": {
+            "x": 355.640869140625,
+            "y": 52.08757781982422,
+            "right": 390.359130859375,
+            "bottom": 91.91242218017578,
+            "width": 34.71826171875,
+            "height": 39.82484436035156
+          },
+          "number": {
+            "x": 454.0291748046875,
+            "y": 55.47590255737305,
+            "right": 481.9708251953125,
+            "bottom": 88.52409362792969,
+            "width": 27.941650390625,
+            "height": 33.04819107055664
+          },
+          "statusFits": true,
+          "nameTruncated": false,
+          "active": false,
+          "accessibleTurn": false,
+          "transition": "0.16s, 0.16s, 0.16s"
+        },
+        {
+          "name": "Frankie",
+          "count": "7 cards",
+          "countText": "7",
+          "rect": {
+            "x": 520.390625,
+            "y": 50,
+            "right": 648.390625,
+            "bottom": 94,
+            "width": 128,
+            "height": 44
+          },
+          "avatar": {
+            "x": 518.031494140625,
+            "y": 52.08757781982422,
+            "right": 552.749755859375,
+            "bottom": 91.91242218017578,
+            "width": 34.71826171875,
+            "height": 39.82484436035156
+          },
+          "number": {
+            "x": 616.4197998046875,
+            "y": 55.47590255737305,
+            "right": 644.3614501953125,
+            "bottom": 88.52409362792969,
+            "width": 27.941650390625,
+            "height": 33.04819107055664
+          },
+          "statusFits": true,
+          "nameTruncated": false,
+          "active": false,
+          "accessibleTurn": false,
+          "transition": "0.16s, 0.16s, 0.16s"
+        },
+        {
+          "name": "Lou",
+          "count": "7 cards",
+          "countText": "7",
+          "rect": {
+            "x": 682.796875,
+            "y": 50,
+            "right": 810.796875,
+            "bottom": 94,
+            "width": 128,
+            "height": 44
+          },
+          "avatar": {
+            "x": 680.437744140625,
+            "y": 52.08757781982422,
+            "right": 715.156005859375,
+            "bottom": 91.91242218017578,
+            "width": 34.71826171875,
+            "height": 39.82484436035156
+          },
+          "number": {
+            "x": 778.8260498046875,
+            "y": 55.47590255737305,
+            "right": 806.7677001953125,
+            "bottom": 88.52409362792969,
+            "width": 27.941650390625,
+            "height": 33.04819107055664
+          },
+          "statusFits": true,
+          "nameTruncated": false,
+          "active": false,
+          "accessibleTurn": false,
+          "transition": "0.16s, 0.16s, 0.16s"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "name": "six-phone-568",
+      "document": [
+        568,
+        320
+      ],
+      "viewport": [
+        568,
+        320
+      ],
+      "seats": [
+        {
+          "name": "Cleo",
+          "count": "12 cards",
+          "countText": "12",
+          "rect": {
+            "x": 18.59375,
+            "y": 46,
+            "right": 120.59375,
+            "bottom": 90,
+            "width": 102,
+            "height": 44
+          },
+          "avatar": {
+            "x": 16.49349594116211,
+            "y": 50.34646224975586,
+            "right": 46.69400405883789,
+            "bottom": 85.65353393554688,
+            "width": 30.20050811767578,
+            "height": 35.307071685791016
+          },
+          "number": {
+            "x": 92.75238037109375,
+            "y": 52.605342864990234,
+            "right": 118.43511962890625,
+            "bottom": 83.3946533203125,
+            "width": 25.6827392578125,
+            "height": 30.789310455322266
+          },
+          "statusFits": true,
+          "nameTruncated": false,
+          "active": false,
+          "accessibleTurn": false,
+          "transition": "0.16s, 0.16s, 0.16s"
+        },
+        {
+          "name": "Jules",
+          "count": "24 cards",
+          "countText": "24",
+          "rect": {
+            "x": 125.796875,
+            "y": 46,
+            "right": 227.796875,
+            "bottom": 90,
+            "width": 102,
+            "height": 44
+          },
+          "avatar": {
+            "x": 123.69662475585938,
+            "y": 50.34646224975586,
+            "right": 153.89712524414062,
+            "bottom": 85.65353393554688,
+            "width": 30.20050048828125,
+            "height": 35.307071685791016
+          },
+          "number": {
+            "x": 199.95550537109375,
+            "y": 52.605342864990234,
+            "right": 225.63824462890625,
+            "bottom": 83.3946533203125,
+            "width": 25.6827392578125,
+            "height": 30.789310455322266
+          },
+          "statusFits": true,
+          "nameTruncated": false,
+          "active": false,
+          "accessibleTurn": false,
+          "transition": "0.16s, 0.16s, 0.16s"
+        },
+        {
+          "name": "Robin",
+          "status": "UNO!",
+          "count": "1 card",
+          "countText": "1",
+          "rect": {
+            "x": 233,
+            "y": 46,
+            "right": 335,
+            "bottom": 90,
+            "width": 102,
+            "height": 44
+          },
+          "avatar": {
+            "x": 230.89974975585938,
+            "y": 50.34646224975586,
+            "right": 261.1002502441406,
+            "bottom": 85.65353393554688,
+            "width": 30.20050048828125,
+            "height": 35.307071685791016
+          },
+          "number": {
+            "x": 307.15863037109375,
+            "y": 52.605342864990234,
+            "right": 332.84136962890625,
+            "bottom": 83.3946533203125,
+            "width": 25.6827392578125,
+            "height": 30.789310455322266
+          },
+          "statusFits": true,
+          "nameTruncated": false,
+          "active": false,
+          "accessibleTurn": false,
+          "transition": "0.16s, 0.16s, 0.16s"
+        },
+        {
+          "name": "Frankie",
+          "count": "7 cards",
+          "countText": "7",
+          "rect": {
+            "x": 340.1875,
+            "y": 46,
+            "right": 442.1875,
+            "bottom": 90,
+            "width": 102,
+            "height": 44
+          },
+          "avatar": {
+            "x": 338.0872497558594,
+            "y": 50.34646224975586,
+            "right": 368.2877502441406,
+            "bottom": 85.65353393554688,
+            "width": 30.20050048828125,
+            "height": 35.307071685791016
+          },
+          "number": {
+            "x": 414.34613037109375,
+            "y": 52.605342864990234,
+            "right": 440.02886962890625,
+            "bottom": 83.3946533203125,
+            "width": 25.6827392578125,
+            "height": 30.789310455322266
+          },
+          "statusFits": true,
+          "nameTruncated": false,
+          "active": false,
+          "accessibleTurn": false,
+          "transition": "0.16s, 0.16s, 0.16s"
+        },
+        {
+          "name": "Lou",
+          "count": "7 cards",
+          "countText": "7",
+          "rect": {
+            "x": 447.390625,
+            "y": 46,
+            "right": 549.390625,
+            "bottom": 90,
+            "width": 102,
+            "height": 44
+          },
+          "avatar": {
+            "x": 445.2903747558594,
+            "y": 50.34646224975586,
+            "right": 475.4908752441406,
+            "bottom": 85.65353393554688,
+            "width": 30.20050048828125,
+            "height": 35.307071685791016
+          },
+          "number": {
+            "x": 521.5492553710938,
+            "y": 52.605342864990234,
+            "right": 547.2319946289062,
+            "bottom": 83.3946533203125,
+            "width": 25.6827392578125,
+            "height": 30.789310455322266
+          },
+          "statusFits": true,
+          "nameTruncated": false,
+          "active": false,
+          "accessibleTurn": false,
+          "transition": "0.16s, 0.16s, 0.16s"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "name": "states-844",
+      "document": [
+        844,
+        390
+      ],
+      "viewport": [
+        844,
+        390
+      ],
+      "seats": [
+        {
+          "name": "Alexandria",
+          "status": "Catch!",
+          "count": "1 card",
+          "countText": "1",
+          "rect": {
+            "x": 33.1875,
+            "y": 50,
+            "right": 161.1875,
+            "bottom": 94,
+            "width": 128,
+            "height": 44
+          },
+          "avatar": {
+            "x": 30.8283634185791,
+            "y": 52.08757781982422,
+            "right": 65.54664039611816,
+            "bottom": 91.91242218017578,
+            "width": 34.71827697753906,
+            "height": 39.82484436035156
+          },
+          "number": {
+            "x": 129.21669006347656,
+            "y": 55.47590255737305,
+            "right": 157.15830993652344,
+            "bottom": 88.52409362792969,
+            "width": 27.941619873046875,
+            "height": 33.04819107055664
+          },
+          "statusFits": true,
+          "nameTruncated": true,
+          "active": false,
+          "accessibleTurn": false,
+          "transition": "0.16s, 0.16s, 0.16s"
+        },
+        {
+          "name": "Maximilian",
+          "status": "Offline",
+          "count": "7 cards",
+          "countText": "7",
+          "rect": {
+            "x": 195.59375,
+            "y": 50,
+            "right": 323.59375,
+            "bottom": 94,
+            "width": 128,
+            "height": 44
+          },
+          "avatar": {
+            "x": 193.234619140625,
+            "y": 52.08757781982422,
+            "right": 227.952880859375,
+            "bottom": 91.91242218017578,
+            "width": 34.71826171875,
+            "height": 39.82484436035156
+          },
+          "number": {
+            "x": 291.6229248046875,
+            "y": 55.47590255737305,
+            "right": 319.5645751953125,
+            "bottom": 88.52409362792969,
+            "width": 27.941650390625,
+            "height": 33.04819107055664
+          },
+          "statusFits": true,
+          "nameTruncated": true,
+          "active": false,
+          "accessibleTurn": false,
+          "transition": "0.16s, 0.16s, 0.16s"
+        },
+        {
+          "name": "Robin",
+          "status": "UNO!",
+          "count": "1 card",
+          "countText": "1",
+          "rect": {
+            "x": 358,
+            "y": 50,
+            "right": 486,
+            "bottom": 94,
+            "width": 128,
+            "height": 44
+          },
+          "avatar": {
+            "x": 355.640869140625,
+            "y": 52.08757781982422,
+            "right": 390.359130859375,
+            "bottom": 91.91242218017578,
+            "width": 34.71826171875,
+            "height": 39.82484436035156
+          },
+          "number": {
+            "x": 454.0291748046875,
+            "y": 55.47590255737305,
+            "right": 481.9708251953125,
+            "bottom": 88.52409362792969,
+            "width": 27.941650390625,
+            "height": 33.04819107055664
+          },
+          "statusFits": true,
+          "nameTruncated": false,
+          "active": false,
+          "accessibleTurn": false,
+          "transition": "0.16s, 0.16s, 0.16s"
+        },
+        {
+          "name": "Frankie",
+          "count": "7 cards",
+          "countText": "7",
+          "rect": {
+            "x": 520.390625,
+            "y": 50,
+            "right": 648.390625,
+            "bottom": 94,
+            "width": 128,
+            "height": 44
+          },
+          "avatar": {
+            "x": 518.031494140625,
+            "y": 52.08757781982422,
+            "right": 552.749755859375,
+            "bottom": 91.91242218017578,
+            "width": 34.71826171875,
+            "height": 39.82484436035156
+          },
+          "number": {
+            "x": 616.4197998046875,
+            "y": 55.47590255737305,
+            "right": 644.3614501953125,
+            "bottom": 88.52409362792969,
+            "width": 27.941650390625,
+            "height": 33.04819107055664
+          },
+          "statusFits": true,
+          "nameTruncated": false,
+          "active": false,
+          "accessibleTurn": false,
+          "transition": "0.16s, 0.16s, 0.16s"
+        },
+        {
+          "name": "Lou",
+          "count": "7 cards",
+          "countText": "7",
+          "rect": {
+            "x": 682.796875,
+            "y": 50,
+            "right": 810.796875,
+            "bottom": 94,
+            "width": 128,
+            "height": 44
+          },
+          "avatar": {
+            "x": 680.437744140625,
+            "y": 52.08757781982422,
+            "right": 715.156005859375,
+            "bottom": 91.91242218017578,
+            "width": 34.71826171875,
+            "height": 39.82484436035156
+          },
+          "number": {
+            "x": 778.8260498046875,
+            "y": 55.47590255737305,
+            "right": 806.7677001953125,
+            "bottom": 88.52409362792969,
+            "width": 27.941650390625,
+            "height": 33.04819107055664
+          },
+          "statusFits": true,
+          "nameTruncated": false,
+          "active": false,
+          "accessibleTurn": false,
+          "transition": "0.16s, 0.16s, 0.16s"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "name": "states-568",
+      "document": [
+        568,
+        320
+      ],
+      "viewport": [
+        568,
+        320
+      ],
+      "seats": [
+        {
+          "name": "Alexandria",
+          "status": "Catch!",
+          "count": "1 card",
+          "countText": "1",
+          "rect": {
+            "x": 18.59375,
+            "y": 46,
+            "right": 120.59375,
+            "bottom": 90,
+            "width": 102,
+            "height": 44
+          },
+          "avatar": {
+            "x": 16.49349594116211,
+            "y": 50.34646224975586,
+            "right": 46.69400405883789,
+            "bottom": 85.65353393554688,
+            "width": 30.20050811767578,
+            "height": 35.307071685791016
+          },
+          "number": {
+            "x": 92.75238037109375,
+            "y": 52.605342864990234,
+            "right": 118.43511962890625,
+            "bottom": 83.3946533203125,
+            "width": 25.6827392578125,
+            "height": 30.789310455322266
+          },
+          "statusFits": true,
+          "nameTruncated": true,
+          "active": false,
+          "accessibleTurn": false,
+          "transition": "0.16s, 0.16s, 0.16s"
+        },
+        {
+          "name": "Maximilian",
+          "status": "Offline",
+          "count": "7 cards",
+          "countText": "7",
+          "rect": {
+            "x": 125.796875,
+            "y": 46,
+            "right": 227.796875,
+            "bottom": 90,
+            "width": 102,
+            "height": 44
+          },
+          "avatar": {
+            "x": 123.69662475585938,
+            "y": 50.34646224975586,
+            "right": 153.89712524414062,
+            "bottom": 85.65353393554688,
+            "width": 30.20050048828125,
+            "height": 35.307071685791016
+          },
+          "number": {
+            "x": 199.95550537109375,
+            "y": 52.605342864990234,
+            "right": 225.63824462890625,
+            "bottom": 83.3946533203125,
+            "width": 25.6827392578125,
+            "height": 30.789310455322266
+          },
+          "statusFits": true,
+          "nameTruncated": true,
+          "active": false,
+          "accessibleTurn": false,
+          "transition": "0.16s, 0.16s, 0.16s"
+        },
+        {
+          "name": "Robin",
+          "status": "UNO!",
+          "count": "1 card",
+          "countText": "1",
+          "rect": {
+            "x": 233,
+            "y": 46,
+            "right": 335,
+            "bottom": 90,
+            "width": 102,
+            "height": 44
+          },
+          "avatar": {
+            "x": 230.89974975585938,
+            "y": 50.34646224975586,
+            "right": 261.1002502441406,
+            "bottom": 85.65353393554688,
+            "width": 30.20050048828125,
+            "height": 35.307071685791016
+          },
+          "number": {
+            "x": 307.15863037109375,
+            "y": 52.605342864990234,
+            "right": 332.84136962890625,
+            "bottom": 83.3946533203125,
+            "width": 25.6827392578125,
+            "height": 30.789310455322266
+          },
+          "statusFits": true,
+          "nameTruncated": false,
+          "active": false,
+          "accessibleTurn": false,
+          "transition": "0.16s, 0.16s, 0.16s"
+        },
+        {
+          "name": "Frankie",
+          "count": "7 cards",
+          "countText": "7",
+          "rect": {
+            "x": 340.1875,
+            "y": 46,
+            "right": 442.1875,
+            "bottom": 90,
+            "width": 102,
+            "height": 44
+          },
+          "avatar": {
+            "x": 338.0872497558594,
+            "y": 50.34646224975586,
+            "right": 368.2877502441406,
+            "bottom": 85.65353393554688,
+            "width": 30.20050048828125,
+            "height": 35.307071685791016
+          },
+          "number": {
+            "x": 414.34613037109375,
+            "y": 52.605342864990234,
+            "right": 440.02886962890625,
+            "bottom": 83.3946533203125,
+            "width": 25.6827392578125,
+            "height": 30.789310455322266
+          },
+          "statusFits": true,
+          "nameTruncated": false,
+          "active": false,
+          "accessibleTurn": false,
+          "transition": "0.16s, 0.16s, 0.16s"
+        },
+        {
+          "name": "Lou",
+          "count": "7 cards",
+          "countText": "7",
+          "rect": {
+            "x": 447.390625,
+            "y": 46,
+            "right": 549.390625,
+            "bottom": 90,
+            "width": 102,
+            "height": 44
+          },
+          "avatar": {
+            "x": 445.2903747558594,
+            "y": 50.34646224975586,
+            "right": 475.4908752441406,
+            "bottom": 85.65353393554688,
+            "width": 30.20050048828125,
+            "height": 35.307071685791016
+          },
+          "number": {
+            "x": 521.5492553710938,
+            "y": 52.605342864990234,
+            "right": 547.2319946289062,
+            "bottom": 83.3946533203125,
+            "width": 25.6827392578125,
+            "height": 30.789310455322266
+          },
+          "statusFits": true,
+          "nameTruncated": false,
+          "active": false,
+          "accessibleTurn": false,
+          "transition": "0.16s, 0.16s, 0.16s"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "name": "active",
+      "document": [
+        845,
+        765
+      ],
+      "viewport": [
+        845,
+        765
+      ],
+      "seats": [
+        {
+          "name": "Cleo",
+          "count": "1 card",
+          "countText": "1",
+          "rect": {
+            "x": 15.71875,
+            "y": 350.34375,
+            "right": 175.71875,
+            "bottom": 404.34375,
+            "width": 160,
+            "height": 54
+          },
+          "avatar": {
+            "x": 13.536417007446289,
+            "y": 347.5252685546875,
+            "right": 61.901079177856445,
+            "bottom": 403.1622314453125,
+            "width": 48.364662170410156,
+            "height": 55.636962890625
+          },
+          "number": {
+            "x": 141.71875,
+            "y": 358.34375,
+            "right": 167.71875,
+            "bottom": 392.34375,
+            "width": 26,
+            "height": 34
+          },
+          "statusFits": true,
+          "nameTruncated": false,
+          "active": true,
+          "accessibleTurn": true,
+          "transition": "0.16s, 0.16s, 0.16s"
+        },
+        {
+          "name": "Jules",
+          "count": "7 cards",
+          "countText": "7",
+          "rect": {
+            "x": 143.25,
+            "y": 231.4375,
+            "right": 303.25,
+            "bottom": 285.4375,
+            "width": 160,
+            "height": 54
+          },
+          "avatar": {
+            "x": 139.84561157226562,
+            "y": 227.62872314453125,
+            "right": 190.65440368652344,
+            "bottom": 285.24627685546875,
+            "width": 50.80879211425781,
+            "height": 57.6175537109375
+          },
+          "number": {
+            "x": 267.01055908203125,
+            "y": 239.793701171875,
+            "right": 297.48944091796875,
+            "bottom": 277.081298828125,
+            "width": 30.4788818359375,
+            "height": 37.28759765625
+          },
+          "statusFits": true,
+          "nameTruncated": false,
+          "active": false,
+          "accessibleTurn": false,
+          "transition": "0.16s, 0.16s, 0.16s"
+        },
+        {
+          "name": "Robin",
+          "status": "UNO!",
+          "count": "1 card",
+          "countText": "1",
+          "rect": {
+            "x": 342.5,
+            "y": 231.4375,
+            "right": 502.5,
+            "bottom": 285.4375,
+            "width": 160,
+            "height": 54
+          },
+          "avatar": {
+            "x": 339.0956115722656,
+            "y": 227.62872314453125,
+            "right": 389.9043884277344,
+            "bottom": 285.24627685546875,
+            "width": 50.80877685546875,
+            "height": 57.6175537109375
+          },
+          "number": {
+            "x": 466.26055908203125,
+            "y": 239.793701171875,
+            "right": 496.73944091796875,
+            "bottom": 277.081298828125,
+            "width": 30.4788818359375,
+            "height": 37.28759765625
+          },
+          "statusFits": true,
+          "nameTruncated": false,
+          "active": false,
+          "accessibleTurn": false,
+          "transition": "0.16s, 0.16s, 0.16s"
+        },
+        {
+          "name": "Frankie",
+          "count": "7 cards",
+          "countText": "7",
+          "rect": {
+            "x": 541.75,
+            "y": 231.4375,
+            "right": 701.75,
+            "bottom": 285.4375,
+            "width": 160,
+            "height": 54
+          },
+          "avatar": {
+            "x": 538.3455810546875,
+            "y": 227.62872314453125,
+            "right": 589.1544189453125,
+            "bottom": 285.24627685546875,
+            "width": 50.808837890625,
+            "height": 57.6175537109375
+          },
+          "number": {
+            "x": 665.5105590820312,
+            "y": 239.793701171875,
+            "right": 695.9894409179688,
+            "bottom": 277.081298828125,
+            "width": 30.4788818359375,
+            "height": 37.28759765625
+          },
+          "statusFits": true,
+          "nameTruncated": false,
+          "active": false,
+          "accessibleTurn": false,
+          "transition": "0.16s, 0.16s, 0.16s"
+        },
+        {
+          "name": "Lou",
+          "count": "7 cards",
+          "countText": "7",
+          "rect": {
+            "x": 669.265625,
+            "y": 350.34375,
+            "right": 829.265625,
+            "bottom": 404.34375,
+            "width": 160,
+            "height": 54
+          },
+          "avatar": {
+            "x": 665.8612060546875,
+            "y": 346.53497314453125,
+            "right": 716.6700439453125,
+            "bottom": 404.15252685546875,
+            "width": 50.808837890625,
+            "height": 57.6175537109375
+          },
+          "number": {
+            "x": 793.0261840820312,
+            "y": 358.699951171875,
+            "right": 823.5050659179688,
+            "bottom": 395.987548828125,
+            "width": 30.4788818359375,
+            "height": 37.28759765625
+          },
+          "statusFits": true,
+          "nameTruncated": false,
+          "active": false,
+          "accessibleTurn": false,
+          "transition": "0.16s, 0.16s, 0.16s"
+        }
+      ],
+      "errors": []
+    },
+    {
+      "name": "active-reduced",
+      "document": [
+        568,
+        320
+      ],
+      "viewport": [
+        568,
+        320
+      ],
+      "seats": [
+        {
+          "name": "Cleo",
+          "count": "1 card",
+          "countText": "1",
+          "rect": {
+            "x": 18.59375,
+            "y": 46,
+            "right": 120.59375,
+            "bottom": 90,
+            "width": 102,
+            "height": 44
+          },
+          "avatar": {
+            "x": 16.49349594116211,
+            "y": 50.34646224975586,
+            "right": 46.69400405883789,
+            "bottom": 85.65353393554688,
+            "width": 30.20050811767578,
+            "height": 35.307071685791016
+          },
+          "number": {
+            "x": 94.59375,
+            "y": 52,
+            "right": 116.59375,
+            "bottom": 80,
+            "width": 22,
+            "height": 28
+          },
+          "statusFits": true,
+          "nameTruncated": false,
+          "active": true,
+          "accessibleTurn": true,
+          "transition": "0s"
+        },
+        {
+          "name": "Jules",
+          "count": "7 cards",
+          "countText": "7",
+          "rect": {
+            "x": 125.796875,
+            "y": 46,
+            "right": 227.796875,
+            "bottom": 90,
+            "width": 102,
+            "height": 44
+          },
+          "avatar": {
+            "x": 123.69662475585938,
+            "y": 50.34646224975586,
+            "right": 153.89712524414062,
+            "bottom": 85.65353393554688,
+            "width": 30.20050048828125,
+            "height": 35.307071685791016
+          },
+          "number": {
+            "x": 199.95550537109375,
+            "y": 52.605342864990234,
+            "right": 225.63824462890625,
+            "bottom": 83.3946533203125,
+            "width": 25.6827392578125,
+            "height": 30.789310455322266
+          },
+          "statusFits": true,
+          "nameTruncated": false,
+          "active": false,
+          "accessibleTurn": false,
+          "transition": "0s"
+        },
+        {
+          "name": "Robin",
+          "status": "UNO!",
+          "count": "1 card",
+          "countText": "1",
+          "rect": {
+            "x": 233,
+            "y": 46,
+            "right": 335,
+            "bottom": 90,
+            "width": 102,
+            "height": 44
+          },
+          "avatar": {
+            "x": 230.89974975585938,
+            "y": 50.34646224975586,
+            "right": 261.1002502441406,
+            "bottom": 85.65353393554688,
+            "width": 30.20050048828125,
+            "height": 35.307071685791016
+          },
+          "number": {
+            "x": 307.15863037109375,
+            "y": 52.605342864990234,
+            "right": 332.84136962890625,
+            "bottom": 83.3946533203125,
+            "width": 25.6827392578125,
+            "height": 30.789310455322266
+          },
+          "statusFits": true,
+          "nameTruncated": false,
+          "active": false,
+          "accessibleTurn": false,
+          "transition": "0s"
+        },
+        {
+          "name": "Frankie",
+          "count": "7 cards",
+          "countText": "7",
+          "rect": {
+            "x": 340.1875,
+            "y": 46,
+            "right": 442.1875,
+            "bottom": 90,
+            "width": 102,
+            "height": 44
+          },
+          "avatar": {
+            "x": 338.0872497558594,
+            "y": 50.34646224975586,
+            "right": 368.2877502441406,
+            "bottom": 85.65353393554688,
+            "width": 30.20050048828125,
+            "height": 35.307071685791016
+          },
+          "number": {
+            "x": 414.34613037109375,
+            "y": 52.605342864990234,
+            "right": 440.02886962890625,
+            "bottom": 83.3946533203125,
+            "width": 25.6827392578125,
+            "height": 30.789310455322266
+          },
+          "statusFits": true,
+          "nameTruncated": false,
+          "active": false,
+          "accessibleTurn": false,
+          "transition": "0s"
+        },
+        {
+          "name": "Lou",
+          "count": "7 cards",
+          "countText": "7",
+          "rect": {
+            "x": 447.390625,
+            "y": 46,
+            "right": 549.390625,
+            "bottom": 90,
+            "width": 102,
+            "height": 44
+          },
+          "avatar": {
+            "x": 445.2903747558594,
+            "y": 50.34646224975586,
+            "right": 475.4908752441406,
+            "bottom": 85.65353393554688,
+            "width": 30.20050048828125,
+            "height": 35.307071685791016
+          },
+          "number": {
+            "x": 521.5492553710938,
+            "y": 52.605342864990234,
+            "right": 547.2319946289062,
+            "bottom": 83.3946533203125,
+            "width": 25.6827392578125,
+            "height": 30.789310455322266
+          },
+          "statusFits": true,
+          "nameTruncated": false,
+          "active": false,
+          "accessibleTurn": false,
+          "transition": "0s"
+        }
+      ],
+      "errors": []
+    }
+  ],
+  "failures": []
+}

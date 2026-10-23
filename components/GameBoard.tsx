@@ -27,18 +27,15 @@ import { toast } from "sonner";
 import type { useUnoGame } from "../hooks/useUnoGame";
 import type { useUnoOnlineGame } from "../hooks/useUnoOnlineGame";
 import type { Card } from "../types/card";
-import type { GameState, Player } from "../types/game";
+import type { GameState } from "../types/game";
 import { canPlayCard } from "../lib/gameRules";
-import {
-  getPlayerExpression,
-  type PlayerExpression,
-} from "../lib/playerExpression";
+import { getPlayerExpression } from "../lib/playerExpression";
 import { getAudioSettings, setAudioSettings } from "../lib/audioSettings";
 import { usePhonePortrait } from "../hooks/usePhonePortrait";
 import { useGamePresentation } from "../hooks/useGamePresentation";
 import PlayerProgress from "./PlayerProgress";
 import RoundSummary from "./RoundSummary";
-import PlayerAvatar from "./PlayerAvatar";
+import OpponentSeat from "./OpponentSeat";
 import GameFeedback, { VictoryBurst } from "./GameFeedback";
 import UnoCard from "./UnoCard";
 import HandCard from "./HandCard";
@@ -106,98 +103,6 @@ function describeAction(game: GameState) {
   if (a.type === "pass") return `${name(a.playerId)} passed`;
   if (a.type === "declareUno") return `${name(a.playerId)} called UNO!`;
   return `${name(a.callerId)} called out ${name(a.targetId)} · +${a.penalty} cards`;
-}
-function Opponent({
-  player,
-  active,
-  expression,
-  position,
-  offline,
-  canCatch,
-  onCatch,
-}: {
-  player: Player;
-  active: boolean;
-  expression: PlayerExpression;
-  position: string;
-  offline: boolean;
-  canCatch: boolean;
-  onCatch: () => void;
-}) {
-  const SeatLabel = canCatch ? "button" : "div";
-  return (
-    <div
-      className={`opponent ${position} ${active ? "active-seat" : ""} ${player.hand.length === 1 ? "last-card-seat" : ""}`}
-      data-seat={player.id}
-    >
-      <div className="opponent-hand" aria-hidden="true">
-        {Array.from({ length: Math.min(5, player.hand.length) }, (_, i) => (
-          <span
-            key={i}
-            style={
-              {
-                "--back-i": i,
-                "--back-count": Math.min(5, player.hand.length),
-              } as CSSProperties
-            }
-          >
-            <UnoCard
-              card={{ id: "back", color: "wild", value: "wild" }}
-              faceDown
-              sizeMultiplier={0.55}
-            />
-          </span>
-        ))}
-        {player.hand.length === 1 && (
-          <b className="last-card-stamp">{player.saidUno ? "UNO" : "1"}</b>
-        )}
-      </div>
-      <SeatLabel
-        className={`opponent-label ${canCatch ? "catch-seat" : ""}`}
-        type={canCatch ? "button" : undefined}
-        onClick={canCatch ? onCatch : undefined}
-        aria-label={canCatch ? `Catch ${player.name}’s missed UNO` : undefined}
-      >
-        <PlayerAvatar
-          seed={player.id}
-          expression={offline ? "neutral" : expression}
-        />
-        <span>
-          <strong>{player.name}</strong>
-          <small
-            aria-label={
-              offline
-                ? "Reconnecting"
-                : player.saidUno && player.hand.length === 1
-                  ? "UNO!"
-                  : `${player.hand.length} ${player.hand.length === 1 ? "card" : "cards"}`
-            }
-          >
-            {canCatch ? (
-              "Catch!"
-            ) : offline ? (
-              "Offline"
-            ) : player.saidUno && player.hand.length === 1 ? (
-              "UNO!"
-            ) : (
-              <>
-                <Layers className="count-icon" size={12} aria-hidden="true" />
-                <span>{player.hand.length}</span>
-                <span className="count-word">
-                  {" "}
-                  {player.hand.length === 1 ? "card" : "cards"}
-                </span>
-              </>
-            )}
-          </small>
-        </span>
-        <span
-          className="turn-marker"
-          aria-label={active ? "Current turn" : undefined}
-        />
-      </SeatLabel>
-    </div>
-  );
 }
 export default function GameBoard({
   gameApi: api,
@@ -538,7 +443,7 @@ export default function GameBoard({
           </div>
           <GameFeedback game={game} />
           {opponents.map(({ player, index }, i) => (
-            <Opponent
+            <OpponentSeat
               key={player.id}
               player={player}
               active={game.currentPlayerIndex === index}
