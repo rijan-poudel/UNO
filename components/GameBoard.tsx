@@ -124,6 +124,7 @@ function Opponent({
   canCatch: boolean;
   onCatch: () => void;
 }) {
+  const SeatLabel = canCatch ? "button" : "div";
   return (
     <div
       className={`opponent ${position} ${active ? "active-seat" : ""} ${player.hand.length === 1 ? "last-card-seat" : ""}`}
@@ -151,7 +152,12 @@ function Opponent({
           <b className="last-card-stamp">{player.saidUno ? "UNO" : "1"}</b>
         )}
       </div>
-      <div className="opponent-label">
+      <SeatLabel
+        className={`opponent-label ${canCatch ? "catch-seat" : ""}`}
+        type={canCatch ? "button" : undefined}
+        onClick={canCatch ? onCatch : undefined}
+        aria-label={canCatch ? `Catch ${player.name}’s missed UNO` : undefined}
+      >
         <PlayerAvatar
           seed={player.id}
           expression={offline ? "neutral" : expression}
@@ -167,8 +173,10 @@ function Opponent({
                   : `${player.hand.length} ${player.hand.length === 1 ? "card" : "cards"}`
             }
           >
-            {offline ? (
-              "Reconnecting"
+            {canCatch ? (
+              "Catch!"
+            ) : offline ? (
+              "Offline"
             ) : player.saidUno && player.hand.length === 1 ? (
               "UNO!"
             ) : (
@@ -187,16 +195,7 @@ function Opponent({
           className="turn-marker"
           aria-label={active ? "Current turn" : undefined}
         />
-      </div>
-      {canCatch && (
-        <button
-          className="catch-button"
-          aria-label={`Catch ${player.name}’s missed UNO`}
-          onClick={onCatch}
-        >
-          Catch!
-        </button>
-      )}
+      </SeatLabel>
     </div>
   );
 }
@@ -690,6 +689,11 @@ export default function GameBoard({
                       buttons.length;
               const target = buttons[next];
               if (target) {
+                // Keyboard intent reveals the final slot, even during hand reflow.
+                target
+                  .closest("[data-hand-card]")
+                  ?.getAnimations()
+                  .forEach((animation) => animation.cancel());
                 target.focus({ preventScroll: true });
                 revealHandCard(event.currentTarget, target);
               }
@@ -798,33 +802,39 @@ export default function GameBoard({
         />
       )}
       {menu && (
-        <Modal title="Your table." onClose={() => setMenu(false)}>
-          <p className="game-turn-order">
-            Turn order:{" "}
-            {game.direction === 1 ? "clockwise" : "counterclockwise"}. Next:{" "}
-            {
-              game.players[
-                (game.currentPlayerIndex +
-                  game.direction +
-                  game.players.length) %
-                  game.players.length
-              ].name
-            }
-            .
-          </p>
-          {online?.room && (
-            <button
-              className="text-button room-code-control"
-              onClick={() => {
-                void navigator.clipboard
-                  .writeText(online.room?.roomId ?? "")
-                  .then(() => toast.success("Room code copied."))
-                  .catch(() => toast.error("Couldn’t copy room code."));
-              }}
-            >
-              Copy room code: {online.room.roomId}
-            </button>
-          )}
+        <Modal
+          title="Your table."
+          onClose={() => setMenu(false)}
+          className="game-menu-modal"
+        >
+          <div className="game-menu-context">
+            <p className="game-turn-order">
+              Turn order:{" "}
+              {game.direction === 1 ? "clockwise" : "counterclockwise"}. Next:{" "}
+              {
+                game.players[
+                  (game.currentPlayerIndex +
+                    game.direction +
+                    game.players.length) %
+                    game.players.length
+                ].name
+              }
+              .
+            </p>
+            {online?.room && (
+              <button
+                className="text-button room-code-control"
+                onClick={() => {
+                  void navigator.clipboard
+                    .writeText(online.room?.roomId ?? "")
+                    .then(() => toast.success("Room code copied."))
+                    .catch(() => toast.error("Couldn’t copy room code."));
+                }}
+              >
+                Copy room code: {online.room.roomId}
+              </button>
+            )}
+          </div>
           <div className="game-menu">
             <button
               className="game-sound-control"
@@ -872,13 +882,9 @@ export default function GameBoard({
               </b>
             </button>
 
-            <button onClick={() => setMenu(false)}>
-              <ArrowLeft />
-              <span>Back to game</span>
-            </button>
             <button aria-pressed={sort} onClick={() => setSort((s) => !s)}>
               <Layers />
-              <span>{sort ? "Keep dealt order" : "Sort hand by color"}</span>
+              <span>Sort by color</span>
               <Check size={17} style={{ opacity: sort ? 1 : 0 }} />
             </button>
             <button
@@ -912,6 +918,7 @@ export default function GameBoard({
               <ArrowRight size={17} />
             </button>
             <button
+              className="game-leave-control"
               onClick={() => {
                 setMenu(false);
                 setExit(true);

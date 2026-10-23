@@ -11,6 +11,7 @@ import { playTableChime, type TableChime } from "../lib/tableChimes";
 import { recordRound } from "../lib/playerProgress";
 import { getAudioSettings } from "../lib/audioSettings";
 import { getCardFlight, type CardPose } from "../lib/cardMotion";
+import { readCardPose as cardPose } from "../lib/cardPose";
 
 const ACTION_SOUNDS: Record<string, TableChime> = {
   skip: "skip",
@@ -20,29 +21,6 @@ const ACTION_SOUNDS: Record<string, TableChime> = {
   wild: "wild",
   shuffle: "shuffle",
 };
-
-function cardPose(element: HTMLElement): CardPose {
-  const rect = element.getBoundingClientRect();
-  // Card, fan and pile rotations compose. Translation alone cannot recover this.
-  let angle = 0;
-  for (
-    let node: HTMLElement | null = element;
-    node;
-    node = node.parentElement
-  ) {
-    const transform = getComputedStyle(node).transform;
-    if (transform !== "none") {
-      const matrix = new DOMMatrixReadOnly(transform);
-      angle += Math.atan2(matrix.b, matrix.a) * (180 / Math.PI);
-    }
-  }
-  return {
-    x: rect.x + rect.width / 2,
-    y: rect.y + rect.height / 2,
-    width: element.offsetWidth,
-    angle,
-  };
-}
 
 type HandPosition = { left: number; top: number; transform: string };
 export function useGamePresentation(
@@ -126,7 +104,7 @@ export function useGamePresentation(
       from: CardPose,
       delay = 0,
       hideDestination = true,
-      to = cardPose(element),
+      to: CardPose = cardPose(element),
     ) {
       if (reduced) return;
       if (!element.offsetWidth || !to.width || !from.width) return;

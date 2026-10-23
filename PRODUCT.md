@@ -74,3 +74,7 @@ The owner answered the background preference with “An illustrated game-room se
 ## October 22 corrective game layout
 
 The owner rejected the shipped illustrated-room UI. Keep the selected room and native cards while making the play itself a close shared composition: piles near the held fan, readable graphical opponents, normal landscape cards visible before focus, and a shallow phone fan that stays scrollable with20cards. Desktop crop already broadly meets the brief; the phone extremes need more hand space. Contextual Pass/inspection controls need their own lane clear of the piles. These are corrective layout findings, not a request for more decorative artwork or a routine status HUD.
+
+## October 23 journey and handling correction
+
+The owner prioritizes the UI and the feeling of playing together. Landscape home must expose all three centered start actions alongside the complete original cast. The game menu should fit core decisions and Close on short screens; Close returns to play and Leave remains distinct. Keep native cards and the selected room while bringing desktop piles closer to the hand, strengthening static legal-card distinction, and making compact identities readable. Eligible missed-UNO catches belong to the player's badge instead of floating over piles. Gestures must preserve measured rendered pose through pickup/return and never suppress a later keyboard activation. This extends the existing world; it does not authorize a new theme or more decorative HUD.

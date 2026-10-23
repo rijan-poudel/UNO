@@ -13,6 +13,7 @@ import {
   primeTableAudioFromUserGesture,
 } from "../lib/tableChimes";
 import { canReleaseCard } from "../lib/cardGesture";
+import { readCardPose } from "../lib/cardPose";
 
 interface Props {
   card: Card;
@@ -40,6 +41,7 @@ export default function HandCard({
     x: number;
     y: number;
     dragging: boolean;
+    pose?: ReturnType<typeof readCardPose>;
   } | null>(null);
   const suppressClick = useRef(false);
   const ghost = useRef<HTMLElement | null>(null);
@@ -51,6 +53,7 @@ export default function HandCard({
       const element = wrapper?.querySelector<HTMLElement>(".uno-card");
       if (element) element.style.opacity = "";
       gesture.current = null;
+      suppressClick.current = false;
       wrapper?.classList.remove("dragging-card");
       if (wrapper) onDragChange(null);
     };
@@ -58,9 +61,11 @@ export default function HandCard({
       if (document.hidden) interrupt();
     };
     window.addEventListener("blur", interrupt);
+    window.addEventListener("resize", interrupt);
     document.addEventListener("visibilitychange", onVisibility);
     return () => {
       window.removeEventListener("blur", interrupt);
+      window.removeEventListener("resize", interrupt);
       document.removeEventListener("visibilitychange", onVisibility);
       interrupt();
     };
@@ -90,14 +95,17 @@ export default function HandCard({
         lifted.remove();
         ghost.current = null;
         if (element) element.style.opacity = "";
-      } else if (lifted && element) {
+      } else if (lifted && element && start.pose) {
+        const destination = readCardPose(element);
         const reduced = window.matchMedia(
           "(prefers-reduced-motion: reduce)",
         ).matches;
         const returning = lifted.animate(
           [
             { transform: lifted.style.transform },
-            { transform: `translate(0, 0) rotate(${position * 16}deg)` },
+            {
+              transform: `translate(${destination.x - start.pose.x}px, ${destination.y - start.pose.y}px) rotate(${destination.angle}deg) scale(${destination.width / start.pose.width})`,
+            },
           ],
           {
             duration: reduced ? 0 : 180,
@@ -130,6 +138,10 @@ export default function HandCard({
           "--hand-i": index,
         } as CSSProperties
       }
+      onClickCapture={(event) => {
+        // Keyboard activation is a new intent, never the drag's synthetic click.
+        if (event.detail === 0) suppressClick.current = false;
+      }}
       onPointerDown={(event) => {
         if (!event.isPrimary || event.button !== 0 || gesture.current) return;
         primeTableAudioFromUserGesture();
@@ -146,6 +158,7 @@ export default function HandCard({
           x: event.clientX,
           y: event.clientY,
           dragging: false,
+          pose: previousFace ? readCardPose(previousFace) : undefined,
         };
       }}
       onPointerMove={(event) => {
@@ -164,7 +177,8 @@ export default function HandCard({
           event.currentTarget.classList.add("dragging-card");
           const element = face();
           if (element) {
-            const rect = element.getBoundingClientRect();
+            const pose = start.pose ?? readCardPose(element);
+            start.pose = pose;
             const lifted = element.cloneNode(true) as HTMLElement;
             lifted.removeAttribute("aria-label");
             lifted.setAttribute("aria-hidden", "true");
@@ -174,17 +188,18 @@ export default function HandCard({
               zIndex: "200",
               pointerEvents: "none",
               margin: "0",
-              left: `${rect.x + (rect.width - element.offsetWidth) / 2}px`,
-              top: `${rect.y + (rect.height - element.offsetHeight) / 2}px`,
-              width: `${element.offsetWidth}px`,
-              height: `${element.offsetHeight}px`,
+              left: `${pose.x - pose.width / 2}px`,
+              top: `${pose.y - pose.height / 2}px`,
+              width: `${pose.width}px`,
+              height: `${pose.height}px`,
               transition: "none",
               boxShadow: "0 18px 28px #060c1780",
             });
             lifted.style.setProperty(
               "--card-scale",
-              getComputedStyle(element).getPropertyValue("--card-scale"),
+              `${(parseFloat(getComputedStyle(element).getPropertyValue("--card-scale")) || 1) * (pose.width / element.offsetWidth)}`,
             );
+            lifted.dataset.heldCard = card.id;
             document.body.append(lifted);
             ghost.current = lifted;
             element.style.opacity = "0";
@@ -198,7 +213,7 @@ export default function HandCard({
               "(prefers-reduced-motion: reduce)",
             ).matches;
             element.style.transition = "none";
-            element.style.transform = `translate(${dx}px, ${dy}px) rotate(${reduced ? 0 : position * 16 + dx * 0.035}deg)`;
+            element.style.transform = `translate(${dx}px, ${dy}px) rotate(${(start.pose?.angle ?? 0) + (reduced ? 0 : dx * 0.035)}deg)`;
           }
         }
       }}

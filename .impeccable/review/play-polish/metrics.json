@@ -1,0 +1,970 @@
+{
+  "results": [
+    {
+      "name": "desktop",
+      "starts": [
+        {
+          "name": "Play with bots",
+          "x": 440,
+          "y": 586.984375,
+          "width": 560,
+          "height": 64,
+          "visible": true
+        },
+        {
+          "name": "Create a room",
+          "x": 440,
+          "y": 662.984375,
+          "width": 274,
+          "height": 54,
+          "visible": true
+        },
+        {
+          "name": "Join a room",
+          "x": 726,
+          "y": 662.984375,
+          "width": 274,
+          "height": 54,
+          "visible": true
+        }
+      ],
+      "geometry": {
+        "gap": 70.01092529296875,
+        "document": [
+          1440,
+          900
+        ],
+        "viewport": [
+          1440,
+          900
+        ],
+        "scrollTop": 0
+      },
+      "menu": [
+        {
+          "name": "Close dialog",
+          "x": 980,
+          "y": 295.59375,
+          "width": 44,
+          "height": 44,
+          "visible": true
+        },
+        {
+          "name": "Copy room code: THREE3",
+          "x": 868.203125,
+          "y": 353.390625,
+          "width": 147.796875,
+          "height": 44,
+          "visible": true
+        },
+        {
+          "name": "Turn sound off",
+          "x": 424,
+          "y": 413.390625,
+          "width": 292,
+          "height": 56,
+          "visible": true
+        },
+        {
+          "name": "Sort by color",
+          "x": 724,
+          "y": 413.390625,
+          "width": 292,
+          "height": 56,
+          "visible": true
+        },
+        {
+          "name": "How to play",
+          "x": 424,
+          "y": 477.390625,
+          "width": 292,
+          "height": 56,
+          "visible": true
+        },
+        {
+          "name": "Settings & house rules",
+          "x": 724,
+          "y": 477.390625,
+          "width": 292,
+          "height": 56,
+          "visible": true
+        },
+        {
+          "name": "Table activity",
+          "x": 424,
+          "y": 541.390625,
+          "width": 292,
+          "height": 56,
+          "visible": true
+        },
+        {
+          "name": "Leave table",
+          "x": 724,
+          "y": 541.390625,
+          "width": 292,
+          "height": 56,
+          "visible": true
+        }
+      ],
+      "wild": [
+        {
+          "name": "Close dialog",
+          "x": 936,
+          "y": 265.40625,
+          "width": 44,
+          "height": 44,
+          "visible": true
+        },
+        {
+          "name": "red",
+          "x": 468,
+          "y": 373.59375,
+          "width": 246,
+          "height": 88,
+          "visible": true
+        },
+        {
+          "name": "yellow",
+          "x": 726,
+          "y": 373.59375,
+          "width": 246,
+          "height": 88,
+          "visible": true
+        },
+        {
+          "name": "green",
+          "x": 468,
+          "y": 473.59375,
+          "width": 246,
+          "height": 88,
+          "visible": true
+        },
+        {
+          "name": "blue",
+          "x": 726,
+          "y": 473.59375,
+          "width": 246,
+          "height": 88,
+          "visible": true
+        },
+        {
+          "name": "Keep the wild card",
+          "x": 468,
+          "y": 583.59375,
+          "width": 504,
+          "height": 44,
+          "visible": true
+        }
+      ],
+      "errors": []
+    },
+    {
+      "name": "owner",
+      "starts": [
+        {
+          "name": "Play with bots",
+          "x": 144,
+          "y": 544.875,
+          "width": 560,
+          "height": 64,
+          "visible": true
+        },
+        {
+          "name": "Create a room",
+          "x": 144,
+          "y": 620.875,
+          "width": 274,
+          "height": 54,
+          "visible": true
+        },
+        {
+          "name": "Join a room",
+          "x": 430,
+          "y": 620.875,
+          "width": 274,
+          "height": 54,
+          "visible": true
+        }
+      ],
+      "geometry": {
+        "gap": 72.326904296875,
+        "document": [
+          848,
+          765
+        ],
+        "viewport": [
+          848,
+          765
+        ],
+        "scrollTop": 0
+      },
+      "menu": [
+        {
+          "name": "Close dialog",
+          "x": 684,
+          "y": 228.09375,
+          "width": 44,
+          "height": 44,
+          "visible": true
+        },
+        {
+          "name": "Copy room code: THREE3",
+          "x": 572.203125,
+          "y": 285.890625,
+          "width": 147.796875,
+          "height": 44,
+          "visible": true
+        },
+        {
+          "name": "Turn sound off",
+          "x": 128,
+          "y": 345.890625,
+          "width": 292,
+          "height": 56,
+          "visible": true
+        },
+        {
+          "name": "Sort by color",
+          "x": 428,
+          "y": 345.890625,
+          "width": 292,
+          "height": 56,
+          "visible": true
+        },
+        {
+          "name": "How to play",
+          "x": 128,
+          "y": 409.890625,
+          "width": 292,
+          "height": 56,
+          "visible": true
+        },
+        {
+          "name": "Settings & house rules",
+          "x": 428,
+          "y": 409.890625,
+          "width": 292,
+          "height": 56,
+          "visible": true
+        },
+        {
+          "name": "Table activity",
+          "x": 128,
+          "y": 473.890625,
+          "width": 292,
+          "height": 56,
+          "visible": true
+        },
+        {
+          "name": "Leave table",
+          "x": 428,
+          "y": 473.890625,
+          "width": 292,
+          "height": 56,
+          "visible": true
+        }
+      ],
+      "wild": [
+        {
+          "name": "Close dialog",
+          "x": 640,
+          "y": 197.90625,
+          "width": 44,
+          "height": 44,
+          "visible": true
+        },
+        {
+          "name": "red",
+          "x": 172,
+          "y": 306.09375,
+          "width": 246,
+          "height": 88,
+          "visible": true
+        },
+        {
+          "name": "yellow",
+          "x": 430,
+          "y": 306.09375,
+          "width": 246,
+          "height": 88,
+          "visible": true
+        },
+        {
+          "name": "green",
+          "x": 172,
+          "y": 406.09375,
+          "width": 246,
+          "height": 88,
+          "visible": true
+        },
+        {
+          "name": "blue",
+          "x": 430,
+          "y": 406.09375,
+          "width": 246,
+          "height": 88,
+          "visible": true
+        },
+        {
+          "name": "Keep the wild card",
+          "x": 172,
+          "y": 516.09375,
+          "width": 504,
+          "height": 44,
+          "visible": true
+        }
+      ],
+      "errors": []
+    },
+    {
+      "name": "phone-844",
+      "starts": [
+        {
+          "name": "Play with bots",
+          "x": 142,
+          "y": 232,
+          "width": 560,
+          "height": 45.75,
+          "visible": true
+        },
+        {
+          "name": "Create a room",
+          "x": 142,
+          "y": 285.75,
+          "width": 275,
+          "height": 44,
+          "visible": true
+        },
+        {
+          "name": "Join a room",
+          "x": 427,
+          "y": 285.75,
+          "width": 275,
+          "height": 44,
+          "visible": true
+        }
+      ],
+      "geometry": {
+        "gap": 46.96104431152344,
+        "document": [
+          844,
+          390
+        ],
+        "viewport": [
+          844,
+          390
+        ],
+        "scrollTop": 0
+      },
+      "menu": [
+        {
+          "name": "Close dialog",
+          "x": 726,
+          "y": 71,
+          "width": 44,
+          "height": 44,
+          "visible": true
+        },
+        {
+          "name": "Copy room code: ANGLE7",
+          "x": 620.015625,
+          "y": 123,
+          "width": 149.984375,
+          "height": 44,
+          "visible": true
+        },
+        {
+          "name": "Turn sound off",
+          "x": 74,
+          "y": 175,
+          "width": 344,
+          "height": 44,
+          "visible": true
+        },
+        {
+          "name": "Sort by color",
+          "x": 426,
+          "y": 175,
+          "width": 344,
+          "height": 44,
+          "visible": true
+        },
+        {
+          "name": "How to play",
+          "x": 74,
+          "y": 225,
+          "width": 344,
+          "height": 44,
+          "visible": true
+        },
+        {
+          "name": "Settings & house rules",
+          "x": 426,
+          "y": 225,
+          "width": 344,
+          "height": 44,
+          "visible": true
+        },
+        {
+          "name": "Table activity",
+          "x": 74,
+          "y": 275,
+          "width": 344,
+          "height": 44,
+          "visible": true
+        },
+        {
+          "name": "Leave table",
+          "x": 426,
+          "y": 275,
+          "width": 344,
+          "height": 44,
+          "visible": true
+        }
+      ],
+      "wild": [
+        {
+          "name": "Close dialog",
+          "x": 702,
+          "y": 88.21875,
+          "width": 44,
+          "height": 44,
+          "visible": true
+        },
+        {
+          "name": "red",
+          "x": 98,
+          "y": 173.765625,
+          "width": 154.5,
+          "height": 72,
+          "visible": true
+        },
+        {
+          "name": "yellow",
+          "x": 262.5,
+          "y": 173.765625,
+          "width": 154.5,
+          "height": 72,
+          "visible": true
+        },
+        {
+          "name": "green",
+          "x": 427,
+          "y": 173.765625,
+          "width": 154.5,
+          "height": 72,
+          "visible": true
+        },
+        {
+          "name": "blue",
+          "x": 591.5,
+          "y": 173.765625,
+          "width": 154.5,
+          "height": 72,
+          "visible": true
+        },
+        {
+          "name": "Keep the wild card",
+          "x": 98,
+          "y": 257.765625,
+          "width": 106.046875,
+          "height": 44,
+          "visible": true
+        }
+      ],
+      "touch": {
+        "before": {
+          "x": 178.85986328125,
+          "y": 258.1096496582031,
+          "width": 108.67123413085938,
+          "height": 146.36026000976562
+        },
+        "held": {
+          "x": 178.6071319580078,
+          "y": 229.9357452392578,
+          "width": 109.16072082519531,
+          "height": 146.67539978027344
+        }
+      },
+      "errors": []
+    },
+    {
+      "name": "phone-568",
+      "starts": [
+        {
+          "name": "Play with bots",
+          "x": 24,
+          "y": 162,
+          "width": 520,
+          "height": 45.75,
+          "visible": true
+        },
+        {
+          "name": "Create a room",
+          "x": 24,
+          "y": 215.75,
+          "width": 255,
+          "height": 44,
+          "visible": true
+        },
+        {
+          "name": "Join a room",
+          "x": 289,
+          "y": 215.75,
+          "width": 255,
+          "height": 44,
+          "visible": true
+        }
+      ],
+      "geometry": {
+        "gap": 21.082656860351562,
+        "document": [
+          568,
+          320
+        ],
+        "viewport": [
+          568,
+          320
+        ],
+        "scrollTop": 0
+      },
+      "menu": [
+        {
+          "name": "Close dialog",
+          "x": 494,
+          "y": 36,
+          "width": 44,
+          "height": 44,
+          "visible": true
+        },
+        {
+          "name": "Copy room code: ANGLE7",
+          "x": 388.015625,
+          "y": 88,
+          "width": 149.984375,
+          "height": 44,
+          "visible": true
+        },
+        {
+          "name": "Turn sound off",
+          "x": 30,
+          "y": 140,
+          "width": 250,
+          "height": 44,
+          "visible": true
+        },
+        {
+          "name": "Sort by color",
+          "x": 288,
+          "y": 140,
+          "width": 250,
+          "height": 44,
+          "visible": true
+        },
+        {
+          "name": "How to play",
+          "x": 30,
+          "y": 190,
+          "width": 250,
+          "height": 44,
+          "visible": true
+        },
+        {
+          "name": "Settings & house rules",
+          "x": 288,
+          "y": 190,
+          "width": 250,
+          "height": 44,
+          "visible": true
+        },
+        {
+          "name": "Table activity",
+          "x": 30,
+          "y": 240,
+          "width": 250,
+          "height": 44,
+          "visible": true
+        },
+        {
+          "name": "Leave table",
+          "x": 288,
+          "y": 240,
+          "width": 250,
+          "height": 44,
+          "visible": true
+        }
+      ],
+      "wild": [
+        {
+          "name": "Close dialog",
+          "x": 490,
+          "y": 53.21875,
+          "width": 44,
+          "height": 44,
+          "visible": true
+        },
+        {
+          "name": "red",
+          "x": 34,
+          "y": 138.765625,
+          "width": 117.5,
+          "height": 72,
+          "visible": true
+        },
+        {
+          "name": "yellow",
+          "x": 161.5,
+          "y": 138.765625,
+          "width": 117.5,
+          "height": 72,
+          "visible": true
+        },
+        {
+          "name": "green",
+          "x": 289,
+          "y": 138.765625,
+          "width": 117.5,
+          "height": 72,
+          "visible": true
+        },
+        {
+          "name": "blue",
+          "x": 416.5,
+          "y": 138.765625,
+          "width": 117.5,
+          "height": 72,
+          "visible": true
+        },
+        {
+          "name": "Keep the wild card",
+          "x": 34,
+          "y": 222.765625,
+          "width": 106.046875,
+          "height": 44,
+          "visible": true
+        }
+      ],
+      "touch": {
+        "before": {
+          "x": 75.53319549560547,
+          "y": 212.7183380126953,
+          "width": 88.55506134033203,
+          "height": 119.26515197753906
+        },
+        "held": {
+          "x": 75.6336441040039,
+          "y": 184.89837646484375,
+          "width": 88.34207916259766,
+          "height": 118.8751220703125
+        }
+      },
+      "errors": []
+    },
+    {
+      "name": "reduced",
+      "starts": [
+        {
+          "name": "Play with bots",
+          "x": 142,
+          "y": 232,
+          "width": 560,
+          "height": 45.75,
+          "visible": true
+        },
+        {
+          "name": "Create a room",
+          "x": 142,
+          "y": 285.75,
+          "width": 275,
+          "height": 44,
+          "visible": true
+        },
+        {
+          "name": "Join a room",
+          "x": 427,
+          "y": 285.75,
+          "width": 275,
+          "height": 44,
+          "visible": true
+        }
+      ],
+      "geometry": {
+        "gap": 46.96104431152344,
+        "document": [
+          844,
+          390
+        ],
+        "viewport": [
+          844,
+          390
+        ],
+        "scrollTop": 0
+      },
+      "menu": [
+        {
+          "name": "Close dialog",
+          "x": 726,
+          "y": 71,
+          "width": 44,
+          "height": 44,
+          "visible": true
+        },
+        {
+          "name": "Copy room code: ANGLE7",
+          "x": 620.015625,
+          "y": 123,
+          "width": 149.984375,
+          "height": 44,
+          "visible": true
+        },
+        {
+          "name": "Turn sound off",
+          "x": 74,
+          "y": 175,
+          "width": 344,
+          "height": 44,
+          "visible": true
+        },
+        {
+          "name": "Sort by color",
+          "x": 426,
+          "y": 175,
+          "width": 344,
+          "height": 44,
+          "visible": true
+        },
+        {
+          "name": "How to play",
+          "x": 74,
+          "y": 225,
+          "width": 344,
+          "height": 44,
+          "visible": true
+        },
+        {
+          "name": "Settings & house rules",
+          "x": 426,
+          "y": 225,
+          "width": 344,
+          "height": 44,
+          "visible": true
+        },
+        {
+          "name": "Table activity",
+          "x": 74,
+          "y": 275,
+          "width": 344,
+          "height": 44,
+          "visible": true
+        },
+        {
+          "name": "Leave table",
+          "x": 426,
+          "y": 275,
+          "width": 344,
+          "height": 44,
+          "visible": true
+        }
+      ],
+      "wild": [
+        {
+          "name": "Close dialog",
+          "x": 702,
+          "y": 88.21875,
+          "width": 44,
+          "height": 44,
+          "visible": true
+        },
+        {
+          "name": "red",
+          "x": 98,
+          "y": 173.765625,
+          "width": 154.5,
+          "height": 72,
+          "visible": true
+        },
+        {
+          "name": "yellow",
+          "x": 262.5,
+          "y": 173.765625,
+          "width": 154.5,
+          "height": 72,
+          "visible": true
+        },
+        {
+          "name": "green",
+          "x": 427,
+          "y": 173.765625,
+          "width": 154.5,
+          "height": 72,
+          "visible": true
+        },
+        {
+          "name": "blue",
+          "x": 591.5,
+          "y": 173.765625,
+          "width": 154.5,
+          "height": 72,
+          "visible": true
+        },
+        {
+          "name": "Keep the wild card",
+          "x": 98,
+          "y": 257.765625,
+          "width": 106.046875,
+          "height": 44,
+          "visible": true
+        }
+      ],
+      "errors": []
+    },
+    {
+      "name": "large-844",
+      "large": {
+        "count": 20,
+        "scroll": 449,
+        "top": 0,
+        "focusedLast": true
+      }
+    },
+    {
+      "name": "large-568",
+      "large": {
+        "count": 20,
+        "scroll": 564,
+        "top": 0,
+        "focusedLast": true
+      }
+    },
+    {
+      "name": "pass-848",
+      "pass": [
+        {
+          "name": "Pass",
+          "x": 642.828125,
+          "y": 523,
+          "width": 90.34375,
+          "height": 44,
+          "visible": true
+        }
+      ]
+    },
+    {
+      "name": "pass-844",
+      "pass": [
+        {
+          "name": "Pass",
+          "x": 721.65625,
+          "y": 202,
+          "width": 90.34375,
+          "height": 44,
+          "visible": true
+        }
+      ]
+    },
+    {
+      "name": "pass-568",
+      "pass": [
+        {
+          "name": "Pass",
+          "x": 445.65625,
+          "y": 156,
+          "width": 90.34375,
+          "height": 44,
+          "visible": true
+        }
+      ]
+    },
+    {
+      "name": "seats-844",
+      "seats": [
+        {
+          "name": "Catch Alexandria’s missed UNO",
+          "x": 33.1875,
+          "y": 50,
+          "width": 128,
+          "height": 44,
+          "visible": true
+        },
+        {
+          "name": "MaximilianReconnecting",
+          "x": 195.59375,
+          "y": 50,
+          "width": 128,
+          "height": 44,
+          "visible": true
+        },
+        {
+          "name": "RobinUNO!",
+          "x": 358,
+          "y": 50,
+          "width": 128,
+          "height": 44,
+          "visible": true
+        },
+        {
+          "name": "Frankie7 cards",
+          "x": 520.390625,
+          "y": 50,
+          "width": 128,
+          "height": 44,
+          "visible": true
+        },
+        {
+          "name": "Lou7 cards",
+          "x": 682.796875,
+          "y": 50,
+          "width": 128,
+          "height": 44,
+          "visible": true
+        }
+      ]
+    },
+    {
+      "name": "seats-568",
+      "seats": [
+        {
+          "name": "Catch Alexandria’s missed UNO",
+          "x": 20.59375,
+          "y": 46,
+          "width": 98,
+          "height": 44,
+          "visible": true
+        },
+        {
+          "name": "MaximilianReconnecting",
+          "x": 127.796875,
+          "y": 46,
+          "width": 98,
+          "height": 44,
+          "visible": true
+        },
+        {
+          "name": "RobinUNO!",
+          "x": 235,
+          "y": 46,
+          "width": 98,
+          "height": 44,
+          "visible": true
+        },
+        {
+          "name": "Frankie7 cards",
+          "x": 342.1875,
+          "y": 46,
+          "width": 98,
+          "height": 44,
+          "visible": true
+        },
+        {
+          "name": "Lou7 cards",
+          "x": 449.390625,
+          "y": 46,
+          "width": 98,
+          "height": 44,
+          "visible": true
+        }
+      ]
+    }
+  ],
+  "failures": []
+}

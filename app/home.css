@@ -328,6 +328,63 @@
     font-size: 15px;
   }
 }
+/* Landscape entry keeps the complete cast above reachable, centered actions. */
+@media (orientation: landscape) and (max-height: 540px) and (min-width: 541px) {
+  .launch-header .app-header {
+    height: 44px;
+    padding-inline: max(16px, env(safe-area-inset-left))
+      max(16px, env(safe-area-inset-right));
+  }
+  .launch-header .wordmark {
+    font-size: 28px;
+  }
+  .launch-main {
+    padding: 4px 24px 8px;
+  }
+  .launch-heading h1 {
+    font-size: 28px;
+  }
+  .launch-heading p {
+    margin-top: 4px;
+    font-size: 14px;
+  }
+  .launch-heading {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+  .launch-scene {
+    height: clamp(80px, calc(100dvh - 210px), 320px);
+    width: min(740px, 94vw);
+    aspect-ratio: auto;
+    margin-top: 4px;
+  }
+  .launch-play {
+    margin-top: 0;
+  }
+  .launch-action-main {
+    min-height: 44px;
+    padding: 10px 16px 12px;
+    font-size: 19px;
+  }
+  .launch-online {
+    margin-top: 8px;
+    gap: 10px;
+  }
+  .launch-online .launch-action {
+    min-height: 44px;
+    padding: 10px 12px 12px;
+    font-size: 15px;
+  }
+  .launch-extras {
+    margin-top: 4px;
+  }
+  .launch-footer {
+    display: none;
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   .launch-screen .launch-action,
   .launch-screen .launch-text-action {

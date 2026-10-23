@@ -1,0 +1,189 @@
+[
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/.codex/worktrees/uno-play-polish/UNO/app/home.css",
+    "line": 55,
+    "snippet": "Undocumented color #c6d9d7 is outside DESIGN.md colors",
+    "ignoreValue": "#c6d9d7"
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/.codex/worktrees/uno-play-polish/UNO/app/home.css",
+    "line": 212,
+    "snippet": "Undocumented color #28454a is outside DESIGN.md colors",
+    "ignoreValue": "#28454a"
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/.codex/worktrees/uno-play-polish/UNO/app/home.css",
+    "line": 222,
+    "snippet": "Undocumented color #527477 is outside DESIGN.md colors",
+    "ignoreValue": "#527477"
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/.codex/worktrees/uno-play-polish/UNO/app/home.css",
+    "line": 245,
+    "snippet": "Undocumented color #2167f0 is outside DESIGN.md colors",
+    "ignoreValue": "#2167f0"
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/.codex/worktrees/uno-play-polish/UNO/app/home.css",
+    "line": 292,
+    "snippet": "font-size: 22px is off the DESIGN.md type ramp",
+    "ignoreValue": "22px"
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/.codex/worktrees/uno-play-polish/UNO/app/home.css",
+    "line": 300,
+    "snippet": "font-size: 16px is off the DESIGN.md type ramp",
+    "ignoreValue": "16px"
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/.codex/worktrees/uno-play-polish/UNO/app/home.css",
+    "line": 339,
+    "snippet": "font-size: 28px is off the DESIGN.md type ramp",
+    "ignoreValue": "28px"
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/.codex/worktrees/uno-play-polish/UNO/app/home.css",
+    "line": 345,
+    "snippet": "font-size: 28px is off the DESIGN.md type ramp",
+    "ignoreValue": "28px"
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/.codex/worktrees/uno-play-polish/UNO/app/arena.css",
+    "line": 33,
+    "snippet": "Undocumented color #172553 is outside DESIGN.md colors",
+    "ignoreValue": "#172553"
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/.codex/worktrees/uno-play-polish/UNO/app/arena.css",
+    "line": 153,
+    "snippet": "border-radius: 24px is outside the DESIGN.md rounded scale",
+    "ignoreValue": "24px"
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/.codex/worktrees/uno-play-polish/UNO/app/arena.css",
+    "line": 234,
+    "snippet": "Undocumented color #514100 is outside DESIGN.md colors",
+    "ignoreValue": "#514100"
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/.codex/worktrees/uno-play-polish/UNO/app/arena.css",
+    "line": 250,
+    "snippet": "Undocumented color #514100 is outside DESIGN.md colors",
+    "ignoreValue": "#514100"
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/.codex/worktrees/uno-play-polish/UNO/app/arena.css",
+    "line": 253,
+    "snippet": "Undocumented color #514100 is outside DESIGN.md colors",
+    "ignoreValue": "#514100"
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/.codex/worktrees/uno-play-polish/UNO/app/arena.css",
+    "line": 459,
+    "snippet": "Undocumented color #ffb1bd is outside DESIGN.md colors",
+    "ignoreValue": "#ffb1bd"
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/.codex/worktrees/uno-play-polish/UNO/app/arena.css",
+    "line": 514,
+    "snippet": "font-size: 32px is off the DESIGN.md type ramp",
+    "ignoreValue": "32px"
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/.codex/worktrees/uno-play-polish/UNO/app/arena.css",
+    "line": 521,
+    "snippet": "font-size: 16px is off the DESIGN.md type ramp",
+    "ignoreValue": "16px"
+  },
+  {
+    "antipattern": "design-system-font-size",
+    "name": "Font size outside DESIGN.md",
+    "description": "A literal font-size is off the type ramp documented in DESIGN.md typography. Use a documented size step or update the design system if the new step is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/.codex/worktrees/uno-play-polish/UNO/app/arena.css",
+    "line": 592,
+    "snippet": "font-size: 28px is off the DESIGN.md type ramp",
+    "ignoreValue": "28px"
+  }
+]

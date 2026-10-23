@@ -1,0 +1,95 @@
+{
+  "results": [
+    {
+      "name": "seats-844",
+      "seats": [
+        {
+          "name": "Catch Alexandria’s missed UNO",
+          "x": 33.1875,
+          "y": 50,
+          "width": 128,
+          "height": 44,
+          "visible": true
+        },
+        {
+          "name": "MaximilianOffline",
+          "x": 195.59375,
+          "y": 50,
+          "width": 128,
+          "height": 44,
+          "visible": true
+        },
+        {
+          "name": "RobinUNO!",
+          "x": 358,
+          "y": 50,
+          "width": 128,
+          "height": 44,
+          "visible": true
+        },
+        {
+          "name": "Frankie7 cards",
+          "x": 520.390625,
+          "y": 50,
+          "width": 128,
+          "height": 44,
+          "visible": true
+        },
+        {
+          "name": "Lou7 cards",
+          "x": 682.796875,
+          "y": 50,
+          "width": 128,
+          "height": 44,
+          "visible": true
+        }
+      ]
+    },
+    {
+      "name": "seats-568",
+      "seats": [
+        {
+          "name": "Catch Alexandria’s missed UNO",
+          "x": 20.59375,
+          "y": 46,
+          "width": 98,
+          "height": 44,
+          "visible": true
+        },
+        {
+          "name": "MaximilianOffline",
+          "x": 127.796875,
+          "y": 46,
+          "width": 98,
+          "height": 44,
+          "visible": true
+        },
+        {
+          "name": "RobinUNO!",
+          "x": 235,
+          "y": 46,
+          "width": 98,
+          "height": 44,
+          "visible": true
+        },
+        {
+          "name": "Frankie7 cards",
+          "x": 342.1875,
+          "y": 46,
+          "width": 98,
+          "height": 44,
+          "visible": true
+        },
+        {
+          "name": "Lou7 cards",
+          "x": 449.390625,
+          "y": 46,
+          "width": 98,
+          "height": 44,
+          "visible": true
+        }
+      ]
+    }
+  ],
+  "failures": []
+}

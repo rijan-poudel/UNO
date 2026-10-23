@@ -51,12 +51,13 @@ export default function RootLayout({
           lettering. STORY: Enter the card scene, then play with bots or
           create/join a private room. FIRST VIEWPORT: Centered title above
           original panoramic artwork; a centered foreground action group with
-          visible Play, Create and Join. Short-phone controls remain reachable.
-          FORM: Owner-pinned game title screen; code-led surface direction6,
-          seed2e1e4271. The five browser corrections supersede the prior home
-          verdict. FINISH: unreviewed and undocumented is unfinished; this build
-          ends with the finish review, the verdict, DESIGN.md, and every
-          shipping raster carrying its provenance
+          visible Play, Create and Join. Short landscape keeps the complete cast
+          and all three start actions in reach. FORM: Owner-pinned game title
+          screen; code-led surface direction6, seed2e1e4271. The five browser
+          corrections supersede the prior home verdict. FINISH: unreviewed and
+          undocumented is unfinished; this build ends with the finish review,
+          the verdict, DESIGN.md, and every shipping raster carrying its
+          provenance
         </span>
         <span hidden data-design-contract="uno-play-field">
           THESIS: Vivid held cards in an illustrated game room. OWN-WORLD: Warm
@@ -65,10 +66,10 @@ export default function RootLayout({
           controls live in Menu. FIRST VIEWPORT: Close piles and a held hand,
           graphical opponents and a quiet header; no casino rail. FORM:
           Owner-pinned UNO play field, code-led, inherited seed457003dd. See
-          .impeccable/review/card-continuity/contract.md. Opponent flights
-          connect to visible fans or compact graphical seats. FINISH: unreviewed
-          and undocumented is unfinished; this build ends with the finish
-          review, the verdict, DESIGN.md, and every shipping raster carrying its
+          .impeccable/review/play-polish/contract.md. Opponent flights connect
+          to visible fans or compact graphical seats. FINISH: unreviewed and
+          undocumented is unfinished; this build ends with the finish review,
+          the verdict, DESIGN.md, and every shipping raster carrying its
           provenance
         </span>
         {children}
