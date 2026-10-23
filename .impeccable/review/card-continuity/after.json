@@ -1,0 +1,613 @@
+[
+  {
+    "name": "desktop-1440",
+    "flights": [
+      {
+        "value": "2",
+        "width": 135,
+        "height": 201,
+        "left": 745.148,
+        "top": 430.852,
+        "frames": [
+          {
+            "offset": null,
+            "easing": "linear",
+            "composite": "auto",
+            "transform": "translate(-92.6563px, 290.431px) rotate(0deg) scale(1.18519)",
+            "computedOffset": 0
+          },
+          {
+            "offset": 0.72,
+            "easing": "linear",
+            "composite": "auto",
+            "transform": "translate(-25.9438px, 67.3206px) rotate(3.99998deg) scale(1.025)",
+            "computedOffset": 0.72
+          },
+          {
+            "offset": null,
+            "easing": "linear",
+            "composite": "auto",
+            "transform": "translate(0px, 0px) rotate(6.99998deg) scale(1)",
+            "computedOffset": 1
+          }
+        ],
+        "duration": 227,
+        "at": 1338.800000000745
+      },
+      {
+        "value": "4",
+        "width": 135,
+        "height": 201,
+        "left": 745.148,
+        "top": 430.852,
+        "frames": [
+          {
+            "offset": null,
+            "easing": "linear",
+            "composite": "auto",
+            "transform": "translate(-456.338px, -302.04px) rotate(-5deg) scale(0.303704)",
+            "computedOffset": 0
+          },
+          {
+            "offset": 0.72,
+            "easing": "linear",
+            "composite": "auto",
+            "transform": "translate(-127.775px, -98.5713px) rotate(3.99998deg) scale(1.025)",
+            "computedOffset": 0.72
+          },
+          {
+            "offset": null,
+            "easing": "linear",
+            "composite": "auto",
+            "transform": "translate(0px, 0px) rotate(6.99998deg) scale(1)",
+            "computedOffset": 1
+          }
+        ],
+        "duration": 256,
+        "at": 1831.9000000003725
+      },
+      {
+        "value": "back",
+        "width": 41,
+        "height": 61,
+        "left": 1011.53,
+        "top": 199.897,
+        "frames": [
+          {
+            "offset": null,
+            "easing": "linear",
+            "composite": "auto",
+            "transform": "translate(-404.676px, 300.933px) rotate(-6.99998deg) scale(3.29268)",
+            "computedOffset": 0
+          },
+          {
+            "offset": 0.72,
+            "easing": "linear",
+            "composite": "auto",
+            "transform": "translate(-113.309px, 70.2611px) rotate(-18deg) scale(1.025)",
+            "computedOffset": 0.72
+          },
+          {
+            "offset": null,
+            "easing": "linear",
+            "composite": "auto",
+            "transform": "translate(0px, 0px) rotate(-15deg) scale(1)",
+            "computedOffset": 1
+          }
+        ],
+        "duration": 251,
+        "at": 2432.60000000149
+      }
+    ],
+    "seats": [
+      {
+        "id": "player_1",
+        "avatar": {
+          "x": 347.09375,
+          "y": 292.671875,
+          "width": 36
+        },
+        "fanWidth": 41
+      },
+      {
+        "id": "player_2",
+        "avatar": {
+          "x": 1041.3593444824219,
+          "y": 292.671875,
+          "width": 36
+        },
+        "fanWidth": 41
+      }
+    ],
+    "hand": 2,
+    "ghostsRemaining": 0,
+    "viewport": [
+      1440,
+      900
+    ],
+    "document": [
+      1440,
+      900
+    ],
+    "discard": "4"
+  },
+  {
+    "name": "user-848",
+    "flights": [
+      {
+        "value": "2",
+        "width": 111,
+        "height": 165,
+        "left": 443.844,
+        "top": 360.156,
+        "frames": [
+          {
+            "offset": null,
+            "easing": "linear",
+            "composite": "auto",
+            "transform": "translate(-75.3516px, 254.47px) rotate(0deg) scale(1.21622)",
+            "computedOffset": 0
+          },
+          {
+            "offset": 0.72,
+            "easing": "linear",
+            "composite": "auto",
+            "transform": "translate(-21.0984px, 57.2515px) rotate(3.99998deg) scale(1.025)",
+            "computedOffset": 0.72
+          },
+          {
+            "offset": null,
+            "easing": "linear",
+            "composite": "auto",
+            "transform": "translate(0px, 0px) rotate(6.99998deg) scale(1)",
+            "computedOffset": 1
+          }
+        ],
+        "duration": 222,
+        "at": 965
+      },
+      {
+        "value": "4",
+        "width": 111,
+        "height": 165,
+        "left": 443.844,
+        "top": 360.156,
+        "frames": [
+          {
+            "offset": null,
+            "easing": "linear",
+            "composite": "auto",
+            "transform": "translate(-291.034px, -247.579px) rotate(-5deg) scale(0.369369)",
+            "computedOffset": 0
+          },
+          {
+            "offset": 0.72,
+            "easing": "linear",
+            "composite": "auto",
+            "transform": "translate(-81.4894px, -83.3223px) rotate(3.99998deg) scale(1.025)",
+            "computedOffset": 0.72
+          },
+          {
+            "offset": null,
+            "easing": "linear",
+            "composite": "auto",
+            "transform": "translate(0px, 0px) rotate(6.99998deg) scale(1)",
+            "computedOffset": 1
+          }
+        ],
+        "duration": 236,
+        "at": 1457.5999999996275
+      },
+      {
+        "value": "back",
+        "width": 41,
+        "height": 61,
+        "left": 567.527,
+        "top": 165.712,
+        "frames": [
+          {
+            "offset": null,
+            "easing": "linear",
+            "composite": "auto",
+            "transform": "translate(-239.371px, 246.472px) rotate(-6.99998deg) scale(2.70732)",
+            "computedOffset": 0
+          },
+          {
+            "offset": 0.72,
+            "easing": "linear",
+            "composite": "auto",
+            "transform": "translate(-67.0239px, 55.0121px) rotate(-18deg) scale(1.025)",
+            "computedOffset": 0.72
+          },
+          {
+            "offset": null,
+            "easing": "linear",
+            "composite": "auto",
+            "transform": "translate(0px, 0px) rotate(-15deg) scale(1)",
+            "computedOffset": 1
+          }
+        ],
+        "duration": 231,
+        "at": 2058.0999999996275
+      }
+    ],
+    "seats": [
+      {
+        "id": "player_1",
+        "avatar": {
+          "x": 199.09375,
+          "y": 258.4375,
+          "width": 36
+        },
+        "fanWidth": 41
+      },
+      {
+        "id": "player_2",
+        "avatar": {
+          "x": 597.359375,
+          "y": 258.4375,
+          "width": 36
+        },
+        "fanWidth": 41
+      }
+    ],
+    "hand": 2,
+    "ghostsRemaining": 0,
+    "viewport": [
+      848,
+      765
+    ],
+    "document": [
+      848,
+      765
+    ],
+    "discard": "4"
+  },
+  {
+    "name": "phone-844",
+    "flights": [
+      {
+        "value": "2",
+        "width": 71,
+        "height": 105,
+        "left": 437.758,
+        "top": 137.047,
+        "frames": [
+          {
+            "offset": null,
+            "easing": "linear",
+            "composite": "auto",
+            "transform": "translate(-51.2656px, 142.022px) rotate(0deg) scale(1.25352)",
+            "computedOffset": 0
+          },
+          {
+            "offset": 0.72,
+            "easing": "linear",
+            "composite": "auto",
+            "transform": "translate(-14.3544px, 25.7663px) rotate(3.99998deg) scale(1.025)",
+            "computedOffset": 0.72
+          },
+          {
+            "offset": null,
+            "easing": "linear",
+            "composite": "auto",
+            "transform": "translate(0px, 0px) rotate(6.99998deg) scale(1)",
+            "computedOffset": 1
+          }
+        ],
+        "duration": 208,
+        "at": 918.0999999996275
+      },
+      {
+        "value": "4",
+        "width": 71,
+        "height": 105,
+        "left": 437.758,
+        "top": 137.047,
+        "frames": [
+          {
+            "offset": null,
+            "easing": "linear",
+            "composite": "auto",
+            "transform": "translate(-256.664px, -123.547px) rotate(-5deg) scale(0.366197)",
+            "computedOffset": 0
+          },
+          {
+            "offset": 0.72,
+            "easing": "linear",
+            "composite": "auto",
+            "transform": "translate(-71.8659px, -48.5931px) rotate(3.99998deg) scale(1.025)",
+            "computedOffset": 0.72
+          },
+          {
+            "offset": null,
+            "easing": "linear",
+            "composite": "auto",
+            "transform": "translate(0px, 0px) rotate(6.99998deg) scale(1)",
+            "computedOffset": 1
+          }
+        ],
+        "duration": 224,
+        "at": 1409.0999999996275
+      },
+      {
+        "value": "back",
+        "width": 26,
+        "height": 38,
+        "left": 528.391,
+        "top": 46.7746,
+        "frames": [
+          {
+            "offset": null,
+            "easing": "linear",
+            "composite": "auto",
+            "transform": "translate(-170.648px, 123.547px) rotate(-6.99998deg) scale(2.73077)",
+            "computedOffset": 0
+          },
+          {
+            "offset": 0.72,
+            "easing": "linear",
+            "composite": "auto",
+            "transform": "translate(-47.7816px, 20.5931px) rotate(-8deg) scale(1.025)",
+            "computedOffset": 0.72
+          },
+          {
+            "offset": null,
+            "easing": "linear",
+            "composite": "auto",
+            "transform": "translate(0px, 0px) rotate(-5deg) scale(1)",
+            "computedOffset": 1
+          }
+        ],
+        "duration": 215,
+        "at": 2010.0999999996275
+      }
+    ],
+    "seats": [
+      {
+        "id": "player_1",
+        "avatar": {
+          "x": 216.59375,
+          "y": 66,
+          "width": 26
+        },
+        "fanWidth": 0
+      },
+      {
+        "id": "player_2",
+        "avatar": {
+          "x": 541.390625,
+          "y": 66,
+          "width": 26
+        },
+        "fanWidth": 0
+      }
+    ],
+    "capture": {
+      "opacity": "0",
+      "animations": [
+        {
+          "state": "paused",
+          "frames": [
+            {
+              "offset": null,
+              "easing": "linear",
+              "composite": "auto",
+              "opacity": "0",
+              "computedOffset": 0
+            },
+            {
+              "offset": null,
+              "easing": "linear",
+              "composite": "auto",
+              "opacity": "0",
+              "computedOffset": 1
+            }
+          ]
+        }
+      ]
+    },
+    "hand": 2,
+    "ghostsRemaining": 0,
+    "viewport": [
+      844,
+      390
+    ],
+    "document": [
+      844,
+      390
+    ],
+    "discard": "4"
+  },
+  {
+    "name": "phone-568",
+    "flights": [
+      {
+        "value": "2",
+        "width": 57,
+        "height": 84,
+        "left": 299.789,
+        "top": 115.914,
+        "frames": [
+          {
+            "offset": null,
+            "easing": "linear",
+            "composite": "auto",
+            "transform": "translate(-44.2891px, 112.887px) rotate(0deg) scale(1.26316)",
+            "computedOffset": 0
+          },
+          {
+            "offset": 0.72,
+            "easing": "linear",
+            "composite": "auto",
+            "transform": "translate(-12.4009px, 17.6083px) rotate(3.99998deg) scale(1.025)",
+            "computedOffset": 0.72
+          },
+          {
+            "offset": null,
+            "easing": "linear",
+            "composite": "auto",
+            "transform": "translate(0px, 0px) rotate(6.99998deg) scale(1)",
+            "computedOffset": 1
+          }
+        ],
+        "duration": 205,
+        "at": 893.1999999992549
+      },
+      {
+        "value": "4",
+        "width": 57,
+        "height": 84,
+        "left": 299.789,
+        "top": 115.914,
+        "frames": [
+          {
+            "offset": null,
+            "easing": "linear",
+            "composite": "auto",
+            "transform": "translate(-185.492px, -96.9141px) rotate(-5deg) scale(0.315789)",
+            "computedOffset": 0
+          },
+          {
+            "offset": 0.72,
+            "easing": "linear",
+            "composite": "auto",
+            "transform": "translate(-51.9378px, -41.1359px) rotate(3.99998deg) scale(1.025)",
+            "computedOffset": 0.72
+          },
+          {
+            "offset": null,
+            "easing": "linear",
+            "composite": "auto",
+            "transform": "translate(0px, 0px) rotate(6.99998deg) scale(1)",
+            "computedOffset": 1
+          }
+        ],
+        "duration": 215,
+        "at": 1382
+      },
+      {
+        "value": "back",
+        "width": 18,
+        "height": 27,
+        "left": 348.188,
+        "top": 47.7368,
+        "frames": [
+          {
+            "offset": null,
+            "easing": "linear",
+            "composite": "auto",
+            "transform": "translate(-117.477px, 96.9141px) rotate(-6.99998deg) scale(3.16667)",
+            "computedOffset": 0
+          },
+          {
+            "offset": 0.72,
+            "easing": "linear",
+            "composite": "auto",
+            "transform": "translate(-32.8934px, 13.1359px) rotate(-8deg) scale(1.025)",
+            "computedOffset": 0.72
+          },
+          {
+            "offset": null,
+            "easing": "linear",
+            "composite": "auto",
+            "transform": "translate(0px, 0px) rotate(-5deg) scale(1)",
+            "computedOffset": 1
+          }
+        ],
+        "duration": 208,
+        "at": 1983.5
+      }
+    ],
+    "seats": [
+      {
+        "id": "player_1",
+        "avatar": {
+          "x": 142.796875,
+          "y": 61.00000190734863,
+          "width": 18
+        },
+        "fanWidth": 0
+      },
+      {
+        "id": "player_2",
+        "avatar": {
+          "x": 357.1875,
+          "y": 61.00000190734863,
+          "width": 18
+        },
+        "fanWidth": 0
+      }
+    ],
+    "capture": {
+      "opacity": "0",
+      "animations": [
+        {
+          "state": "paused",
+          "frames": [
+            {
+              "offset": null,
+              "easing": "linear",
+              "composite": "auto",
+              "opacity": "0",
+              "computedOffset": 0
+            },
+            {
+              "offset": null,
+              "easing": "linear",
+              "composite": "auto",
+              "opacity": "0",
+              "computedOffset": 1
+            }
+          ]
+        }
+      ]
+    },
+    "hand": 2,
+    "ghostsRemaining": 0,
+    "viewport": [
+      568,
+      320
+    ],
+    "document": [
+      568,
+      320
+    ],
+    "discard": "4"
+  },
+  {
+    "name": "reduced-844",
+    "flights": [],
+    "seats": [
+      {
+        "id": "player_1",
+        "avatar": {
+          "x": 216.59375,
+          "y": 66,
+          "width": 26
+        },
+        "fanWidth": 0
+      },
+      {
+        "id": "player_2",
+        "avatar": {
+          "x": 541.390625,
+          "y": 66,
+          "width": 26
+        },
+        "fanWidth": 0
+      }
+    ],
+    "hand": 2,
+    "ghostsRemaining": 0,
+    "viewport": [
+      844,
+      390
+    ],
+    "document": [
+      844,
+      390
+    ],
+    "discard": "4"
+  }
+]

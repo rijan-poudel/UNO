@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-22T08:17:26Z",
+  "generatedAt": "2026-10-23T05:28:21Z",
   "title": "Design System: UNO — Card club and illustrated game room",
   "extensions": {
     "colorMeta": {
@@ -1175,12 +1175,12 @@
       {
         "name": "play-flight",
         "value": "190–262ms cubic-bezier(.16,1,.3,1)",
-        "purpose": "Actual source center, width and composed rotation to the real endpoint; interrupts on a new snapshot."
+        "purpose": "Move the native discard face from the actual release pose or a visible opponent fan card to the pile; compact landscape falls back to a visible avatar pose without cloning the avatar. Hidden pages and reduced motion suppress flights; new snapshots, visibility loss, unmount and reduced-motion changes interrupt and clean up. Neither flight nor sound gates a turn."
       },
       {
         "name": "draw-flight",
         "value": "190–262ms cubic-bezier(.16,1,.3,1)",
-        "purpose": "Actual source center, width and composed rotation to the real endpoint; interrupts on a new snapshot."
+        "purpose": "Clone the face-down deck for opponent draws and scale dimensions and card lettering into a visible fan-card pose, falling back to a visible avatar pose on compact landscape; never clone the avatar. One flight per opponent receiving cards, with existing six-representative local arrivals and 25ms stagger. Shared bounded geometry, suppression and cleanup never gate turns or audio."
       },
       {
         "name": "hand-reflow",
@@ -1592,6 +1592,11 @@
       "Original card characters with truthful expressions, bounded reactions and pressed control surfaces."
     ],
     "rules": [
+      {
+        "name": "The Visible Seat Rule",
+        "body": "Anchor opponent card travel to a visible native fan card; when compact landscape hides that fan, use the visible avatar only for its center, width and composed rotation. A play moves the native discard face to the pile. An opponent draw clones the face-down deck, scaling its dimensions and card lettering into the destination pose; the avatar itself never becomes the flying card. Each opponent receiving cards gets one representative flight per published snapshot, within the existing bounded timing and interruption rules.",
+        "section": "components"
+      },
       {
         "name": "The Scoped Worlds Rule",
         "body": "Keep home in its fixed navy/ivory/full-color club palette, honor appearance variables in settings and setup, and scope the illustrated lounge, opaque identities, white lettering and yellow state feedback to live play. The native deck remains stable across appearances.",

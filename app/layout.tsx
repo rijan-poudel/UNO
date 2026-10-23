@@ -65,9 +65,10 @@ export default function RootLayout({
           controls live in Menu. FIRST VIEWPORT: Close piles and a held hand,
           graphical opponents and a quiet header; no casino rail. FORM:
           Owner-pinned UNO play field, code-led, inherited seed457003dd. See
-          .impeccable/review/closer-table/contract.md. FINISH: unreviewed and
-          undocumented is unfinished; this build ends with the finish review,
-          the verdict, DESIGN.md, and every shipping raster carrying its
+          .impeccable/review/card-continuity/contract.md. Opponent flights
+          connect to visible fans or compact graphical seats. FINISH: unreviewed
+          and undocumented is unfinished; this build ends with the finish
+          review, the verdict, DESIGN.md, and every shipping raster carrying its
           provenance
         </span>
         {children}

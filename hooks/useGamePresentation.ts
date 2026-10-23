@@ -94,6 +94,19 @@ export function useGamePresentation(
       Array.from(board.querySelectorAll<HTMLElement>("[data-seat]")).find(
         (el) => el.dataset.seat === id,
       );
+    const playerCardPose = (id: string): CardPose | null => {
+      const seat = findSeat(id);
+      // Compact phones hide the fan, but keep the player's graphical identity.
+      for (const selector of [
+        ".opponent-hand .uno-card",
+        ".opponent-label .player-avatar",
+      ]) {
+        const element = seat?.querySelector<HTMLElement>(selector);
+        if (element?.offsetWidth && element.offsetHeight)
+          return cardPose(element);
+      }
+      return null;
+    };
     const findCard = (id: string) =>
       Array.from(board.querySelectorAll<HTMLElement>("[data-hand-card]")).find(
         (el) => el.dataset.handCard === id,
@@ -113,11 +126,13 @@ export function useGamePresentation(
       from: CardPose,
       delay = 0,
       hideDestination = true,
+      to = cardPose(element),
     ) {
       if (reduced) return;
-      const to = cardPose(element);
-      if (!to.width || !from.width) return;
+      if (!element.offsetWidth || !to.width || !from.width) return;
       const { keyframes, duration } = getCardFlight(from, to);
+      const resize = to.width / element.offsetWidth;
+      const height = element.offsetHeight * resize;
       const ghost = element.cloneNode(true) as HTMLElement;
       ghost.removeAttribute("aria-label");
       ghost.setAttribute("aria-hidden", "true");
@@ -125,10 +140,10 @@ export function useGamePresentation(
       ghost.dataset.presentationCard = "";
       Object.assign(ghost.style, {
         position: "fixed",
-        left: `${to.x - element.offsetWidth / 2}px`,
-        top: `${to.y - element.offsetHeight / 2}px`,
-        width: `${element.offsetWidth}px`,
-        height: `${element.offsetHeight}px`,
+        left: `${to.x - to.width / 2}px`,
+        top: `${to.y - height / 2}px`,
+        width: `${to.width}px`,
+        height: `${height}px`,
         margin: "0",
         pointerEvents: "none",
         transition: "none",
@@ -136,7 +151,7 @@ export function useGamePresentation(
       });
       ghost.style.setProperty(
         "--card-scale",
-        getComputedStyle(element).getPropertyValue("--card-scale"),
+        `${(parseFloat(getComputedStyle(element).getPropertyValue("--card-scale")) || 1) * resize}`,
       );
       document.body.append(ghost);
       ghosts.current.add(ghost);
@@ -172,15 +187,10 @@ export function useGamePresentation(
       top.id !== oldTop?.id &&
       discard
     ) {
-      const actorCard = findSeat(action.playerId)?.querySelector<HTMLElement>(
-        ".opponent-hand .uno-card",
-      );
       const from =
         origin?.cardId === action.card.id
           ? origin.pose
-          : actorCard
-            ? cardPose(actorCard)
-            : null;
+          : playerCardPose(action.playerId);
       if (from) fly(discard, from);
     }
     if (
@@ -281,10 +291,9 @@ export function useGamePresentation(
             oldPlayer &&
             player.hand.length > oldPlayer.hand.length
           ) {
-            const endpoint = findSeat(player.id)?.querySelector<HTMLElement>(
-              ".opponent-hand .uno-card",
-            );
-            if (endpoint) fly(endpoint, origin, 0, false);
+            const destination = playerCardPose(player.id);
+            // Clone the face-down deck, never the avatar used as its landing pose.
+            if (destination) fly(deck, origin, 0, false, destination);
           }
         }
     }

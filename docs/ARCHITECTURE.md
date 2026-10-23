@@ -26,7 +26,7 @@ Human turns are not driven by a UI idle timer. A voluntary draw with no playable
 
 Voice assets are preloaded when enabled, use normalized compressed files, and expire if they cannot start promptly. A newer action, mute, hidden document, or leaving the board stops the old voice. Original WAVs remain source material, not runtime requests.
 
-The presentation hook cancels animations and removes temporary flight nodes on unmount. Reduced motion uses state changes without travel. Do not animate `left`, `top`, or layout dimensions frame by frame.
+The presentation hook cancels animations and removes temporary flight nodes on unmount. Reduced motion uses state changes without travel. Do not animate `left`, `top`, or layout dimensions frame by frame. Opponent flights use a visible native fan card as their pose; compact phones hide those fans, so the visible avatar supplies the pose instead. A drawn card always clones the face-down deck and scales its geometry and card lettering into that destination; the avatar is never cloned as a card. The loopback-only card-continuity fixture records both directions against published engine snapshots.
 
 ## Reconnect and storage
 

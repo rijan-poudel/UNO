@@ -1,0 +1,70 @@
+[
+  {
+    "name": "before-844",
+    "flights": [
+      {
+        "value": "2",
+        "width": 71,
+        "height": 105,
+        "left": 437.758,
+        "top": 137.047,
+        "frames": [
+          {
+            "offset": null,
+            "easing": "linear",
+            "composite": "auto",
+            "transform": "translate(-51.2656px, 142.022px) rotate(0deg) scale(1.25352)",
+            "computedOffset": 0
+          },
+          {
+            "offset": 0.72,
+            "easing": "linear",
+            "composite": "auto",
+            "transform": "translate(-14.3544px, 25.7663px) rotate(3.99998deg) scale(1.025)",
+            "computedOffset": 0.72
+          },
+          {
+            "offset": null,
+            "easing": "linear",
+            "composite": "auto",
+            "transform": "translate(0px, 0px) rotate(6.99998deg) scale(1)",
+            "computedOffset": 1
+          }
+        ],
+        "duration": 208,
+        "at": 2160.300000000745
+      }
+    ],
+    "seats": [
+      {
+        "id": "player_1",
+        "avatar": {
+          "x": 216.59375,
+          "y": 66,
+          "width": 28.5157470703125
+        },
+        "fanWidth": 0
+      },
+      {
+        "id": "player_2",
+        "avatar": {
+          "x": 541.390625,
+          "y": 66,
+          "width": 28.5157470703125
+        },
+        "fanWidth": 0
+      }
+    ],
+    "hand": 2,
+    "ghostsRemaining": 0,
+    "viewport": [
+      844,
+      390
+    ],
+    "document": [
+      844,
+      390
+    ],
+    "discard": "4"
+  }
+]
