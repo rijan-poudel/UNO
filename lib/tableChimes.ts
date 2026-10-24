@@ -265,7 +265,19 @@ function renderChime(ctx: AudioContext, event: TableChime): void {
       cardTexture(ctx, volume * 0.8, false);
       landing(ctx, volume);
     }
-    if (!['uno', 'win', 'lose', 'callOut'].includes(event)) return;
+    if (
+      ![
+        'uno',
+        'win',
+        'lose',
+        'callOut',
+        'draw2',
+        'wild4',
+        'reverse',
+        'skip',
+      ].includes(event)
+    )
+      return;
     const notes: Partial<Record<TableChime, number[]>> = {
       skip: [430, 330],
       reverse: [392, 523, 392],
@@ -278,7 +290,13 @@ function renderChime(ctx: AudioContext, event: TableChime): void {
       lose: [330, 260],
     };
     (notes[event] ?? [420]).forEach((frequency, i) =>
-      tone(ctx, frequency, ctx.currentTime + i * 0.08, volume),
+      tone(
+        ctx,
+        frequency,
+        ctx.currentTime + i * 0.08,
+        volume *
+          (['draw2', 'wild4', 'reverse', 'skip'].includes(event) ? 0.65 : 1),
+      ),
     );
   } catch {
     /* Audio must never interfere with play. */

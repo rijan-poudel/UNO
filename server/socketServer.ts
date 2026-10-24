@@ -12,7 +12,13 @@ import {
 } from '../lib/gameActions';
 import { getBotMove } from '../lib/botSupport';
 import { canJumpInPlay, canPlayCard } from '../lib/gameRules';
-import type { CardColor } from '../types/card';
+import {
+  BOT_TURN_MS,
+  FORCED_DRAW_DELAY_MS,
+  expireTurn,
+  hasForcedPenalty,
+  withTurnDeadline,
+} from '../lib/turnFlow';
 import type { GameState } from '../types/game';
 import type {
   Ack,
@@ -86,6 +92,14 @@ interface PendingInviteRecord extends FriendInvite {
 }
 
 const rooms = new Map<string, ServerRoom>();
+const turnClocks = new Map<
+  string,
+  {
+    game: GameState;
+    signature: string;
+    timer: ReturnType<typeof setTimeout> | null;
+  }
+>();
 const orphanedRoomTimers = new Map<string, ReturnType<typeof setTimeout>>();
 const playerBySocket = new Map<string, { roomId: string; playerId: string }>();
 const presenceBySocket = new Map<string, PresenceRecord>();
@@ -126,6 +140,7 @@ function makeNextPlayerId(players: ServerRoomPlayer[]): string {
 }
 
 function toSnapshot(room: ServerRoom): RoomSnapshot {
+  synchronizeRoomTurn(room);
   return {
     roomId: room.roomId,
     hostPlayerId: room.hostPlayerId,
@@ -146,6 +161,79 @@ function toSnapshot(room: ServerRoom): RoomSnapshot {
     game: room.game,
     pendingColorChoice: room.pendingColorChoice,
   };
+}
+
+// One authoritative deadline per turn, shared by all clients and reconnects.
+function synchronizeRoomTurn(room: ServerRoom): void {
+  const previous = turnClocks.get(room.roomId);
+  if (
+    !room.started ||
+    !room.game ||
+    room.game.winnerId ||
+    !room.players.some((player) => player.connected)
+  ) {
+    if (previous?.timer) clearTimeout(previous.timer);
+    turnClocks.delete(room.roomId);
+    return;
+  }
+  room.game = withTurnDeadline(previous?.game ?? null, room.game);
+  const game = room.game;
+  const current = game.players[game.currentPlayerIndex];
+  const humanConnected = room.players.some(
+    (player) =>
+      player.playerId === current.id && player.connected && !player.isBot,
+  );
+  const forced =
+    humanConnected && !room.pendingColorChoice && hasForcedPenalty(game);
+  const signature = `${game.turnCount}:${current.id}:${game.turnDeadlineAt}:${forced}:${humanConnected}`;
+  if (previous?.signature === signature) {
+    previous.game = game;
+    return;
+  }
+  if (previous?.timer) clearTimeout(previous.timer);
+  const record: {
+    game: GameState;
+    signature: string;
+    timer: ReturnType<typeof setTimeout> | null;
+  } = { game, signature, timer: null };
+  turnClocks.set(room.roomId, record);
+  if (!humanConnected || !game.turnDeadlineAt) return;
+  const delay = forced
+    ? Math.min(
+        FORCED_DRAW_DELAY_MS,
+        Math.max(0, game.turnDeadlineAt - Date.now()),
+      )
+    : Math.max(0, game.turnDeadlineAt - Date.now());
+  record.timer = setTimeout(() => {
+    if (
+      rooms.get(room.roomId) !== room ||
+      turnClocks.get(room.roomId) !== record ||
+      !room.game ||
+      room.game.winnerId
+    )
+      return;
+    const live = room.game;
+    if (
+      live.currentPlayerIndex !== game.currentPlayerIndex ||
+      live.turnCount !== game.turnCount
+    )
+      return;
+    try {
+      if (forced && (room.pendingColorChoice || !hasForcedPenalty(live))) {
+        turnClocks.delete(room.roomId);
+        synchronizeRoomTurn(room);
+        return;
+      }
+      room.pendingColorChoice = null;
+      room.game = forced
+        ? drawRequiredCards(live, live.currentPlayerIndex)
+        : expireTurn(live);
+      broadcastRoom(io, room);
+      runOfflineBotTurns(room);
+    } catch (error) {
+      console.error('Could not resolve automatic turn:', error);
+    }
+  }, delay);
 }
 
 function createRoomForPlayer(
@@ -386,6 +474,9 @@ function leaveRoomForSocket(socketId: string, ioServer: Server): void {
 
   const hasConnectedPlayers = room.players.some((p) => p.connected);
   if (!hasConnectedPlayers) {
+    const clock = turnClocks.get(room.roomId);
+    if (clock?.timer) clearTimeout(clock.timer);
+    turnClocks.delete(room.roomId);
     const timer = botTimers.get(room.roomId);
     if (timer) clearTimeout(timer);
     botTimers.delete(room.roomId);
@@ -401,6 +492,9 @@ function leaveRoomForSocket(socketId: string, ioServer: Server): void {
           )
             return;
           removeInvitesForRoom(room.roomId, ioServer);
+          const clock = turnClocks.get(room.roomId);
+          if (clock?.timer) clearTimeout(clock.timer);
+          turnClocks.delete(room.roomId);
           rooms.delete(room.roomId);
         }, 45_000),
       );
@@ -594,7 +688,7 @@ function handleGameAction(
 }
 
 const botTimers = new Map<string, ReturnType<typeof setTimeout>>();
-const BOT_TURN_DELAY_MS = 760;
+const BOT_TURN_DELAY_MS = BOT_TURN_MS;
 
 function runOfflineBotTurns(room: ServerRoom): void {
   if (
@@ -651,29 +745,7 @@ function runOfflineBotTurns(room: ServerRoom): void {
         } else if (move.action === 'pass') {
           nextState = passTurn(botState, currentIndex);
         } else if (move.action === 'draw') {
-          const afterDraw = drawOneCard(botState, currentIndex);
-          const updatedHand = afterDraw.players[currentIndex].hand;
-          const drawnCard = updatedHand[updatedHand.length - 1];
-
-          if (afterDraw.currentPlayerIndex !== currentIndex) {
-            nextState = afterDraw;
-          } else if (
-            drawnCard &&
-            canPlayCard(drawnCard, afterDraw, currentIndex)
-          ) {
-            const chosenColor =
-              drawnCard.color === 'wild'
-                ? ((move as { chosenColor?: CardColor }).chosenColor ?? 'red')
-                : undefined;
-            nextState = playCard(
-              afterDraw,
-              currentIndex,
-              drawnCard.id,
-              chosenColor,
-            );
-          } else {
-            nextState = passTurn(afterDraw, currentIndex);
-          }
+          nextState = drawOneCard(botState, currentIndex);
         } else {
           nextState = playCard(
             botState,

@@ -21,7 +21,6 @@ import { UnoWordmark } from "../components/ui/PageChrome";
 import { getSavedPlayerNames } from "../lib/playerNames";
 import { toast } from "sonner";
 
-const subscribeToClient = () => () => {};
 import {
   DEFAULT_TABLE_RULES,
   parseRulePreferences,
@@ -29,6 +28,7 @@ import {
   RULES_VERSION_KEY,
   RULES_VERSION,
 } from "../lib/rulePreferences";
+const subscribeToClient = () => () => {};
 const PREFERRED_THEME_KEY = "uno.preferred.theme";
 
 const ONLINE_PLAYER_NAME_KEY = "uno.online.playerName";
@@ -255,6 +255,8 @@ export default function Home() {
     content = (
       <>
         <HomeScreen
+          rules={rules}
+          onRulesChange={setRules}
           themeLabel={label}
           onSelectTheme={selectTheme}
           onOpenControlsSettings={() => openSettingsAt("controls")}

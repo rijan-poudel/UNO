@@ -1,16 +1,7 @@
 // Room creation, joining, invitations, and seats share a single lobby flow.
 "use client";
 import { useEffect, useState, type ReactNode } from "react";
-import {
-  ArrowRight,
-  Bot,
-  Check,
-  Copy,
-  Link,
-  Plus,
-  User,
-  X,
-} from "lucide-react";
+import { ArrowRight, Check, Copy, Link, Plus, X } from "lucide-react";
 import { toast } from "sonner";
 import type {
   FriendInvite,
@@ -20,6 +11,7 @@ import type {
 import type { GameRules } from "../types/rules";
 import { parseRoomCode, isRoomCode } from "../lib/roomCodes";
 import TableRules from "./TableRules";
+import PlayerAvatar from "./PlayerAvatar";
 import {
   getPlayerName,
   savePlayerName,
@@ -388,11 +380,9 @@ export default function OnlineLobby(props: Props) {
             </div>
           </div>
           <div className="seat-list">
-            {room.players.map((p, i) => (
+            {room.players.map((p) => (
               <div className="seat-row" key={p.playerId}>
-                <span className={`avatar seat-avatar seat-${i % 6}`}>
-                  {p.isBot ? <Bot size={20} /> : <User size={20} />}
-                </span>
+                <PlayerAvatar seed={p.playerId} />
                 <span className="lobby-seat-name">
                   <strong>
                     {p.name}

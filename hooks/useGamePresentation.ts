@@ -10,7 +10,11 @@ import {
 import { playTableChime, type TableChime } from "../lib/tableChimes";
 import { recordRound } from "../lib/playerProgress";
 import { getAudioSettings } from "../lib/audioSettings";
-import { getCardFlight, type CardPose } from "../lib/cardMotion";
+import {
+  getCardFlight,
+  hasCardLayoutChanged,
+  type CardPose,
+} from "../lib/cardMotion";
 import { readCardPose as cardPose } from "../lib/cardPose";
 
 const ACTION_SOUNDS: Record<string, TableChime> = {
@@ -56,10 +60,13 @@ export function useGamePresentation(
       game.lastAction.type === "init" && prior?.winnerId ? null : prior;
     previous.current = game;
     if (before === game) return;
-    // A rapid jump-in/reconnect interrupts the old picture instead of piling up ghosts.
-    running.current.forEach((animation) => animation.cancel());
-    ghosts.current.forEach((element) => element.remove());
-    ghosts.current.clear();
+    // Interrupt only when cards actually change. UNO declarations and equivalent
+    // network snapshots can arrive mid-flight and must not flash the destination.
+    if (!before || hasCardLayoutChanged(before, game)) {
+      running.current.forEach((animation) => animation.cancel());
+      ghosts.current.forEach((element) => element.remove());
+      ghosts.current.clear();
+    }
     const board = root.current;
     if (!before) {
       handPositions.current.clear();
@@ -189,7 +196,10 @@ export function useGamePresentation(
         next?.focus({ preventScroll: true });
       });
     }
-    selectedOrigin.current = null;
+    // Preparing an online wild publishes metadata before the card moves. Keep
+    // its measured origin and focus intent through that color-choice snapshot.
+    if (before && hasCardLayoutChanged(before, game))
+      selectedOrigin.current = null;
     const local = game.players.find((p) => p.id === localPlayerId);
     const priorIds = new Set(
       before?.players

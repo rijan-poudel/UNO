@@ -1,14 +1,7 @@
-// Small original card-face badges identify players without image downloads.
+// Original illustrated portrait sheet shared by seats, setup and round results.
 import type { CSSProperties } from "react";
 import type { PlayerExpression } from "../lib/playerExpression";
-const COLORS = [
-  "#ff6942",
-  "#4892ff",
-  "#ffcf18",
-  "#43ce7d",
-  "#a67aff",
-  "#ffae36",
-];
+import styles from "./PlayerAvatar.module.css";
 export default function PlayerAvatar({
   seed,
   large = false,
@@ -19,24 +12,19 @@ export default function PlayerAvatar({
   expression?: PlayerExpression;
 }) {
   const hash = Array.from(seed).reduce((n, char) => n + char.charCodeAt(0), 0);
+  const index = hash % 6;
   return (
     <span
       key={expression}
-      className={`player-avatar ${large ? "large" : ""}`}
+      className={`${styles.portrait} player-avatar ${large ? "large" : ""}`}
       data-expression={expression}
       aria-hidden="true"
       style={
         {
-          "--avatar-color": COLORS[hash % COLORS.length],
-          "--avatar-tilt": `${hash % 2 ? 8 : -8}deg`,
+          backgroundImage: 'url("/artwork/player-portraits.webp")',
+          backgroundPosition: `${(index % 3) * 50}% ${Math.floor(index / 3) * 100}%`,
         } as CSSProperties
       }
-    >
-      <span className="avatar-eyes">
-        <i />
-        <i />
-      </span>
-      <span className={`avatar-smile ${hash % 3 === 0 ? "cheeky" : ""}`} />
-    </span>
+    />
   );
 }

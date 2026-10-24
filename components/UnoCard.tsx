@@ -10,10 +10,12 @@ interface UnoCardProps {
   card: Card;
   isPlayable?: boolean;
   isSelected?: boolean;
+  disabled?: boolean;
   faceDown?: boolean;
   sizeMultiplier?: number;
   onClick?: () => void;
   ariaLabel?: string;
+  tabIndex?: number;
 }
 const LABELS: Record<string, string> = {
   skip: "Skip",
@@ -53,10 +55,12 @@ export default function UnoCard({
   card,
   isPlayable = false,
   isSelected = false,
+  disabled = false,
   faceDown = false,
   sizeMultiplier = 1,
   onClick,
   ariaLabel,
+  tabIndex,
 }: UnoCardProps) {
   const label = faceDown
     ? "Face-down card"
@@ -105,9 +109,12 @@ export default function UnoCard({
       type="button"
       className={className}
       style={style}
-      onClick={onClick}
+      onClick={() => {
+        if (!disabled) onClick();
+      }}
+      aria-disabled={disabled || undefined}
       aria-label={ariaLabel ?? `Play ${label}`}
-      aria-pressed={isSelected}
+      tabIndex={tabIndex}
     >
       {content}
       <span className={styles.finish} aria-hidden="true" />
@@ -117,39 +124,5 @@ export default function UnoCard({
       {content}
       <span className={styles.finish} aria-hidden="true" />
     </div>
-  );
-}
-
-// Native card geometry also gives the title screen its real, semantic controls.
-export function UnoMenuCard({
-  color,
-  label,
-  children,
-  onClick,
-}: {
-  color: "red" | "yellow" | "blue";
-  label: string;
-  children: React.ReactNode;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      className={`${styles.menu} ${styles[color]}`}
-      aria-label={label}
-      onClick={onClick}
-    >
-      <span className={styles.menuIndex} aria-hidden="true">
-        0
-      </span>
-      <span className={styles.menuOval} aria-hidden="true" />
-      <span className={styles.menuLabel}>{children}</span>
-      <span
-        className={`${styles.menuIndex} ${styles.menuBottom}`}
-        aria-hidden="true"
-      >
-        0
-      </span>
-    </button>
   );
 }

@@ -20,6 +20,330 @@
         ],
         "createdAt": "2026-10-23T13:32:03.071Z",
         "reason": "UNO physical UNO action button: its bottom inset lip communicates a pressed game control, not a decorative information-container side stripe; preserved by the selected comic-card world."
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#172553",
+        "files": [
+          "app/arena.css"
+        ],
+        "createdAt": "2026-10-24T03:53:18.864Z",
+        "reason": "Reviewed for interaction polish: preserved arena geometry and inherited native-card/short-screen values; app/club.css supplies the current comic palette. Small labels, physical card shapes and translucent contact ink are intentional in DESIGN.md and the game surface brief."
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "34px",
+        "files": [
+          "app/arena.css"
+        ],
+        "createdAt": "2026-10-24T03:53:18.923Z",
+        "reason": "Reviewed for interaction polish: preserved arena geometry and inherited native-card/short-screen values; app/club.css supplies the current comic palette. Small labels, physical card shapes and translucent contact ink are intentional in DESIGN.md and the game surface brief."
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#1e2c42",
+        "files": [
+          "app/arena.css"
+        ],
+        "createdAt": "2026-10-24T03:53:18.962Z",
+        "reason": "Reviewed for interaction polish: preserved arena geometry and inherited native-card/short-screen values; app/club.css supplies the current comic palette. Small labels, physical card shapes and translucent contact ink are intentional in DESIGN.md and the game surface brief."
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#2a3b54",
+        "files": [
+          "app/arena.css"
+        ],
+        "createdAt": "2026-10-24T03:53:19.001Z",
+        "reason": "Reviewed for interaction polish: preserved arena geometry and inherited native-card/short-screen values; app/club.css supplies the current comic palette. Small labels, physical card shapes and translucent contact ink are intentional in DESIGN.md and the game surface brief."
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "13px",
+        "files": [
+          "app/arena.css"
+        ],
+        "createdAt": "2026-10-24T03:53:19.050Z",
+        "reason": "Reviewed for interaction polish: preserved arena geometry and inherited native-card/short-screen values; app/club.css supplies the current comic palette. Small labels, physical card shapes and translucent contact ink are intentional in DESIGN.md and the game surface brief."
+      },
+      {
+        "rule": "design-system-radius",
+        "value": "4px",
+        "files": [
+          "app/arena.css"
+        ],
+        "createdAt": "2026-10-24T03:53:19.214Z",
+        "reason": "Reviewed for interaction polish: preserved arena geometry and inherited native-card/short-screen values; app/club.css supplies the current comic palette. Small labels, physical card shapes and translucent contact ink are intentional in DESIGN.md and the game surface brief."
+      },
+      {
+        "rule": "design-system-radius",
+        "value": "24px",
+        "files": [
+          "app/arena.css"
+        ],
+        "createdAt": "2026-10-24T03:53:19.292Z",
+        "reason": "Reviewed for interaction polish: preserved arena geometry and inherited native-card/short-screen values; app/club.css supplies the current comic palette. Small labels, physical card shapes and translucent contact ink are intentional in DESIGN.md and the game surface brief."
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#1c293c",
+        "files": [
+          "app/arena.css"
+        ],
+        "createdAt": "2026-10-24T03:53:19.338Z",
+        "reason": "Reviewed for interaction polish: preserved arena geometry and inherited native-card/short-screen values; app/club.css supplies the current comic palette. Small labels, physical card shapes and translucent contact ink are intentional in DESIGN.md and the game surface brief."
+      },
+      {
+        "rule": "design-system-radius",
+        "value": "7px",
+        "files": [
+          "app/arena.css"
+        ],
+        "createdAt": "2026-10-24T03:53:19.437Z",
+        "reason": "Reviewed for interaction polish: preserved arena geometry and inherited native-card/short-screen values; app/club.css supplies the current comic palette. Small labels, physical card shapes and translucent contact ink are intentional in DESIGN.md and the game surface brief."
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#102e37",
+        "files": [
+          "app/arena.css"
+        ],
+        "createdAt": "2026-10-24T03:53:19.477Z",
+        "reason": "Reviewed for interaction polish: preserved arena geometry and inherited native-card/short-screen values; app/club.css supplies the current comic palette. Small labels, physical card shapes and translucent contact ink are intentional in DESIGN.md and the game surface brief."
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#c2cedf",
+        "files": [
+          "app/arena.css"
+        ],
+        "createdAt": "2026-10-24T03:53:19.513Z",
+        "reason": "Reviewed for interaction polish: preserved arena geometry and inherited native-card/short-screen values; app/club.css supplies the current comic palette. Small labels, physical card shapes and translucent contact ink are intentional in DESIGN.md and the game surface brief."
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "12px",
+        "files": [
+          "app/arena.css"
+        ],
+        "createdAt": "2026-10-24T03:53:19.701Z",
+        "reason": "Reviewed for interaction polish: preserved arena geometry and inherited native-card/short-screen values; app/club.css supplies the current comic palette. Small labels, physical card shapes and translucent contact ink are intentional in DESIGN.md and the game surface brief."
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#392700",
+        "files": [
+          "app/arena.css"
+        ],
+        "createdAt": "2026-10-24T03:53:19.747Z",
+        "reason": "Reviewed for interaction polish: preserved arena geometry and inherited native-card/short-screen values; app/club.css supplies the current comic palette. Small labels, physical card shapes and translucent contact ink are intentional in DESIGN.md and the game surface brief."
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#514100",
+        "files": [
+          "app/arena.css"
+        ],
+        "createdAt": "2026-10-24T03:53:19.803Z",
+        "reason": "Reviewed for interaction polish: preserved arena geometry and inherited native-card/short-screen values; app/club.css supplies the current comic palette. Small labels, physical card shapes and translucent contact ink are intentional in DESIGN.md and the game surface brief."
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#00000040",
+        "files": [
+          "app/arena.css"
+        ],
+        "createdAt": "2026-10-24T03:53:19.861Z",
+        "reason": "Reviewed for interaction polish: preserved arena geometry and inherited native-card/short-screen values; app/club.css supplies the current comic palette. Small labels, physical card shapes and translucent contact ink are intentional in DESIGN.md and the game surface brief."
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#263a50",
+        "files": [
+          "app/arena.css"
+        ],
+        "createdAt": "2026-10-24T03:53:19.910Z",
+        "reason": "Reviewed for interaction polish: preserved arena geometry and inherited native-card/short-screen values; app/club.css supplies the current comic palette. Small labels, physical card shapes and translucent contact ink are intentional in DESIGN.md and the game surface brief."
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#ffb1bd",
+        "files": [
+          "app/arena.css"
+        ],
+        "createdAt": "2026-10-24T03:53:19.985Z",
+        "reason": "Reviewed for interaction polish: preserved arena geometry and inherited native-card/short-screen values; app/club.css supplies the current comic palette. Small labels, physical card shapes and translucent contact ink are intentional in DESIGN.md and the game surface brief."
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#e71c3b",
+        "files": [
+          "app/arena.css"
+        ],
+        "createdAt": "2026-10-24T03:53:20.026Z",
+        "reason": "Reviewed for interaction polish: preserved arena geometry and inherited native-card/short-screen values; app/club.css supplies the current comic palette. Small labels, physical card shapes and translucent contact ink are intentional in DESIGN.md and the game surface brief."
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#095be5",
+        "files": [
+          "app/arena.css"
+        ],
+        "createdAt": "2026-10-24T03:53:20.096Z",
+        "reason": "Reviewed for interaction polish: preserved arena geometry and inherited native-card/short-screen values; app/club.css supplies the current comic palette. Small labels, physical card shapes and translucent contact ink are intentional in DESIGN.md and the game surface brief."
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "16px",
+        "files": [
+          "app/arena.css"
+        ],
+        "createdAt": "2026-10-24T03:53:20.152Z",
+        "reason": "Reviewed for interaction polish: preserved arena geometry and inherited native-card/short-screen values; app/club.css supplies the current comic palette. Small labels, physical card shapes and translucent contact ink are intentional in DESIGN.md and the game surface brief."
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "11px",
+        "files": [
+          "app/arena.css"
+        ],
+        "createdAt": "2026-10-24T03:53:20.191Z",
+        "reason": "Reviewed for interaction polish: preserved arena geometry and inherited native-card/short-screen values; app/club.css supplies the current comic palette. Small labels, physical card shapes and translucent contact ink are intentional in DESIGN.md and the game surface brief."
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "24px",
+        "files": [
+          "app/arena.css"
+        ],
+        "createdAt": "2026-10-24T03:53:20.271Z",
+        "reason": "Reviewed for interaction polish: preserved arena geometry and inherited native-card/short-screen values; app/club.css supplies the current comic palette. Small labels, physical card shapes and translucent contact ink are intentional in DESIGN.md and the game surface brief."
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#00000012",
+        "files": [
+          "components/UnoCard.module.css"
+        ],
+        "createdAt": "2026-10-24T03:56:36.154Z",
+        "reason": "Preserved native card laminate/contact inks and owner-selected painted opening-hand card proportions; sanctioned material and responsive title-card geometry in DESIGN.md. Reviewed during interaction polish; no new palette or shape."
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#06123024",
+        "files": [
+          "components/UnoCard.module.css"
+        ],
+        "createdAt": "2026-10-24T03:56:36.183Z",
+        "reason": "Preserved native card laminate/contact inks and owner-selected painted opening-hand card proportions; sanctioned material and responsive title-card geometry in DESIGN.md. Reviewed during interaction polish; no new palette or shape."
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#02071845",
+        "files": [
+          "components/UnoCard.module.css"
+        ],
+        "createdAt": "2026-10-24T03:56:36.215Z",
+        "reason": "Preserved native card laminate/contact inks and owner-selected painted opening-hand card proportions; sanctioned material and responsive title-card geometry in DESIGN.md. Reviewed during interaction polish; no new palette or shape."
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#800622",
+        "files": [
+          "components/UnoCard.module.css"
+        ],
+        "createdAt": "2026-10-24T03:56:36.255Z",
+        "reason": "Preserved native card laminate/contact inks and owner-selected painted opening-hand card proportions; sanctioned material and responsive title-card geometry in DESIGN.md. Reviewed during interaction polish; no new palette or shape."
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#06123030",
+        "files": [
+          "components/UnoCard.module.css"
+        ],
+        "createdAt": "2026-10-24T03:56:36.287Z",
+        "reason": "Preserved native card laminate/contact inks and owner-selected painted opening-hand card proportions; sanctioned material and responsive title-card geometry in DESIGN.md. Reviewed during interaction polish; no new palette or shape."
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#06123050",
+        "files": [
+          "components/UnoCard.module.css"
+        ],
+        "createdAt": "2026-10-24T03:56:36.318Z",
+        "reason": "Preserved native card laminate/contact inks and owner-selected painted opening-hand card proportions; sanctioned material and responsive title-card geometry in DESIGN.md. Reviewed during interaction polish; no new palette or shape."
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#00000030",
+        "files": [
+          "components/UnoCard.module.css"
+        ],
+        "createdAt": "2026-10-24T03:56:36.351Z",
+        "reason": "Preserved native card laminate/contact inks and owner-selected painted opening-hand card proportions; sanctioned material and responsive title-card geometry in DESIGN.md. Reviewed during interaction polish; no new palette or shape."
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "74px",
+        "files": [
+          "components/UnoCard.module.css"
+        ],
+        "createdAt": "2026-10-24T03:58:03.784Z",
+        "reason": "Preserved approved painted menu-card responsive lettering and native scaled card corners. These physical card values belong to the owner-selected opening-hand composition in DESIGN.md and its surface brief, not a new interface type or radius scale."
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "18px",
+        "files": [
+          "components/UnoCard.module.css"
+        ],
+        "createdAt": "2026-10-24T03:58:03.928Z",
+        "reason": "Preserved approved painted menu-card responsive lettering and native scaled card corners. These physical card values belong to the owner-selected opening-hand composition in DESIGN.md and its surface brief, not a new interface type or radius scale."
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "21px",
+        "files": [
+          "components/UnoCard.module.css"
+        ],
+        "createdAt": "2026-10-24T03:58:04.047Z",
+        "reason": "Preserved approved painted menu-card responsive lettering and native scaled card corners. These physical card values belong to the owner-selected opening-hand composition in DESIGN.md and its surface brief, not a new interface type or radius scale."
+      },
+      {
+        "rule": "design-system-radius",
+        "value": "3px",
+        "files": [
+          "components/UnoCard.module.css"
+        ],
+        "createdAt": "2026-10-24T03:58:04.187Z",
+        "reason": "Preserved approved painted menu-card responsive lettering and native scaled card corners. These physical card values belong to the owner-selected opening-hand composition in DESIGN.md and its surface brief, not a new interface type or radius scale."
+      },
+      {
+        "rule": "side-tab",
+        "value": "*",
+        "files": [
+          "app/home.css"
+        ],
+        "createdAt": "2026-10-24T09:11:07.438Z",
+        "reason": "User-approved Color play composite: the primary Play control has a physical pressed bottom lip, matching the approved casual-game button material; no decorative side border."
+      },
+      {
+        "rule": "side-tab",
+        "value": "*",
+        "files": [
+          "app/arena.css"
+        ],
+        "createdAt": "2026-10-24T09:11:07.552Z",
+        "reason": "User-approved Color play composite: the amber local-turn cue uses a shallow physical bottom edge consistent with its button-like printed material, not a decorative side stripe."
+      },
+      {
+        "rule": "side-tab",
+        "value": "*",
+        "files": [
+          "app/club.css"
+        ],
+        "createdAt": "2026-10-24T09:11:07.667Z",
+        "reason": "User-approved Color play composite: primary and color-choice controls retain a shallow pressed bottom lip as functional game-control depth, not decorative information-container side accents."
       }
     ]
   }

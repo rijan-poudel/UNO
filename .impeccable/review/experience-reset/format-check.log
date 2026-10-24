@@ -1,0 +1,6 @@
+
+> uno@0.1.0 format:check
+> prettier --check app components hooks lib server scripts types docs .github *.json *.ts *.mjs *.md
+
+Checking formatting...
+All matched files use Prettier code style!

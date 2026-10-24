@@ -1,5 +1,6 @@
 import './check-gesture';
-import { getCardFlight } from '../lib/cardMotion';
+import './check-turn-flow';
+import { getCardFlight, hasCardLayoutChanged } from '../lib/cardMotion';
 // Framework-free engine smoke check. Run with npm run check:game.
 import assert from 'node:assert/strict';
 import { defaultRules } from '../types/rules';
@@ -708,3 +709,49 @@ assert.equal(
   262,
 );
 console.log('Card motion source pose, pile landing and bounded timing passed.');
+
+// Network metadata preserves presentation; actual card changes interrupt it.
+{
+  const state = initializeGame(['You', 'Cleo'], {
+    allowStartingActionCard: false,
+  });
+  assert.equal(
+    hasCardLayoutChanged(state, JSON.parse(JSON.stringify(state))),
+    false,
+  );
+  const metadata = {
+    ...state,
+    players: state.players.map((player, index) =>
+      index === 0 ? { ...player, saidUno: true } : player,
+    ),
+    lastAction: { type: 'declareUno' as const, playerId: state.players[0].id },
+  };
+  assert.equal(
+    hasCardLayoutChanged(state, metadata),
+    false,
+    'UNO metadata preserves the current flight',
+  );
+  assert.equal(
+    hasCardLayoutChanged(state, drawOneCard(state, state.currentPlayerIndex)),
+    true,
+  );
+  const reordered = {
+    ...state,
+    players: state.players.map((player, index) =>
+      index === 0 ? { ...player, hand: [...player.hand].reverse() } : player,
+    ),
+  };
+  assert.equal(
+    hasCardLayoutChanged(state, reordered),
+    true,
+    'Changed hand ordering needs a new pose',
+  );
+  assert.equal(
+    flight.keyframes.length,
+    2,
+    'Card flights settle directly without an overshoot waypoint',
+  );
+  console.log(
+    'Motion continuity passed: metadata, cloned snapshots, real card changes and no overshoot.',
+  );
+}

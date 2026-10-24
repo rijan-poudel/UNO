@@ -1,0 +1,17 @@
+Use case: stylized-concept
+Asset type: reusable 3-column by 2-row sprite sheet of six illustrated human player portrait avatars for a friendly card game.
+Input image: the provided Color Court game-screen reference contributes ONLY the portrait illustration style visible in the small human avatars: soft modern flat illustration, natural expressive faces, rounded organic hair shapes, warm dimensional shading, subtle painterly texture. Do not copy or reproduce the interface, cards, nameplates, lettering, table, or controls.
+
+Primary request: create exactly six distinct friendly adult human head-and-shoulder portraits in an EXACT equal-cell 3-column 2-row grid. Canvas aspect ratio precisely 3:2; target 1536 by 1024 pixels, each cell precisely 512 by 512. NO gutters, separators, frames, or margins around the sheet. All six square cells completely filled with the same quiet pastel peach-cream background. Each face is independently centered in its cell and fully contained inside an invisible circular safe area with diameter 88% of the cell: keep all hair and head inside that circle and shoulders pleasantly visible at its lower edge, with enough breathing space above hair. CSS will perform the circular clipping, so do not draw circles or borders. Consistent face size and straight-on or gentle three-quarter framing.
+
+Grid order left to right, top row then bottom row:
+1. Warm medium-brown-skinned woman, long wavy dark teal-black hair, small golden hoop earrings, coral top, friendly confident smile.
+2. Fair-skinned man with tousled auburn hair, green shirt, gently amused smile.
+3. Brown-skinned androgynous adult with black hair under a small golden-yellow baseball cap, teal shirt, playful smile.
+4. Dark-skinned Black man with short textured curls and a neat small beard, warm golden-ochre shirt, relaxed cheerful smile.
+5. East Asian woman with a short dark bob and round coral glasses, soft blue shirt, bright friendly smile.
+6. Olive-skinned adult with short silver-gray wavy hair, plum shirt, welcoming smile.
+
+Style/medium: richly drawn contemporary character portrait illustration, like the human avatars in the approved reference. Lifelike illustrated eyes, eyebrows, noses, mouths, ears, individual hair shapes and expressive human features. Smooth flat color planes with restrained warm shadowing and soft highlights, tactile hand-drawn refinement. Natural adult proportions with a slightly enlarged head for readability. Diverse people with distinct personalities, cohesive art direction.
+Lighting/mood: soft warm flattering light, friendly social card-night energy.
+Constraints: exactly six separate human portraits, exact equal square cell grid with no overlap between cells, no text anywhere, no logos, no watermark, no UI. No geometric icon faces, no emojis, no card characters, no clay/plastic/3D toy appearance, no backgrounds or scenes, no objects apart from specified clothing/accessories, no shadows or presentation chrome outside the portraits.

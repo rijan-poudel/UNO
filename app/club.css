@@ -1,27 +1,27 @@
-/* Comic-card showdown: canonical shared chrome, controls and supporting screens.
+/* Color play: shared chrome, controls and supporting screens.
    Home composition lives in home.css; live card geometry remains in arena.css. */
 :root {
-  --club-ink: #15151b;
-  --club-paper: #fff4d6;
+  --club-ink: #17345f;
+  --club-paper: #fff7e7;
   --club-red: #df0735;
-  --club-yellow: #ffce00;
-  --club-blue: #075bee;
+  --club-yellow: #ffd45a;
+  --club-blue: #1254b5;
   --club-green: #00bc68;
-  --ui-bg: #fff4d6;
-  --ui-surface: #fff9e8;
-  --ui-text: #15151b;
-  --ui-muted: #57524a;
-  --ui-line: #c6bfae;
+  --ui-bg: #fff7e7;
+  --ui-surface: #fffcf4;
+  --ui-text: #17345f;
+  --ui-muted: #58687a;
+  --ui-line: #ccd3da;
   --ui-accent-red: #c50730;
-  --ui-accent-blue: #075bee;
+  --ui-accent-blue: #1254b5;
   --ui-accent-green: #007943;
-  --ui-accent-yellow: #ffce00;
+  --ui-accent-yellow: #ffd45a;
   --ui-shadow: 0 16px 48px #00000045;
 }
 :root[data-theme="midnight"] {
-  --ui-bg: #15151b;
+  --ui-bg: #17345f;
   --ui-surface: #26262f;
-  --ui-text: #fff4d6;
+  --ui-text: #fff7e7;
   --ui-muted: #c8c4b9;
   --ui-line: #56565f;
   --ui-accent-red: #ff637c;
@@ -35,7 +35,7 @@
   --ui-muted: #4e6256;
   --ui-line: #adbfad;
   --ui-accent-red: #c50730;
-  --ui-accent-blue: #075bee;
+  --ui-accent-blue: #1254b5;
 }
 :root[data-theme="sunset"] {
   --ui-bg: #ffe7df;
@@ -44,30 +44,23 @@
   --ui-muted: #6e4c50;
   --ui-line: #d7b2ad;
   --ui-accent-red: #c50730;
-  --ui-accent-blue: #075bee;
+  --ui-accent-blue: #1254b5;
 }
 html,
 body {
-  background: var(--club-ink);
+  background: #123d86;
 }
 body {
-  --font-display: var(--font-card);
+  --font-display: var(--font-body);
   display: flow-root;
 }
 h1,
 h2 {
-  font-family: var(--font-card), sans-serif;
-  font-style: italic;
-  font-weight: 800;
-  text-transform: uppercase;
+  font-family: var(--font-body), sans-serif;
+  font-style: normal;
+  font-weight: 750;
+  text-transform: none;
   letter-spacing: -0.02em;
-}
-.club-frame {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background: url("/artwork/comic-frame.webp") center / 100% 100% no-repeat;
 }
 .wordmark,
 .wordmark.compact,
@@ -111,12 +104,12 @@ h2 {
 .segmented button,
 .stepper,
 .stepper .icon-button {
-  border-radius: 8px;
+  border-radius: 12px;
 }
 .button {
   min-height: 48px;
   font-weight: 750;
-  border: 2px solid var(--ui-text);
+  border: 0;
   transition:
     transform 140ms cubic-bezier(0.16, 1, 0.3, 1),
     background-color 140ms ease,
@@ -125,13 +118,15 @@ h2 {
 .button.primary {
   background: var(--club-yellow);
   color: var(--club-ink);
-  border-color: var(--club-ink);
-  box-shadow: inset 0 -3px 0 #15151b35;
+  border-color: transparent;
+  box-shadow:
+    inset 0 -3px 0 #bf8a28,
+    0 4px 10px #061e4c20;
 }
 .button.secondary {
   background: transparent;
   color: var(--ui-text);
-  border-color: var(--ui-line);
+  border: 1px solid var(--ui-line);
   box-shadow: none;
 }
 .button.small {
@@ -139,7 +134,7 @@ h2 {
 }
 .button:active:not(:disabled) {
   transform: scale(0.97);
-  box-shadow: inset 0 -1px 0 #15151b35;
+  box-shadow: inset 0 -1px 0 #17345f35;
 }
 .button:disabled,
 .launch-action:disabled {
@@ -179,23 +174,8 @@ input[aria-invalid="true"] {
   font-weight: 650;
   text-underline-offset: 4px;
 }
-.launch-header .settings-trigger {
-  background: transparent;
-  border: 0;
-  color: var(--club-ink);
-  font-family: var(--font-card), sans-serif;
-  font-size: 20px;
-  font-style: italic;
-  text-transform: uppercase;
-  transition:
-    transform 140ms cubic-bezier(0.16, 1, 0.3, 1),
-    color 140ms ease;
-}
-.launch-header .settings-trigger:active {
-  transform: scale(0.96);
-}
 .launch-screen .wordmark {
-  color: var(--club-ink);
+  color: var(--club-paper);
 }
 .launch-screen .brand-colors {
   display: none;
@@ -204,6 +184,7 @@ input[aria-invalid="true"] {
   position: relative;
   min-height: 100dvh;
   padding-bottom: 24px;
+  background: radial-gradient(ellipse at 50% 20%, #2259a1, #123d86 80%);
 }
 .setup-page > .app-header {
   width: min(1280px, 100%);
@@ -215,7 +196,7 @@ input[aria-invalid="true"] {
 .setup-page > .app-header .button,
 .setup-page > .app-header .icon-button {
   color: var(--club-paper);
-  border-color: #fff4d64d;
+  border-color: #fff7e74d;
 }
 .setup-content {
   position: relative;
@@ -225,30 +206,21 @@ input[aria-invalid="true"] {
   padding: 36px 44px;
   gap: 24px;
   background: var(--ui-surface);
-  border: 2px solid var(--club-ink);
-  border-radius: 12px;
+  border: 0;
+  border-radius: 20px;
+  box-shadow: 0 16px 44px #061e4c30;
   animation: none;
 }
 .setup-content::before,
 .modal-content::before {
-  content: "";
-  display: block;
-  width: 84px;
-  height: 6px;
-  background: linear-gradient(
-    to right,
-    var(--club-red) 25%,
-    var(--club-yellow) 25% 50%,
-    var(--club-green) 50% 75%,
-    var(--club-blue) 75%
-  );
+  display: none;
 }
 .setup-intro {
   gap: 12px;
 }
 .setup-intro h1 {
-  font-size: clamp(42px, 6vw, 64px);
-  line-height: 0.98;
+  font-size: clamp(32px, 4vw, 42px);
+  line-height: 1.08;
   letter-spacing: -0.02em;
 }
 .setup-intro > .text-button {
@@ -348,7 +320,7 @@ input[aria-invalid="true"] {
 .rule-preset[aria-pressed="true"] {
   background: var(--club-yellow);
   color: var(--club-ink);
-  border-color: #15151b50;
+  border-color: #17345f50;
   transform: none;
 }
 .rule-preset strong {
@@ -472,18 +444,18 @@ input[aria-invalid="true"] {
   font-size: 14px;
 }
 .modal {
-  --ui-bg: #fff4d6;
-  --ui-surface: #fff9e8;
-  --ui-text: #15151b;
-  --ui-muted: #57524a;
-  --ui-line: #c6bfae;
+  --ui-bg: #fff7e7;
+  --ui-surface: #fffcf4;
+  --ui-text: #17345f;
+  --ui-muted: #58687a;
+  --ui-line: #ccd3da;
   --ui-accent-red: #c50730;
-  --ui-accent-blue: #075bee;
+  --ui-accent-blue: #1254b5;
   --ui-accent-green: #007943;
   color-scheme: light;
-  border: 2px solid var(--club-ink);
-  border-radius: 12px;
-  box-shadow: 0 16px 48px #00000066;
+  border: 0;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px #061e4c66;
   transform-origin: center;
 }
 .modal::backdrop {
@@ -502,8 +474,8 @@ input[aria-invalid="true"] {
   margin-bottom: 2px;
 }
 .modal-heading h2 {
-  font-size: 36px;
-  line-height: 1;
+  font-size: 28px;
+  line-height: 1.1;
   letter-spacing: -0.01em;
 }
 .modal-heading .icon-button {
@@ -577,7 +549,7 @@ input[aria-invalid="true"] {
   border: 2px solid var(--club-ink);
 }
 [data-swatch="paper"] {
-  background: #fff4d6;
+  background: #fff7e7;
 }
 [data-swatch="midnight"] {
   background: #26262f;
@@ -591,7 +563,7 @@ input[aria-invalid="true"] {
 .color-choice {
   border: 2px solid var(--club-ink);
   border-radius: 8px;
-  box-shadow: inset 0 -3px 0 #15151b35;
+  box-shadow: inset 0 -3px 0 #17345f35;
   font-family: var(--font-card), sans-serif;
   font-size: 28px;
   font-style: italic;
@@ -602,7 +574,7 @@ input[aria-invalid="true"] {
 }
 .color-choice:active {
   transform: scale(0.97);
-  box-shadow: inset 0 -1px 0 #15151b35;
+  box-shadow: inset 0 -1px 0 #17345f35;
 }
 .color-choice span {
   border-radius: 3px;
@@ -612,10 +584,10 @@ input[aria-invalid="true"] {
   color: var(--ui-text);
 }
 .launch-progress {
-  --ui-text: #15151b;
-  --ui-muted: #57524a;
-  --ui-line: #c6bfae;
-  --ui-surface: #fff9e8;
+  --ui-text: #17345f;
+  --ui-muted: #58687a;
+  --ui-line: #ccd3da;
+  --ui-surface: #fffcf4;
 }
 .milestone-stamp {
   border-radius: 6px;
@@ -667,51 +639,22 @@ input[aria-invalid="true"] {
   z-index: 1;
 }
 .game-header {
-  border-top: 4px solid transparent;
-  border-image: linear-gradient(
-      to right,
-      var(--club-red) 25%,
-      var(--club-yellow) 25% 50%,
-      var(--club-green) 50% 75%,
-      var(--club-blue) 75%
-    )
-    1;
+  border: 0;
+  border-image: none;
 }
 .game-header .wordmark {
   font-size: 36px;
-  color: var(--club-paper);
+  color: #fff7e7;
 }
 .game-header .brand-colors {
   display: none;
 }
 .game-header .game-menu-trigger {
-  background: #26262f;
-  border: 1px solid #62616b;
-  color: var(--club-paper);
-  border-radius: 6px;
+  background: #08265760;
+  color: #fff7e7;
+  border: 0;
+  border-radius: 14px;
   box-shadow: none;
-}
-.game-main .opponent-label {
-  background: #fff4d6;
-  color: var(--club-ink);
-  border: 2px solid var(--club-ink);
-  border-radius: 6px;
-}
-.game-main .opponent-label small {
-  color: #57524a;
-}
-.game-main .active-seat .opponent-label,
-.game-main .opponent-label.catch-seat {
-  background: var(--club-yellow);
-  color: var(--club-ink);
-  box-shadow: inset 0 -2px 0 #15151b30;
-}
-.game-main .opponent-label.catch-seat {
-  border: 2px solid var(--club-ink);
-}
-.game-main .active-seat .opponent-label small,
-.game-main .opponent-label.catch-seat small {
-  color: #514500;
 }
 .game-menu-modal .game-menu > button {
   background: transparent;
@@ -720,7 +663,7 @@ input[aria-invalid="true"] {
   border-radius: 6px;
 }
 .game-menu-modal .game-menu > button > svg:first-child {
-  color: #57524a;
+  color: #58687a;
 }
 .game-menu-modal .game-menu > .game-leave-control {
   color: #c50730;
@@ -728,7 +671,7 @@ input[aria-invalid="true"] {
 }
 .game-menu-modal .game-menu-context,
 .game-menu-modal .game-turn-order {
-  color: #57524a;
+  color: #58687a;
 }
 .game-menu-modal .game-turn-order .active {
   color: var(--club-ink);
@@ -770,7 +713,7 @@ input[aria-invalid="true"] {
   }
   .button.secondary:hover:not(:disabled),
   .game-menu-modal .game-menu > button:hover:not(:disabled) {
-    background: #ffce0020;
+    background: #ffd45a20;
   }
   .rule-preset:hover {
     transform: none;
@@ -794,7 +737,7 @@ input[aria-invalid="true"] {
     gap: 22px;
   }
   .setup-intro h1 {
-    font-size: 46px;
+    font-size: 34px;
   }
   .setup-intro p {
     font-size: 15px;
@@ -842,7 +785,7 @@ input[aria-invalid="true"] {
   .launch-header .settings-trigger {
     min-height: 44px;
     padding: 6px;
-    font-size: 18px;
+    font-size: 14px;
   }
   .game-header {
     border-top-width: 3px;

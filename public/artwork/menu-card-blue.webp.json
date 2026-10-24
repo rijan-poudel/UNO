@@ -1,0 +1,23 @@
+{
+  "prompt": "Use case: precise-object-edit. Edit target is image 1, the blue UNO menu-card face. Image 2, yellow card, is supporting reference ONLY for decorative zero index treatment.\nMake one narrow fidelity correction ONLY: the two elongated oblique zero indices at top-left and bottom-right of the blue card should have a thick BLACK zero ring stroke enclosed by a narrow warm CREAM outer outline, exactly like the yellow reference. Their open center holes must remain blue, showing the same colored printed face through the hole. They must remain oblique elongated cutout ovals, NOT upright font zero characters, NOT solid black filled ovals. Preserve each index's existing outer silhouette, placement, rotation, and scale.\nKeep ALL other image 1 pixels/layout/material visually unchanged: same blue print palette, grain, cream dimensional paper rim, rounded corners, corner scuffs, broad diagonal cream oval ring, blank central semantic label band, transparent alpha outside, same front-on unrotated orthographic card. No arrow, no semantic text, no words, letters, logo, new decoration, background, glow, or external shadow.\nOutput a single separate transparent card in exactly the same 1041 by 1511 pixel canvas, no crop or reframing. This is a precise edit, not a redesign.",
+  "createdAt": "2026-10-24T03:24:23.165Z",
+  "history": [
+    {
+      "prompt": "Use case: precise-object-edit. Asset type: one clean transparent printed UNO menu-card face.\nEdit the provided yellow card asset as the authoritative geometry reference. Preserve EXACT front-on card silhouette, proportions, cream rounded rim, subtle laminated-paper bevel, small comic-ink edge scuffs, broad diagonal cream oval ring rising lower-left to upper-right, and the two strongly oblique elongated oval zero indices. Do not rotate or give perspective.\nChange the yellow printed face to vivid native blue #075bee. Make both zero indices cream, with the open centers showing the blue face, retaining their oblique cutout oval shape and cream edging. Remove the black brush arrow completely, filling its old region seamlessly with blue. The entire central label band x=18%-82%, y=32%-62% must remain blank uniform blue for live semantic HTML text. Subtle authentic print grain is allowed, no lighting gradients across central blank region.\nPreserve full intact physical card silhouette, similar minimal transparent padding. Alpha outside the rounded card must be completely clear with no stray flecks outside the silhouette. No words, logo, letters, title, UI text, arrow, characters, surrounding scenery, glow, or cast shadow. High production detail and real painted print material, not metallic or exaggerated 3D.",
+      "cleanupPrompt": "Use case: precise-object-edit. Clean only the outside transparency of this isolated card. There are unwanted white flecks scattered outside the smooth rounded cream card perimeter, above the top edge and to the sides. Remove every outside fleck and make all outside pixels completely alpha transparent. Keep the complete rounded cream card silhouette intact and precisely preserve every pixel inside it: its same dimensions, front-on geometry, rounded corners, rim, zero shapes, diagonal cream ring, print color and texture, blank central label area. Do not redesign, add marks, change colors, crop, rotate, or add shadow. Deliver a clean full card cutout on truly transparent background with a modest, empty, evenly sized transparent margin.",
+      "createdAt": "2026-10-24T03:17:01.959Z",
+      "reference": ".impeccable/mocks/decision/home-correction/opening-hand.png",
+      "tool": "Built-in image_gen",
+      "format": "Lossless WebP RGBA",
+      "revision": "Initial printed card generation and outside-alpha cleanup attempt"
+    }
+  ],
+  "revision": "Change both decorative zero indices to black stroke enclosed narrow cream outline with colored cutout holes.",
+  "reference": [
+    "public/artwork/menu-card-blue.webp (prior revision)",
+    "public/artwork/menu-card-yellow.webp"
+  ],
+  "generatedSource": "/Users/rizx/.codex/generated_images/01a16be3-8a29-7612-b8fe-184e62cffc56/exec-8c54ecd6-b4cd-4b56-a514-40c304347fc9.png",
+  "tool": "Built-in image_gen",
+  "format": "Lossless WebP RGBA"
+}

@@ -1,0 +1,5 @@
+{
+  "findings": 45,
+  "disposition": "File-and-value-scoped intentional arena values; no file or rule disabled. New navigation uses existing paper/ink tokens. Inherited final club.css overrides remain authoritative.",
+  "exceptions": 22
+}

@@ -11,7 +11,9 @@ export default function GameFeedback({ game }: { game: GameState }) {
         ? "uno"
         : action.type === "callOut"
           ? "caught"
-          : null;
+          : action.type === "draw" && action.count > 1
+            ? "penalty"
+            : null;
   const visual =
     value === "reverse" ? (
       <Repeat2 />
@@ -20,11 +22,13 @@ export default function GameFeedback({ game }: { game: GameState }) {
     ) : value === "shuffle" ? (
       <Shuffle />
     ) : value === "draw2" ? (
-      "+2"
+      `+${game.pendingDraw || 2}`
     ) : value === "wild4" ? (
-      "+4"
+      `+${game.pendingDraw || 4}`
     ) : value === "uno" ? (
       "UNO!"
+    ) : value === "penalty" && action.type === "draw" ? (
+      `+${action.count}`
     ) : value === "caught" ? (
       action.type === "callOut" ? (
         `+${action.penalty}`
@@ -51,6 +55,14 @@ export default function GameFeedback({ game }: { game: GameState }) {
       aria-hidden="true"
     >
       <span>{visual}</span>
+      {(game.pendingDraw > 0 || value === "penalty") && (
+        <small>
+          {value === "penalty" && action.type === "draw"
+            ? game.players.find((player) => player.id === action.playerId)?.name
+            : game.players[game.currentPlayerIndex].name}
+          {value === "penalty" ? " takes the cards" : " is up next"}
+        </small>
+      )}
     </div>
   );
 }

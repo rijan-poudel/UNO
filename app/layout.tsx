@@ -29,7 +29,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#15151b",
+  themeColor: "#123d86",
 };
 
 export default function RootLayout({
@@ -45,16 +45,11 @@ export default function RootLayout({
         />
       </head>
       <body className={`${bodyFont.variable} ${cardFont.variable}`}>
-        <div className="club-frame" aria-hidden="true" />
-        <span hidden data-design-contract="comic-card-showdown">
-          THESIS: One comic-card world across home, setup, rooms, preferences
-          and play. OWN-WORLD: Crisp dark ink, warm white, native four-color
-          graphics, Barlow Condensed display and Outfit UI. FIRST VIEWPORT:
-          Centered UNO, original comic cast, clear Play/Create/Join. Live cards
-          lead a calm arena with direct play and a cropped held hand. FORM:
-          Owner-selected Comic-card showdown, seed 5f8e7c72; comp-led panel
-          composition chosen under delegated continuation. Contract:
-          .impeccable/review/site-redesign/contract.md.
+        <span hidden data-design-contract="color-play">
+          UNO Color play: user-approved blue arena, Color court portraits, vivid
+          native cards, amber turn cues, a calm title screen and shared
+          components with preset moods. Contract:
+          .impeccable/review/experience-reset/contract.md.
         </span>
         {children}
         <Toaster

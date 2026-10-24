@@ -182,8 +182,8 @@ async function main() {
   playTableChime('reverse');
   assert.equal(
     audible,
-    beforeSpecial + 2,
-    'special card uses paper and contact instead of a melody',
+    beforeSpecial + 5,
+    'reverse combines paper contact with its bounded three-note direction cue',
   );
   const beforeColdDraw = audible;
   Context.instance.state = 'suspended';
@@ -224,8 +224,12 @@ async function main() {
     firstSignal >= 0 && firstSignal / wav.readUInt32LE(24) < 0.015,
     'card sample has no perceptible silent lead-in',
   );
-  const { setAudioSettings, getAudioSettings } =
-    await import('../lib/audioSettings');
+  const {
+    setAudioSettings,
+    getAudioSettings,
+    getMusicContextSettings,
+    setMusicEnabledForContext,
+  } = await import('../lib/audioSettings');
   let notifications = 0;
   windowEvents.addEventListener('uno:audio-settings', () => notifications++);
   setAudioSettings({ muted: false, chimesEnabled: true, sfxVolume: 0.4 });
@@ -245,6 +249,17 @@ async function main() {
     notifications,
     2,
     'audio controls notify subscribers even when storage is blocked',
+  );
+  setMusicEnabledForContext('game', false);
+  assert.equal(
+    getMusicContextSettings().gameEnabled,
+    false,
+    'Music can be stopped when storage is blocked',
+  );
+  assert.equal(
+    notifications,
+    3,
+    'Music controls immediately notify the player',
   );
   assert.ok(sources > 0);
   console.log(

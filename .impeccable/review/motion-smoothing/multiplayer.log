@@ -1,0 +1,3 @@
+
+> uno@0.1.0 check:multiplayer
+> tsx scripts/check-multiplayer.ts

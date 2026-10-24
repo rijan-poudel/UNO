@@ -1,0 +1,15 @@
+# Color play verification — October 24
+
+The user explicitly approved combining the three preview directions and delegated implementation. The shipped result uses Classic blue/vivid cards, Color court human portraits and After-hours amber turn feedback, with common components and supported-preset moods. Current design authority is DESIGN.md and the two refreshed surface briefs.
+
+Passed npm run lint (no warnings), npm run check:types, npm run check:game, npm run check:audio, npm run build, npm run check:multiplayer, npm run format:check and git diff --check. No dependency or test framework added. Production preview uses a build-time loopback socket URL3213; source environment configuration was not changed. A regular unconfigured production build also passed before preview configuration.
+
+The protocol suite checks real Socket.IO room operations, bot pacing and separate snapshots, reconnect, last-human refresh, transport handoff, deadline preservation after draws/metadata, an automatic unavoidable draw-two opener and an unattended30-second human draw/pass. The updated socket service must be deployed with the frontend for these online behaviors.
+
+Browser captures cover1280×720 real gameplay,1536×1024 stress layout,844×390 and568×320 six-seat20-card hands,390×844 home and portrait guidance, short landscape Menu and wild decisions. Static six-seat captures use the loopback fixture, not the production service; fixture countdown0 is synthetic, while timing correctness is established by real protocol tests. All five compact badges measure44px and all five names fit their rendered width at568. Keyboard Home/End reaches the final wild with exactly one hand Tab stop and no document scrolling. A real legal first tap changed7cards to6, published the red1 discard, and created one immediate flight copy without blocking the next turn. Reduced-motion rules were inspected; physical touch/speaker quality is not certified.
+
+Independent full finish review requested two visual corrections and documentation. finish-verdict.md scores all three resolved: compact Catch/UNO labels, cream Settings contrast, and current Color play documentation. This verdict covers those fixes, not an unqualified whole-surface certification. Settings default/hover contrast5.56/4.90 and focus-ring contrast4.92 are recorded in contrast.json.
+
+Design detector triage is in detector-triage.json. Approved palette/type/radius changes are documented rather than suppressed. Three narrowly scoped side-tab value/file exceptions retain intentional pressed bottom edges in home, arena and shared controls; no rule or file was disabled. Earlier globals.css baseline advisories were not mechanically rewritten. Portrait asset provenance scan:10rasters,0missing. Old artwork/material assets retain their historical provenance and are not restored into the redesigned interface.
+
+Local preview remains on127.0.0.1:3212 with the real socket service3213. Synthetic fixture servers were stopped. This work has not been published or deployed.

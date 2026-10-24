@@ -56,6 +56,8 @@ export type LastAction =
  *   - Replay games from a move log
  */
 export interface GameState {
+  /** Absolute human-turn deadline; controllers set it, pure actions preserve it. */
+  turnDeadlineAt?: number | null;
   /** All participants in order. Index positions are stable for the game's life. */
   players: Player[];
 

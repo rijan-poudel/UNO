@@ -1,0 +1,100 @@
+{
+  "approved_mock": ".impeccable/mocks/decision/home-correction/opening-hand.png",
+  "tool": "Built-in image_gen; initial generation and cleanup attempt per asset, followed by a narrow index-treatment correction for red and blue.",
+  "produce": [
+    {
+      "id": "menu-card-yellow",
+      "source_crop": "Approved comp: central yellow menu card (reference only; no mock pixels shipped)",
+      "output_path": "public/artwork/menu-card-yellow.webp",
+      "strategy": "Faithful front-on regeneration from approved comp. One focused transparency cleanup was tried, then original chosen because cleanup removed desired rim scuffs.",
+      "prompt_used": "Use case: stylized-concept. Asset type: one clean reusable printed UNO menu card face, transparent cutout.\nReference image is the approved UI comp, reference only. Recreate ONLY the central yellow physical card as an isolated asset, never the surrounding UI.\nComposition: a single front-on, unrotated portrait playing card, width-to-height 0.69, full intact silhouette, orthographic flat elevation. Straight parallel vertical sides, matching modest rounded corners, about 4% transparent margin. No perspective, no cast shadow, no scene.\nPreserve the reference card's thick warm cream rim, subtly dimensional laminated paper bevel, fine comic ink scuffs near rim corners. Authentic printed material, not metal, plastic toy, or exaggerated 3D. Face is vivid native yellow #ffce00.\nNative cream diagonal oval ring crosses the face, rising from lower-left to upper-right, bounded as in the reference. Large oblique black zero outline indices at upper-left and lower-right, enclosed by narrow cream outline. Each zero is a slanted elongated oval cutout, not a font character 0. Preserve the comp's oblique angle within the card while the card itself is front-on.\nThe entire central horizontal label band, x=18%-82%, y=32%-62%, must be blank uniform yellow with NO marks so live HTML labels can be overlaid. Arrange the cream ring outside this central blank label region as in the comp.\nSmall expressive dry-brush black right arrow centered below that blank zone at y=68%. No words, no logo, no letters, no title, no UI text. No characters, background, glow, or shadows outside silhouette. Actual alpha transparent background. Painted print finish at high production detail.",
+      "cleanup_prompt_used": "Use case: precise-object-edit. Clean only the outside transparency of this isolated card. There are unwanted white flecks scattered outside the smooth rounded cream card perimeter, above the top edge and to the sides. Remove every outside fleck and make all outside pixels completely alpha transparent. Keep the complete rounded cream card silhouette intact and precisely preserve every pixel inside it: its same dimensions, front-on geometry, rounded corners, rim, zero shapes, diagonal cream ring, print color and texture, blank central label area, and black brushed arrow. Do not redesign, add marks, change colors, crop, rotate, or add shadow. Deliver a clean full card cutout on truly transparent background with a modest, empty, evenly sized transparent margin.",
+      "dimensions": {
+        "width": 1041,
+        "height": 1511
+      },
+      "format": "Lossless WebP RGBA",
+      "transparency": true,
+      "deviations": [
+        "Small cream flecks remain outside the smooth card silhouette after one cleanup retry. Parent has been told to clip the image layer to the inset rounded card perimeter.",
+        "Subtle mottled print texture remains under the blank semantic label area; no semantic text baked into the face."
+      ],
+      "qa_status": "needs_parent_review"
+    },
+    {
+      "id": "menu-card-red",
+      "source_crop": "Approved comp: left red menu card (reference only; no mock pixels shipped)",
+      "output_path": "public/artwork/menu-card-red.webp",
+      "strategy": "Precise reference-preserving index edit of existing card: both oblique zero rings now black with narrow cream outline and colored center cutouts; all other face artwork preserved.",
+      "prompt_used": "Use case: precise-object-edit. Edit target is image 1, the red UNO menu-card face. Image 2, yellow card, is supporting reference ONLY for decorative zero index treatment.\nMake one narrow fidelity correction ONLY: the two elongated oblique zero indices at top-left and bottom-right of the red card should have a thick BLACK zero ring stroke enclosed by a narrow warm CREAM outer outline, exactly like the yellow reference. Their open center holes must remain red, showing the same colored printed face through the hole. They must remain oblique elongated cutout ovals, NOT upright font zero characters, NOT solid black filled ovals. Preserve each index's existing outer silhouette, placement, rotation, and scale.\nKeep ALL other image 1 pixels/layout/material visually unchanged: same red print palette, grain, cream dimensional paper rim, rounded corners, corner scuffs, broad diagonal cream oval ring, blank central semantic label band, transparent alpha outside, same front-on unrotated orthographic card. No arrow, no semantic text, no words, letters, logo, new decoration, background, glow, or external shadow.\nOutput a single separate transparent card in exactly the same 1041 by 1511 pixel canvas, no crop or reframing. This is a precise edit, not a redesign.",
+      "dimensions": {
+        "width": 1041,
+        "height": 1511
+      },
+      "format": "Lossless WebP RGBA",
+      "transparency": true,
+      "deviations": [
+        "Small cream flecks remain outside the smooth card silhouette after one cleanup retry. Parent has been told to clip the image layer to the inset rounded card perimeter.",
+        "Subtle mottled print texture remains under the blank semantic label area; no semantic text baked into the face."
+      ],
+      "qa_status": "accepted",
+      "generation_history": [
+        {
+          "prompt_used": "Use case: precise-object-edit. Asset type: one clean transparent printed UNO menu-card face.\nEdit the provided yellow card asset as the authoritative geometry reference. Preserve EXACT front-on card silhouette, proportions, cream rounded rim, subtle laminated-paper bevel, small comic-ink edge scuffs, broad diagonal cream oval ring rising lower-left to upper-right, and the two strongly oblique elongated oval zero indices. Do not rotate or give perspective.\nChange the yellow printed face to vivid native red #df0735. Make both zero indices cream, with the open centers showing the red face, retaining their oblique cutout oval shape and cream edging. Remove the black brush arrow completely, filling its old region seamlessly with red. The entire central label band x=18%-82%, y=32%-62% must remain blank uniform red for live semantic HTML text. Subtle authentic print grain is allowed, no lighting gradients across central blank region.\nPreserve full intact physical card silhouette, similar minimal transparent padding. Alpha outside the rounded card must be completely clear with no stray flecks outside the silhouette. No words, logo, letters, title, UI text, arrow, characters, surrounding scenery, glow, or cast shadow. High production detail and real painted print material, not metallic or exaggerated 3D.",
+          "cleanup_prompt_used": "Use case: precise-object-edit. Clean only the outside transparency of this isolated card. There are unwanted white flecks scattered outside the smooth rounded cream card perimeter, above the top edge and to the sides. Remove every outside fleck and make all outside pixels completely alpha transparent. Keep the complete rounded cream card silhouette intact and precisely preserve every pixel inside it: its same dimensions, front-on geometry, rounded corners, rim, zero shapes, diagonal cream ring, print color and texture, blank central label area. Do not redesign, add marks, change colors, crop, rotate, or add shadow. Deliver a clean full card cutout on truly transparent background with a modest, empty, evenly sized transparent margin.",
+          "strategy": "Reference-preserving recolor of generated yellow master, arrow removal, then focused transparency cleanup."
+        }
+      ],
+      "qa_notes": "Viewed both generated edits against previous red/blue card and yellow reference. Correct black zero stroke with cream outer/inner edging and colored open centers. Same 1041×1511 RGBA geometry; rim, grain, oval ring and blank labels preserved. Existing CSS clipping handles previously reported perimeter flecks."
+    },
+    {
+      "id": "menu-card-blue",
+      "source_crop": "Approved comp: right blue menu card (reference only; no mock pixels shipped)",
+      "output_path": "public/artwork/menu-card-blue.webp",
+      "strategy": "Precise reference-preserving index edit of existing card: both oblique zero rings now black with narrow cream outline and colored center cutouts; all other face artwork preserved.",
+      "prompt_used": "Use case: precise-object-edit. Edit target is image 1, the blue UNO menu-card face. Image 2, yellow card, is supporting reference ONLY for decorative zero index treatment.\nMake one narrow fidelity correction ONLY: the two elongated oblique zero indices at top-left and bottom-right of the blue card should have a thick BLACK zero ring stroke enclosed by a narrow warm CREAM outer outline, exactly like the yellow reference. Their open center holes must remain blue, showing the same colored printed face through the hole. They must remain oblique elongated cutout ovals, NOT upright font zero characters, NOT solid black filled ovals. Preserve each index's existing outer silhouette, placement, rotation, and scale.\nKeep ALL other image 1 pixels/layout/material visually unchanged: same blue print palette, grain, cream dimensional paper rim, rounded corners, corner scuffs, broad diagonal cream oval ring, blank central semantic label band, transparent alpha outside, same front-on unrotated orthographic card. No arrow, no semantic text, no words, letters, logo, new decoration, background, glow, or external shadow.\nOutput a single separate transparent card in exactly the same 1041 by 1511 pixel canvas, no crop or reframing. This is a precise edit, not a redesign.",
+      "dimensions": {
+        "width": 1041,
+        "height": 1511
+      },
+      "format": "Lossless WebP RGBA",
+      "transparency": true,
+      "deviations": [
+        "Small cream flecks remain outside the smooth card silhouette after one cleanup retry. Parent has been told to clip the image layer to the inset rounded card perimeter.",
+        "Subtle mottled print texture remains under the blank semantic label area; no semantic text baked into the face."
+      ],
+      "qa_status": "accepted",
+      "generation_history": [
+        {
+          "prompt_used": "Use case: precise-object-edit. Asset type: one clean transparent printed UNO menu-card face.\nEdit the provided yellow card asset as the authoritative geometry reference. Preserve EXACT front-on card silhouette, proportions, cream rounded rim, subtle laminated-paper bevel, small comic-ink edge scuffs, broad diagonal cream oval ring rising lower-left to upper-right, and the two strongly oblique elongated oval zero indices. Do not rotate or give perspective.\nChange the yellow printed face to vivid native blue #075bee. Make both zero indices cream, with the open centers showing the blue face, retaining their oblique cutout oval shape and cream edging. Remove the black brush arrow completely, filling its old region seamlessly with blue. The entire central label band x=18%-82%, y=32%-62% must remain blank uniform blue for live semantic HTML text. Subtle authentic print grain is allowed, no lighting gradients across central blank region.\nPreserve full intact physical card silhouette, similar minimal transparent padding. Alpha outside the rounded card must be completely clear with no stray flecks outside the silhouette. No words, logo, letters, title, UI text, arrow, characters, surrounding scenery, glow, or cast shadow. High production detail and real painted print material, not metallic or exaggerated 3D.",
+          "cleanup_prompt_used": "Use case: precise-object-edit. Clean only the outside transparency of this isolated card. There are unwanted white flecks scattered outside the smooth rounded cream card perimeter, above the top edge and to the sides. Remove every outside fleck and make all outside pixels completely alpha transparent. Keep the complete rounded cream card silhouette intact and precisely preserve every pixel inside it: its same dimensions, front-on geometry, rounded corners, rim, zero shapes, diagonal cream ring, print color and texture, blank central label area. Do not redesign, add marks, change colors, crop, rotate, or add shadow. Deliver a clean full card cutout on truly transparent background with a modest, empty, evenly sized transparent margin.",
+          "strategy": "Reference-preserving recolor of generated yellow master, arrow removal, then focused transparency cleanup."
+        }
+      ],
+      "qa_notes": "Viewed both generated edits against previous red/blue card and yellow reference. Correct black zero stroke with cream outer/inner edging and colored open centers. Same 1041×1511 RGBA geometry; rim, grain, oval ring and blank labels preserved. Existing CSS clipping handles previously reported perimeter flecks."
+    }
+  ],
+  "direct": [],
+  "semantic": [
+    {
+      "id": "menu-action-labels-and-physical-fan",
+      "implementation": "Keep each card as a native button with this raster as an aria-hidden absolutely positioned image, then layer live semantic label text above it. Code owns fan rotation, overlap, focus/hover transforms, drop shadow, hit target, and responsive hand layout. Yellow label uses black; red/blue labels use cream. Center labels around y46%; preserve the yellow image arrow around y68%. All images share the same 1041×1511 geometry. Clip only the img layer to an inset rounded card perimeter to suppress outside cream flecks; start with clip-path: inset(2% 2.6% 2.2% 2.7% round 5%) and assess against the surrounding dark field.",
+      "notes": "No CSS/source implementation edited by this agent. The card face, native oval ring, oblique zero indices, cream printed rim, and yellow arrow are raster artwork. Parent owns live labels and interactions.",
+      "qa_status": "needs_parent_review"
+    }
+  ],
+  "execution_order": [
+    "Generate yellow from approved comp.",
+    "Generate red and blue as reference-preserving recolors from yellow.",
+    "Run one focused transparency cleanup attempt on each.",
+    "Publish separate lossless RGBA WebP files and exact prompt sidecars.",
+    "Parent composes semantic labels and clips tiny outside flecks at image layer.",
+    "Edit red and blue oblique indices to black stroke with cream edging using yellow as reference; preserve prior prompts in sidecar history."
+  ],
+  "blockers": [],
+  "assumptions": [
+    "The printed physical card face is intrinsic approved artwork; perspective, fan rotation, shadow, and semantic labels remain implementation-owned.",
+    "Same native aspect ratio for all three assets is more important than arbitrary resizing to 700×1000.",
+    "Outside alpha cleanup was retried once as required; residual perimeter flecks are clearly reported rather than marked accepted."
+  ]
+}

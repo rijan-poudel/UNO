@@ -1,0 +1,100 @@
+{
+  "produce": [
+    {
+      "id": "player-portraits",
+      "source_crop": ".impeccable/mocks/decision/reset-color-court.png (portrait style reference only)",
+      "output_path": "public/artwork/player-portraits.webp",
+      "strategy": "Faithful generated illustration followed by one constrained crop-framing edit and quality-86 WebP conversion.",
+      "prompt_used": "Use the provided six-portrait sprite sheet as the approved visual reference and edit target. Preserve the same six individual people, drawing style, facial features, expressions, hair, skin tones, clothing, colors, lighting, texture, and exact order. This is a production framing cleanup only.\n\nKeep the canvas exactly 1536 by 1024 pixels, divided into exactly three columns and two rows, each cell exactly 512 by 512 pixels, no gutters. Keep all six square cells completely filled with the same pastel peach-cream background. NO border or circle outlines.\n\nMake every individual head-and-shoulders illustration 18% smaller relative to its own cell while preserving natural proportions, and center each character comfortably in their cell. Each head including ALL hair, hats, ears and earrings must fit comfortably inside the invisible centered circle of diameter 88% of its cell, with at least 12% top breathing room. Portraits should read as centered avatar busts rather than edge-filling headshots. Extend the warm cream background around each smaller portrait. Shoulders may terminate naturally at the bottom edge but no part of one person may overlap another cell. Maintain consistent head scale across all six. In particular give the top-left woman's long wavy hair and top-right person's cap and hair enough space so a CSS circular crop will not cut them off.\n\nDo not redesign the characters or add objects. No lettering, labels, circles, frames, shadows, interface, or scene. Keep exactly six portraits in the same order.",
+      "source_prompt": "Use case: stylized-concept\nAsset type: reusable 3-column by 2-row sprite sheet of six illustrated human player portrait avatars for a friendly card game.\nInput image: the provided Color Court game-screen reference contributes ONLY the portrait illustration style visible in the small human avatars: soft modern flat illustration, natural expressive faces, rounded organic hair shapes, warm dimensional shading, subtle painterly texture. Do not copy or reproduce the interface, cards, nameplates, lettering, table, or controls.\n\nPrimary request: create exactly six distinct friendly adult human head-and-shoulder portraits in an EXACT equal-cell 3-column 2-row grid. Canvas aspect ratio precisely 3:2; target 1536 by 1024 pixels, each cell precisely 512 by 512. NO gutters, separators, frames, or margins around the sheet. All six square cells completely filled with the same quiet pastel peach-cream background. Each face is independently centered in its cell and fully contained inside an invisible circular safe area with diameter 88% of the cell: keep all hair and head inside that circle and shoulders pleasantly visible at its lower edge, with enough breathing space above hair. CSS will perform the circular clipping, so do not draw circles or borders. Consistent face size and straight-on or gentle three-quarter framing.\n\nGrid order left to right, top row then bottom row:\n1. Warm medium-brown-skinned woman, long wavy dark teal-black hair, small golden hoop earrings, coral top, friendly confident smile.\n2. Fair-skinned man with tousled auburn hair, green shirt, gently amused smile.\n3. Brown-skinned androgynous adult with black hair under a small golden-yellow baseball cap, teal shirt, playful smile.\n4. Dark-skinned Black man with short textured curls and a neat small beard, warm golden-ochre shirt, relaxed cheerful smile.\n5. East Asian woman with a short dark bob and round coral glasses, soft blue shirt, bright friendly smile.\n6. Olive-skinned adult with short silver-gray wavy hair, plum shirt, welcoming smile.\n\nStyle/medium: richly drawn contemporary character portrait illustration, like the human avatars in the approved reference. Lifelike illustrated eyes, eyebrows, noses, mouths, ears, individual hair shapes and expressive human features. Smooth flat color planes with restrained warm shadowing and soft highlights, tactile hand-drawn refinement. Natural adult proportions with a slightly enlarged head for readability. Diverse people with distinct personalities, cohesive art direction.\nLighting/mood: soft warm flattering light, friendly social card-night energy.\nConstraints: exactly six separate human portraits, exact equal square cell grid with no overlap between cells, no text anywhere, no logos, no watermark, no UI. No geometric icon faces, no emojis, no card characters, no clay/plastic/3D toy appearance, no backgrounds or scenes, no objects apart from specified clothing/accessories, no shadows or presentation chrome outside the portraits.",
+      "dimensions": {
+        "width": 1536,
+        "height": 1024,
+        "columns": 3,
+        "rows": 2,
+        "cell_width": 512,
+        "cell_height": 512
+      },
+      "format": "webp",
+      "transparency": false,
+      "bytes": 92392,
+      "grid_order": [
+        {
+          "index": 0,
+          "row": 0,
+          "column": 0,
+          "description": "Brown-skinned woman, long dark waves, golden hoops, coral shirt",
+          "background_position": "0% 0%"
+        },
+        {
+          "index": 1,
+          "row": 0,
+          "column": 1,
+          "description": "Fair-skinned auburn-haired man, green shirt",
+          "background_position": "50% 0%"
+        },
+        {
+          "index": 2,
+          "row": 0,
+          "column": 2,
+          "description": "Brown-skinned adult, yellow cap, teal shirt",
+          "background_position": "100% 0%"
+        },
+        {
+          "index": 3,
+          "row": 1,
+          "column": 0,
+          "description": "Dark-skinned Black man, short curls, beard, golden shirt",
+          "background_position": "0% 100%"
+        },
+        {
+          "index": 4,
+          "row": 1,
+          "column": 1,
+          "description": "East Asian woman, dark bob, coral glasses, blue shirt",
+          "background_position": "50% 100%"
+        },
+        {
+          "index": 5,
+          "row": 1,
+          "column": 2,
+          "description": "Olive-skinned silver-haired adult, plum shirt",
+          "background_position": "100% 100%"
+        }
+      ],
+      "deviations": [
+        "Six portraits as assigned; approved mock supplies style only.",
+        "CSS owns circular masks, borders, state rings and shadows.",
+        "WebP uses embed-prompt.mjs's documented adjacent JSON fallback; generated PNG originals carry embedded tEXt."
+      ],
+      "qa_status": "accepted",
+      "qa_notes": "Compared both generated passes and final compressed image with approved reference. Six expressive human portraits, precise equal square cells, no text or gutters, heads inside circular crop-safe area."
+    }
+  ],
+  "direct": [],
+  "semantic": [
+    {
+      "id": "portrait-badges",
+      "implementation": "Square div/span with border-radius:50%, overflow:hidden, background-image:url('/artwork/player-portraits.webp'), background-size:300% 200%, and the listed background-position. Names, exact counts and current-state labels remain adjacent semantic text. CSS owns border, amber turn ring, shadows, focus, pressed state and bounded reactions.",
+      "notes": "512px cells provide 2x resolution up to 256px display. Keep 1:1 masks at all breakpoints. Use aria-hidden when adjacent name already labels the player. Reuse portrait indices deterministically for all six seats.",
+      "qa_status": "accepted"
+    },
+    {
+      "id": "native-cards-arena-home",
+      "implementation": "Compose portraits with existing UnoCard HTML/CSS and semantic arena, primary Play, counts and countdown components. Preserve native deck and use SVG/CSS for graphical direction and state cues.",
+      "notes": "No room scene, UI screenshot, card art, icon or final page copy generated. Parent owns code and responsive final verification.",
+      "qa_status": "accepted"
+    }
+  ],
+  "execution_order": [
+    "Generate exact six-cell portrait sheet.",
+    "Apply one framing cleanup for circular crops.",
+    "Convert to WebP, save exact provenance, inspect final compressed sheet."
+  ],
+  "blockers": [],
+  "assumptions": [
+    "Approved hybrid contract supersedes older identity constraints for this asset.",
+    "Illustrated adults represent player identities rather than real people.",
+    "Parent uses equal-cell CSS positions and clips each cell as a circle."
+  ]
+}

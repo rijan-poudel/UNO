@@ -1,18 +1,29 @@
 ---
-name: "UNO — Comic-card showdown"
-description: "Confident comic ink, warm paper and vivid held cards across a shared card night."
+name: "UNO — Color play"
+description: "A welcoming blue card table with human portraits, vivid native cards and warm amber actions."
 colors:
-  club-ink: "#15151b"
-  club-paper: "#fff4d6"
+  club-ink: "#17345f"
+  club-paper: "#fff7e7"
   club-red: "#df0735"
-  club-yellow: "#ffce00"
-  club-blue: "#075bee"
+  club-yellow: "#ffd45a"
+  club-blue: "#1254b5"
   club-green: "#00bc68"
-  ui-surface: "#fff9e8"
-  ui-muted: "#57524a"
-  ui-line: "#c6bfae"
+  stage: "#123d86"
+  stage-light: "#1d56a3"
+  stack-stage: "#143975"
+  stack-stage-light: "#2259a1"
+  wild-stage: "#302247"
+  wild-stage-light: "#523466"
+  ui-surface: "#fffcf4"
+  ui-muted: "#58687a"
+  ui-line: "#ccd3da"
   ui-accent-red: "#c50730"
   ui-accent-green: "#007943"
+  cue-surface: "#09285c"
+  cue-ink: "#38290c"
+  cue-muted: "#5a410f"
+  amber-edge: "#bf8a28"
+  cream-hover: "#ffdc36"
   midnight-surface: "#26262f"
   midnight-muted: "#c8c4b9"
   midnight-line: "#56565f"
@@ -30,29 +41,37 @@ colors:
   sunset-muted: "#6e4c50"
   sunset-line: "#d7b2ad"
   card-paper: "#ffffff"
+  card-blue: "#075bee"
+  card-yellow: "#ffce00"
   card-back: "#101d3a"
   card-green-index: "#00321e"
   card-green-value: "#00894a"
   card-yellow-index: "#482f00"
   card-yellow-value: "#805100"
-  turn-yellow: "#ffe329"
+  arena-focus: "#ffe329"
 typography:
-  headline:
+  home-display:
     fontFamily: "Barlow Condensed, sans-serif"
-    fontSize: "clamp(42px, 6vw, 64px)"
+    fontSize: "96px"
     fontWeight: 800
-    lineHeight: 0.98
+    lineHeight: 0.85
+    letterSpacing: "-0.025em"
+  headline:
+    fontFamily: "Outfit, sans-serif"
+    fontSize: "clamp(32px, 4vw, 42px)"
+    fontWeight: 750
+    lineHeight: 1.08
     letterSpacing: "-0.02em"
   dialog-title:
-    fontFamily: "Barlow Condensed, sans-serif"
-    fontSize: "36px"
-    fontWeight: 800
-    lineHeight: 1
-    letterSpacing: "-0.01em"
-  title:
-    fontFamily: "Barlow Condensed, sans-serif"
+    fontFamily: "Outfit, sans-serif"
     fontSize: "28px"
-    fontWeight: 800
+    fontWeight: 750
+    lineHeight: 1.1
+    letterSpacing: "-0.01em"
+  section-title:
+    fontFamily: "Outfit, sans-serif"
+    fontSize: "28px"
+    fontWeight: 750
     lineHeight: 1.1
     letterSpacing: "-0.02em"
   body:
@@ -60,31 +79,96 @@ typography:
     fontSize: "15px"
     fontWeight: 400
     lineHeight: 1.5
-  label:
+  body-large:
     fontFamily: "Outfit, sans-serif"
-    fontSize: "14px"
-    fontWeight: 750
+    fontSize: "16px"
+    fontWeight: 400
+    lineHeight: 1.5
   control:
     fontFamily: "Outfit, sans-serif"
     fontSize: "14px"
     fontWeight: 750
     lineHeight: 1.25
-  launch-control:
+  support:
+    fontFamily: "Outfit, sans-serif"
+    fontSize: "13px"
+    fontWeight: 400
+    lineHeight: 1.4
+  compact:
+    fontFamily: "Outfit, sans-serif"
+    fontSize: "12px"
+    fontWeight: 600
+  compact-count:
+    fontFamily: "Outfit, sans-serif"
+    fontSize: "11px"
+    fontWeight: 400
+    lineHeight: 1.25
+  compact-status:
+    fontFamily: "Outfit, sans-serif"
+    fontSize: "10px"
+    fontWeight: 400
+  player-name:
+    fontFamily: "Outfit, sans-serif"
+    fontSize: "16px"
+    fontWeight: 700
+    lineHeight: 1.2
+  player-count:
+    fontFamily: "Outfit, sans-serif"
+    fontSize: "13px"
+    fontWeight: 400
+    lineHeight: 1.25
+  compact-player-name:
+    fontFamily: "Outfit, sans-serif"
+    fontSize: "12px"
+    fontWeight: 700
+    lineHeight: 1.2
+  cue-title:
+    fontFamily: "Outfit, sans-serif"
+    fontSize: "18px"
+    fontWeight: 750
+    lineHeight: 1.1
+  compact-cue-title:
+    fontFamily: "Outfit, sans-serif"
+    fontSize: "13px"
+    fontWeight: 750
+    lineHeight: 1.1
+  play-control:
+    fontFamily: "Outfit, sans-serif"
+    fontSize: "24px"
+    fontWeight: 750
+    lineHeight: 1.25
+  card-value:
     fontFamily: "Barlow Condensed, sans-serif"
-    fontSize: "32px"
+    fontSize: "calc(70px * var(--card-scale, 1))"
     fontWeight: 800
-    lineHeight: 1.15
+    lineHeight: 1
+    letterSpacing: "-0.03em"
+  card-index:
+    fontFamily: "Barlow Condensed, sans-serif"
+    fontSize: "calc(19px * var(--card-scale, 1))"
+    fontWeight: 800
+    lineHeight: 1
 rounded:
   field: "6px"
-  control: "8px"
-  panel: "12px"
+  small: "8px"
+  inset: "9px"
+  control: "12px"
+  action: "14px"
+  identity: "16px"
+  cue: "18px"
+  panel: "20px"
+  portrait: "50%"
 spacing:
+  micro: "4px"
+  detail: "6px"
   tight: "8px"
   compact: "12px"
   regular: "16px"
   group: "20px"
   section: "24px"
   dialog: "28px"
+  wide: "32px"
+  panel: "44px"
 components:
   button-primary:
     backgroundColor: "{colors.club-yellow}"
@@ -92,29 +176,23 @@ components:
     typography: "{typography.control}"
     rounded: "{rounded.control}"
     padding: "14px 22px"
+    height: "48px"
+  button-primary-hover:
+    backgroundColor: "{colors.cream-hover}"
   button-secondary:
     backgroundColor: "transparent"
     textColor: "{colors.club-ink}"
     typography: "{typography.control}"
     rounded: "{rounded.control}"
     padding: "14px 22px"
+    height: "48px"
   launch-primary:
     backgroundColor: "{colors.club-yellow}"
-    textColor: "{colors.club-ink}"
-    rounded: "{rounded.control}"
-    padding: "10px 18px 13px"
-  launch-create:
-    backgroundColor: "{colors.club-red}"
-    textColor: "{colors.card-paper}"
-    typography: "{typography.launch-control}"
-    rounded: "{rounded.control}"
-    padding: "10px 18px 13px"
-  launch-join:
-    backgroundColor: "{colors.club-blue}"
-    textColor: "{colors.card-paper}"
-    typography: "{typography.launch-control}"
-    rounded: "{rounded.control}"
-    padding: "10px 18px 13px"
+    textColor: "{colors.cue-ink}"
+    typography: "{typography.play-control}"
+    rounded: "{rounded.action}"
+    padding: "12px 22px"
+    height: "70px"
   input:
     backgroundColor: "{colors.ui-surface}"
     textColor: "{colors.club-ink}"
@@ -124,171 +202,185 @@ components:
   settings-navigation:
     textColor: "{colors.club-ink}"
     rounded: "{rounded.field}"
-  rule-preset:
-    backgroundColor: "transparent"
+    padding: "9px 6px"
+    height: "48px"
+  preset-selected:
+    backgroundColor: "{colors.club-paper}"
     textColor: "{colors.club-ink}"
-    rounded: "0px"
-    padding: "14px 16px"
+    rounded: "{rounded.inset}"
+    padding: "8px"
+    height: "44px"
   dialog:
     backgroundColor: "{colors.ui-surface}"
     textColor: "{colors.club-ink}"
     rounded: "{rounded.panel}"
     padding: "28px"
-  opponent-label:
+  player-label:
+    backgroundColor: "{colors.cue-surface}"
+    textColor: "{colors.club-paper}"
+    rounded: "{rounded.identity}"
+    padding: "8px 14px 8px 0"
+    width: "172px"
+    height: "66px"
+  player-label-active:
     backgroundColor: "{colors.club-paper}"
-    textColor: "{colors.club-ink}"
-    rounded: "{rounded.field}"
+    textColor: "#19385e"
+  player-label-catch:
+    backgroundColor: "{colors.club-yellow}"
+    textColor: "{colors.cue-ink}"
+  cue-local:
+    backgroundColor: "{colors.club-yellow}"
+    textColor: "{colors.cue-ink}"
+    rounded: "{rounded.cue}"
+    padding: "10px 20px 10px 12px"
+    height: "64px"
 ---
 
-# Design System: UNO — Comic-card showdown
+# Design System: UNO — Color play
 
 ## Overview
 
-**Creative North Star: "Comic-card showdown"**
+**Creative North Star: "Color play"**
 
-UNO feels like a shared competitive card night, expressed through confident comic print. Almost-black ink, warm paper, vivid native card colors and condensed italic headings carry one identity across entry, setup, rooms, preferences, notifications, results and live play. Outlined controls press into their bottom edge; original expressive characters provide energy without competing with decisions.
+A welcoming shared card table combines a rich blue field, warm cream foreground, vivid native UNO cards and expressive illustrated human portraits. Outfit keeps the interface friendly and direct; Barlow Condensed gives the deck, wordmark and selected game actions their familiar energy. Soft contact shadows and inset press edges make cards and controls feel physical.
 
-This records the shipped whole-site identity replacement selected by the owner on October 23. The approved panel comp establishes the home composition; its illustration and oversized UNO graphic are specific to that surface. Supporting screens inherit the ink, paper, lettering and control grammar. Live play keeps a calm ink field, opaque player identities and the existing vivid native deck. The archived prior system is at `.impeccable/review/site-redesign/DESIGN.before.md`.
+This records the shipped October 24 composite: Classic supplies the blue field and card prominence, Color court supplies the portraits, and After-hours supplies amber turn and action emphasis. The approved direction is `.impeccable/review/experience-reset/contract.md` (FORM seed `2fba311c`); its three references are `reset-classic.png`, `reset-color-court.png` and `reset-after-hours.png` under `.impeccable/mocks/decision/`. No catalog quality-bar world was selected. Earlier Comic-card showdown, giant-cast/painted-menu, violet-corner, illustrated-room and poker-table instructions are historical and superseded. Their assets and provenance remain recoverable; they are not current surface guidance.
 
 **Key Characteristics:**
 
-- Warm paper against almost-black ink, with native red, yellow, green and blue as purposeful accents.
-- Barlow Condensed italic display lettering paired with Outfit interface text.
-- Crisp outlines, restrained corners and shallow pressed control lips.
-- Original comic artwork with full silhouettes, real raster ink swashes and recorded provenance.
-- A bottom-cropped held hand, nearby piles and immediate legal-card play.
-- Real published game state, bounded reactions and sound that never delays a turn.
+- Quiet blue or plum preset fields keep attention on live cards and people.
+- Human portraits, opaque nameplates and exact hand counts make the table social and readable.
+- Outfit UI and Barlow Condensed deck lettering share one friendly voice.
+- Amber pressed actions and a compact real countdown explain the current decision.
+- A bottom-cropped curved hand preserves direct legal play and independent large-hand scrolling.
+
+Source authority: `app/layout.tsx` imports globals, legacy table geometry, arena, home, then club styles. `app/club.css` owns final shared palette/chrome; `app/home.css` owns home; `app/arena.css` owns live geometry/cues; `PlayerAvatar.module.css`, `OpponentSeat.module.css` and `UnoCard.module.css` own their materials. Component module specificity matters: the active portrait badge is cream, not the older arena yellow badge. Source takes precedence over older captures.
 
 ## Colors
 
-The palette takes its saturation from the native deck and its reading surfaces from warm printed paper. Frontmatter holds normative primitives; theme assignments below describe their application rather than introducing parallel values.
+The primary palette is saturated blue with cream and amber; the native deck retains its own brighter four-color print.
 
 ### Primary
 
-- **Card Yellow:** primary start/submit actions, selected rules, earned milestones and active player labels; always paired with dark ink.
-- **Card Red:** home title, Create action and red native cards. **Readable Red** (`ui-accent-red`) serves supporting error and action text.
+- **Club blue and stage blue:** shared action/focus blue and the deeper arena ground. Stage light creates a broad radial lift rather than a competing object.
+- **Stack blue and Wild plum:** supported rule presets change the stage mood in both home and arena. Classic uses the default stage; stacking deepens blue; jump-in/shuffle/discard-all rules choose plum.
 
 ### Secondary
 
-- **Card Blue:** Join action, native blue cards and the default focus ring.
-- **Card Green:** native green cards and registration marks; **Readable Green** (`ui-accent-green`) serves online/winner text on paper.
+- **Club yellow:** primary controls, local-turn cue, catch action and portrait ring. Its darker amber edge supplies the pressed lip; cue ink and cue muted provide readable text.
+- **Native red, blue, green and yellow:** card identity stays faithful to the code-rendered deck. Club blue/yellow are interface colors; card blue/yellow remain distinct tokens.
 
 ### Neutral
 
-- **Club Ink:** page surround, live arena, outlines and primary paper text.
-- **Club Paper / UI Surface:** home and player-label paper, then the lighter supporting content surface.
-- **UI Muted / UI Line:** supporting copy and structural dividers.
-- **Card Paper / Card Back:** white printed faces and the retained navy native backs. Green and yellow keep distinct index/value inks for legibility.
+- **Club paper and UI surface:** warm foreground, selected home preset and consistently light native dialogs.
+- **Club ink, UI muted and UI line:** supporting-page text, secondary text and field/divider strokes.
+- **Cue surface:** opaque dark blue identity and remote-turn surfaces; no scene detail shows through names.
+- **Saved appearances:** paper is the default; midnight, forest and sunset override supporting UI tokens in `club.css`. Home and arena retain preset moods; dialogs set their own light token scope. Do not remove these working appearances during new surface work.
 
-### Named Rules
-
-**The Paper Scope Rule.** Home, native dialogs, toasts and live player badges retain the comic paper/ink palette. Supporting setup and room content honors the saved appearance; the native deck stays unchanged.
-
-The four appearance choices are paper, midnight, forest and sunset. Paper uses Club Paper as background and Club Ink as text. Midnight swaps those roles, with its named surface, muted, line and readable accent tokens. Forest and sunset use their named background/surface/text/muted/line sets; red and blue use the default readable accents. Green and yellow inherit the default roles outside midnight. Every native dialog resets to the paper palette and light color scheme, including dialogs opened from a dark arena or midnight setup. Arena focus/state yellow remains the separate `turn-yellow` role.
-
-**The Published Color Rule.** A selected yellow row, active badge, chosen wild color or penalty cue describes real state. Do not use color as the only label for a decision.
+**The Published Color Rule.** Amber, cream active badges, legal-card outlines and wild swatches describe actual published state. Retain names, counts and written action/color labels alongside color.
 
 ## Typography
 
-**Display Font:** Barlow Condensed, sans-serif; italic, uppercase and weight 800 on page/dialog headings and major start actions.
-**Body Font:** Outfit, sans-serif; readable sentence-case copy, labels and dense settings rows.
+**Display Font:** Barlow Condensed, sans-serif, for the home UNO mark, native card faces and selected game actions; display lettering is italic where implemented.
+**Body Font:** Outfit, sans-serif, for headings, forms, controls, names, help and countdowns. Both are loaded through `next/font` in `app/layout.tsx`.
 
-**Character:** Narrow, forceful display lettering supplies the comic voice while the softer interface face keeps rules, names and decisions readable. These are the two pinned font families, loaded in `app/layout.tsx`.
+The ramp is role-based, not a geometric scale. The frontmatter records the actual range, including compact roles; small phone text is subordinate metadata rather than the primary action label.
 
 ### Hierarchy
 
-- **Headline:** setup and room page titles; the phone override uses 46px.
-- **Dialog title:** compact native dialog heading; 32px on narrow screens and 28px in short landscape game dialogs.
-- **Title:** setup section headings; 25px on narrow screens.
-- **Body:** default copy; setup introductions use 16px with a 50ch limit, returning to 15px on phones.
-- **Label / Control:** Outfit for form labels, row choices and shared controls. Supporting descriptions use 13px; secondary table text may use 12px where the compact geometry requires it.
-- **Launch control:** condensed italic major home actions; primary action grows to 40px on tall desktop and contracts with the home-specific responsive composition.
+- **Home display:** home-only condensed italic mark; switches to an 80px role in short landscape. Do not reuse its scale for routine headings.
+- **Headline / section / dialog:** Outfit with compact tracking and weight 750. Setup headline is responsive; dialog and section titles use their own roles. The mobile dialog title grows to 32px; short landscape dialogs use 28px after the last shared override.
+- **Body / large body:** supporting content and setup explanations, with measured line lengths (setup 50ch, home rules explanatory copy).
+- **Control / support:** regular button and field labels, preset descriptions and secondary actions. Home Play is a larger Outfit role with a smaller explanatory line.
+- **Player name / count:** names are 16px desktop and 12px compact; counts are 13px desktop and 11px compact. Inline status is 11px desktop and 10px compact. Tabular numerals keep counts and the clock stable.
+- **Cue:** title is 18px, 16px under 680px height, and 13px under 460px height; helper copy is 12px then 10px. Clock numerals are 16px then 12px.
+- **Native deck:** face values and corner indices scale together through `--card-scale`. Preserve the native card-back Outfit wordmark and Barlow Condensed face numerals.
 
-**The Brand Graphic Rule.** The home UNO word is a surface-specific brand graphic, not a general display scale: tall desktop uses a 144–208px clamp, shorter desktop 128px and narrow entry 112px, with outline, stretched lettering and seven-pixel desktop ink shadow. Keep those rules in the home brief; do not apply them to forms or dialogs.
-
-**The Deck Lettering Rule.** Preserve Barlow Condensed native face numerals, Outfit card-back lettering, italic indices and the shared card proportions. The retained native card-back wordmark is separate from the uppercase UNO brand wordmark in page chrome.
+**The Two Lettering Roles Rule.** Outfit carries ordinary interface headings. Condensed italic lettering belongs to brand/deck expression and the existing emphatic game actions; it is not a global heading transform.
 
 ## Layout
 
-Use one clear content surface rather than nested decorative tiles. Supporting setup/room pages sit within a 1280px header boundary and a content sheet capped at 780px, with 36px/44px vertical/horizontal padding. At 700px and below, the content boundary becomes viewport minus 24px with 24px/20px padding. The observed spacing rhythm uses the frontmatter's tight through dialog steps; controls preserve at least 44px interaction targets.
+Home is a centered title/start composition: main width capped at 760px, play lane at 400px, supporting progress at 420px. A small decorative native-card fan sits above one dominant Play action; Create/Join share a secondary row, with bot setup and help below. Portrait entry remains usable. Under 700px width, spacing and type adapt; short landscape (height ≤540px, width ≥541px) uses a 900px two-column composition with an 0.85fr/1.15fr split.
 
-Home is one centered cream sheet with the title, complete comic cast and immediately available Play/Create/Join. Its deliberate illustration/action overlap belongs to its surface brief. Artwork loading never gates the controls. Portrait and short-landscape entry both remain usable; short landscape lets header UNO carry the identity while the semantic main heading stays accessible.
+The arena fills `100dvh`, clips page overflow and caps its internal stage at 1600px. Opponents occupy the upper/perimeter field; central tilted draw/discard piles sit directly above the bottom-held hand. The hand owns horizontal overflow, headroom and paging controls. Use safe-area insets at the screen edges. Legal cards rise; focus/inspection rises further without clipping. Contextual decisions sit beside the centered turn cue rather than displacing piles.
 
-Live play is one clipped dynamic viewport. `app/arena.css` owns opponent, pile and hand geometry; `app/club.css`, imported last, owns current shared chrome and visual roles. Piles sit near the held fan; the lower hand is cropped at the viewport edge while complete card boxes and focus clearance remain inside its scrollport. Large hands scroll horizontally without scrolling the document. Contextual decisions use their separate right-side lane. Phone gameplay uses the landscape gate; local bots pause in portrait, while online continuation is disclosed. Retain five readable compact opponent identities at six seats.
+Height determines live density: large desktop starts at 900px height with width ≥701px; compact stages apply below 680px; landscape phone applies below 460px with width ≥541px; the shortest variant applies below 360px. At the phone thresholds, portrait badges become 126px then 100px wide while retaining a 44px minimum target, exact count and inline status. The name/status wrapper stays a row. Compact opponent back fans disappear; native card indices remain readable. Phone gameplay uses a rotate gate in portrait.
 
-**The Hand Owns Its Width Rule.** Bound the fan arc and keep large-hand overflow inside the hand, preserving corner identity, focus clearance and usable card size.
+The observed spacing vocabulary runs from micro/detail gaps through compact, regular, section and dialog steps. It is not an instruction to normalize every card-specific overlap. See the two surface briefs for geometry and the sidecar for exact responsive conditions.
+
+**The Hand Owns Its Width Rule.** Large hands scroll inside their own fan; do not shrink them into an unreadable row or allow document-width overflow.
 
 ## Elevation & Depth
 
-Depth comes from printed outlines, shallow control lips and the native card's thin stock/laminate layers. Content sheets remain visually quiet. Native dialogs use a diffuse ambient shadow over a dark unblurred backdrop; the oversized title's hard ink shadow is a home graphic exception.
+Depth comes from native card stock, soft blue contact shadows, floating portrait/cue surfaces and shallow inset control lips. Containers do not inherit a comic outline or hard offset shadow. The amber bottom lip is intentional material feedback, not a side accent border.
 
 ### Shadow Vocabulary
 
-- **Pressed control:** `inset 0 -3px 0 #15151b35`; active shared/home buttons reduce it to a one-pixel bottom lip while translating down two pixels.
-- **Native card stock:** `inset 0 1px 2px #ffffffb0, inset 0 -1px 1px #17234145, 0 1px 1px #c4ccdf, 0 3px 1px #68748e, 0 8px 12px #02071880`; shared face depth from `UnoCard.module.css`.
-- **Native dialog:** `0 16px 48px #00000066`; supporting the modal above the `#0b0b10ce` backdrop.
+- **Primary press:** inset amber lip plus a small blue shadow; the home Play enlarges the same relationship.
+- **Identity and cue:** soft blue contact shadows beneath an opaque surface.
+- **Native stock:** fine white highlight, thin layered grey stock and a soft dark contact shadow; the draw pile adds stacked edges.
+- **Dialog:** broad blue ambient shadow, with a dark native backdrop.
 
-**The Contact Before Flight Rule.** Settle hover tilt on contact before capturing drag or flight geometry. Preserve scale and composed rotation through pickup/return; clean up interrupted copies and retain readable static color, edge and focus when spatial motion is disabled.
+Exact shadow values and motion durations live in `.impeccable/design.json` extensions. Primary controls use a small scale press; card fan lift uses the standard out easing. Portrait reactions are bounded to a short state-triggered bounce. Skip/reverse/penalty feedback is brief and derived from the move; reduced motion removes travel and preserves legible state. Thinking dots may pulse only while waiting for the actual actor; no decorative idle character loop is part of the system.
 
-Motion communicates current intent: home controls use 140ms transitions; native dialogs enter over 180ms with `cubic-bezier(0.2, 0.8, 0.2, 1)`. Card response uses `cubic-bezier(0.16, 1, 0.3, 1)`. Fine-pointer tilt/sheen stays within hover/no-reduced-motion guards. Reduced-motion rules remove decorative travel and retain state. Sound and animation never delay a turn, queue narration or wait for clip duration.
+**The Contact Rule.** Use inset press depth for actions and stock/contact depth for cards. Preserve readable resting geometry and keyboard focus; sound and animation never determine turn timing.
 
 ## Shapes
 
-Use crisp dark outlines with restrained corners: field/badge corners, control corners and panel corners are the three reusable radius roles. Home uses a surface-specific larger sheet corner on desktop. Shared controls and paper panels use two-pixel outlines; home start actions strengthen to three pixels. Rule choices are flat divider rows, not independent rounded cards. The four equal native-color registration segments appear above supporting content and dialogs and along the arena header. Brand chrome uses uppercase UNO and four skewed native-color marks; home/game header suppress the little marks where the composition already carries color.
-
-**The Printed Edge Rule.** Use a control's bottom lip to acknowledge pressing. Keep information containers flat; physical card stock and the authored title graphic retain their own depth language.
+Forms use gently rounded rectangles: small field/tab corners, medium controls, larger identity/cue surfaces and soft panel corners. Home Play has its own action radius. Portraits are circular with a cream rim. Native cards keep their scaled small corners and white oval print. These distinct silhouettes identify material and function; do not flatten them to one radius.
 
 ## Components
 
 ### Buttons
 
-Confident printed controls. Shared primary actions use Card Yellow and Club Ink; secondary actions are transparent with a structural outline and theme-aware text. Shared buttons use the control radius, two-pixel border and 48px minimum height; small/icon controls retain 44px targets. Home actions use heavier borders and condensed italic lettering, with a full-width yellow Play ahead of paired red Create and blue Join. Disabled shared/start actions use half opacity and remove the lip. Fine-pointer primary hover lightens yellow; focus uses a three-pixel ring offset four pixels, switching to Turn Yellow in live play.
+Warm yellow primary controls have club ink text, weight 750, a shallow amber bottom edge and a soft contact shadow. Shared targets are at least 48px tall; small/icon controls retain 44px targets. Home Play is a larger 70px action, 58px in short landscape. Hover warms the yellow on fine pointers; active scales to 0.97. Secondary buttons use a fine divider stroke; blue-stage room controls explicitly keep cream text. Home Settings explicitly keeps cream text in default and hover states. Focus rings stay visible and outside the control.
 
-### Selection rows and navigation
+### Chips and preset choices
 
-Rule presets form a single divider list with an original miniature card marker, Outfit label, description and explicit selected check. The entire selected row turns yellow. Only engine-supported presets are offered. Segmented controls and settings tabs have a strong enclosing outline; selected segments use dark ink with light surface text. Settings tabs stack their icon and text on phones. Switches use a rectangular track and small square thumb rather than a new decorative pill language.
+Home's supported-preset selector is a dark blue rounded track with cream selected segments and a small contact shadow. Supporting setup uses full-width flat rule rows with native miniature-card markers, written descriptions and an explicit check; its selection is amber. These are two contexts for the same real presets, not interchangeable decoration.
 
-### Cards / Containers
+### Cards / containers
 
-Supporting content uses one lightly rounded paper surface with a four-color registration bar and simple divisions. Theme-aware setup/room surfaces preserve reading contrast in all four appearances. Native dialogs consistently reset to paper with compact italic heading, visible Close, and reachable decisions inside the dialog scroll boundary. Toasts share paper, dark outline and Outfit copy. Progress stamps remain compact; earned state is yellow and reflects completed device-local rounds rather than clicks.
+Setup uses a centered rounded theme-aware panel. Native dialogs are fixed light surfaces with Outfit headings, explicit Close and reachable decisions in short landscape. Settings, rules, results and earned progress use the same shared palette/control vocabulary; progress always reflects completed-round device-local data. Keep the native `Modal` primitive.
 
-### Inputs / Fields
+### Inputs / fields
 
-Theme-aware light/dark surfaces, two-pixel structural stroke and the field radius, with 50px height and 12px/15px vertical/horizontal padding. Focus changes the stroke to current text and retains the global focus ring; invalid input uses readable red. Room codes are large explicit text on a divider-framed panel with Copy/Share, distinct from the ordinary input.
+Theme-aware fields use UI surface/text, a two-pixel divider border, 50px height and a darker text-colored focus stroke. Invalid fields use accent red. Labels remain explicit; room codes and room links share the existing input flow.
 
-### Native deck and held hand
+### Navigation
 
-One `UnoCard` face serves hand, piles and flight. Preserve vivid faces, white orbit/index structure, dark green/yellow inks and original stock edges. Legal cards play on first activation; drag readiness and release share the canonical gesture predicate. Nonmatching cards stay inspectable, with a full named Play fallback when a pre-inspected card becomes legal. Actual new local draws reveal without forced selection. Draw lives on the deck; eligible UNO stays at hand level, Pass and fallback Play stay contextual, and sorting lives in Menu.
+Small wordmark and restrained Settings/Menu chrome sit at the perimeter. Settings tabs use an outlined segmented container with ink selected background and cream text; mobile tabs stack icon/label while keeping their full target. Do not add a parallel navigation library.
 
-Opponents keep original expressive card avatars and opaque paper name badges. Active or catchable badges turn yellow and retain explicit names/state. A representative opponent flight uses a visible native fan card; when compact geometry hides that fan, the avatar supplies destination pose only. Draws clone the face-down deck, never the avatar. Reactions derive from published facts, restart only when expression changes and remain bounded.
+### Portrait identities
 
-### Original imagery
+`PlayerAvatar` selects one of six original human portraits from `/artwork/player-portraits.webp`; preserve its companion prompt provenance. Opaque dark blue nameplates hold a name/status row and exact count below. The active player's badge turns cream and portrait gains an amber outline; a catchable badge turns amber. Compact states retain the same footprint and inline status instead of creating a third text tier.
 
-The shipped comic cast, frame swashes and character energy are raster assets at `public/artwork/card-night-comic.webp`, `comic-frame.webp` and `comic-energy.webp`, each with prompt provenance. Preserve complete character silhouettes and use the authored alpha edges. Frame swashes sit outside the content sheet; the live arena leaves its central field calm. Historical artwork/table assets retain provenance without defining the current world. Do not synthesize substitute characters with CSS or copy external mascots.
+### Held cards and live turn cue
 
-Not canonized: dormant home/arena literals in legacy stylesheets, stale detector palette/type/radius advisories and the oversized home wordmark as a reusable type role. They do not define the current shared system. No unresolved craft-floor device is promoted into house style; the functional pressed lips and approved title shadow belong to this printed world.
+`UnoCard` owns card print; `HandCard` owns direct tap/drag handling; `useGamePresentation` owns transitions/audio. Legal cards play on first activation, with the shared gesture predicate governing drag readiness. Inspection, roving keyboard navigation and overflow paging stay available. Wild decisions preserve written chosen-color state and accessible counts.
+
+`TurnCue` presents the real actor, direction, current action and deadline. Human turns last 30 seconds; the ring and tabular number derive from the published deadline, never a sample comp value. Drawing and metadata do not restart it; online timing belongs to the server. Forced penalties show the actual total/target and resolve automatically when no stack response exists. At five seconds or fewer the cue uses its urgency treatment. Local portrait gating pauses local timing; online rounds continue. Music and sound respect saved preferences and never gate a turn.
 
 ## Do's and Don'ts
 
 ### Do:
 
-- **Do** use cream paper, black ink, native four-color accents and one shared comic control grammar across the journey.
-- **Do** pair condensed italic display lettering with Outfit interface text, preserving native deck lettering.
-- **Do** honor saved appearance on supporting pages while keeping native dialogs, toasts and live identity badges in their explicit paper scope.
-- **Do** retain the complete original comic cast, real ink artwork and exact prompt provenance.
-- **Do** preserve nearby piles, a bottom-cropped held fan, independent hand scrolling and readable six-seat phone identities.
-- **Do** keep legal-card activation immediate and give touch, drag and keyboard the same current availability rules.
-- **Do** retain a written chosen-color marker for wild discards and accessible routine turn/color announcements without a visible routine HUD.
-- **Do** keep motion, sound, reactions and earned history tied to actual published or completed game state.
-- **Do** use the native Modal, visible Close, reachable short-landscape decisions and the established SVG icon system.
+- **Do** use the quiet preset field, warm cream, human portraits and vivid native deck as one shared identity.
+- **Do** keep Outfit ordinary headings and the separate Barlow Condensed brand/deck roles.
+- **Do** retain saved supporting appearances and the explicit light native-dialog scope.
+- **Do** keep exact hand counts, inline compact status, a real turn clock and written action/color cues.
+- **Do** preserve the curved bottom-held fan, independent overflow, direct legal play and visible keyboard focus.
+- **Do** use soft contact depth and the intentional inset amber pressed-control lip.
+- **Do** keep original artwork and exact provenance, even when earlier artwork is superseded.
+- **Do** verify six-seat landscape phones, large hands and reduced motion when extending the interface.
 
 ### Don't:
 
-- **Don't** restore the rejected assistant-like identity, navy title screen, side-column start actions or feature-tile grid.
-- **Don't** apply the home title's stretched size or ink shadow to routine content headings.
-- **Don't** restore poker felt/rails, illustrated room backgrounds, electric-blue orbit planes or decoration behind the central piles.
-- **Don't** replace the held fan with a flat shrinking row, let large hands overflow the page or add portrait phone gameplay.
-- **Don't** add a third font family, Unicode glyph icons, a parallel component library or idle character loops.
-- **Don't** add decorative hard offset shadows to information containers; preserve native stock edges, pressed control lips and the approved title graphic.
-- **Don't** add blocking splashes, queue stale sound/reactions or let presentation control turn timing.
-- **Don't** infer points, finishing ranks or new rewards without completed-round evidence.
+- **Don't** restore giant background cast, painted menu-card actions, ink swashes, poker felt/rail or the giant orbit field.
+- **Don't** add decoration behind the piles or allow compact player states to expand into their space.
+- **Don't** add another font family, glyph icons, mixed display systems or a parallel component library.
+- **Don't** replace the live deadline with a decorative countdown or reset it after a draw or metadata update.
+- **Don't** add blocking splashes or let audio, reactions or motion gate game turns.
+- **Don't** label No Mercy, Flip or Flex playable before their actual decks/actions exist.
+
+Not canonized: legacy comments and historical selectors describing an ink-only field, geometric avatars or no visible routine HUD are superseded by the shipped composite. Their presence in source/history is not a rule. The former compact status-column collision and low-contrast Settings control were defects; the corrected row and explicit cream foreground are the recorded behavior. Static screenshots do not certify physical touch, audible quality or execution of reduced-motion fallbacks.

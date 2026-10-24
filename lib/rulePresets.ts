@@ -54,3 +54,13 @@ export function matchesPreset(
         defaultRules[key as keyof GameRules]) === value,
   );
 }
+
+export function getTableMood(
+  rules: Partial<GameRules>,
+): 'classic' | 'stack' | 'wild' {
+  if (rules.allowJumpIn || rules.allowShuffleCard || rules.allowDiscardAll)
+    return 'wild';
+  return rules.stackDraw2 || rules.stackWild4 || rules.allowWild4OnDraw2
+    ? 'stack'
+    : 'classic';
+}

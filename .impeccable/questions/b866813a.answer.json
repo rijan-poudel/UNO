@@ -1,0 +1,8 @@
+{
+  "optionId": "opening-hand",
+  "steer": "",
+  "comp": ".impeccable/mocks/decision/home-correction/opening-hand.png",
+  "buildPath": "comp",
+  "buildPathFlipped": false,
+  "provenance": "Exact ANSWER returned by serve-question --wait --key b866813a during this chat; persisted after detection that the daemon had not saved the answer file."
+}

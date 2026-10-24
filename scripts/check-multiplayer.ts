@@ -141,6 +141,15 @@ async function main() {
       roomId,
       action: { type: 'draw' },
     });
+    assert.ok(
+      before.turnDeadlineAt && before.turnDeadlineAt > Date.now(),
+      'Server publishes a human-turn deadline',
+    );
+    assert.equal(
+      drawn.room.game?.turnDeadlineAt,
+      before.turnDeadlineAt,
+      'Online draw preserves the original deadline',
+    );
     const repeatedDraw = (await actor.timeout(5000).emitWithAck('game:action', {
       roomId,
       action: { type: 'draw' },

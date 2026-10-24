@@ -12,6 +12,8 @@ import {
 import {
   ArrowLeft,
   ArrowRight,
+  ChevronLeft,
+  ChevronRight,
   Check,
   HelpCircle,
   Menu,
@@ -22,17 +24,22 @@ import {
   Trophy,
   Volume2,
   VolumeX,
+  X,
 } from "lucide-react";
 import { toast } from "sonner";
 import type { useUnoGame } from "../hooks/useUnoGame";
 import type { useUnoOnlineGame } from "../hooks/useUnoOnlineGame";
 import type { Card } from "../types/card";
+import { isActionCard } from "../types/card";
 import type { GameState } from "../types/game";
 import { canPlayCard } from "../lib/gameRules";
+import { getTableMood } from "../lib/rulePresets";
+import TurnCue from "./TurnCue";
 import { getPlayerExpression } from "../lib/playerExpression";
 import { getAudioSettings, setAudioSettings } from "../lib/audioSettings";
 import { usePhonePortrait } from "../hooks/usePhonePortrait";
 import { useGamePresentation } from "../hooks/useGamePresentation";
+import { useHandNavigation } from "../hooks/useHandNavigation";
 import PlayerProgress from "./PlayerProgress";
 import RoundSummary from "./RoundSummary";
 import OpponentSeat from "./OpponentSeat";
@@ -122,7 +129,6 @@ export default function GameBoard({
   } = api;
   const phonePortrait = usePhonePortrait();
   const root = useRef<HTMLDivElement>(null);
-  const hand = useRef<HTMLDivElement>(null);
   const [exit, setExit] = useState(false);
   const [menu, setMenu] = useState(false);
   const [help, setHelp] = useState(false);
@@ -161,6 +167,8 @@ export default function GameBoard({
         )
       : cards;
   }, [localPlayer?.hand, sort]);
+  const handNavigation = useHandNavigation(cards);
+  const { hand } = handNavigation;
   useEffect(() => {
     const scroller = hand.current;
     if (!scroller) return;
@@ -181,7 +189,7 @@ export default function GameBoard({
     const observer = new ResizeObserver(reveal);
     observer.observe(scroller);
     return () => observer.disconnect();
-  }, [inspectedId, sort]);
+  }, [inspectedId, sort, hand]);
   useEffect(() => {
     const timer = setTimeout(() => {
       pendingRef.current = false;
@@ -227,6 +235,10 @@ export default function GameBoard({
   useEffect(() => {
     function onKey(event: KeyboardEvent) {
       if (phonePortrait) return;
+      if (event.key === "Escape" && !document.querySelector("dialog[open]")) {
+        setInspectedId(null);
+        return;
+      }
       if (
         event.repeat ||
         event.ctrlKey ||
@@ -361,7 +373,15 @@ export default function GameBoard({
                     ? playable.length
                       ? `That card can’t stack. Choose a highlighted draw card or draw ${game.pendingDraw}.`
                       : `Draw ${game.pendingDraw} to take the penalty. No cards in your hand can stack.`
-                    : "That card doesn’t match. Choose another or draw."
+                    : !game.rules.canFinishWithActionCard &&
+                        isActionCard(selectedCard) &&
+                        (cards.length === 1 ||
+                          (selectedCard.value === "discardAll" &&
+                            cards.every(
+                              (card) => card.color === selectedCard.color,
+                            )))
+                      ? "This table needs a number card to finish. Draw to keep playing."
+                      : `Match ${activeColor}${top?.color !== "wild" && top ? ` or ${VALUES[top.value] ?? top.value}` : ""}, or play a wild.`
                   : game.pendingDraw
                     ? playable.length
                       ? "Stack a matching draw card, or take the penalty."
@@ -371,8 +391,15 @@ export default function GameBoard({
                       : "No matching card. Draw to keep the round moving.";
   return (
     <div
-      className={`game-page seats-${game.players.length} ${phonePortrait ? "needs-landscape" : ""} ${isLocalTurn ? "local-turn" : ""}`}
+      className={`game-page mood-${getTableMood(game.rules)} seats-${game.players.length} ${phonePortrait ? "needs-landscape" : ""} ${isLocalTurn ? "local-turn" : ""}`}
       ref={root}
+      onPointerDownCapture={(event) => {
+        if (
+          inspectedId &&
+          !(event.target as HTMLElement).closest(".hand-card, .move-dock")
+        )
+          setInspectedId(null);
+      }}
     >
       {phonePortrait && (
         <section
@@ -470,6 +497,13 @@ export default function GameBoard({
             />
           ))}
           <div className="table-center">
+            <div
+              className={`direction-path ${game.direction === -1 ? "direction-reversed" : ""}`}
+              aria-hidden="true"
+            >
+              <RotateCw />
+              <RotateCw />
+            </div>
             <div className="pile-zone">
               <button
                 data-draw-pile
@@ -551,6 +585,13 @@ export default function GameBoard({
           aria-label={`Your hand, ${cards.length} ${cards.length === 1 ? "card" : "cards"}`}
           data-seat={localPlayer.id}
         >
+          {canSayUno && <span className="sr-only">You can call UNO.</span>}
+          <TurnCue
+            game={game}
+            local={isLocalTurn}
+            choosing={!!pendingWild}
+            connected={!online || online.connected}
+          />
           {canSayUno && (
             <button
               className="button uno-button uno-ready hand-uno"
@@ -568,6 +609,7 @@ export default function GameBoard({
             </span>
           )}
           <div
+            id={handNavigation.id}
             className="hand-scroll"
             ref={hand}
             role="region"
@@ -585,6 +627,7 @@ export default function GameBoard({
               const index = buttons.indexOf(event.target as HTMLButtonElement);
               if (index < 0) return;
               event.preventDefault();
+              setInspectedId(null);
               const next =
                 event.key === "Home"
                   ? 0
@@ -610,12 +653,15 @@ export default function GameBoard({
               className={`hand-cards ${cards.length > 10 ? "large-hand" : ""}`}
             >
               {cards.map((card, i) => {
+                // Request locks block interaction without making the whole hand
+                // briefly lose/reacquire its legal-card lift and color.
                 const legal =
-                  canPlayCard(card, game, localPlayerIndex) &&
-                  !pendingWild &&
-                  !winner &&
-                  !pendingAction &&
-                  (!online || online.connected);
+                  canPlayCard(card, game, localPlayerIndex) && !winner;
+                const disabled =
+                  !!pendingWild ||
+                  !!winner ||
+                  pendingAction ||
+                  !!(online && !online.connected);
                 return (
                   <HandCard
                     key={card.id}
@@ -623,7 +669,17 @@ export default function GameBoard({
                     index={i}
                     count={cards.length}
                     playable={legal}
+                    disabled={disabled}
                     selected={inspectedId === card.id}
+                    tabIndex={handNavigation.tabStop === card.id ? 0 : -1}
+                    onFocus={() => {
+                      handNavigation.setFocusedId(card.id);
+                      const element = hand.current?.querySelector<HTMLElement>(
+                        `[data-hand-card="${card.id}"] .uno-card`,
+                      );
+                      if (hand.current && element?.matches(":focus-visible"))
+                        revealHandCard(hand.current, element);
+                    }}
                     onInspect={() =>
                       setInspectedId((id) => (id === card.id ? null : card.id))
                     }
@@ -634,12 +690,50 @@ export default function GameBoard({
               })}
             </div>
           </div>
+          {(handNavigation.edges.before || handNavigation.edges.after) && (
+            <div
+              className="hand-navigation"
+              aria-label="Browse your hand"
+              role="group"
+            >
+              <button
+                className="hand-page hand-page-previous"
+                aria-label="Show earlier cards"
+                aria-controls={handNavigation.id}
+                disabled={!handNavigation.edges.before}
+                onClick={() => handNavigation.scroll(-1)}
+              >
+                <ChevronLeft size={24} aria-hidden="true" />
+              </button>
+              <button
+                className="hand-page hand-page-next"
+                aria-label="Show more cards"
+                aria-controls={handNavigation.id}
+                disabled={!handNavigation.edges.after}
+                onClick={() => handNavigation.scroll(1)}
+              >
+                <ChevronRight size={24} aria-hidden="true" />
+              </button>
+            </div>
+          )}
           <div className="move-dock">
             <div
               className={`move-hint ${selectedCard || drawnThisTurn || (online && !online.connected) ? "" : "sr-only"}`}
               role="status"
             >
-              {moveHint}
+              {selectedCard && (
+                <strong className="inspected-label">{selectedLabel}</strong>
+              )}
+              <span>{moveHint}</span>
+              {selectedCard && (
+                <button
+                  className="inspection-dismiss"
+                  aria-label="Clear card inspection"
+                  onClick={() => setInspectedId(null)}
+                >
+                  <X size={16} aria-hidden="true" />
+                </button>
+              )}
             </div>
             <div className="move-buttons">
               {(isLocalTurn || canPlaySelected) && !pendingWild && !winner && (
@@ -682,6 +776,7 @@ export default function GameBoard({
       {pendingWild && !phonePortrait && (
         <ColorPicker
           playerName={localPlayer.name}
+          hand={cards.filter((card) => card.id !== pendingWild.id)}
           onSelect={(color) => act(() => api.confirmWildColor(color))}
           onCancel={() => {
             pendingRef.current = false;
@@ -856,6 +951,15 @@ export default function GameBoard({
             </p>
             <p>
               <strong>Win it.</strong> Get rid of every card in your hand.
+            </p>
+            <p>
+              <strong>Make it move.</strong> Tap a lifted card to play, or drag
+              it upward and release. Swipe sideways to browse a large hand.
+            </p>
+            <p>
+              <strong>Use your keyboard.</strong> Arrow keys browse cards; Enter
+              or Space plays. D draws, P passes, U calls UNO. Escape clears an
+              inspection. R, Y, G or B chooses a wild color.
             </p>
           </div>
           <div className="modal-footer">

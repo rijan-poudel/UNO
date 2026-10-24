@@ -1,0 +1,41 @@
+/* Six consistently framed human portraits; state remains text in the player label. */
+.portrait:global(.player-avatar) {
+  display: inline-block;
+  width: 44px;
+  height: 44px;
+  border: 3px solid #fff7e7;
+  border-radius: 50%;
+  background-color: #ffebdb;
+  background-size: 300% 200%;
+  background-repeat: no-repeat;
+  box-shadow: 0 4px 10px #061e4c40;
+  transform: none;
+}
+.portrait:global(.player-avatar.large) {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+}
+.portrait:global(.player-avatar)[data-expression] {
+  animation: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .portrait:global(.player-avatar):is(
+      [data-expression="happy"],
+      [data-expression="celebrate"],
+      [data-expression="surprised"]
+    ) {
+    animation: portrait-react 360ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+}
+@keyframes portrait-react {
+  0% {
+    transform: translateY(0) scale(1);
+  }
+  40% {
+    transform: translateY(-5px) scale(1.05);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}

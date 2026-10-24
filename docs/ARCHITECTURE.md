@@ -137,3 +137,25 @@ The original image and targeted composition edit were made with the built-in ima
 ### Closer game layout — October22 correction
 
 After the owner rejected the illustrated-room interface, `app/arena.css` coordinates piles with the held hand using a bottom-anchored pile lane. Desktop foreground geometry remains; opponent identities and card backs grow and sit closer to the action. On landscape phones the hand row reserves140px (116px at short heights), the fan retains a shallow arc, and every opponent retains its avatar. Compact identity grids keep names/counts from competing for width. Pass and invalid-inspection decisions live in a separate right-side lane above the hand; no ordinary HUD is added. The inherited room artwork, engine, gestures, card faces, presentation timing and orientation gate remain. `.impeccable/review/closer-table/` records the independent rejected-baseline assessment and corrective review; this supersedes the earlier layout approval, not the chosen room material.
+
+## Rule and turn boundaries
+
+`validateGameRules` validates known numeric and boolean rule fields at `initializeGame`, shared by offline and online play. A deal also reserves enough cards for a valid opener. `rulePreferences` owns device-default stacking and its one-time legacy preference migration; standard `defaultRules` still names the explicit Classic rule set. The server builds a valid new game before committing room flags or replacing a round.
+
+`GameState.drawnThisTurn` records a voluntary draw until `advanceTurn` resets it. Engine actions reject duplicate draws and premature passes, and online reconnection derives its UI from that authoritative field. UNO metadata preserves draw sequencing. Wild jump-in color selection belongs to the jumping player and suspends pending bot work until the choice resolves or cancels.
+
+### Hand navigation and wild focus continuity
+
+`useHandNavigation` owns the single hand Tab stop and overflow paging state. Native horizontal scrolling remains available; ResizeObserver measures the viewport and hand width, while scroll events update edge availability. GameBoard reveals keyboard focus within that scrollport, avoiding pointer-triggered recentering. UnoCard exposes its native tabIndex; hand faces retain button semantics instead of an unrelated toggle state.
+
+ColorPicker derives per-color counts from the local hand excluding the pending wild, then supports arrow/Home/End navigation and R/Y/G/B selection. Preparing an online wild publishes a metadata snapshot before play; useGamePresentation preserves the selected origin and focus intent through that snapshot, clearing it when cards actually change. This keeps the original card flight and restores focus to a neighboring card after confirmation.
+
+## Color play and automatic turns — October 24
+
+This supersedes historical visual-world notes above. `getTableMood` maps engine-supported rules to Classic blue, Stack party blue and Wild table plum without pretending to implement new editions. Home uses a small native fan and semantic start/room controls. `PlayerAvatar` uses the original six-person equal-cell portrait sheet; `OpponentSeat` keeps actual hand counts and catch state. `TurnCue` shows the published actor, direction, legal decision and human deadline, without owning actions.
+
+`lib/turnFlow.ts` shares the 30-second deadline policy, forced-penalty detection, bot pacing and immutable expiry outcome. `useUnoGame` stamps controller snapshots and resolves local timers against the live ref. Portrait pause extends the deadline without duplicating activity entries. The server synchronizes one room timer through its snapshot boundary, preserving deadlines across draws, metadata and reconnect. It automatically takes penalties only when no legal stack exists. Expiry cancels an unresolved wild choice, takes the required draw or passes an already drawn turn, publishes the snapshot and schedules the next controller. Room cleanup clears clocks. Optional `GameState.turnDeadlineAt` retains JSON compatibility; an older server omitting it does not receive an invented client deadline. Deploy the updated socket service together with the frontend to enable online timing.
+
+Bot draws are published as their own snapshot before their later play/pass. Existing `useGamePresentation` owns card travel and immediate sound; neither audio nor motion gates state. Background music defaults on at low volume after a user gesture, respects saved per-context/master settings, and keeps session preferences when storage is blocked. Reverse/skip/penalty audio adds bounded short tonal signatures to paper/contact effects.
+
+`check:multiplayer` now also exercises a real automatic +2 opener and an unattended 30-second human timeout, in addition to the prior room/reconnect suite. Review fixtures remain loopback-only under `.impeccable/review/experience-reset/`; they are never application routes or production socket services.

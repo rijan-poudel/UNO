@@ -80,6 +80,7 @@ export default function OpponentSeat({
           role="img"
           aria-label={`${count} ${count === 1 ? "card" : "cards"}`}
           data-wide={count >= 100 || undefined}
+          data-count={count}
         >
           <span aria-hidden="true">{count}</span>
         </span>

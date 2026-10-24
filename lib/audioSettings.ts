@@ -36,8 +36,8 @@ export const defaultAudioSettings: AudioSettings = {
 };
 
 export const defaultMusicContextSettings: MusicContextSettings = {
-  lobbyEnabled: false,
-  gameEnabled: false,
+  lobbyEnabled: true,
+  gameEnabled: true,
 };
 
 function parseStored(raw: string | null): Partial<AudioSettings> {
@@ -91,6 +91,7 @@ export function storedToUiVolume(stored: number): number {
 }
 
 let fallbackAudioSettings: AudioSettings | null = null;
+let fallbackMusicContextSettings: MusicContextSettings | null = null;
 
 export function getAudioSettings(): AudioSettings {
   if (typeof window === 'undefined') return { ...defaultAudioSettings };
@@ -117,6 +118,7 @@ export function setAudioSettings(partial: Partial<AudioSettings>): void {
 
 export function getMusicContextSettings(): MusicContextSettings {
   if (typeof window === 'undefined') return { ...defaultMusicContextSettings };
+  if (fallbackMusicContextSettings) return { ...fallbackMusicContextSettings };
   try {
     const raw = window.localStorage.getItem(MUSIC_CONTEXT_SETTINGS_KEY);
     return { ...defaultMusicContextSettings, ...parseMusicContextStored(raw) };
@@ -146,8 +148,9 @@ export function setMusicEnabledForContext(
       MUSIC_CONTEXT_SETTINGS_KEY,
       JSON.stringify(next),
     );
-    window.dispatchEvent(new CustomEvent('uno:audio-settings'));
+    fallbackMusicContextSettings = null;
   } catch {
-    // Ignore storage errors.
+    fallbackMusicContextSettings = next;
   }
+  window.dispatchEvent(new CustomEvent('uno:audio-settings'));
 }

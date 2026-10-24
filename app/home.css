@@ -1,196 +1,226 @@
-/* The opening hand: three native card controls, ready to deal the visitor in. */
+/* Color play title screen: live-card character, quiet space and one start action. */
 .launch-screen {
+  --stage: #123d86;
+  --stage-light: #1d56a3;
   position: relative;
+  isolation: isolate;
   display: flex;
   flex-direction: column;
   min-height: 100dvh;
   overflow: clip;
-  color: #fff4d6;
-  background: #15151b;
-  isolation: isolate;
+  color: #fff7e7;
+  background: radial-gradient(
+    ellipse at 50% 32%,
+    var(--stage-light),
+    var(--stage) 75%
+  );
 }
-.launch-screen::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: url("/artwork/comic-frame.webp") center / 100% 100% no-repeat;
-  pointer-events: none;
+.mood-stack {
+  --stage: #143975;
+  --stage-light: #2259a1;
+}
+.mood-wild {
+  --stage: #302247;
+  --stage-light: #523466;
 }
 .launch-header .app-header {
-  height: 72px;
-  padding-inline: clamp(20px, 4vw, 64px);
-  color: #fff4d6;
-}
-.launch-header .settings-trigger {
+  height: 76px;
+  padding-inline: clamp(20px, 4vw, 60px);
   color: inherit;
-  border-color: transparent;
-  background: transparent;
-  font-family: var(--font-card), sans-serif;
-  font-size: 23px;
-  font-style: italic;
-  font-weight: 800;
-  text-transform: uppercase;
+}
+.launch-screen .launch-header .settings-trigger {
+  color: #fff7e7;
+  background: #ffffff12;
+  border: 0;
+  font:
+    600 14px var(--font-body),
+    sans-serif;
+  text-transform: none;
+  min-height: 44px;
+  border-radius: 12px;
+}
+.launch-header .wordmark {
+  color: inherit;
 }
 .launch-main {
+  width: min(760px, 100%);
+  margin: auto;
+  padding: 12px 24px 20px;
   display: flex;
-  flex: 1;
   flex-direction: column;
   align-items: center;
-  width: 100%;
-  padding: 0 20px;
+  gap: 16px;
 }
 .launch-heading {
-  position: relative;
-  z-index: 4;
   text-align: center;
 }
 .launch-heading h1 {
-  display: inline-block;
   margin: 0;
-  color: #fff4d6;
+  color: #fff7e7;
   font-family: var(--font-card), sans-serif;
-  font-size: clamp(108px, 17dvh, 176px);
-  font-style: italic;
+  font-size: 96px;
+  line-height: 0.85;
   font-weight: 800;
-  line-height: 0.82;
+  font-style: italic;
   letter-spacing: -0.025em;
-  transform: scaleX(1.45) rotate(-3deg);
+}
+.launch-heading h1 > span {
+  color: #ffd45a;
 }
 .launch-heading p {
-  margin-top: 16px;
-  font-size: clamp(19px, 2vw, 28px);
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  margin: 16px 0 0;
+  color: #dae8ff;
+  font-size: 19px;
+  font-weight: 500;
 }
-.launch-stage {
-  --menu-height: clamp(300px, 49dvh, 550px);
+.title-card-fan {
   position: relative;
-  display: grid;
-  place-items: center;
-  width: 100%;
-  margin: 25px 0 30px;
-}
-.launch-hand {
-  position: relative;
-  z-index: 2;
-  width: calc(var(--menu-height) * 2.05);
-  height: var(--menu-height);
-  max-width: 90vw;
-}
-.launch-card {
-  --card-rotation: 0deg;
-  --card-lift: 0px;
-  position: absolute;
-  top: 0;
-  width: 34%;
-  height: 100%;
-  transform: translateY(var(--card-lift)) rotate(var(--card-rotation));
-  transform-origin: 50% 85%;
-  transition: transform 280ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-.launch-card-main {
-  z-index: 3;
-  left: 33%;
-}
-.launch-card-create {
-  --card-rotation: -12deg;
-  --card-lift: 24px;
-  z-index: 1;
-  left: 0;
-}
-.launch-card-join {
-  --card-rotation: 12deg;
-  --card-lift: 24px;
-  z-index: 2;
-  right: 0;
-}
-.launch-card:focus-within {
-  z-index: 5;
-  transform: translateY(-16px) rotate(0deg);
-}
-.launch-cast {
-  position: absolute;
-  bottom: -100px;
-  left: 50%;
-  z-index: 1;
-  width: min(1800px, 116vw);
-  height: min(360px, 28vw);
-  margin: 0;
+  width: 240px;
+  height: 118px;
+  margin: 20px auto 0;
   pointer-events: none;
-  transform: translateX(-50%);
 }
-.launch-cast img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  object-position: bottom;
+.title-card-fan > span {
+  position: absolute;
+  bottom: 0;
+  left: calc(50% + (var(--title-i) - 1.5) * 38px);
+  transform: translateX(-50%)
+    translateY(calc((var(--title-i) - 1.5) * (var(--title-i) - 1.5) * 8px))
+    rotate(calc((var(--title-i) - 1.5) * 13deg));
+  transform-origin: 50% 110%;
+}
+.title-card-fan .uno-card {
+  --card-scale: 0.88 !important;
 }
 .launch-play {
-  position: relative;
-  z-index: 4;
-  width: min(600px, 90vw);
+  width: min(400px, 100%);
 }
-.launch-extras {
+.launch-presets {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 12px;
+  background: #061e4c55;
+}
+.launch-presets button {
+  flex: 1;
+  min-height: 44px;
+  padding: 8px;
+  background: transparent;
+  color: #dce9ff;
+  border: 0;
+  border-radius: 9px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 160ms,
+    color 160ms;
+}
+.launch-presets button[aria-pressed="true"] {
+  background: #fff7e7;
+  color: #17345f;
+  box-shadow: 0 3px 8px #061c4540;
+}
+.launch-preset-description {
+  min-height: 38px;
+  max-width: 40ch;
+  margin: 10px auto 16px;
+  text-align: center;
+  font-size: 13px;
+  line-height: 1.4;
+  color: #dce9ff;
+}
+.launch-screen .launch-primary {
+  width: 100%;
+  min-height: 70px;
+  justify-content: space-between;
+  padding: 12px 22px;
+  border: 0;
+  border-radius: 14px;
+  background: #ffd45a;
+  color: #38290c;
+  box-shadow:
+    inset 0 -4px 0 #bf8a28,
+    0 8px 18px #061e4c45;
+  text-align: left;
+  font-size: 24px;
+  font-weight: 750;
+}
+.launch-primary small {
+  display: block;
+  margin-top: 1px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #5a410f;
+}
+.launch-rooms {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  gap: 12px;
+  margin-top: 14px;
+}
+.launch-screen .launch-rooms .button {
+  min-height: 52px;
+  padding: 10px 12px;
+  border: 1px solid #b1d1ff55;
+  border-radius: 12px;
+  background: #ffffff0c;
+  color: #fff7e7;
+  font-size: 14px;
+  gap: 8px;
+}
+.launch-extras {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 12px;
 }
 .launch-text-action {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  min-height: 54px;
-  padding: 10px 14px;
-  border: 2px solid #fff4d6;
-  border-radius: 8px;
-  background: #15151b;
-  color: #fff4d6;
-  font-family: var(--font-card), sans-serif;
-  font-size: 25px;
-  font-style: italic;
-  font-weight: 800;
-  text-transform: uppercase;
+  gap: 6px;
+  min-height: 44px;
+  padding: 6px 4px;
+  border: 0;
+  background: transparent;
+  color: #dce9ff;
+  font-size: 13px;
+  font-weight: 500;
   cursor: pointer;
-  transition:
-    background 140ms,
-    color 140ms,
-    transform 140ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-.launch-text-action:active {
-  transform: scale(0.97);
 }
 .launch-text-action[aria-expanded="true"] > svg:last-child {
   transform: rotate(180deg);
 }
-.launch-screen :focus-visible {
-  outline: 3px solid #ffce00;
-  outline-offset: 5px;
-}
 .launch-rules {
-  margin-top: 20px;
-  padding-block: 16px;
-  border-block: 1px solid #fff4d655;
-  font-size: 16px;
+  margin-top: 12px;
+  padding: 16px 0;
+  border-top: 1px solid #b1d1ff55;
+  font-size: 14px;
   line-height: 1.6;
+  color: #e2edff;
 }
 .launch-rules p + p {
-  margin-top: 10px;
+  margin-top: 8px;
+}
+.launch-screen :focus-visible {
+  outline: 3px solid #ffd45a;
+  outline-offset: 4px;
 }
 .launch-progress {
-  position: relative;
-  z-index: 4;
-  width: min(660px, 100%);
+  width: min(420px, 100%);
   text-align: center;
 }
 .launch-progress:empty {
   display: none;
 }
 .launch-progress .player-progress {
-  --ui-muted: #c8c4b9;
-  --ui-text: #fff4d6;
-  margin: 20px 0 0;
+  --ui-text: #fff7e7;
+  --ui-muted: #dce9ff;
+  --ui-line: #b1d1ff55;
+  margin: 0;
 }
 .launch-progress .progress-record,
 .launch-progress .milestone-collection summary {
@@ -200,105 +230,48 @@
   margin-inline: auto;
 }
 .launch-footer {
-  z-index: 4;
-  padding: 20px 20px 18px;
-  font-size: 14px;
+  padding: 16px 20px 24px;
   text-align: center;
-}
-.launch-card:active {
-  transform: translateY(-4px) rotate(0deg) scale(0.98);
+  color: #c6dcff;
+  font-size: 13px;
 }
 @media (hover: hover) and (pointer: fine) {
-  .launch-card:hover {
-    z-index: 5;
-    transform: translateY(-16px) rotate(0deg);
+  .launch-screen .launch-header .settings-trigger:hover {
+    color: #fff7e7;
+    background: #ffffff20;
   }
+  .launch-screen .launch-rooms .button:hover,
   .launch-text-action:hover {
-    background: #fff4d6;
-    color: #15151b;
+    background: #ffffff1c;
   }
-}
-@media (prefers-reduced-motion: no-preference) {
-  .launch-card {
-    animation: opening-deal 550ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
-  }
-  .launch-card-create {
-    animation-delay: 50ms;
-  }
-  .launch-card-join {
-    animation-delay: 100ms;
-  }
-  @keyframes opening-deal {
-    from {
-      transform: translateY(38px) rotate(0deg) scale(0.94);
-    }
+  .launch-presets button:hover:not([aria-pressed="true"]) {
+    background: #ffffff14;
   }
 }
 @media (max-width: 700px) {
   .launch-header .app-header {
     height: 64px;
-  }
-  .launch-header .settings-trigger {
-    font-size: 19px;
+    padding-inline: 20px;
   }
   .launch-main {
-    padding-inline: 16px;
+    padding: 20px 24px;
+    gap: 22px;
   }
   .launch-heading h1 {
-    font-size: clamp(100px, 16dvh, 142px);
+    font-size: 96px;
   }
   .launch-heading p {
-    margin-top: 14px;
-    font-size: 20px;
+    font-size: 17px;
   }
-  .launch-stage {
-    --menu-height: 280px;
-    margin: 24px 0 26px;
+  .title-card-fan {
+    height: 128px;
+    margin-top: 24px;
   }
-  .launch-hand {
-    width: min(520px, 88vw);
-    max-width: none;
-    height: 350px;
+  .title-card-fan .uno-card {
+    --card-scale: 0.93 !important;
   }
-  .launch-card-main {
-    left: 23%;
-    width: 54%;
-    height: 78%;
-  }
-  .launch-card-create,
-  .launch-card-join {
-    --card-lift: 0px;
-    top: 51%;
-    width: 48%;
-    height: 49%;
-    z-index: 4;
-  }
-  .launch-card-create {
-    --card-rotation: -8deg;
-  }
-  .launch-card-join {
-    --card-rotation: 8deg;
-  }
-  .launch-cast {
-    bottom: -34px;
-    width: 160vw;
-    height: 160px;
-    opacity: 0.7;
-  }
-  .launch-text-action {
-    min-height: 48px;
-    padding: 8px;
-    gap: 7px;
-    font-size: 21px;
-  }
-  .launch-text-action svg {
-    width: 17px;
-  }
-  .launch-extras {
-    gap: 10px;
-  }
-  .launch-footer {
-    margin-top: auto;
+  .launch-presets button {
+    font-size: 13px;
   }
 }
 @media (orientation: landscape) and (max-height: 540px) and (min-width: 541px) {
@@ -307,85 +280,74 @@
     padding-inline: 22px;
   }
   .launch-main {
+    width: min(900px, 100%);
     display: grid;
-    grid-template-columns: 32% 1fr;
+    grid-template-columns: 0.85fr 1.15fr;
     align-content: center;
-    gap: 12px 22px;
-    padding: 0 34px 16px;
-  }
-  .launch-heading {
-    grid-column: 1;
-    grid-row: 1;
+    gap: 16px 36px;
+    padding: 8px 32px 16px;
   }
   .launch-heading h1 {
-    font-size: clamp(72px, 20dvh, 108px);
-    transform: scaleX(1.2) rotate(-3deg);
+    font-size: 80px;
   }
   .launch-heading p {
-    font-size: 17px;
+    font-size: 15px;
     margin-top: 10px;
   }
-  .launch-stage {
-    --menu-height: min(63dvh, 270px);
-    grid-column: 2;
-    grid-row: 1 / 3;
-    margin: 0;
+  .title-card-fan {
+    width: 190px;
+    height: 100px;
+    margin-top: 14px;
   }
-  .launch-hand {
-    width: 100%;
-    max-width: 100%;
-    height: var(--menu-height);
+  .title-card-fan > span {
+    left: calc(50% + (var(--title-i) - 1.5) * 26px);
   }
-  .launch-card-main {
-    left: 33%;
-    width: 34%;
-    height: 100%;
-  }
-  .launch-card-create,
-  .launch-card-join {
-    top: 0;
-    width: 34%;
-    height: 100%;
-    z-index: 1;
-    --card-lift: 12px;
+  .title-card-fan .uno-card {
+    --card-scale: 0.68 !important;
   }
   .launch-play {
-    grid-column: 1;
-    grid-row: 2;
     width: 100%;
   }
-  .launch-extras {
-    grid-template-columns: 1fr;
+  .launch-preset-description {
+    margin: 6px auto 8px;
+    min-height: 30px;
+    font-size: 12px;
+  }
+  .launch-screen .launch-primary {
+    min-height: 58px;
+    font-size: 21px;
+    padding: 9px 16px;
+  }
+  .launch-rooms {
+    margin-top: 10px;
     gap: 8px;
   }
-  .launch-text-action {
+  .launch-screen .launch-rooms .button {
+    font-size: 12px;
+    padding: 6px;
     min-height: 44px;
-    font-size: 20px;
   }
-  .launch-rules {
-    font-size: 14px;
+  .launch-extras {
+    margin-top: 4px;
   }
-  .launch-cast {
-    bottom: -38px;
-    width: 120%;
-    height: 130px;
+  .launch-text-action {
+    font-size: 12px;
+  }
+  .launch-presets button {
+    min-height: 36px;
+    font-size: 12px;
+    padding: 6px 2px;
+  }
+  .launch-progress {
+    grid-column: 1/-1;
   }
   .launch-footer {
     display: none;
   }
-  .launch-progress {
-    grid-column: 1 / -1;
-  }
 }
 @media (prefers-reduced-motion: reduce) {
-  .launch-card,
   .launch-screen button {
     transition: none;
     animation: none;
-  }
-  .launch-card:hover,
-  .launch-card:focus-within,
-  .launch-card:active {
-    transform: translateY(var(--card-lift)) rotate(var(--card-rotation));
   }
 }

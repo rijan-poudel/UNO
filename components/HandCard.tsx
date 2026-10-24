@@ -20,7 +20,10 @@ interface Props {
   index: number;
   count: number;
   playable: boolean;
+  disabled: boolean;
   selected: boolean;
+  tabIndex: number;
+  onFocus: () => void;
   onInspect: () => void;
   onPlay: (element: HTMLElement) => void;
   onDragChange: (state: "lifting" | "ready" | null) => void;
@@ -30,7 +33,10 @@ export default function HandCard({
   index,
   count,
   playable,
+  disabled,
   selected,
+  tabIndex,
+  onFocus,
   onInspect,
   onPlay,
   onDragChange,
@@ -54,8 +60,10 @@ export default function HandCard({
       if (element) element.style.opacity = "";
       gesture.current = null;
       suppressClick.current = false;
-      wrapper?.classList.remove("dragging-card");
-      if (wrapper) onDragChange(null);
+      if (wrapper?.classList.contains("dragging-card")) {
+        wrapper.classList.remove("dragging-card");
+        onDragChange(null);
+      }
     };
     const onVisibility = () => {
       if (document.hidden) interrupt();
@@ -69,7 +77,7 @@ export default function HandCard({
       document.removeEventListener("visibilitychange", onVisibility);
       interrupt();
     };
-  }, [playable, onDragChange]);
+  }, [playable, disabled, onDragChange]);
   // Bound the spread for large hands; extra cards scroll instead of shrinking.
   const position =
     count < 2 ? 0 : (index - (count - 1) / 2) / Math.max(3, (count - 1) / 2);
@@ -131,6 +139,7 @@ export default function HandCard({
       ref={root}
       className={`hand-card ${playable ? "legal-card" : "quiet-card"} ${selected ? "inspected-card" : ""}`}
       data-hand-card={card.id}
+      onFocus={onFocus}
       style={
         {
           "--fan-angle": `${position * 16}deg`,
@@ -143,7 +152,13 @@ export default function HandCard({
         if (event.detail === 0) suppressClick.current = false;
       }}
       onPointerDown={(event) => {
-        if (!event.isPrimary || event.button !== 0 || gesture.current) return;
+        if (
+          disabled ||
+          !event.isPrimary ||
+          event.button !== 0 ||
+          gesture.current
+        )
+          return;
         primeTableAudioFromUserGesture();
         suppressClick.current = false;
         ghost.current?.remove();
@@ -164,6 +179,10 @@ export default function HandCard({
       onPointerMove={(event) => {
         const start = gesture.current;
         if (!start || start.id !== event.pointerId || !playable) return;
+        if (disabled) {
+          finish(event, true);
+          return;
+        }
         if (event.buttons !== 1) {
           finish(event, true);
           return;
@@ -226,8 +245,11 @@ export default function HandCard({
         sizeMultiplier={1.45}
         isPlayable={playable}
         isSelected={selected}
+        tabIndex={tabIndex}
+        disabled={disabled}
         ariaLabel={`${playable ? "Play" : "Inspect"} ${card.color === "wild" ? "" : card.color + " "}${({ skip: "skip", reverse: "reverse", draw2: "draw two", wild4: "wild draw four", wild: "wild", shuffle: "shuffle hands", discardAll: "discard all" } as Record<string, string>)[card.value] ?? card.value}${playable ? "" : ", not playable now"}`}
         onClick={() => {
+          if (disabled) return;
           if (suppressClick.current) {
             suppressClick.current = false;
             return;

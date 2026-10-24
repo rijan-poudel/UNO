@@ -1,0 +1,55 @@
+{
+  "scope": "October 24 Color play redesign",
+  "findings": 126,
+  "tokenAdvisories": 122,
+  "tokenDisposition": "User approved replacing the visual world. Documenter will record shipped colors, radii and typography; no token advisories are suppressed.",
+  "pressedControlFindings": [
+    {
+      "antipattern": "side-tab",
+      "name": "Side-tab accent border",
+      "description": "Thick colored border on one side of a card — the most recognizable tell of AI-generated UIs. Use a subtler accent or remove it entirely.",
+      "severity": "warning",
+      "category": "slop",
+      "file": "/Users/rizx/projects/UNO/app/home.css",
+      "line": 135,
+      "snippet": ".launch-screen .launch-primary — inset box-shadow 4px stripe (bottom)"
+    },
+    {
+      "antipattern": "side-tab",
+      "name": "Side-tab accent border",
+      "description": "Thick colored border on one side of a card — the most recognizable tell of AI-generated UIs. Use a subtler accent or remove it entirely.",
+      "severity": "warning",
+      "category": "slop",
+      "file": "/Users/rizx/projects/UNO/app/arena.css",
+      "line": 1026,
+      "snippet": ".turn-cue-local .turn-message — inset box-shadow 3px stripe (bottom)"
+    },
+    {
+      "antipattern": "side-tab",
+      "name": "Side-tab accent border",
+      "description": "Thick colored border on one side of a card — the most recognizable tell of AI-generated UIs. Use a subtler accent or remove it entirely.",
+      "severity": "warning",
+      "category": "slop",
+      "file": "/Users/rizx/projects/UNO/app/club.css",
+      "line": 118,
+      "snippet": ".button.primary — inset box-shadow 3px stripe (bottom)"
+    },
+    {
+      "antipattern": "side-tab",
+      "name": "Side-tab accent border",
+      "description": "Thick colored border on one side of a card — the most recognizable tell of AI-generated UIs. Use a subtler accent or remove it entirely.",
+      "severity": "warning",
+      "category": "slop",
+      "file": "/Users/rizx/projects/UNO/app/club.css",
+      "line": 563,
+      "snippet": ".color-choice — inset box-shadow 3px stripe (bottom)"
+    }
+  ],
+  "pressedDisposition": "Intentional approved physical button/turn-cue depth; persisted only rule/value/file-specific exceptions for home.css, arena.css and club.css. No rule or file disabled.",
+  "realFixes": [
+    "Phone pile/nameplate spacing",
+    "Singular card count",
+    "Removed giant character/painted-menu composition"
+  ],
+  "standing": "Inherited globals.css baseline advisories are outside changed source; historic reference values are not mechanically rewritten."
+}

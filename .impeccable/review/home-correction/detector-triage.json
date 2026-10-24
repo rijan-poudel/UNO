@@ -1,0 +1,10 @@
+{
+  "scan_count": 1,
+  "total": 58,
+  "counts": {
+    "design-system-font-size": 37,
+    "design-system-radius": 7,
+    "design-system-color": 14
+  },
+  "disposition": "All findings advisory against the old DESIGN.md. Final documenter records actual intentional home type and raster card geometry; inherited shared styles remain as documented. No new ignores and no second detector scan."
+}

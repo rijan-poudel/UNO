@@ -1,0 +1,225 @@
+{
+  "title": "Make the cards the main event",
+  "question": "Choose the visual world for the full redesign. All paths include a calmer home, a held hand, visible turn direction, a real countdown, automatic forced penalties, and stronger card motion and sound.",
+  "options": [
+    {
+      "id": "assigned",
+      "label": "After-hours arcade",
+      "kicker": "THE ROLL",
+      "lineage": "Night-time arcade title screens and shared card nights",
+      "thesis": "A quiet plum stage makes every card throw, reverse and penalty the star.",
+      "palette": [
+        "#26172e",
+        "#3b2545",
+        "#ffd45a",
+        "#fff5e8"
+      ],
+      "materials": [
+        "matte stage",
+        "bright printed cards",
+        "soft contact shadows"
+      ],
+      "viewport": "Compact UNO wordmark, three opponents around a clear central pile, direction chevrons and an amber 24s turn ring; a held fan fills the bottom.",
+      "risk": "Too dark would feel severe; keep faces bright and controls friendly.",
+      "raised": [
+        {
+          "from": "challenger-versailles",
+          "raise": "A single clear center, with every turn effect choreographed around it."
+        },
+        {
+          "from": "challenger-earth",
+          "raise": "Make accumulated penalties feel physically heavier without changing the deck."
+        },
+        {
+          "from": "challenger-darkroom",
+          "raise": "Each action gets one visible beginning, landing and handoff."
+        },
+        {
+          "from": "challenger-minihompy",
+          "raise": "Keep the whole composition readable at small sizes."
+        },
+        {
+          "from": "challenger-magazine",
+          "raise": "One dominant focal point, with secondary content genuinely quiet."
+        },
+        {
+          "from": "challenger-console",
+          "raise": "Only real state receives accent color; leave and reset remain separated."
+        }
+      ],
+      "comp": ".impeccable/mocks/decision/reset-after-hours.png"
+    },
+    {
+      "id": "model-pick",
+      "label": "Color court",
+      "kicker": "IMPECCABLE’S PICK",
+      "lineage": "Friendly recreational courts and modern casual games",
+      "thesis": "A warm, open playing field gives the game a bright, welcoming rhythm.",
+      "palette": [
+        "#f3f0e6",
+        "#254c49",
+        "#ffcf47",
+        "#ee5146"
+      ],
+      "materials": [
+        "clean color fields",
+        "native printed cards",
+        "pressed controls"
+      ],
+      "viewport": "Quiet ivory home with one yellow Play control; inside a muted teal court, opponents and piles gather closely above a generous held hand.",
+      "risk": "The familiar casual-game direction; distinction depends on excellent card handling.",
+      "comp": ".impeccable/mocks/decision/reset-color-court.png"
+    },
+    {
+      "id": "challenger-versailles",
+      "label": "Garden choreography",
+      "lineage": "architecture-inhabitable-space-versailles-bosquet-vistas",
+      "verdict": "declined",
+      "thesis": "Garden axes would become fixed player positions and sequential water cues would become card effects.",
+      "palette": [
+        "#315b39",
+        "#d6c19b"
+      ],
+      "materials": [
+        "source visual system"
+      ],
+      "viewport": "Garden axes would become fixed player positions and sequential water cues would become card effects; formal gardens lose both social familiarity and action clarity.",
+      "case": "Garden axes would become fixed player positions and sequential water cues would become card effects; formal gardens lose both social familiarity and action clarity.",
+      "kept": "A single clear center, with every turn effect choreographed around it.",
+      "risk": "Formal geometry could make a casual card night feel ceremonial.",
+      "hero": "https://impeccable.style/worlds/cards/architecture-inhabitable-space-versailles-bosquet-vistas-hero.webp",
+      "board": "https://impeccable.style/worlds/cards/architecture-inhabitable-space-versailles-bosquet-vistas.webp"
+    },
+    {
+      "id": "challenger-earth",
+      "label": "Coiled earth",
+      "lineage": "clay-ceramics-fracture-coiled-earth-tower",
+      "verdict": "declined",
+      "thesis": "Coil bands could carry penalty accumulation.",
+      "palette": [
+        "#925c42",
+        "#e6c4a5"
+      ],
+      "materials": [
+        "source visual system"
+      ],
+      "viewport": "Coil bands could carry penalty accumulation; clay loses both native-card recognition and instant turn clarity.",
+      "case": "Coil bands could carry penalty accumulation; clay loses both native-card recognition and instant turn clarity.",
+      "kept": "Make accumulated penalties feel physically heavier without changing the deck.",
+      "risk": "Clay material also recalls a previously rejected toy-like direction.",
+      "hero": "https://impeccable.style/worlds/cards/clay-ceramics-fracture-coiled-earth-tower-hero.webp",
+      "board": "https://impeccable.style/worlds/cards/clay-ceramics-fracture-coiled-earth-tower.webp"
+    },
+    {
+      "id": "challenger-darkroom",
+      "label": "Safelight sequence",
+      "lineage": "signals-instruments-darkroom-safelight-bay",
+      "verdict": "declined",
+      "thesis": "Fixed development stations could frame draw, play and hand.",
+      "palette": [
+        "#462921",
+        "#efaa49"
+      ],
+      "materials": [
+        "source visual system"
+      ],
+      "viewport": "Fixed development stations could frame draw, play and hand; photographic chemistry loses social recognition and introduces a false sequence.",
+      "case": "Fixed development stations could frame draw, play and hand; photographic chemistry loses social recognition and introduces a false sequence.",
+      "kept": "Each action gets one visible beginning, landing and handoff.",
+      "risk": "Amber-only imagery would weaken the four-color game.",
+      "hero": "https://impeccable.style/worlds/cards/signals-instruments-darkroom-safelight-bay-hero.webp",
+      "board": "https://impeccable.style/worlds/cards/signals-instruments-darkroom-safelight-bay.webp"
+    },
+    {
+      "id": "challenger-minihompy",
+      "label": "Miniature room",
+      "lineage": "cyworld-minihompy-room",
+      "verdict": "declined",
+      "thesis": "Room objects could host Play and Friends.",
+      "palette": [
+        "#c4b5d7",
+        "#fae6ca"
+      ],
+      "materials": [
+        "source visual system"
+      ],
+      "viewport": "Room objects could host Play and Friends; an isometric room loses both compactness and immediate card focus for this brief.",
+      "case": "Room objects could host Play and Friends; an isometric room loses both compactness and immediate card focus for this brief.",
+      "kept": "Keep the whole composition readable at small sizes.",
+      "risk": "Decorative furnishings repeat the clutter the owner rejected.",
+      "hero": "https://impeccable.style/worlds/cards/cyworld-minihompy-room-hero.webp",
+      "board": "https://impeccable.style/worlds/cards/cyworld-minihompy-room.webp"
+    },
+    {
+      "id": "challenger-magazine",
+      "label": "Printed issue",
+      "lineage": "brand-identity-canon-art-paul-magazine-program",
+      "verdict": "declined",
+      "thesis": "A masthead and two columns could hold play and rooms.",
+      "palette": [
+        "#181818",
+        "#fff6e4",
+        "#e94738"
+      ],
+      "materials": [
+        "source visual system"
+      ],
+      "viewport": "A masthead and two columns could hold play and rooms; editorial reading loses both game energy and immediacy.",
+      "case": "A masthead and two columns could hold play and rooms; editorial reading loses both game energy and immediacy.",
+      "kept": "One dominant focal point, with secondary content genuinely quiet.",
+      "risk": "A magazine can feel like a landing page instead of a game.",
+      "hero": "https://impeccable.style/worlds/cards/brand-identity-canon-art-paul-magazine-program-hero.webp",
+      "board": "https://impeccable.style/worlds/cards/brand-identity-canon-art-paul-magazine-program.webp"
+    },
+    {
+      "id": "challenger-console",
+      "label": "Graphite console",
+      "lineage": "digital-design-canon-dark-first-developer-console",
+      "verdict": "declined",
+      "thesis": "Persistent panels could show hand, turn and history.",
+      "palette": [
+        "#202227",
+        "#8fc4f5"
+      ],
+      "materials": [
+        "source visual system"
+      ],
+      "viewport": "Persistent panels could show hand, turn and history; work-console grammar loses playful identification and makes a single turn harder to scan.",
+      "case": "Persistent panels could show hand, turn and history; work-console grammar loses playful identification and makes a single turn harder to scan.",
+      "kept": "Only real state receives accent color; leave and reset remain separated.",
+      "risk": "Tiled panels would turn the game into the dashboard being removed.",
+      "hero": "https://impeccable.style/worlds/cards/digital-design-canon-dark-first-developer-console-hero.webp",
+      "board": "https://impeccable.style/worlds/cards/digital-design-canon-dark-first-developer-console.webp"
+    }
+  ],
+  "reroll": {
+    "registers": [
+      "safer",
+      "bolder"
+    ]
+  },
+  "buildPath": {
+    "value": "comp",
+    "toggle": true
+  },
+  "canon": true,
+  "canonCard": {
+    "label": "Classic casual-game arena",
+    "thesis": "The familiar bright blue card-game screen, executed with care.",
+    "palette": [
+      "#123a86",
+      "#ffffff",
+      "#ffcd38",
+      "#ec303f"
+    ],
+    "materials": [
+      "smooth blue field",
+      "bright plastic controls",
+      "native cards"
+    ],
+    "viewport": "Centered Play on home; a clean blue multiplayer arena, corner identities, obvious countdown and bottom-held hand.",
+    "risk": "Intentionally conventional; it may feel similar to other online card games.",
+    "comp": ".impeccable/mocks/decision/reset-classic.png"
+  },
+  "steer": true
+}

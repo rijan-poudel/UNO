@@ -1,5 +1,11 @@
 # Product
 
+## October 24 — Color play experience replacement (current authority)
+
+The owner rejects the congested character/card title screen and sparse game board, then explicitly approves combining the three new previews and delegates continuation: Classic supplies the blue arena and vivid cards, Color court supplies illustrated human portraits, After-hours supplies amber turn cues and action feedback. The new title screen has one primary Play action with smaller Create/Join controls; no giant cast or painted card buttons. Shared components serve every mode, with supported presets changing mood: Classic blue, Stack party deeper blue, Wild table plum. No Mercy remains future work until its engine exists. This supersedes earlier comic-world and no-visible-turn-HUD guidance.
+
+The owner confirms a real countdown with automatic draw/pass. Human turns last 30 seconds; drawing or metadata cannot restart that clock. Unavoidable penalties resolve automatically after a short reaction; legal stacking remains a choice. Online deadlines belong to the server. Bots publish a draw separately from the following play/pass, with 1.15-second pacing. Low music starts after interaction by default; saved mute/music preferences remain authoritative. Local phone portrait pauses its timer; online rounds continue.
+
 ## October 23 whole-site identity replacement
 
 The owner rejected the Microsoft AI Copilot feeling across the entire site and selected **Comic-card showdown** in the direction chooser, with a comp-led build, then delegated continuation. This replaces the prior visual identity across home, bot setup, online rooms, preferences, notifications, progress, results and arena chrome. Use confident black ink, warm-white panels, the native four-color palette, condensed italic display lettering, a new original comic cast and drawn ink accents. Preserve the existing engine, native card faces, held hand, direct play, accessible state, phone landscape gameplay, honest device-local history and immediate sound. This visual replacement supersedes previous palette, home artwork style and display-lettering constraints; it does not authorize changing game rules or replacing card handling.
@@ -86,3 +92,9 @@ The owner prioritizes the UI and the feeling of playing together. Landscape home
 ## October 23 arena background choice
 
 The owner rejected the room-image/blue-table split and explicitly chose “A colorful UNO-style arena without a room.” This supersedes the illustrated-room requirement for the live game background. Use a cohesive colorful arena with clear space for live cards; preserve the home artwork and game mechanics.
+
+### Default table and home correction
+
+Normal new tables use same-type stacking: +2 on +2, +4 on +4. Cross-type +4-on-+2 remains an explicit house rule; Classic remains an explicit preset. Old untouched Classic defaults migrate once; later explicit Classic preferences persist. Active rounds keep their rules until a new table is set up.
+
+The user rejected the centered cream-poster homepage after the first comic pass. The selected replacement is the opening-hand title screen (b866813a): the menu itself is a hand of native illustrated cards, Play forward, Create and Join alongside. Keep controls semantic and immediate. A prior review is not approval when user evidence contradicts it.

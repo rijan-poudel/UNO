@@ -1,0 +1,10 @@
+
+> uno@0.1.0 check:multiplayer
+> tsx scripts/check-multiplayer.ts && tsx scripts/check-turn-network.ts
+
+(node:85329) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+Passed: create/join/kick, six seats, stable IDs, separate bot broadcasts, turn pacing, reconnect, last-human refresh, and overlapping connection handoff.
+(node:85362) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+Server countdown passed: 30-second expiry, automatic draw/pass, metadata continuity and next-player deadline.
