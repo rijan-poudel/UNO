@@ -3,6 +3,7 @@
 import {
   useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -25,6 +26,9 @@ import {
   Volume2,
   VolumeX,
   X,
+  AlertCircle,
+  Clock,
+  Zap,
 } from "lucide-react";
 import { toast } from "sonner";
 import type { useUnoGame } from "../hooks/useUnoGame";
@@ -32,7 +36,7 @@ import type { useUnoOnlineGame } from "../hooks/useUnoOnlineGame";
 import type { Card } from "../types/card";
 import { isActionCard } from "../types/card";
 import type { GameState } from "../types/game";
-import { canPlayCard } from "../lib/gameRules";
+import { canJumpInPlay, canPlayCard } from "../lib/gameRules";
 import { getTableMood } from "../lib/rulePresets";
 import TurnCue from "./TurnCue";
 import { getPlayerExpression } from "../lib/playerExpression";
@@ -43,6 +47,7 @@ import { useHandNavigation } from "../hooks/useHandNavigation";
 import PlayerProgress from "./PlayerProgress";
 import RoundSummary from "./RoundSummary";
 import OpponentSeat from "./OpponentSeat";
+import PlayerAvatar from "./PlayerAvatar";
 import GameFeedback, { VictoryBurst } from "./GameFeedback";
 import UnoCard from "./UnoCard";
 import HandCard from "./HandCard";
@@ -134,6 +139,33 @@ export default function GameBoard({
   const [help, setHelp] = useState(false);
   const [history, setHistory] = useState(false);
   const [sort, setSort] = useState(true);
+  const [copiedRoomCode, setCopiedRoomCode] = useState(false);
+  const [manualRoomCode, setManualRoomCode] = useState(false);
+  const [startingRematch, setStartingRematch] = useState(false);
+  const [dismissedTips, setDismissedTips] = useState<Record<string, boolean>>(
+    () => {
+      try {
+        return {
+          jumpIn: localStorage.getItem("uno.dismissed_tip.jumpIn") === "true",
+          stacking:
+            localStorage.getItem("uno.dismissed_tip.stacking") === "true",
+          catchUno:
+            localStorage.getItem("uno.dismissed_tip.catchUno") === "true",
+        };
+      } catch {
+        return { jumpIn: false, stacking: false, catchUno: false };
+      }
+    },
+  );
+  const dismissTip = useCallback(
+    (tipKey: "jumpIn" | "stacking" | "catchUno") => {
+      setDismissedTips((prev) => ({ ...prev, [tipKey]: true }));
+      try {
+        localStorage.setItem(`uno.dismissed_tip.${tipKey}`, "true");
+      } catch {}
+    },
+    [],
+  );
   const [draggingCard, setDraggingCard] = useState<"lifting" | "ready" | null>(
     null,
   );
@@ -155,7 +187,11 @@ export default function GameBoard({
   const [pendingAction, setPendingAction] = useState(false);
   const pendingRef = useRef(false);
   const actionTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const { rememberOrigin } = useGamePresentation(game, localPlayer?.id, root);
+  const { rememberOrigin, takeCard } = useGamePresentation(
+    game,
+    localPlayer?.id,
+    root,
+  );
   const online = "room" in api ? api : null;
   const cards = useMemo(() => {
     const cards = localPlayer?.hand ?? [];
@@ -169,6 +205,63 @@ export default function GameBoard({
   }, [localPlayer?.hand, sort]);
   const handNavigation = useHandNavigation(cards);
   const { hand } = handNavigation;
+  // The hand compacts to its scrollport: deeper overlap first, then a bounded
+  // scale step-down, so a normal hand never needs the paging arrows. Scale 0
+  // means "no override" and lets the CSS media queries own the size.
+  const [handFit, setHandFit] = useState({ scale: 0, overlap: -44 });
+  const handFitRef = useRef(handFit);
+  useLayoutEffect(() => {
+    const scroller = hand.current;
+    const count = cards.length;
+    const reset = () => {
+      if (handFitRef.current.scale !== 0) {
+        handFitRef.current = { scale: 0, overlap: -44 };
+        setHandFit({ scale: 0, overlap: -44 });
+      }
+    };
+    if (!scroller || !scroller.clientWidth || count < 2) {
+      reset();
+      return;
+    }
+    const measure = () => {
+      const scrollerStyle = getComputedStyle(scroller);
+      const base =
+        parseFloat(scrollerStyle.getPropertyValue("--hand-scale")) || 1.65;
+      const inner = scroller.firstElementChild;
+      const innerStyle = inner ? getComputedStyle(inner) : null;
+      const available =
+        scroller.clientWidth -
+        parseFloat(scrollerStyle.paddingLeft) -
+        parseFloat(scrollerStyle.paddingRight) -
+        (innerStyle
+          ? parseFloat(innerStyle.paddingLeft) +
+            parseFloat(innerStyle.paddingRight)
+          : 0);
+      let fit = { scale: base, overlap: -44 };
+      for (let step = 1; step >= 0.61; step -= 0.065) {
+        const cardWidth = 82 * base * step;
+        const needed = (available - cardWidth) / (count - 1) - cardWidth;
+        // Show at least 30% of each face; a short hand keeps a light overlap.
+        const overlap = Math.max(-0.7 * cardWidth, Math.min(-40, needed));
+        const advance = cardWidth + overlap;
+        fit = { scale: base * step, overlap };
+        // A 1px tolerance absorbs float drift; the side padding hides it.
+        if (cardWidth + (count - 1) * advance <= available + 1) break;
+      }
+      const prior = handFitRef.current;
+      if (
+        Math.abs(prior.scale - fit.scale) > 0.005 ||
+        Math.abs(prior.overlap - fit.overlap) > 0.5
+      ) {
+        handFitRef.current = fit;
+        setHandFit(fit);
+      }
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(scroller);
+    return () => observer.disconnect();
+  }, [cards.length, hand]);
   useEffect(() => {
     const scroller = hand.current;
     if (!scroller) return;
@@ -332,6 +425,12 @@ export default function GameBoard({
     setInspectedId(null);
     primeTableAudioFromUserGesture();
     rememberOrigin(card.id, element);
+    if (!isLocalTurn && canJumpInPlay(card, game)) {
+      dismissTip("jumpIn");
+    }
+    if (isLocalTurn && game.pendingDraw > 0) {
+      dismissTip("stacking");
+    }
     act(() => api.selectCard(card));
   };
   const selectedCard = cards.find((card) => card.id === inspectedId);
@@ -349,6 +448,60 @@ export default function GameBoard({
     game.lastAction.count === 1
       ? localPlayer.hand.at(-1)
       : null;
+
+  const canJumpInNow =
+    !isLocalTurn &&
+    !winner &&
+    !pendingWild &&
+    game.rules.allowJumpIn &&
+    cards.some((c) => canJumpInPlay(c, game));
+  const canStackNow =
+    isLocalTurn &&
+    !winner &&
+    !pendingWild &&
+    game.pendingDraw > 0 &&
+    cards.some((c) => canPlayCard(c, game, localPlayerIndex));
+  const catchableOpponent = opponents.find(
+    ({ player }) =>
+      (!online || isLocalTurn) &&
+      !winner &&
+      !pendingWild &&
+      !pendingAction &&
+      (!online || online.connected) &&
+      !player.saidUno &&
+      player.hand.length === 1 &&
+      game.rules.mustDeclareUno,
+  );
+
+  const activeTip = (() => {
+    if (canJumpInNow && !dismissedTips.jumpIn) {
+      return {
+        key: "jumpIn" as const,
+        icon: Zap,
+        title: "Jump-in",
+        message:
+          "You hold an exact match (same color and value). Tap it now to play out of turn!",
+      };
+    }
+    if (canStackNow && !dismissedTips.stacking) {
+      return {
+        key: "stacking" as const,
+        icon: Layers,
+        title: "Stacking",
+        message:
+          "Play your matching draw card to pass the penalty along and increase the count!",
+      };
+    }
+    if (catchableOpponent && !dismissedTips.catchUno) {
+      return {
+        key: "catchUno" as const,
+        icon: AlertCircle,
+        title: "Missed UNO",
+        message: `${catchableOpponent.player.name} didn’t call UNO with 1 card left! Tap their “Catch!” badge to penalize +2 cards.`,
+      };
+    }
+    return null;
+  })();
   const moveHint =
     online && !online.connected
       ? "Reconnecting. Your hand is safe."
@@ -493,17 +646,32 @@ export default function GameBoard({
                 player.hand.length === 1 &&
                 game.rules.mustDeclareUno
               }
-              onCatch={() => act(() => api.callOut(localPlayerIndex, index))}
+              onCatch={() => {
+                dismissTip("catchUno");
+                act(() => api.callOut(localPlayerIndex, index));
+              }}
             />
           ))}
           <div className="table-center">
-            <div
-              className={`direction-path ${game.direction === -1 ? "direction-reversed" : ""}`}
-              aria-hidden="true"
-            >
-              <RotateCw />
-              <RotateCw />
-            </div>
+            {(["far", "near"] as const).map((half) => (
+              <div
+                key={half}
+                className={`direction-orbit direction-orbit-${half} ${game.direction === -1 ? "direction-reversed" : ""}`}
+                aria-hidden="true"
+              >
+                <span className="direction-orbit-track" />
+                <span className="direction-orbit-ring">
+                  <i />
+                  <i />
+                  <i />
+                  <i />
+                  <i />
+                  <i />
+                  <i />
+                  <i />
+                </span>
+              </div>
+            ))}
             <div className="pile-zone">
               <button
                 data-draw-pile
@@ -514,6 +682,7 @@ export default function GameBoard({
                     ? `Draw ${game.pendingDraw} penalty cards`
                     : "Draw a card"
                 }
+                aria-keyshortcuts="D"
                 onClick={() => act(api.drawCard)}
               >
                 <UnoCard
@@ -550,7 +719,9 @@ export default function GameBoard({
                   ))}
                 </div>
                 <div data-discard-pile className="discard-pile">
-                  {top && <UnoCard card={top} sizeMultiplier={1.25} />}
+                  {top && (
+                    <UnoCard key={top.id} card={top} sizeMultiplier={1.25} />
+                  )}
                 </div>
               </div>
               <span className="sr-only">Last played</span>
@@ -586,6 +757,59 @@ export default function GameBoard({
           data-seat={localPlayer.id}
         >
           {canSayUno && <span className="sr-only">You can call UNO.</span>}
+          {activeTip && (
+            <div
+              className="action-hint-banner"
+              role="status"
+              aria-live="polite"
+            >
+              <activeTip.icon
+                size={15}
+                className="action-hint-icon"
+                aria-hidden="true"
+              />
+              <span className="action-hint-text">
+                <strong>{activeTip.title}:</strong> {activeTip.message}
+              </span>
+              <button
+                type="button"
+                className="action-hint-dismiss"
+                aria-label={`Dismiss ${activeTip.title} hint`}
+                onClick={() => dismissTip(activeTip.key)}
+              >
+                <X size={13} aria-hidden="true" />
+              </button>
+            </div>
+          )}
+          {(isLocalTurn || canPlaySelected) && !pendingWild && !winner && (
+            <div className="move-buttons">
+              {canPlaySelected && (
+                <button
+                  className="button primary play-selected"
+                  onClick={() => {
+                    const element = hand.current?.querySelector<HTMLElement>(
+                      `[data-hand-card="${selectedCard.id}"] .uno-card`,
+                    );
+                    if (element) select(selectedCard, element);
+                  }}
+                >
+                  <span className="play-card-label">Play {selectedLabel}</span>
+                  <ArrowRight size={18} />
+                </button>
+              )}
+              {isLocalTurn &&
+                (canPass ? (
+                  <button
+                    className={`button ${canPlaySelected ? "secondary" : "primary"}`}
+                    disabled={pendingAction || !!(online && !online.connected)}
+                    aria-keyshortcuts="P"
+                    onClick={() => act(api.pass)}
+                  >
+                    Pass <ArrowRight size={18} />
+                  </button>
+                ) : null)}
+            </div>
+          )}
           <TurnCue
             game={game}
             local={isLocalTurn}
@@ -595,6 +819,7 @@ export default function GameBoard({
           {canSayUno && (
             <button
               className="button uno-button uno-ready hand-uno"
+              aria-keyshortcuts="U"
               onClick={() => {
                 primeTableAudioFromUserGesture();
                 api.sayUno(localPlayerIndex);
@@ -613,7 +838,7 @@ export default function GameBoard({
             className="hand-scroll"
             ref={hand}
             role="region"
-            aria-label="Cards. Scroll sideways, or use left and right arrow keys."
+            aria-label="Cards. Use the left and right arrow keys to browse."
             onKeyDown={(event) => {
               if (
                 !["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)
@@ -651,6 +876,14 @@ export default function GameBoard({
           >
             <div
               className={`hand-cards ${cards.length > 10 ? "large-hand" : ""}`}
+              style={
+                handFit.scale
+                  ? ({
+                      "--hand-scale": handFit.scale,
+                      "--hand-overlap": `${handFit.overlap.toFixed(1)}px`,
+                    } as CSSProperties)
+                  : undefined
+              }
             >
               {cards.map((card, i) => {
                 // Request locks block interaction without making the whole hand
@@ -684,6 +917,7 @@ export default function GameBoard({
                       setInspectedId((id) => (id === card.id ? null : card.id))
                     }
                     onPlay={(element) => select(card, element)}
+                    onLift={takeCard}
                     onDragChange={onDragChange}
                   />
                 );
@@ -733,41 +967,6 @@ export default function GameBoard({
                 >
                   <X size={16} aria-hidden="true" />
                 </button>
-              )}
-            </div>
-            <div className="move-buttons">
-              {(isLocalTurn || canPlaySelected) && !pendingWild && !winner && (
-                <>
-                  {canPlaySelected && (
-                    <button
-                      className="button primary play-selected"
-                      onClick={() => {
-                        const element =
-                          hand.current?.querySelector<HTMLElement>(
-                            `[data-hand-card="${selectedCard.id}"] .uno-card`,
-                          );
-                        if (element) select(selectedCard, element);
-                      }}
-                    >
-                      <span className="play-card-label">
-                        Play {selectedLabel}
-                      </span>
-                      <ArrowRight size={18} />
-                    </button>
-                  )}
-                  {isLocalTurn &&
-                    (canPass ? (
-                      <button
-                        className={`button ${canPlaySelected ? "secondary" : "primary"}`}
-                        disabled={
-                          pendingAction || !!(online && !online.connected)
-                        }
-                        onClick={() => act(api.pass)}
-                      >
-                        Pass <ArrowRight size={18} />
-                      </button>
-                    ) : null)}
-                </>
               )}
             </div>
           </div>
@@ -824,17 +1023,49 @@ export default function GameBoard({
               .
             </p>
             {online?.room && (
-              <button
-                className="text-button room-code-control"
-                onClick={() => {
-                  void navigator.clipboard
-                    .writeText(online.room?.roomId ?? "")
-                    .then(() => toast.success("Room code copied."))
-                    .catch(() => toast.error("Couldn’t copy room code."));
-                }}
-              >
-                Copy room code: {online.room.roomId}
-              </button>
+              <div className="menu-room-code-group">
+                <button
+                  className="text-button room-code-control"
+                  onClick={async () => {
+                    const roomCode = online.room?.roomId;
+                    if (!roomCode) return;
+                    try {
+                      await navigator.clipboard.writeText(roomCode);
+                      toast.success("Room code copied.");
+                      setCopiedRoomCode(true);
+                      setManualRoomCode(false);
+                      setTimeout(() => setCopiedRoomCode(false), 2000);
+                    } catch {
+                      toast.error("Couldn’t copy room code automatically.");
+                      setManualRoomCode(true);
+                    }
+                  }}
+                >
+                  {copiedRoomCode
+                    ? `Copied: ${online.room.roomId}`
+                    : `Copy room code: ${online.room.roomId}`}
+                </button>
+                {manualRoomCode && (
+                  <div
+                    className="manual-copy-box"
+                    role="region"
+                    aria-label="Manual copy room code"
+                  >
+                    <span className="manual-copy-hint">
+                      Select and copy room code:
+                    </span>
+                    <input
+                      type="text"
+                      readOnly
+                      value={online.room.roomId}
+                      aria-label="Room code"
+                      autoFocus
+                      onFocus={(e) => e.target.select()}
+                      className="manual-copy-input"
+                    />
+                  </div>
+                )}
+              </div>
             )}
           </div>
           <div className="game-menu">
@@ -991,27 +1222,157 @@ export default function GameBoard({
           {winner.id === localPlayer.id && <VictoryBurst />}
           <RoundSummary game={game} localPlayerId={localPlayer.id} />
           <PlayerProgress />
+          {online?.room &&
+            (() => {
+              const isHost = online.room.hostPlayerId === online.playerId;
+              const players = online.room.players;
+              const guests = players.filter(
+                (p) => p.playerId !== online.room?.hostPlayerId,
+              );
+              const readyGuests = guests.filter(
+                (p) => (p.ready || p.isBot) && p.connected,
+              );
+              const waitingGuests = guests.filter(
+                (p) => !p.ready && !p.isBot && p.connected,
+              );
+              const allGuestsReady =
+                guests.length > 0 && readyGuests.length === guests.length;
+              const myPlayer = players.find(
+                (p) => p.playerId === online.playerId,
+              );
+              const isMyPlayerReady = !!myPlayer?.ready;
+
+              let headline = "";
+              let subtext = "";
+              if (startingRematch) {
+                headline = "Dealing cards for the next round…";
+                subtext =
+                  "Shuffling the deck and dealing cards to all players.";
+              } else if (isHost) {
+                if (allGuestsReady) {
+                  headline = "Everyone is ready for a rematch!";
+                  subtext = "Deal whenever you’re ready to start.";
+                } else if (waitingGuests.length > 0) {
+                  headline = `Waiting on players (${readyGuests.length} of ${guests.length} ready)`;
+                  subtext = `Waiting for ${waitingGuests.map((g) => g.name).join(", ")} to ready up.`;
+                } else {
+                  headline = "Ready for the next round?";
+                  subtext = "Deal whenever you’re ready.";
+                }
+              } else {
+                if (isMyPlayerReady) {
+                  headline = "You’re marked ready!";
+                  subtext = allGuestsReady
+                    ? "All players ready. Waiting for the host to deal."
+                    : "Waiting for other players and the host to deal.";
+                } else {
+                  headline = "Ready for another round?";
+                  subtext = "Tap Ready below to let the host know you’re in.";
+                }
+              }
+
+              return (
+                <div
+                  className="rematch-readiness-card"
+                  role="region"
+                  aria-label="Rematch readiness"
+                >
+                  <div className="rematch-card-header">
+                    <strong>{headline}</strong>
+                    <small>{subtext}</small>
+                  </div>
+                  <div className="rematch-seats-list">
+                    {players.map((p) => {
+                      const isPlayerHost =
+                        p.playerId === online.room?.hostPlayerId;
+                      const isMe = p.playerId === online.playerId;
+                      let badgeState:
+                        "waiting" | "ready" | "disconnected" | "starting" =
+                        "waiting";
+                      let stateLabel = "";
+
+                      if (!p.connected && !p.isBot) {
+                        badgeState = "disconnected";
+                        stateLabel = "Disconnected";
+                      } else if (startingRematch) {
+                        badgeState = "starting";
+                        stateLabel = "Dealing in…";
+                      } else if (isPlayerHost) {
+                        badgeState = "ready";
+                        stateLabel = "Host";
+                      } else if (p.ready || p.isBot) {
+                        badgeState = "ready";
+                        stateLabel = p.isBot ? "Bot · Ready" : "Ready";
+                      } else {
+                        badgeState = "waiting";
+                        stateLabel = "Waiting…";
+                      }
+
+                      return (
+                        <div
+                          key={p.playerId}
+                          className={`rematch-seat-item status-${badgeState}`}
+                        >
+                          <PlayerAvatar seed={p.playerId} />
+                          <span className="rematch-seat-name">
+                            <strong>{p.name}</strong>
+                            <small>
+                              {isMe
+                                ? "You"
+                                : isPlayerHost
+                                  ? "Host"
+                                  : p.isBot
+                                    ? "Bot"
+                                    : "Guest"}
+                            </small>
+                          </span>
+                          <span
+                            className={`rematch-status-badge status-${badgeState}`}
+                          >
+                            {badgeState === "starting" ? (
+                              <RotateCw size={12} className="spin" />
+                            ) : badgeState === "disconnected" ? (
+                              <AlertCircle size={12} />
+                            ) : badgeState === "ready" ? (
+                              <Check size={12} />
+                            ) : (
+                              <Clock size={12} />
+                            )}
+                            {stateLabel}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })()}
           <div className="dialog-actions round-actions">
             {!online || online.room?.hostPlayerId === online.playerId ? (
               <button
                 className="button primary"
-                onClick={onDealAgain}
-                disabled={!!online && !online.connected}
+                onClick={() => {
+                  setStartingRematch(true);
+                  onDealAgain();
+                }}
+                disabled={startingRematch || (!!online && !online.connected)}
               >
-                One more round
+                {startingRematch ? "Dealing cards…" : "One more round"}
                 <ArrowRight size={18} />
               </button>
             ) : (
               <button
-                className="button primary"
+                className={`button ${online.room?.players.find((p) => p.playerId === online.playerId)?.ready ? "secondary ready-active" : "primary"}`}
                 onClick={() => void online.toggleReady()}
-                disabled={pendingAction || !online.connected}
+                disabled={startingRematch || pendingAction || !online.connected}
               >
-                {online.room?.players.find(
-                  (p) => p.playerId === online.playerId,
-                )?.ready
-                  ? "Ready for a rematch"
-                  : "Ready for another"}
+                {startingRematch
+                  ? "Host is dealing…"
+                  : online.room?.players.find(
+                        (p) => p.playerId === online.playerId,
+                      )?.ready
+                    ? "Ready · Tap to unready"
+                    : "Ready for a rematch"}
                 <Check size={17} />
               </button>
             )}
@@ -1019,9 +1380,11 @@ export default function GameBoard({
               Back to home
             </button>
           </div>
-          {online && online.room?.hostPlayerId !== online.playerId && (
-            <p className="muted">The host will start the next round.</p>
-          )}
+          {online &&
+            online.room?.hostPlayerId !== online.playerId &&
+            !startingRematch && (
+              <p className="muted">The host will start the next round.</p>
+            )}
         </Modal>
       )}
     </div>

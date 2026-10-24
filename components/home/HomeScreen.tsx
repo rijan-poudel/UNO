@@ -137,20 +137,26 @@ export default function HomeScreen(props: Props) {
               <ChevronDown size={14} aria-hidden="true" />
             </button>
           </div>
-          {help && (
-            <div className="launch-rules" id="launch-quick-rules">
-              <p>
-                Match the top card’s <strong>color or number</strong>. Tap a
-                lifted card to play, or draw from the deck. Wilds let you choose
-                the color.
-              </p>
-              <p>
-                Call <strong>UNO</strong> with one card left. You have 30
-                seconds per turn; time runs out, you draw and pass. Unavoidable
-                draw penalties arrive automatically.
-              </p>
+          <div
+            className={`launch-rules-wrapper ${help ? "open" : ""}`}
+            id="launch-quick-rules"
+            aria-hidden={!help}
+          >
+            <div className="launch-rules-inner">
+              <div className="launch-rules">
+                <p>
+                  Match the top card’s <strong>color or number</strong>. Tap a
+                  lifted card to play, or draw from the deck. Wilds let you
+                  choose the color.
+                </p>
+                <p>
+                  Call <strong>UNO</strong> with one card left. You have 30
+                  seconds per turn; time runs out, you draw and pass.
+                  Unavoidable draw penalties arrive automatically.
+                </p>
+              </div>
             </div>
-          )}
+          </div>
         </section>
         <div className="launch-progress">
           <PlayerProgress />

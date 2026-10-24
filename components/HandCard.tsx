@@ -14,6 +14,7 @@ import {
 } from "../lib/tableChimes";
 import { canReleaseCard } from "../lib/cardGesture";
 import { readCardPose } from "../lib/cardPose";
+import { CARD_MOTION_EASE, getCardFlight } from "../lib/cardMotion";
 
 interface Props {
   card: Card;
@@ -25,6 +26,7 @@ interface Props {
   tabIndex: number;
   onFocus: () => void;
   onInspect: () => void;
+  onLift: (element: HTMLElement) => ReturnType<typeof readCardPose>;
   onPlay: (element: HTMLElement) => void;
   onDragChange: (state: "lifting" | "ready" | null) => void;
 }
@@ -38,6 +40,7 @@ export default function HandCard({
   tabIndex,
   onFocus,
   onInspect,
+  onLift,
   onPlay,
   onDragChange,
 }: Props) {
@@ -78,10 +81,26 @@ export default function HandCard({
       interrupt();
     };
   }, [playable, disabled, onDragChange]);
-  // Bound the spread for large hands; extra cards scroll instead of shrinking.
-  const position =
-    count < 2 ? 0 : (index - (count - 1) / 2) / Math.max(3, (count - 1) / 2);
+  // A held fan: cards lean a fixed amount per card away from the grip, so a
+  // short hand stays compact and a long one opens to the same capped spread.
+  const fromCenter = count < 2 ? 0 : index - (count - 1) / 2;
+  const half = Math.max(1, (count - 1) / 2);
+  const step = Math.min(5, 12 / half);
+  const angle = fromCenter * step;
+  const edge = fromCenter / half;
+  // Edge cards droop along the grip arc plus a little gravity sag.
+  const droop =
+    520 * (1 - Math.cos((angle * Math.PI) / 180)) + edge * edge * 16;
   const face = () => root.current?.querySelector<HTMLElement>(".uno-card");
+  function moveHeldCard(dx: number, dy: number, angle: number) {
+    const lifted = ghost.current;
+    if (!lifted) return;
+    const reduced = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    const bank = reduced ? 0 : Math.max(-9, Math.min(9, dx * 0.035));
+    lifted.style.transform = `translate(${dx}px, ${dy}px) rotate(${angle + bank}deg)`;
+  }
   function finish(event: PointerEvent<HTMLDivElement>, cancelled = false) {
     const start = gesture.current;
     if (!start || start.id !== event.pointerId) return;
@@ -92,6 +111,14 @@ export default function HandCard({
     if (start.dragging) {
       suppressClick.current = true;
       const lifted = ghost.current;
+      // Pointer-up can carry a newer position than the final move event.
+      // Capture that exact release pose before the presentation layer takes over.
+      if (!cancelled && start.pose)
+        moveHeldCard(
+          event.clientX - start.x,
+          event.clientY - start.y,
+          start.pose.angle,
+        );
       onDragChange(null);
       if (
         !cancelled &&
@@ -105,19 +132,30 @@ export default function HandCard({
         if (element) element.style.opacity = "";
       } else if (lifted && element && start.pose) {
         const destination = readCardPose(element);
+        const from = readCardPose(lifted);
+        const { keyframes, duration } = getCardFlight(
+          from,
+          destination,
+          "return",
+        );
+        // Rebase at the destination before returning so the same center-origin
+        // geometry drives pickup, throw and a cancelled lift.
+        Object.assign(lifted.style, {
+          left: `${destination.x - start.pose.width / 2}px`,
+          top: `${destination.y - start.pose.height / 2}px`,
+        });
+        const resize = destination.width / start.pose.width;
         const reduced = window.matchMedia(
           "(prefers-reduced-motion: reduce)",
         ).matches;
         const returning = lifted.animate(
-          [
-            { transform: lifted.style.transform },
-            {
-              transform: `translate(${destination.x - start.pose.x}px, ${destination.y - start.pose.y}px) rotate(${destination.angle}deg) scale(${destination.width / start.pose.width})`,
-            },
-          ],
+          keyframes.map((frame) => ({
+            ...frame,
+            transform: `${frame.transform} scale(${resize})`,
+          })),
           {
-            duration: reduced ? 0 : 180,
-            easing: "cubic-bezier(.16,1,.3,1)",
+            duration: reduced ? 0 : duration,
+            easing: CARD_MOTION_EASE,
             fill: "forwards",
           },
         );
@@ -142,8 +180,8 @@ export default function HandCard({
       onFocus={onFocus}
       style={
         {
-          "--fan-angle": `${position * 16}deg`,
-          "--fan-drop": `${position * position * 34}px`,
+          "--fan-angle": `${angle.toFixed(2)}deg`,
+          "--fan-drop": `${droop.toFixed(2)}px`,
           "--hand-i": index,
         } as CSSProperties
       }
@@ -196,7 +234,7 @@ export default function HandCard({
           event.currentTarget.classList.add("dragging-card");
           const element = face();
           if (element) {
-            const pose = start.pose ?? readCardPose(element);
+            const pose = onLift(element);
             start.pose = pose;
             const lifted = element.cloneNode(true) as HTMLElement;
             lifted.removeAttribute("aria-label");
@@ -212,6 +250,8 @@ export default function HandCard({
               width: `${pose.width}px`,
               height: `${pose.height}px`,
               transition: "none",
+              animation: "none",
+              transformOrigin: "50% 50%",
               boxShadow: "0 18px 28px #060c1780",
             });
             lifted.style.setProperty(
@@ -226,14 +266,7 @@ export default function HandCard({
         }
         if (start.dragging) {
           onDragChange(canReleaseCard(dx, dy) ? "ready" : "lifting");
-          const element = ghost.current;
-          if (element) {
-            const reduced = window.matchMedia(
-              "(prefers-reduced-motion: reduce)",
-            ).matches;
-            element.style.transition = "none";
-            element.style.transform = `translate(${dx}px, ${dy}px) rotate(${(start.pose?.angle ?? 0) + (reduced ? 0 : dx * 0.035)}deg)`;
-          }
+          moveHeldCard(dx, dy, start.pose?.angle ?? 0);
         }
       }}
       onPointerUp={(event) => finish(event)}

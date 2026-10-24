@@ -1,15 +1,24 @@
 // Room creation, joining, invitations, and seats share a single lobby flow.
 "use client";
 import { useEffect, useState, type ReactNode } from "react";
-import { ArrowRight, Check, Copy, Link, Plus, X } from "lucide-react";
+import {
+  ArrowRight,
+  Check,
+  ChevronsLeftRight,
+  Copy,
+  Link,
+  Plus,
+  X,
+} from "lucide-react";
 import { toast } from "sonner";
 import type {
   FriendInvite,
   FriendPresenceState,
   RoomSnapshot,
 } from "../types/multiplayer";
-import type { GameRules } from "../types/rules";
+import { defaultRules, type GameRules } from "../types/rules";
 import { parseRoomCode, isRoomCode } from "../lib/roomCodes";
+import { RULE_PRESETS, matchesPreset } from "../lib/rulePresets";
 import TableRules from "./TableRules";
 import PlayerAvatar from "./PlayerAvatar";
 import {
@@ -117,6 +126,13 @@ export default function OnlineLobby(props: Props) {
   );
   const [busy, setBusy] = useState(false);
   const [localError, setLocalError] = useState("");
+  const [copiedCode, setCopiedCode] = useState(false);
+  const [copiedLink, setCopiedLink] = useState(false);
+  const [copiedFriendCode, setCopiedFriendCode] = useState(false);
+  const [manualCopy, setManualCopy] = useState<{
+    label: string;
+    value: string;
+  } | null>(null);
   const isHost = room?.hostPlayerId === playerId;
   useEffect(() => subscribePlayerName(() => setName(getPlayerName())), []);
   useEffect(() => {
@@ -189,14 +205,21 @@ export default function OnlineLobby(props: Props) {
       toast.success("Invitation sent.");
     }
   };
-  const copy = async (value: string, message: string) => {
+  const copy = async (
+    value: string,
+    label: string,
+    message: string,
+  ): Promise<boolean> => {
     try {
       await navigator.clipboard.writeText(value);
       toast.success(message);
+      setManualCopy(null);
+      setLocalError("");
+      return true;
     } catch {
-      setLocalError(
-        `Couldn’t copy automatically. Your code is ${room?.roomId ?? props.friendCode}.`,
-      );
+      setLocalError(`Couldn’t copy automatically. Select and copy below.`);
+      setManualCopy({ label, value });
+      return false;
     }
   };
   const leave = async () => {
@@ -360,24 +383,70 @@ export default function OnlineLobby(props: Props) {
             <div className="room-share-actions">
               <button
                 className="button secondary small"
-                onClick={() => void copy(room.roomId, "Room code copied.")}
+                onClick={async () => {
+                  const ok = await copy(
+                    room.roomId,
+                    "Room code",
+                    "Room code copied.",
+                  );
+                  if (ok) {
+                    setCopiedCode(true);
+                    setTimeout(() => setCopiedCode(false), 2000);
+                  }
+                }}
               >
-                <Copy size={16} />
-                Copy code
+                {copiedCode ? <Check size={16} /> : <Copy size={16} />}
+                {copiedCode ? "Copied!" : "Copy code"}
               </button>
               <button
                 className="button secondary small"
                 aria-label="Copy invitation link"
-                onClick={() =>
-                  void copy(
+                onClick={async () => {
+                  const ok = await copy(
                     `${window.location.origin}/?room=${room.roomId}`,
+                    "Room link",
                     "Room link copied.",
-                  )
-                }
+                  );
+                  if (ok) {
+                    setCopiedLink(true);
+                    setTimeout(() => setCopiedLink(false), 2000);
+                  }
+                }}
               >
-                <Link size={18} /> Copy link
+                {copiedLink ? <Check size={18} /> : <Link size={18} />}
+                {copiedLink ? "Copied link!" : "Copy link"}
               </button>
             </div>
+            {manualCopy && (
+              <div
+                className="manual-copy-box"
+                role="region"
+                aria-label={`Manual copy ${manualCopy.label}`}
+              >
+                <div className="manual-copy-header">
+                  <span className="manual-copy-hint">
+                    Select and copy your {manualCopy.label.toLowerCase()}:
+                  </span>
+                  <button
+                    type="button"
+                    className="icon-button"
+                    aria-label="Close manual copy input"
+                    onClick={() => setManualCopy(null)}
+                  >
+                    <X size={15} />
+                  </button>
+                </div>
+                <input
+                  type="text"
+                  readOnly
+                  value={manualCopy.value}
+                  aria-label={manualCopy.label}
+                  autoFocus
+                  onFocus={(e) => e.target.select()}
+                  className="manual-copy-input"
+                />
+              </div>
+            )}
           </div>
           <div className="seat-list">
             {room.players.map((p) => (
@@ -434,9 +503,130 @@ export default function OnlineLobby(props: Props) {
           onOpenRules={props.onOpenRules}
         />
       )}
-      {room && !isHost && (
-        <p className="muted">The host chooses this table’s rules.</p>
-      )}
+      {room &&
+        !isHost &&
+        (() => {
+          const activeRules: Partial<GameRules> =
+            room.rules ?? props.rules ?? defaultRules;
+          const matchingPreset = RULE_PRESETS.find((p) =>
+            matchesPreset(activeRules, p.rules),
+          );
+          const presetLabel = matchingPreset
+            ? matchingPreset.label
+            : "Custom rules";
+          const presetDesc = matchingPreset
+            ? matchingPreset.description
+            : "Custom table rules selected by host.";
+          const enabledHouseRules: Array<{
+            key: string;
+            label: string;
+            desc: string;
+          }> = [];
+          if (activeRules.stackDraw2)
+            enabledHouseRules.push({
+              key: "stackDraw2",
+              label: "Stack +2",
+              desc: "Answer +2 with another +2",
+            });
+          if (activeRules.stackWild4)
+            enabledHouseRules.push({
+              key: "stackWild4",
+              label: "Stack +4",
+              desc: "Pass +4 with another +4",
+            });
+          if (activeRules.allowWild4OnDraw2)
+            enabledHouseRules.push({
+              key: "allowWild4OnDraw2",
+              label: "Wild +4 on +2",
+              desc: "Four beats two",
+            });
+          if (activeRules.allowJumpIn)
+            enabledHouseRules.push({
+              key: "allowJumpIn",
+              label: "Jump-in",
+              desc: "Exact matches play out of turn",
+            });
+          if (activeRules.allowDoublePlaySameNumber)
+            enabledHouseRules.push({
+              key: "doublePlay",
+              label: "Double-play",
+              desc: "Play matching numbers together",
+            });
+          if (activeRules.allowShuffleCard)
+            enabledHouseRules.push({
+              key: "allowShuffleCard",
+              label: "Shuffle hands",
+              desc: "Wild redistributes cards",
+            });
+          if (activeRules.allowDiscardAll)
+            enabledHouseRules.push({
+              key: "allowDiscardAll",
+              label: "Discard all",
+              desc: "Discard one full color",
+            });
+          if (activeRules.drawUntilPlayable)
+            enabledHouseRules.push({
+              key: "drawUntilPlayable",
+              label: "Draw until playable",
+              desc: "Draw until matching card",
+            });
+
+          return (
+            <section
+              className="setup-rules guest-table-rules"
+              aria-label="Table rules for this room"
+            >
+              <div className="section-heading">
+                <h2>Table rules</h2>
+                <span className="rules-host-pill">Chosen by host</span>
+              </div>
+              <div className="guest-rules-card">
+                <div className="guest-preset-banner">
+                  <span className="guest-preset-badge" aria-hidden="true">
+                    {matchingPreset?.id === "wild" ? (
+                      <ChevronsLeftRight strokeWidth={2.5} size={16} />
+                    ) : (
+                      (matchingPreset?.symbol ?? "⚙️")
+                    )}
+                  </span>
+                  <div className="guest-preset-info">
+                    <strong>{presetLabel}</strong>
+                    <small>{presetDesc}</small>
+                  </div>
+                </div>
+                <div className="guest-rules-breakdown">
+                  <div className="guest-rule-row">
+                    <span className="guest-rule-metric">Cards dealt</span>
+                    <strong>{activeRules.startingHandSize ?? 7} each</strong>
+                  </div>
+                  <div className="guest-rule-row">
+                    <span className="guest-rule-metric">House rules</span>
+                    <div className="guest-rule-tags">
+                      {enabledHouseRules.length > 0 ? (
+                        enabledHouseRules.map((r) => (
+                          <span
+                            key={r.key}
+                            className="guest-rule-tag"
+                            title={r.desc}
+                          >
+                            {r.label}
+                          </span>
+                        ))
+                      ) : (
+                        <span className="guest-rule-tag tag-standard">
+                          Standard rules only
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <p className="muted">
+                  The host controls table rules before dealing.
+                </p>
+              </div>
+            </section>
+          );
+        })()}
       <details
         className="lobby-friends setup-disclosure"
         key={outgoingInvites.length ? "invited" : "friends"}
@@ -500,10 +690,21 @@ export default function OnlineLobby(props: Props) {
           <button
             className="text-button"
             disabled={!props.friendCode}
-            onClick={() => void copy(props.friendCode, "Friend code copied.")}
+            onClick={async () => {
+              if (!props.friendCode) return;
+              const ok = await copy(
+                props.friendCode,
+                "Friend code",
+                "Friend code copied.",
+              );
+              if (ok) {
+                setCopiedFriendCode(true);
+                setTimeout(() => setCopiedFriendCode(false), 2000);
+              }
+            }}
           >
             {props.friendCode || "Connecting…"}
-            <Copy size={14} />
+            {copiedFriendCode ? <Check size={14} /> : <Copy size={14} />}
           </button>
         </div>
       </details>

@@ -1,6 +1,7 @@
 // Preferences use the same controls and typography as the rest of the club.
 "use client";
 import { useState } from "react";
+import { toast } from "sonner";
 import {
   AudioLines,
   Copy,
@@ -125,6 +126,7 @@ export function Toggle({
       <input
         type="checkbox"
         role="switch"
+        {...({ switch: "" } as Record<string, string>)}
         checked={checked}
         disabled={disabled}
         onChange={(e) => onChange(e.target.checked)}
@@ -151,6 +153,8 @@ export default function SettingsModal({
   const [music, setMusic] = useState(getMusicContextSettings);
   const [name, setName] = useState(getPlayerName);
   const [saved, setSaved] = useState(false);
+  const [copiedFriendCode, setCopiedFriendCode] = useState(false);
+  const [manualFriendCode, setManualFriendCode] = useState(false);
   const updateAudio = (partial: Partial<AudioSettings>) => {
     setAudioSettings(partial);
     setAudio(getAudioSettings());
@@ -268,13 +272,52 @@ export default function SettingsModal({
               <div className="friend-code-block">
                 <span>Your friend code</span>
                 <button
-                  onClick={onCopyFriendCode}
+                  onClick={async () => {
+                    let ok = false;
+                    try {
+                      if (friendCode) {
+                        await navigator.clipboard.writeText(friendCode);
+                        toast.success("Friend code copied.");
+                        ok = true;
+                        onCopyFriendCode?.();
+                      }
+                    } catch {
+                      toast.error("Couldn’t copy friend code automatically.");
+                    }
+                    if (ok) {
+                      setCopiedFriendCode(true);
+                      setManualFriendCode(false);
+                      setTimeout(() => setCopiedFriendCode(false), 2000);
+                    } else {
+                      setManualFriendCode(true);
+                    }
+                  }}
                   className="code-button"
                   aria-label={`Copy friend code ${friendCode}`}
                 >
                   {friendCode}
-                  <Copy size={17} />
+                  {copiedFriendCode ? <Check size={17} /> : <Copy size={17} />}
                 </button>
+                {manualFriendCode && (
+                  <div
+                    className="manual-copy-box"
+                    role="region"
+                    aria-label="Manual copy friend code"
+                  >
+                    <span className="manual-copy-hint">
+                      Select and copy your friend code:
+                    </span>
+                    <input
+                      type="text"
+                      readOnly
+                      value={friendCode}
+                      aria-label="Friend code"
+                      autoFocus
+                      onFocus={(e) => e.target.select()}
+                      className="manual-copy-input"
+                    />
+                  </div>
+                )}
                 <p>Share it so friends can invite you to their table.</p>
               </div>
             )}

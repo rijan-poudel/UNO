@@ -1,30 +1,31 @@
-/* Color court portraits and exact, readable card counts on an opaque nameplate. */
+/* Seat token — portrait, name/status row and an exact count chip.
+   Comfortable on large stages; compacts as viewport height tightens,
+   always sitting under the card backs it annotates. */
 :global(.game-main) .seat .label {
   position: relative;
   display: grid;
-  grid-template-columns: 56px minmax(0, 1fr);
-  grid-template-rows: auto auto;
-  column-gap: 12px;
-  row-gap: 2px;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  width: 172px;
-  max-width: 172px;
-  min-height: 66px;
-  padding: 8px 14px 8px 0;
+  column-gap: 9px;
+  width: fit-content;
+  min-width: 132px;
+  max-width: 168px;
+  min-height: 56px;
+  padding: 6px 10px 6px 6px;
   border: 0;
-  border-radius: 16px;
+  border-radius: 15px;
   background: #09285c;
   color: #fff7e7;
-  box-shadow: 0 5px 12px #061e4c35;
+  box-shadow: 0 4px 10px #061e4c35;
   transform: none;
   text-align: left;
 }
 :global(.game-main) .seat .label :global(.player-avatar) {
   grid-column: 1;
-  grid-row: 1/3;
-  width: 56px;
-  height: 56px;
-  margin: -6px 0 -6px -4px;
+  grid-row: 1;
+  width: 44px;
+  height: 44px;
+  margin: 0;
   border-radius: 50%;
   transform: none;
 }
@@ -33,47 +34,46 @@
   grid-row: 1;
   display: flex;
   flex-direction: row;
-  align-items: center;
+  align-items: baseline;
   gap: 6px;
   min-width: 0;
 }
 :global(.game-main) .seat .label strong {
-  max-width: 100%;
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   color: inherit;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 700;
-  line-height: 1.2;
+  line-height: 1.25;
 }
 :global(.game-main) .seat .label small {
   color: #d4e5ff;
   font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1.3;
   flex-shrink: 0;
   white-space: nowrap;
 }
 :global(.game-main) .seat .label .count {
-  grid-column: 2;
-  grid-row: 2;
-  width: auto;
-  height: auto;
-  padding: 0;
+  grid-column: 3;
+  grid-row: 1;
+  min-width: 30px;
+  padding: 3px 8px 2px;
   border: 0;
-  background: none;
+  border-radius: 9px;
+  background: #fff7e71f;
   box-shadow: none;
   transform: none;
-  color: #cbdfff;
-  font-family: var(--font-body), sans-serif;
-  font-size: 13px;
-  line-height: 1.25;
+  color: #d4e5ff;
+  font-family: var(--font-card), sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.2;
   font-variant-numeric: tabular-nums;
-}
-:global(.game-main) .seat .label .count > span::after {
-  content: " cards";
-}
-:global(.game-main) .seat .label .count[data-count="1"] > span::after {
-  content: " card";
+  text-align: center;
 }
 :global(.game-main) .seat:global(.active-seat) .label {
   background: #fff7e7;
@@ -83,9 +83,12 @@
 :global(.game-main) .seat:global(.active-seat) .label small {
   color: #425c7c;
 }
+:global(.game-main) .seat:global(.active-seat) .label .count {
+  background: #19385e14;
+}
 :global(.game-main) .seat:global(.active-seat) .label :global(.player-avatar) {
   outline: 3px solid #ffd45a;
-  outline-offset: 3px;
+  outline-offset: 2px;
 }
 :global(.game-main) .seat:global(.last-card-seat) .label .count {
   color: #ffd45a;
@@ -98,60 +101,128 @@
   background: #ffd45a;
   color: #38290c;
   cursor: pointer;
+  transition:
+    transform 140ms cubic-bezier(0.16, 1, 0.3, 1),
+    background-color 140ms ease,
+    box-shadow 140ms ease;
+}
+@media (prefers-reduced-motion: no-preference) {
+  :global(.game-main) .seat .label:global(.catch-seat) {
+    animation: catch-seat-pulse 1.4s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+  }
+}
+@keyframes catch-seat-pulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 0 #ffd45a80,
+      inset 0 -2px 1px #bd7600,
+      0 4px 7px #03091250;
+  }
+  50% {
+    box-shadow:
+      0 0 0 5px #ffd45a00,
+      inset 0 -2px 1px #bd7600,
+      0 6px 14px #ffd45a60;
+  }
+}
+@media (hover: hover) and (pointer: fine) {
+  :global(.game-main) .seat .label:global(.catch-seat):hover {
+    background: #ffdc36;
+    transform: translateY(-2px);
+  }
 }
 :global(.game-main) .seat .label:global(.catch-seat) .count,
 :global(.game-main) .seat .label:global(.catch-seat) small {
   color: #5a410f;
 }
+:global(.game-main) .seat .label:global(.catch-seat) .count {
+  background: #38290c14;
+}
 :global(.game-main) .seat .label:focus-visible {
-  outline: 3px solid #ffd45a;
-  outline-offset: 4px;
+  outline: 2px solid #ffd45a;
+  outline-offset: 3px;
 }
 :global(.game-main) .seat .label:global(.catch-seat):active {
-  transform: scale(0.97);
+  transform: scale(0.96);
 }
-@media (max-height: 460px) and (min-width: 541px) {
-  :global(.game-main) .seat .label .name {
-    gap: 4px;
-  }
+/* Height-tight stages keep the 44px touch floor; width and type shrink. */
+@media (max-height: 680px) {
   :global(.game-main) .seat .label {
-    grid-template-columns: 36px minmax(0, 1fr);
-    width: 126px;
-    max-width: 126px;
-    min-height: 44px;
-    gap: 1px 8px;
-    padding: 5px 8px 5px 0;
-    border-radius: 12px;
+    min-width: 116px;
+    max-width: 148px;
+    column-gap: 8px;
+    min-height: 46px;
+    padding: 5px 7px 5px 5px;
+    border-radius: 13px;
   }
   :global(.game-main) .seat .label :global(.player-avatar) {
     width: 36px;
     height: 36px;
-    margin: -2px 0 -2px -2px;
     border-width: 2px;
   }
   :global(.game-main) .seat .label strong {
-    font-size: 12px;
-  }
-  :global(.game-main) .seat .label .count {
-    font-size: 11px;
+    font-size: 13px;
   }
   :global(.game-main) .seat .label small {
     font-size: 10px;
   }
-}
-@media (max-height: 360px) and (min-width: 541px) {
-  :global(.game-main) .seat .label .name {
-    gap: 2px;
+  :global(.game-main) .seat .label .count {
+    min-width: 27px;
+    padding: 2px 6px 1px;
+    border-radius: 8px;
+    font-size: 16px;
   }
+  :global(.game-main)
+    .seat:global(.active-seat)
+    .label
+    :global(.player-avatar) {
+    outline-width: 2px;
+  }
+}
+@media (max-height: 460px) and (min-width: 541px) {
   :global(.game-main) .seat .label {
-    width: 100px;
-    max-width: 100px;
-    grid-template-columns: 30px minmax(0, 1fr);
-    gap: 1px 5px;
-    padding-right: 4px;
+    min-width: 96px;
+    max-width: 126px;
+    column-gap: 6px;
+    padding: 4px 6px 4px 4px;
+    border-radius: 11px;
   }
   :global(.game-main) .seat .label :global(.player-avatar) {
-    width: 30px;
-    height: 30px;
+    width: 32px;
+    height: 32px;
+  }
+  :global(.game-main) .seat .label strong {
+    font-size: 12px;
+  }
+  :global(.game-main) .seat .label small {
+    font-size: 9px;
+  }
+  :global(.game-main) .seat .label .count {
+    min-width: 24px;
+    padding: 1px 5px;
+    font-size: 14px;
+  }
+}
+@media (max-height: 360px) and (min-width: 541px) {
+  :global(.game-main) .seat .label {
+    min-width: 78px;
+    max-width: 100px;
+    column-gap: 5px;
+    padding: 3px 5px 3px 3px;
+    border-radius: 9px;
+  }
+  :global(.game-main) .seat .label :global(.player-avatar) {
+    width: 26px;
+    height: 26px;
+  }
+  :global(.game-main) .seat .label strong {
+    font-size: 11px;
+  }
+  :global(.game-main) .seat .label .count {
+    min-width: 20px;
+    padding: 1px 4px;
+    border-radius: 6px;
+    font-size: 13px;
   }
 }

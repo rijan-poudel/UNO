@@ -329,7 +329,12 @@ export default function Home() {
       <>
         <OnlineLobby
           rules={rules}
-          onRulesChange={setRules}
+          onRulesChange={(newRules) => {
+            setRules(newRules);
+            if (online.room && online.room.hostPlayerId === online.playerId) {
+              void online.updateRoomRules(newRules);
+            }
+          }}
           onOpenRules={() => openSettingsAt("controls")}
           onPlayBots={() => {
             setMode("computer");
@@ -346,7 +351,7 @@ export default function Home() {
           outgoingInvites={online.outgoingInvites}
           error={online.error}
           onSyncPresence={online.syncPresence}
-          onCreateRoom={online.createRoom}
+          onCreateRoom={(name) => online.createRoom(name, rules)}
           onJoinRoom={online.joinRoom}
           onSendFriendInvite={online.sendFriendInvite}
           onAcceptFriendInvite={online.acceptFriendInvite}

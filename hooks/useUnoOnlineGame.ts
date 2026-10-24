@@ -642,11 +642,11 @@ export function useUnoOnlineGame() {
   );
 
   const createRoom = useCallback(
-    async (playerName: string) => {
+    async (playerName: string, rules?: Partial<GameRules>) => {
       const revision = ++membershipRevision.current;
       const ack = await callAck<{ room: RoomSnapshot; playerId: string }>(
         'room:create',
-        { playerName, deviceId },
+        { playerName, deviceId, rules },
       );
       if (discardStaleMembership(revision, ack.ok ? ack.data.room : undefined))
         return false;
@@ -666,6 +666,31 @@ export function useUnoOnlineGame() {
       return true;
     },
     [callAck, discardStaleMembership, deviceId],
+  );
+
+  const updateRoomRules = useCallback(
+    async (rules: Partial<GameRules>) => {
+      if (!state.room) return false;
+      const revision = membershipRevision.current;
+      const ack = await callAck<{ room: RoomSnapshot }>('room:set-rules', {
+        roomId: state.room.roomId,
+        rules,
+      });
+      if (discardStaleMembership(revision)) return false;
+      if (!ack.ok) {
+        setState((prev) => ({ ...prev, error: ack.error }));
+        return false;
+      }
+
+      setState((prev) => ({
+        ...prev,
+        room: ack.data.room,
+        game: ack.data.room.game,
+        error: null,
+      }));
+      return true;
+    },
+    [callAck, discardStaleMembership, state.room],
   );
 
   const joinRoom = useCallback(
@@ -1146,6 +1171,7 @@ export function useUnoOnlineGame() {
     syncPresence,
     checkFriendOnline,
     createRoom,
+    updateRoomRules,
     joinRoom,
     startOnlineGame,
     kickPlayer,

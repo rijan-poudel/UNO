@@ -39,12 +39,26 @@ export default function Modal({
       ref={ref}
       className={`modal ${className}`}
       aria-labelledby={id}
+      {...({ closedby: "any" } as Record<string, string>)}
       onCancel={(e) => {
         e.preventDefault();
         onClose?.();
       }}
       onClick={(e) => {
-        if (e.target === e.currentTarget) onClose?.();
+        if (e.target === e.currentTarget) {
+          onClose?.();
+          return;
+        }
+        const dialog = ref.current;
+        if (dialog && e.target === dialog) {
+          const rect = dialog.getBoundingClientRect();
+          const inside =
+            rect.top <= e.clientY &&
+            e.clientY <= rect.top + rect.height &&
+            rect.left <= e.clientX &&
+            e.clientX <= rect.left + rect.width;
+          if (!inside) onClose?.();
+        }
       }}
     >
       <div className="modal-content">
@@ -53,7 +67,7 @@ export default function Modal({
           {onClose && (
             <button
               type="button"
-              className="icon-button"
+              className="icon-button modal-close-btn"
               aria-label="Close dialog"
               onClick={onClose}
             >

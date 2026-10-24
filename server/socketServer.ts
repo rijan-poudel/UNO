@@ -2,6 +2,8 @@ import { createServer } from 'node:http';
 import { randomBytes } from 'node:crypto';
 import { Server } from 'socket.io';
 import { initializeGame } from '../lib/gameSetup';
+import { validateGameRules } from '../lib/validateGameRules';
+import { defaultRules, type GameRules } from '../types/rules';
 import {
   playCard,
   drawOneCard,
@@ -38,6 +40,7 @@ import type {
   SendFriendInvitePayload,
   StartRoomPayload,
   ReadyPayload,
+  UpdateRulesPayload,
 } from '../types/multiplayer';
 
 const PORT = Number(process.env.PORT ?? process.env.UNO_SOCKET_PORT ?? 3001);
@@ -77,6 +80,7 @@ interface ServerRoom {
   started: boolean;
   game: RoomSnapshot['game'];
   pendingColorChoice: RoomSnapshot['pendingColorChoice'];
+  rules?: Partial<GameRules>;
 }
 
 interface PresenceRecord {
@@ -160,6 +164,7 @@ function toSnapshot(room: ServerRoom): RoomSnapshot {
     started: room.started,
     game: room.game,
     pendingColorChoice: room.pendingColorChoice,
+    rules: room.rules ?? defaultRules,
   };
 }
 
@@ -240,6 +245,7 @@ function createRoomForPlayer(
   socketId: string,
   playerName: string,
   deviceId: string,
+  rules?: Partial<GameRules>,
 ): { room: ServerRoom; playerId: string } {
   let roomId = makeRoomId();
   while (rooms.has(roomId)) {
@@ -264,6 +270,7 @@ function createRoomForPlayer(
     started: false,
     game: null,
     pendingColorChoice: null,
+    rules: rules ? validateGameRules(rules) : { ...defaultRules },
   };
 
   rooms.set(roomId, room);
@@ -909,6 +916,7 @@ io.on('connection', (socket) => {
           socket.id,
           playerName,
           deviceId,
+          payload.rules,
         );
         socket.join(room.roomId);
 
@@ -1225,11 +1233,18 @@ io.on('connection', (socket) => {
 
         // Validate and deal before changing the live room. A rejected configuration
         // must leave its lobby or current round intact.
+        const effectiveRules = payload.rules
+          ? validateGameRules({
+              ...(room.rules ?? defaultRules),
+              ...payload.rules,
+            })
+          : (room.rules ?? defaultRules);
         const newGame = initializeGame(
           room.players.map((p) => p.name),
-          payload.rules,
+          effectiveRules,
           room.players.map((p) => p.isBot),
         );
+        room.rules = effectiveRules;
         // Preserve room identities when a lobby seat has been removed or replaced.
         room.game = {
           ...newGame,
@@ -1254,6 +1269,46 @@ io.on('connection', (socket) => {
 
         const snapshot = toSnapshot(room);
         io.to(roomId).emit('room:update', snapshot);
+        reply?.({ ok: true, data: { room: snapshot } });
+      } catch (error) {
+        reply?.(ackError((error as Error).message));
+      }
+    },
+  );
+
+  socket.on(
+    'room:set-rules',
+    (
+      payload: UpdateRulesPayload,
+      reply?: (ack: Ack<{ room: RoomSnapshot }>) => void,
+    ) => {
+      try {
+        const roomId = payload.roomId?.trim().toUpperCase();
+        if (!roomId) {
+          reply?.(ackError('Room code is required.'));
+          return;
+        }
+
+        const room = rooms.get(roomId);
+        if (!room) {
+          reply?.(ackError('Room not found.'));
+          return;
+        }
+
+        const actor = room.players.find((p) => p.socketId === socket.id);
+        if (!actor || actor.playerId !== room.hostPlayerId) {
+          reply?.(ackError('Only the host can change table rules.'));
+          return;
+        }
+
+        const merged = validateGameRules({
+          ...(room.rules ?? defaultRules),
+          ...payload.rules,
+        });
+        room.rules = merged;
+
+        const snapshot = toSnapshot(room);
+        io.to(room.roomId).emit('room:update', snapshot);
         reply?.({ ok: true, data: { room: snapshot } });
       } catch (error) {
         reply?.(ackError((error as Error).message));

@@ -1,7 +1,6 @@
 // A compact cue ties the real actor, legal decision and authoritative clock together.
 "use client";
 import { useEffect, useState } from "react";
-import { RotateCw, RotateCcw } from "lucide-react";
 import type { GameState } from "../types/game";
 import { HUMAN_TURN_MS, hasForcedPenalty } from "../lib/turnFlow";
 export default function TurnCue({
@@ -45,20 +44,10 @@ export default function TurnCue({
           : local
             ? `Match ${game.activeColor}${top?.color !== "wild" && value ? ` or ${value}` : ""}`
             : "Get your next card ready";
-  const Direction = game.direction === 1 ? RotateCw : RotateCcw;
   return (
     <div
       className={`turn-cue ${local ? "turn-cue-local" : ""} ${seconds !== null && seconds <= 5 ? "turn-urgent" : ""}`}
     >
-      <div
-        className="turn-direction"
-        aria-label={
-          game.direction === 1 ? "Clockwise turns" : "Counterclockwise turns"
-        }
-      >
-        <Direction size={18} aria-hidden="true" />
-        <span>{game.direction === 1 ? "Clockwise" : "Counterclockwise"}</span>
-      </div>
       <div className="turn-message">
         {seconds !== null && connected ? (
           <span

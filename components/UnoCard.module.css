@@ -16,23 +16,28 @@
 }
 .face:global(.card-red) {
   --card-color: #df0735;
+  --card-glow: #df073566;
 }
 .face:global(.card-blue) {
   --card-color: #075bee;
+  --card-glow: #075bee66;
 }
 .face:global(.card-green) {
   --card-color: #00bc68;
   --card-ink: #00321e;
   --card-value-ink: #00894a;
+  --card-glow: #00bc6866;
 }
 .face:global(.card-yellow) {
   --card-color: #ffce00;
   --card-ink: #482f00;
   --card-value-ink: #805100;
+  --card-glow: #ffce0066;
 }
 .face:global(.card-wild),
 .face:global(.card-back) {
   --card-color: #101d3a;
+  --card-glow: #ffd0004d;
 }
 .face :global(.card-orbit) {
   background: #ffffff;

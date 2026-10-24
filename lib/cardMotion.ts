@@ -8,19 +8,38 @@ export interface CardPose {
   angle: number;
 }
 
-export function getCardFlight(from: CardPose, to: CardPose) {
+export const CARD_MOTION_EASE = 'cubic-bezier(.22,.68,0,1)';
+export type CardFlightKind = 'play' | 'draw' | 'deal' | 'return';
+
+export function getCardFlight(
+  from: CardPose,
+  to: CardPose,
+  kind: CardFlightKind = 'play',
+) {
   const dx = from.x - to.x;
   const dy = from.y - to.y;
   const scale = from.width / to.width;
+  const distance = Math.min(600, Math.hypot(dx, dy));
+  const lift = Math.min(kind === 'deal' ? 38 : 24, distance * 0.09);
+  // Sample one shallow arc: exact pickup and contact poses, no rebound at rest.
+  const angle = ((to.angle - from.angle + 540) % 360) - 180;
   return {
-    duration: Math.round(190 + Math.min(600, Math.hypot(dx, dy)) * 0.12),
-    keyframes: [
-      {
-        transform: `translate(${dx}px, ${dy}px) rotate(${from.angle}deg) scale(${scale})`,
-      },
-      { transform: `translate(0, 0) rotate(${to.angle}deg) scale(1)` },
-    ],
+    duration: Math.round(
+      (kind === 'return' ? 180 : kind === 'deal' ? 300 : 240) + distance * 0.1,
+    ),
+    keyframes: [0, 0.25, 0.5, 0.75, 1].map((progress) => {
+      const arc = 4 * progress * (1 - progress);
+      return {
+        offset: progress,
+        transform: `translate(${dx * (1 - progress)}px, ${dy * (1 - progress) - lift * arc}px) rotate(${from.angle + angle * progress}deg) scale(${scale + (1 - scale) * progress + arc * Math.min(distance / 600, 1) * 0.035})`,
+      };
+    }),
   };
+}
+
+// A full table deals in short rounds, capped even for unusually large hands.
+export function getDealDelay(cardIndex: number, seatIndex = 0): number {
+  return Math.min(320, cardIndex * 42 + seatIndex * 8);
 }
 
 // Equivalent online snapshots and UNO metadata must not interrupt a card in flight.

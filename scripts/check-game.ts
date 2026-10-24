@@ -1,6 +1,10 @@
 import './check-gesture';
 import './check-turn-flow';
-import { getCardFlight, hasCardLayoutChanged } from '../lib/cardMotion';
+import {
+  getCardFlight,
+  getDealDelay,
+  hasCardLayoutChanged,
+} from '../lib/cardMotion';
 // Framework-free engine smoke check. Run with npm run check:game.
 import assert from 'node:assert/strict';
 import { defaultRules } from '../types/rules';
@@ -691,24 +695,45 @@ assert.equal(
 );
 assert.equal(
   flight.keyframes.at(-1)?.transform,
-  'translate(0, 0) rotate(7deg) scale(1)',
+  'translate(0px, 0px) rotate(7deg) scale(1)',
 );
-assert.ok(flight.duration >= 190 && flight.duration <= 262);
+assert.ok(flight.duration >= 240 && flight.duration <= 300);
+const middle = flight.keyframes[2];
+assert.ok(middle.transform.startsWith('translate(-50px, 176px)'));
+assert.equal(middle.offset, 0.5);
 assert.equal(
   getCardFlight(
     { x: 0, y: 0, width: 80, angle: 0 },
     { x: 0, y: 0, width: 80, angle: 0 },
   ).duration,
-  190,
+  240,
 );
 assert.equal(
   getCardFlight(
     { x: 10000, y: 10000, width: 80, angle: 0 },
     { x: 0, y: 0, width: 80, angle: 0 },
   ).duration,
-  262,
+  300,
 );
-console.log('Card motion source pose, pile landing and bounded timing passed.');
+for (const kind of ['deal', 'draw', 'return'] as const) {
+  const motion = getCardFlight(
+    { x: 100, y: 600, width: 120, angle: -16 },
+    { x: 200, y: 200, width: 80, angle: 7 },
+    kind,
+  );
+  assert.equal(motion.keyframes[0].transform, flight.keyframes[0].transform);
+  assert.equal(
+    motion.keyframes.at(-1)?.transform,
+    flight.keyframes.at(-1)?.transform,
+  );
+  assert.ok(motion.duration <= (kind === 'deal' ? 360 : 300));
+}
+assert.equal(getDealDelay(0), 0);
+assert.ok(getDealDelay(1) > getDealDelay(0, 5));
+assert.ok(getDealDelay(99, 5) <= 320);
+console.log(
+  'Card arcs, exact pickup/contact, bounded timing and round-robin deal passed.',
+);
 
 // Network metadata preserves presentation; actual card changes interrupt it.
 {
@@ -746,10 +771,12 @@ console.log('Card motion source pose, pile landing and bounded timing passed.');
     true,
     'Changed hand ordering needs a new pose',
   );
-  assert.equal(
-    flight.keyframes.length,
-    2,
-    'Card flights settle directly without an overshoot waypoint',
+  const horizontal = flight.keyframes.map((frame) =>
+    Number(/translate\(([-\d.]+)px/.exec(frame.transform)?.[1]),
+  );
+  assert.ok(
+    horizontal.every((x, i) => i === 0 || x >= horizontal[i - 1]),
+    'The arc approaches contact without horizontal overshoot',
   );
   console.log(
     'Motion continuity passed: metadata, cloned snapshots, real card changes and no overshoot.',

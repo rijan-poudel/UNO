@@ -22,6 +22,7 @@ export interface RoomSnapshot {
     cardId: string;
     cardValue: CardValue;
   } | null;
+  rules?: Partial<GameRules>;
 }
 
 export interface FriendInvite {
@@ -45,6 +46,12 @@ export type MultiplayerAction =
 export interface CreateRoomPayload {
   playerName: string;
   deviceId: string;
+  rules?: Partial<GameRules>;
+}
+
+export interface UpdateRulesPayload {
+  roomId: string;
+  rules: Partial<GameRules>;
 }
 
 export interface PresencePayload {

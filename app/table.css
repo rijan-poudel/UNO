@@ -640,7 +640,7 @@ body {
 @keyframes catch-arrive {
   from {
     opacity: 0;
-    transform: scale(0.5) translateY(-4px);
+    transform: scale(0.92) translateY(-4px);
   }
   to {
     opacity: 1;
@@ -834,10 +834,10 @@ body {
 @keyframes uno-arrive {
   from {
     opacity: 0;
-    transform: scale(0.55) translateY(10px) rotate(-6deg);
+    transform: scale(0.92) translateY(10px) rotate(-6deg);
   }
   60% {
-    transform: scale(1.08) translateY(-2px) rotate(2deg);
+    transform: scale(1.06) translateY(-2px) rotate(2deg);
   }
   to {
     opacity: 1;
@@ -1537,11 +1537,11 @@ body {
 @keyframes penalty-pop {
   0% {
     opacity: 0;
-    transform: scale(0.4) rotate(-12deg);
+    transform: scale(0.88) rotate(-10deg);
   }
   60% {
     opacity: 1;
-    transform: scale(1.18) rotate(4deg);
+    transform: scale(1.1) rotate(3deg);
   }
   100% {
     opacity: 1;
@@ -1551,14 +1551,14 @@ body {
 @keyframes last-card-settle {
   0% {
     opacity: 0;
-    transform: translateY(12px) rotate(-16deg) scale(0.6);
+    transform: translateY(12px) rotate(-16deg) scale(0.9);
   }
   55% {
     opacity: 1;
-    transform: translateY(-3px) rotate(12deg) scale(1.14);
+    transform: translateY(-3px) rotate(12deg) scale(1.08);
   }
   80% {
-    transform: translateY(1px) rotate(8deg) scale(0.97);
+    transform: translateY(1px) rotate(8deg) scale(0.98);
   }
   100% {
     opacity: 1;
@@ -1593,14 +1593,14 @@ body {
 @keyframes winner-avatar-pop {
   0% {
     opacity: 0;
-    transform: translateY(24px) scale(0.6) rotate(-15deg);
+    transform: translateY(20px) scale(0.88) rotate(-12deg);
   }
   60% {
     opacity: 1;
-    transform: translateY(-8px) scale(1.12) rotate(2deg);
+    transform: translateY(-6px) scale(1.08) rotate(2deg);
   }
   85% {
-    transform: translateY(2px) scale(0.97) rotate(-7deg);
+    transform: translateY(2px) scale(0.98) rotate(-6deg);
   }
   100% {
     opacity: 1;
@@ -1624,7 +1624,7 @@ body {
 @keyframes winner-card-left {
   from {
     opacity: 0;
-    transform: translate(14px, 14px) rotate(0deg) scale(0.7);
+    transform: translate(14px, 14px) rotate(0deg) scale(0.9);
   }
   to {
     opacity: 1;
@@ -1634,7 +1634,7 @@ body {
 @keyframes winner-card-right {
   from {
     opacity: 0;
-    transform: translate(-14px, 14px) rotate(0deg) scale(0.7);
+    transform: translate(-14px, 14px) rotate(0deg) scale(0.9);
   }
   to {
     opacity: 1;
@@ -1654,11 +1654,11 @@ body {
 @keyframes crown-drop {
   0% {
     opacity: 0;
-    transform: translateY(-24px) scale(0.3) rotate(-20deg);
+    transform: translateY(-20px) scale(0.88) rotate(-16deg);
   }
   65% {
     opacity: 1;
-    transform: translateY(3px) scale(1.2) rotate(12deg);
+    transform: translateY(3px) scale(1.1) rotate(10deg);
   }
   100% {
     opacity: 1;

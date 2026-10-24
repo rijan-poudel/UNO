@@ -12,7 +12,10 @@ import { recordRound } from "../lib/playerProgress";
 import { getAudioSettings } from "../lib/audioSettings";
 import {
   getCardFlight,
+  getDealDelay,
+  CARD_MOTION_EASE,
   hasCardLayoutChanged,
+  type CardFlightKind,
   type CardPose,
 } from "../lib/cardMotion";
 import { readCardPose as cardPose } from "../lib/cardPose";
@@ -42,13 +45,33 @@ export function useGamePresentation(
   } | null>(null);
   const running = useRef<Set<Animation>>(new Set());
   const ghosts = useRef<Set<HTMLElement>>(new Set());
+  const flights = useRef(
+    new Map<
+      HTMLElement,
+      {
+        ghost: HTMLElement;
+        stop: () => void;
+        to: CardPose;
+        startsAt: number;
+        kind: CardFlightKind;
+      }
+    >(),
+  );
+  const reflowing = useRef(new Map<HTMLElement, Animation>());
+  const takeCard = (element: HTMLElement) => {
+    const arrival = flights.current.get(element);
+    const pose = cardPose(arrival?.ghost ?? element);
+    // A pointer owns one physical card from pickup onward, even mid-deal.
+    arrival?.stop();
+    return pose;
+  };
   const rememberOrigin = (cardId: string, element: HTMLElement) => {
     const wrapper = element.closest<HTMLElement>("[data-hand-card]");
     const neighbor =
       wrapper?.nextElementSibling ?? wrapper?.previousElementSibling;
     selectedOrigin.current = {
       cardId,
-      pose: cardPose(element),
+      pose: cardPose(flights.current.get(element)?.ghost ?? element),
       nextId: (neighbor as HTMLElement | null)?.dataset.handCard,
       restoreFocus: document.activeElement === element,
     };
@@ -59,14 +82,22 @@ export function useGamePresentation(
     const before =
       game.lastAction.type === "init" && prior?.winnerId ? null : prior;
     previous.current = game;
-    if (before === game) return;
-    // Interrupt only when cards actually change. UNO declarations and equivalent
-    // network snapshots can arrive mid-flight and must not flash the destination.
-    if (!before || hasCardLayoutChanged(before, game)) {
+    const changed = before !== game;
+    // Only a new round clears the table's motion. Metadata and later moves
+    // preserve independent flights and their hidden endpoints.
+    if (!before) {
       running.current.forEach((animation) => animation.cancel());
       ghosts.current.forEach((element) => element.remove());
       ghosts.current.clear();
+      flights.current.clear();
+      reflowing.current.clear();
     }
+    // Independent arrivals finish through later moves. Remove only hand cards
+    // that left the DOM; a new throw must not snap every other card to rest.
+    flights.current.forEach((flight, element) => {
+      if (!element.isConnected && element.closest("[data-hand-card]"))
+        flight.stop();
+    });
     const board = root.current;
     if (!before) {
       handPositions.current.clear();
@@ -106,16 +137,36 @@ export function useGamePresentation(
         .catch(() => {})
         .finally(() => running.current.delete(animation));
     }
+    function destinationPose(element: HTMLElement): CardPose {
+      const pose = cardPose(element);
+      const wrapper = element.closest<HTMLElement>("[data-hand-card]");
+      if (wrapper && reflowing.current.has(wrapper)) {
+        const [x, y] = getComputedStyle(wrapper)
+          .translate.split(" ")
+          .map(parseFloat);
+        pose.x -= x || 0;
+        pose.y -= y || 0;
+      }
+      return pose;
+    }
     function fly(
       element: HTMLElement,
       from: CardPose,
       delay = 0,
       hideDestination = true,
-      to: CardPose = cardPose(element),
+      to: CardPose = destinationPose(element),
+      kind: CardFlightKind = "play",
     ) {
       if (reduced) return;
       if (!element.offsetWidth || !to.width || !from.width) return;
-      const { keyframes, duration } = getCardFlight(from, to);
+      const existing = hideDestination
+        ? flights.current.get(element)
+        : undefined;
+      if (existing) {
+        from = cardPose(existing.ghost);
+        existing.stop();
+      }
+      const { keyframes, duration } = getCardFlight(from, to, kind);
       const resize = to.width / element.offsetWidth;
       const height = element.offsetHeight * resize;
       const ghost = element.cloneNode(true) as HTMLElement;
@@ -132,6 +183,10 @@ export function useGamePresentation(
         margin: "0",
         pointerEvents: "none",
         transition: "none",
+        animation: "none",
+        transformOrigin: "50% 50%",
+        opacity: "1",
+        filter: "none",
         zIndex: "90",
       });
       ghost.style.setProperty(
@@ -143,22 +198,36 @@ export function useGamePresentation(
       const flight = ghost.animate(keyframes, {
         duration,
         delay,
-        easing: "cubic-bezier(.16,1,.3,1)",
-        fill: "backwards",
+        easing: CARD_MOTION_EASE,
+        fill: "both",
       });
       track(flight);
       // The real endpoint remains in layout; only one visible copy moves to it.
-      if (hideDestination)
-        track(
-          element.animate([{ opacity: 0 }, { opacity: 0 }], {
+      const mask = hideDestination
+        ? element.animate([{ opacity: 0 }, { opacity: 0 }], {
             duration: duration + delay,
-          }),
-        );
+          })
+        : null;
+      if (mask) track(mask);
+      const entry = {
+        ghost,
+        to,
+        kind,
+        startsAt: performance.now() + delay,
+        stop: () => {
+          flight.cancel();
+          mask?.cancel();
+          ghost.remove();
+          ghosts.current.delete(ghost);
+          if (flights.current.get(element) === entry)
+            flights.current.delete(element);
+        },
+      };
+      if (hideDestination) flights.current.set(element, entry);
       void flight.finished
         .catch(() => {})
         .finally(() => {
-          ghost.remove();
-          ghosts.current.delete(ghost);
+          entry.stop();
         });
     }
     const top = game.discardPile.at(-1);
@@ -166,6 +235,7 @@ export function useGamePresentation(
     const action = game.lastAction;
     const origin = selectedOrigin.current;
     if (
+      changed &&
       before &&
       action.type === "play" &&
       top &&
@@ -179,6 +249,7 @@ export function useGamePresentation(
       if (from) fly(discard, from);
     }
     if (
+      changed &&
       action.type === "play" &&
       origin?.cardId === action.card.id &&
       origin.restoreFocus
@@ -198,7 +269,7 @@ export function useGamePresentation(
     }
     // Preparing an online wild publishes metadata before the card moves. Keep
     // its measured origin and focus intent through that color-choice snapshot.
-    if (before && hasCardLayoutChanged(before, game))
+    if (changed && before && hasCardLayoutChanged(before, game))
       selectedOrigin.current = null;
     const local = game.players.find((p) => p.id === localPlayerId);
     const priorIds = new Set(
@@ -207,7 +278,12 @@ export function useGamePresentation(
         ?.hand.map((c) => c.id),
     );
     const added = local?.hand.filter((card) => !priorIds.has(card.id)) ?? [];
-    if (before && action.type === "draw" && action.playerId === localPlayerId) {
+    if (
+      changed &&
+      before &&
+      action.type === "draw" &&
+      action.playerId === localPlayerId
+    ) {
       const newest = added.at(-1);
       if (newest)
         findCard(newest.id)?.closest("[data-hand-card]")?.scrollIntoView({
@@ -243,51 +319,121 @@ export function useGamePresentation(
           reflows.push({ element: wrapper, from, to });
       });
     handPositions.current = nextPositions;
-    reflows.forEach(({ element, from, to }) =>
-      track(
-        element.animate(
-          [
-            {
-              translate: `${from.left - to.left}px ${from.top - to.top}px`,
-            },
-            { translate: "0px 0px" },
-          ],
-          { duration: 180, easing: "cubic-bezier(.16,1,.3,1)" },
-        ),
-      ),
-    );
-    if (deck) {
+    // Measure all flight endpoints BEFORE applying reflow inversions.
+    // Otherwise the arriving card lands in the hand's old position.
+    if (changed && deck) {
       const origin = cardPose(
         action.type === "play" && action.shuffledHands && discard
           ? discard
           : deck,
       );
-      // Six representative arrivals maximum, including the newest card in a large draw.
-      added
-        .filter((_, i) => i < 5 || i === added.length - 1)
-        .forEach((card, i) => {
-          const element = findCard(card.id);
-          if (element) fly(element, origin, i * 25);
-        });
-      if (before && !reduced)
-        for (const player of game.players) {
-          const oldPlayer = before.players.find((p) => p.id === player.id);
-          if (
-            player.id !== localPlayerId &&
-            oldPlayer &&
-            player.hand.length > oldPlayer.hand.length
-          ) {
-            const destination = playerCardPose(player.id);
-            // Clone the face-down deck, never the avatar used as its landing pose.
-            if (destination) fly(deck, origin, 0, false, destination);
+      const arrivals = before
+        ? added.filter((_, i) => i < 5 || i === added.length - 1)
+        : added.filter((_, i) => i < 7 || i === added.length - 1);
+      arrivals.forEach((card, i) => {
+        const element = findCard(card.id);
+        if (element)
+          fly(
+            element,
+            origin,
+            before ? i * 32 : getDealDelay(i),
+            true,
+            destinationPose(element),
+            before ? "draw" : "deal",
+          );
+      });
+      if (!reduced)
+        for (const [seatIndex, player] of game.players.entries()) {
+          if (player.id === localPlayerId) continue;
+          const oldPlayer = before?.players.find((p) => p.id === player.id);
+          const count = before
+            ? Math.max(
+                0,
+                player.hand.length -
+                  (oldPlayer?.hand.length ?? player.hand.length),
+              )
+            : Math.min(5, player.hand.length);
+          const backs = Array.from(
+            findSeat(player.id)?.querySelectorAll<HTMLElement>(
+              ".opponent-hand .uno-card",
+            ) ?? [],
+          ).filter((el) => el.offsetWidth && el.offsetHeight);
+          const destination = playerCardPose(player.id);
+          if (!destination) continue;
+          for (let i = 0; i < Math.min(before ? 3 : 5, count); i++) {
+            const back = !before ? backs[i] : undefined;
+            const delay = before ? i * 38 : getDealDelay(i, seatIndex);
+            // Always move a card back, including when a compact seat uses its avatar as an anchor.
+            fly(
+              back ?? deck,
+              origin,
+              delay,
+              !!back,
+              back ? cardPose(back) : destination,
+              before ? "draw" : "deal",
+            );
           }
         }
+      if (!before && discard)
+        fly(
+          discard,
+          origin,
+          getDealDelay(Math.min(7, local?.hand.length ?? 7)),
+          true,
+          cardPose(discard),
+          "deal",
+        );
     }
+    // Adaptive sizing/sorting can produce a second layout without a new game
+    // snapshot. Retarget the arrival from its visible pose, never from the deck.
+    for (const [element, flight] of flights.current) {
+      if (!element.closest("[data-hand-card]")) continue;
+      const to = destinationPose(element);
+      if (
+        Math.hypot(to.x - flight.to.x, to.y - flight.to.y) > 1 ||
+        Math.abs(to.width - flight.to.width) > 1
+      ) {
+        fly(
+          element,
+          cardPose(flight.ghost),
+          Math.max(0, flight.startsAt - performance.now()),
+          true,
+          to,
+          flight.kind,
+        );
+      }
+    }
+    reflows.forEach(({ element, from, to }) => {
+      const active = reflowing.current.get(element);
+      const translate = active
+        ? getComputedStyle(element).translate.split(" ").map(parseFloat)
+        : [0, 0];
+      active?.cancel();
+      const animation = element.animate(
+        [
+          {
+            translate: `${from.left - to.left + (translate[0] || 0)}px ${from.top - to.top + (translate[1] || 0)}px`,
+          },
+          { translate: "0px 0px" },
+        ],
+        { duration: 240, easing: CARD_MOTION_EASE },
+      );
+      reflowing.current.set(element, animation);
+      track(animation);
+      void animation.finished
+        .catch(() => {})
+        .finally(() => {
+          if (reflowing.current.get(element) === animation)
+            reflowing.current.delete(element);
+        });
+    });
     // Effects describe the current snapshot immediately; no queue or duration wait.
-    if (!before) playTableChime("deal");
+    if (changed && !before) playTableChime("deal");
     else if (
-      JSON.stringify(before.lastAction) !== JSON.stringify(action) ||
-      before.turnCount !== game.turnCount
+      changed &&
+      before &&
+      (JSON.stringify(before.lastAction) !== JSON.stringify(action) ||
+        before.turnCount !== game.turnCount)
     ) {
       announceBoardFromTransition(
         before,
@@ -303,7 +449,7 @@ export function useGamePresentation(
       else if (action.type === "declareUno") playTableChime("uno");
       else if (action.type === "callOut") playTableChime("callOut");
     }
-  }, [game, localPlayerId, root]);
+  });
   useEffect(() => {
     if (game?.winnerId && localPlayerId) recordRound(game, localPlayerId);
   }, [game, localPlayerId]);
@@ -319,6 +465,8 @@ export function useGamePresentation(
       running.current.forEach((animation) => animation.cancel());
       ghosts.current.forEach((element) => element.remove());
       ghosts.current.clear();
+      flights.current.clear();
+      reflowing.current.clear();
       selectedOrigin.current = null;
     };
     const onVisibility = () => {
@@ -341,6 +489,8 @@ export function useGamePresentation(
     media.addEventListener("change", onMotion);
     const active = running.current;
     const activeGhosts = ghosts.current;
+    const activeFlights = flights.current;
+    const activeReflows = reflowing.current;
     return () => {
       window.removeEventListener("uno:audio-settings", onSettings);
       window.removeEventListener("resize", onResize);
@@ -351,7 +501,10 @@ export function useGamePresentation(
       activeGhosts.forEach((element) => element.remove());
       active.clear();
       activeGhosts.clear();
+      previous.current = null;
+      activeFlights.clear();
+      activeReflows.clear();
     };
   }, []);
-  return { rememberOrigin };
+  return { rememberOrigin, takeCard };
 }

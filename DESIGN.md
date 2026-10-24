@@ -304,11 +304,11 @@ Home is a centered title/start composition: main width capped at 760px, play lan
 
 The arena fills `100dvh`, clips page overflow and caps its internal stage at 1600px. Opponents occupy the upper/perimeter field; central tilted draw/discard piles sit directly above the bottom-held hand. The hand owns horizontal overflow, headroom and paging controls. Use safe-area insets at the screen edges. Legal cards rise; focus/inspection rises further without clipping. Contextual decisions sit beside the centered turn cue rather than displacing piles.
 
-Height determines live density: large desktop starts at 900px height with width ≥701px; compact stages apply below 680px; landscape phone applies below 460px with width ≥541px; the shortest variant applies below 360px. At the phone thresholds, portrait badges become 126px then 100px wide while retaining a 44px minimum target, exact count and inline status. The name/status wrapper stays a row. Compact opponent back fans disappear; native card indices remain readable. Phone gameplay uses a rotate gate in portrait.
+Height determines live density: large desktop starts at 900px height with width ≥701px; compact stages apply below 680px; landscape phone applies below 460px with width ≥541px; the shortest variant applies below 360px. Portrait badges hold a comfortable single-row token on large stages and compact below 680px height, then become 126px then 100px wide at the phone thresholds while retaining a 44px minimum target, exact count and inline status. The name/status wrapper stays a row. Compact opponent back fans shrink in place rather than disappearing, and pointer hover magnifies the hovered back with its neighbors dock-style; on five- and six-seat landscape phones the top seat drops its decorative fan so its badge clears the piles. Native card indices remain readable. Phone gameplay uses a rotate gate in portrait.
 
 The observed spacing vocabulary runs from micro/detail gaps through compact, regular, section and dialog steps. It is not an instruction to normalize every card-specific overlap. See the two surface briefs for geometry and the sidecar for exact responsive conditions.
 
-**The Hand Owns Its Width Rule.** Large hands scroll inside their own fan; do not shrink them into an unreadable row or allow document-width overflow.
+**The Hand Owns Its Width Rule.** A hand first compacts inside its own fan — deeper overlap, then a bounded scale floor — so a normal hand fits without paging; only a hand that cannot fit readable scrolls, and document-width overflow is never allowed.
 
 ## Elevation & Depth
 
@@ -322,6 +322,8 @@ Depth comes from native card stock, soft blue contact shadows, floating portrait
 - **Dialog:** broad blue ambient shadow, with a dark native backdrop.
 
 Exact shadow values and motion durations live in `.impeccable/design.json` extensions. Primary controls use a small scale press; card fan lift uses the standard out easing. Portrait reactions are bounded to a short state-triggered bounce. Skip/reverse/penalty feedback is brief and derived from the move; reduced motion removes travel and preserves legible state. Thinking dots may pulse only while waiting for the actual actor; no decorative idle character loop is part of the system.
+
+Card motion follows a shallow paper arc with a small airborne lift and direct contact, without a rebound. Ordinary travel lasts 240–300 ms; the opening deal uses short rounds across seats with at most 320 ms of stagger. Hover gently straightens the held card and eases neighboring cards apart; pointer focus does not pin the keyboard inspection pose. Motion stays interruptible, and independent arrivals finish through later moves.
 
 **The Contact Rule.** Use inset press depth for actions and stock/contact depth for cards. Preserve readable resting geometry and keyboard focus; sound and animation never determine turn timing.
 
@@ -353,11 +355,11 @@ Small wordmark and restrained Settings/Menu chrome sit at the perimeter. Setting
 
 ### Portrait identities
 
-`PlayerAvatar` selects one of six original human portraits from `/artwork/player-portraits.webp`; preserve its companion prompt provenance. Opaque dark blue nameplates hold a name/status row and exact count below. The active player's badge turns cream and portrait gains an amber outline; a catchable badge turns amber. Compact states retain the same footprint and inline status instead of creating a third text tier.
+`PlayerAvatar` selects one of six original human portraits from `/artwork/player-portraits.webp`; preserve its companion prompt provenance. Opaque dark blue nameplates are compact single-row tokens — portrait, name/status row and a Barlow Condensed count chip — sized under the card backs they annotate. The active player's badge turns cream and portrait gains an amber outline; a catchable badge turns amber. Compact tiers keep the 44px floor and inline status, shrinking width and type instead of creating a third text tier.
 
 ### Held cards and live turn cue
 
-`UnoCard` owns card print; `HandCard` owns direct tap/drag handling; `useGamePresentation` owns transitions/audio. Legal cards play on first activation, with the shared gesture predicate governing drag readiness. Inspection, roving keyboard navigation and overflow paging stay available. Wild decisions preserve written chosen-color state and accessible counts.
+`UnoCard` owns card print; `HandCard` owns direct tap/drag handling; `useGamePresentation` owns transitions/audio. Legal cards play on first activation, with the shared gesture predicate governing drag readiness. Inspection, roving keyboard navigation and overflow paging stay available. On pointers, hovering a held card magnifies it dock-style, spreads its neighbors and lifts the quiet-card dim; touch and keyboard paths stay unchanged. Wild decisions preserve written chosen-color state and accessible counts.
 
 `TurnCue` presents the real actor, direction, current action and deadline. Human turns last 30 seconds; the ring and tabular number derive from the published deadline, never a sample comp value. Drawing and metadata do not restart it; online timing belongs to the server. Forced penalties show the actual total/target and resolve automatically when no stack response exists. At five seconds or fewer the cue uses its urgency treatment. Local portrait gating pauses local timing; online rounds continue. Music and sound respect saved preferences and never gate a turn.
 
