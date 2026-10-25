@@ -3,15 +3,24 @@
 import { useEffect, useState } from "react";
 import type { GameState } from "../types/game";
 import { HUMAN_TURN_MS, hasForcedPenalty } from "../lib/turnFlow";
+const VALUE_LABELS: Record<string, string> = {
+  draw2: "+2",
+  wild4: "+4",
+  skip: "Skip",
+  reverse: "Reverse",
+  discardAll: "Discard all",
+};
 export default function TurnCue({
   game,
   local,
   choosing,
+  playableCount,
   connected = true,
 }: {
   game: GameState;
   local: boolean;
   choosing: boolean;
+  playableCount: number;
   connected?: boolean;
 }) {
   const [now, setNow] = useState(() => Date.now());
@@ -29,21 +38,24 @@ export default function TurnCue({
     : 1;
   const top = game.discardPile.at(-1);
   const forced = hasForcedPenalty(game);
-  const value =
-    top?.value === "draw2" ? "+2" : top?.value === "wild4" ? "+4" : top?.value;
+  const value = top ? (VALUE_LABELS[top.value] ?? top.value) : null;
   const hint = !connected
     ? "Reconnecting to the table"
     : choosing
       ? "Choose your next color"
-      : game.pendingDraw
-        ? forced
-          ? `Taking +${game.pendingDraw} automatically`
-          : `Stack a draw card or take +${game.pendingDraw}`
-        : game.drawnThisTurn
-          ? "Play a match or pass"
-          : local
-            ? `Match ${game.activeColor}${top?.color !== "wild" && value ? ` or ${value}` : ""}`
-            : "Get your next card ready";
+      : !local
+        ? "Get your next card ready"
+        : game.pendingDraw
+          ? forced
+            ? `Taking +${game.pendingDraw} automatically`
+            : `Stack a draw card or take +${game.pendingDraw}`
+          : game.drawnThisTurn
+            ? playableCount > 0
+              ? "Play a lifted card or pass"
+              : "No match · Passing automatically"
+            : playableCount === 0
+              ? "No match · Tap the deck to draw"
+              : `Match ${game.activeColor}${top?.color !== "wild" && value ? ` or ${value}` : ""}`;
   return (
     <div
       className={`turn-cue ${local ? "turn-cue-local" : ""} ${seconds !== null && seconds <= 5 ? "turn-urgent" : ""}`}
@@ -76,7 +88,9 @@ export default function TurnCue({
           </span>
         )}
         <span>
-          <strong>{local ? "Your turn" : `${player.name}’s turn`}</strong>
+          <strong title={local ? "Your turn" : `${player.name}’s turn`}>
+            {local ? "Your turn" : `${player.name}’s turn`}
+          </strong>
           <small>{hint}</small>
         </span>
       </div>

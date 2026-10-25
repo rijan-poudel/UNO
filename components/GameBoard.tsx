@@ -66,7 +66,7 @@ export type GameApi =
 interface Props {
   gameApi: GameApi;
   onReset: () => void;
-  onDealAgain: () => void;
+  onDealAgain: () => boolean | Promise<boolean>;
   onOpenSettings: (tab?: "profile" | "controls" | "audio") => void;
 }
 // Reveal in the hand’s horizontal scrollport without scrolling the document.
@@ -479,8 +479,7 @@ export default function GameBoard({
         key: "jumpIn" as const,
         icon: Zap,
         title: "Jump-in",
-        message:
-          "You hold an exact match (same color and value). Tap it now to play out of turn!",
+        message: "Exact color and value? Tap the match to play out of turn.",
       };
     }
     if (canStackNow && !dismissedTips.stacking) {
@@ -488,8 +487,7 @@ export default function GameBoard({
         key: "stacking" as const,
         icon: Layers,
         title: "Stacking",
-        message:
-          "Play your matching draw card to pass the penalty along and increase the count!",
+        message: "Play a matching draw card to pass the penalty along.",
       };
     }
     if (catchableOpponent && !dismissedTips.catchUno) {
@@ -497,7 +495,7 @@ export default function GameBoard({
         key: "catchUno" as const,
         icon: AlertCircle,
         title: "Missed UNO",
-        message: `${catchableOpponent.player.name} didn’t call UNO with 1 card left! Tap their “Catch!” badge to penalize +2 cards.`,
+        message: `Tap ${catchableOpponent.player.name}’s “Catch!” badge to give them +2 cards.`,
       };
     }
     return null;
@@ -814,6 +812,7 @@ export default function GameBoard({
             game={game}
             local={isLocalTurn}
             choosing={!!pendingWild}
+            playableCount={playable.length}
             connected={!online || online.connected}
           />
           {canSayUno && (
@@ -1220,140 +1219,155 @@ export default function GameBoard({
           className="winner-modal"
         >
           {winner.id === localPlayer.id && <VictoryBurst />}
-          <RoundSummary game={game} localPlayerId={localPlayer.id} />
-          <PlayerProgress />
-          {online?.room &&
-            (() => {
-              const isHost = online.room.hostPlayerId === online.playerId;
-              const players = online.room.players;
-              const guests = players.filter(
-                (p) => p.playerId !== online.room?.hostPlayerId,
-              );
-              const readyGuests = guests.filter(
-                (p) => (p.ready || p.isBot) && p.connected,
-              );
-              const waitingGuests = guests.filter(
-                (p) => !p.ready && !p.isBot && p.connected,
-              );
-              const allGuestsReady =
-                guests.length > 0 && readyGuests.length === guests.length;
-              const myPlayer = players.find(
-                (p) => p.playerId === online.playerId,
-              );
-              const isMyPlayerReady = !!myPlayer?.ready;
+          <div
+            className="round-details"
+            role="region"
+            aria-label="Round results"
+            tabIndex={0}
+          >
+            <RoundSummary game={game} localPlayerId={localPlayer.id} />
+            <PlayerProgress />
+            {online?.room &&
+              (() => {
+                const isHost = online.room.hostPlayerId === online.playerId;
+                const players = online.room.players;
+                const guests = players.filter(
+                  (p) => p.playerId !== online.room?.hostPlayerId,
+                );
+                const readyGuests = guests.filter(
+                  (p) => (p.ready || p.isBot) && p.connected,
+                );
+                const waitingGuests = guests.filter(
+                  (p) => !p.ready && !p.isBot && p.connected,
+                );
+                const allGuestsReady =
+                  guests.length > 0 && readyGuests.length === guests.length;
+                const myPlayer = players.find(
+                  (p) => p.playerId === online.playerId,
+                );
+                const isMyPlayerReady = !!myPlayer?.ready;
 
-              let headline = "";
-              let subtext = "";
-              if (startingRematch) {
-                headline = "Dealing cards for the next round…";
-                subtext =
-                  "Shuffling the deck and dealing cards to all players.";
-              } else if (isHost) {
-                if (allGuestsReady) {
-                  headline = "Everyone is ready for a rematch!";
-                  subtext = "Deal whenever you’re ready to start.";
-                } else if (waitingGuests.length > 0) {
-                  headline = `Waiting on players (${readyGuests.length} of ${guests.length} ready)`;
-                  subtext = `Waiting for ${waitingGuests.map((g) => g.name).join(", ")} to ready up.`;
+                let headline = "";
+                let subtext = "";
+                if (startingRematch) {
+                  headline = "Dealing cards for the next round…";
+                  subtext =
+                    "Shuffling the deck and dealing cards to all players.";
+                } else if (isHost) {
+                  if (allGuestsReady) {
+                    headline = "Everyone is ready for a rematch!";
+                    subtext = "Deal whenever you’re ready to start.";
+                  } else if (waitingGuests.length > 0) {
+                    headline = `Waiting on players (${readyGuests.length} of ${guests.length} ready)`;
+                    subtext = `Waiting for ${waitingGuests.map((g) => g.name).join(", ")} to ready up.`;
+                  } else {
+                    headline = "Ready for the next round?";
+                    subtext = "Deal whenever you’re ready.";
+                  }
                 } else {
-                  headline = "Ready for the next round?";
-                  subtext = "Deal whenever you’re ready.";
+                  if (isMyPlayerReady) {
+                    headline = "You’re marked ready!";
+                    subtext = allGuestsReady
+                      ? "All players ready. Waiting for the host to deal."
+                      : "Waiting for other players and the host to deal.";
+                  } else {
+                    headline = "Ready for another round?";
+                    subtext = "Tap Ready below to let the host know you’re in.";
+                  }
                 }
-              } else {
-                if (isMyPlayerReady) {
-                  headline = "You’re marked ready!";
-                  subtext = allGuestsReady
-                    ? "All players ready. Waiting for the host to deal."
-                    : "Waiting for other players and the host to deal.";
-                } else {
-                  headline = "Ready for another round?";
-                  subtext = "Tap Ready below to let the host know you’re in.";
-                }
-              }
 
-              return (
-                <div
-                  className="rematch-readiness-card"
-                  role="region"
-                  aria-label="Rematch readiness"
-                >
-                  <div className="rematch-card-header">
-                    <strong>{headline}</strong>
-                    <small>{subtext}</small>
-                  </div>
-                  <div className="rematch-seats-list">
-                    {players.map((p) => {
-                      const isPlayerHost =
-                        p.playerId === online.room?.hostPlayerId;
-                      const isMe = p.playerId === online.playerId;
-                      let badgeState:
-                        "waiting" | "ready" | "disconnected" | "starting" =
-                        "waiting";
-                      let stateLabel = "";
+                return (
+                  <div
+                    className="rematch-readiness-card"
+                    role="region"
+                    aria-label="Rematch readiness"
+                  >
+                    <div className="rematch-card-header">
+                      <strong>{headline}</strong>
+                      <small>{subtext}</small>
+                    </div>
+                    <div className="rematch-seats-list">
+                      {players.map((p) => {
+                        const isPlayerHost =
+                          p.playerId === online.room?.hostPlayerId;
+                        const isMe = p.playerId === online.playerId;
+                        let badgeState:
+                          "waiting" | "ready" | "disconnected" | "starting" =
+                          "waiting";
+                        let stateLabel = "";
 
-                      if (!p.connected && !p.isBot) {
-                        badgeState = "disconnected";
-                        stateLabel = "Disconnected";
-                      } else if (startingRematch) {
-                        badgeState = "starting";
-                        stateLabel = "Dealing in…";
-                      } else if (isPlayerHost) {
-                        badgeState = "ready";
-                        stateLabel = "Host";
-                      } else if (p.ready || p.isBot) {
-                        badgeState = "ready";
-                        stateLabel = p.isBot ? "Bot · Ready" : "Ready";
-                      } else {
-                        badgeState = "waiting";
-                        stateLabel = "Waiting…";
-                      }
+                        if (!p.connected && !p.isBot) {
+                          badgeState = "disconnected";
+                          stateLabel = "Disconnected";
+                        } else if (startingRematch) {
+                          badgeState = "starting";
+                          stateLabel = "Dealing in…";
+                        } else if (isPlayerHost) {
+                          badgeState = "ready";
+                          stateLabel = "Host";
+                        } else if (p.ready || p.isBot) {
+                          badgeState = "ready";
+                          stateLabel = p.isBot ? "Bot · Ready" : "Ready";
+                        } else {
+                          badgeState = "waiting";
+                          stateLabel = "Waiting…";
+                        }
 
-                      return (
-                        <div
-                          key={p.playerId}
-                          className={`rematch-seat-item status-${badgeState}`}
-                        >
-                          <PlayerAvatar seed={p.playerId} />
-                          <span className="rematch-seat-name">
-                            <strong>{p.name}</strong>
-                            <small>
-                              {isMe
-                                ? "You"
-                                : isPlayerHost
-                                  ? "Host"
-                                  : p.isBot
-                                    ? "Bot"
-                                    : "Guest"}
-                            </small>
-                          </span>
-                          <span
-                            className={`rematch-status-badge status-${badgeState}`}
+                        return (
+                          <div
+                            key={p.playerId}
+                            className={`rematch-seat-item status-${badgeState}`}
                           >
-                            {badgeState === "starting" ? (
-                              <RotateCw size={12} className="spin" />
-                            ) : badgeState === "disconnected" ? (
-                              <AlertCircle size={12} />
-                            ) : badgeState === "ready" ? (
-                              <Check size={12} />
-                            ) : (
-                              <Clock size={12} />
-                            )}
-                            {stateLabel}
-                          </span>
-                        </div>
-                      );
-                    })}
+                            <PlayerAvatar seed={p.playerId} />
+                            <span className="rematch-seat-name">
+                              <strong>{p.name}</strong>
+                              <small>
+                                {isMe
+                                  ? "You"
+                                  : isPlayerHost
+                                    ? "Host"
+                                    : p.isBot
+                                      ? "Bot"
+                                      : "Guest"}
+                              </small>
+                            </span>
+                            <span
+                              className={`rematch-status-badge status-${badgeState}`}
+                            >
+                              {badgeState === "starting" ? (
+                                <RotateCw size={12} className="spin" />
+                              ) : badgeState === "disconnected" ? (
+                                <AlertCircle size={12} />
+                              ) : badgeState === "ready" ? (
+                                <Check size={12} />
+                              ) : (
+                                <Clock size={12} />
+                              )}
+                              {stateLabel}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
-              );
-            })()}
+                );
+              })()}
+          </div>
           <div className="dialog-actions round-actions">
             {!online || online.room?.hostPlayerId === online.playerId ? (
               <button
                 className="button primary"
-                onClick={() => {
+                onClick={async () => {
                   setStartingRematch(true);
-                  onDealAgain();
+                  try {
+                    if (!(await onDealAgain())) {
+                      toast.error("Couldn’t start the next round. Try again.");
+                    }
+                  } catch {
+                    toast.error("Couldn’t start the next round. Try again.");
+                  } finally {
+                    setStartingRematch(false);
+                  }
                 }}
                 disabled={startingRematch || (!!online && !online.connected)}
               >

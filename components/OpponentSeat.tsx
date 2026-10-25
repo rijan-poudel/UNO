@@ -69,20 +69,26 @@ export default function OpponentSeat({
         />
         <span className={styles.name}>
           <strong title={player.name}>{player.name}</strong>
-          {status && (
-            <small aria-label={offline ? "Reconnecting" : undefined}>
-              {status}
-            </small>
-          )}
-        </span>
-        <span
-          className={styles.count}
-          role="img"
-          aria-label={`${count} ${count === 1 ? "card" : "cards"}`}
-          data-wide={count >= 100 || undefined}
-          data-count={count}
-        >
-          <span aria-hidden="true">{count}</span>
+          <span className={styles.details}>
+            <span
+              className={styles.count}
+              role="img"
+              aria-label={`${count} ${count === 1 ? "card" : "cards"}`}
+              data-count={count}
+            >
+              <span aria-hidden="true">
+                {count}
+                <span className={styles.countUnit}>
+                  {count === 1 ? " card" : " cards"}
+                </span>
+              </span>
+            </span>
+            {status && (
+              <small aria-label={offline ? "Reconnecting" : undefined}>
+                {status}
+              </small>
+            )}
+          </span>
         </span>
         {active && <span className="sr-only">Current turn</span>}
       </SeatLabel>

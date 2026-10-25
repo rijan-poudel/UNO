@@ -1,5 +1,7 @@
 import './check-gesture';
 import './check-turn-flow';
+import './check-turn-cue';
+import './check-lobby';
 import {
   getCardFlight,
   getDealDelay,

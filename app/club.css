@@ -413,6 +413,51 @@ input[type="range"] {
   padding-block: 16px;
   animation: none;
 }
+.room-seats-heading {
+  margin-top: 24px;
+}
+.room-seat-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 24px;
+}
+.room-seat-list .seat-row {
+  min-width: 0;
+  border-bottom: 1px solid var(--ui-line);
+}
+.room-start-actions {
+  display: grid;
+  gap: 12px;
+  margin-top: 24px;
+}
+.room-rules-summary > p {
+  margin-block: 16px;
+}
+.room-rules-summary dl > div {
+  display: grid;
+  grid-template-columns: minmax(110px, 1fr) minmax(0, 2fr);
+  gap: 16px;
+  padding-block: 12px;
+  border-bottom: 1px solid var(--ui-line);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.room-rules-summary dt {
+  color: var(--ui-muted);
+}
+.room-rules-summary dd {
+  margin: 0;
+  color: var(--ui-text);
+  overflow-wrap: anywhere;
+}
+@media (max-width: 540px) {
+  .room-seat-list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .room-seats-heading .count-badge {
+    white-space: nowrap;
+  }
+}
 .seat-row .icon-button {
   transition:
     background-color 140ms ease,
@@ -576,6 +621,116 @@ input[type="range"] {
   background: var(--club-ink);
   color: var(--club-paper);
 }
+/* Dialog decisions stay visible while long preferences/results scroll. */
+.settings-modal,
+.winner-modal {
+  max-height: min(90dvh, 850px);
+  overflow: hidden;
+}
+.settings-modal .modal-content,
+.winner-modal .modal-content {
+  display: flex;
+  flex-direction: column;
+  max-height: inherit;
+  gap: 16px;
+  padding: 24px;
+}
+.settings-modal .modal-heading,
+.settings-modal .settings-tabs,
+.settings-modal .modal-footer,
+.winner-modal .modal-heading,
+.winner-modal .round-actions,
+.winner-modal .modal-content > .muted {
+  flex-shrink: 0;
+}
+.settings-modal .modal-heading .icon-button {
+  margin: 0;
+}
+.settings-modal .settings-panel,
+.winner-modal .round-details {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  padding-inline-end: 12px;
+}
+.winner-modal .round-details {
+  display: grid;
+  gap: 16px;
+}
+.settings-rule-group {
+  min-width: 0;
+  margin: 24px 0 0;
+  padding: 0;
+  border: 0;
+}
+.settings-rule-group legend {
+  padding: 0;
+  font-size: 16px;
+  font-weight: 750;
+  color: var(--ui-text);
+}
+.audio-muted-note {
+  padding-block: 12px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ui-muted);
+}
+.crew-line > div {
+  flex: 1;
+  min-width: 0;
+}
+.crew-line > div > span:last-child {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.bot-rule-disclosure summary > span {
+  margin-left: 8px;
+  color: var(--ui-muted);
+  font-weight: 500;
+}
+@media (max-height: 460px) {
+  .settings-modal,
+  .winner-modal {
+    max-height: calc(100dvh - 24px);
+  }
+  .settings-modal .modal-content,
+  .winner-modal .modal-content {
+    padding: 12px 16px;
+    gap: 8px;
+  }
+  .settings-modal .modal-heading h2,
+  .winner-modal .modal-heading h2 {
+    font-size: 24px;
+  }
+  .settings-modal .settings-tabs button {
+    min-height: 44px;
+    flex-direction: row;
+    padding-block: 6px;
+    font-size: 12px;
+  }
+  .settings-modal .modal-footer {
+    padding-top: 8px;
+  }
+  .settings-modal .modal-footer > span {
+    font-size: 12px;
+  }
+  .winner-modal .round-winner-art {
+    height: 64px;
+    margin-block: 0;
+  }
+  .winner-modal .round-winner-art .uno-card {
+    --card-scale: 0.4 !important;
+  }
+  .winner-modal .round-winner-art > .player-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+  }
+}
 .preference-row {
   gap: 16px;
   padding-block: 18px;
@@ -709,6 +864,12 @@ input[type="range"] {
   min-height: 48px;
   padding-inline: 0;
 }
+.round-scorecard li .player-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border-width: 2px;
+}
 .round-winner-row .result-card-count {
   color: #007943;
 }
@@ -827,6 +988,12 @@ input[type="range"] {
     width: calc(100% - 24px);
     padding: 24px 20px;
     gap: 22px;
+  }
+  .setup-content:has(.bot-rule-disclosure) {
+    gap: 16px;
+  }
+  .setup-content:has(.bot-rule-disclosure) .setup-footer {
+    padding-top: 12px;
   }
   .setup-intro h1 {
     font-size: 34px;

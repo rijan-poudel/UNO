@@ -219,9 +219,9 @@ components:
     backgroundColor: "{colors.cue-surface}"
     textColor: "{colors.club-paper}"
     rounded: "{rounded.identity}"
-    padding: "8px 14px 8px 0"
-    width: "172px"
-    height: "66px"
+    padding: "4px 8px 4px 4px"
+    width: "128px"
+    height: "44px"
   player-label-active:
     backgroundColor: "{colors.club-paper}"
     textColor: "#19385e"
@@ -292,7 +292,7 @@ The ramp is role-based, not a geometric scale. The frontmatter records the actua
 - **Headline / section / dialog:** Outfit with compact tracking and weight 750. Setup headline is responsive; dialog and section titles use their own roles. The mobile dialog title grows to 32px; short landscape dialogs use 28px after the last shared override.
 - **Body / large body:** supporting content and setup explanations, with measured line lengths (setup 50ch, home rules explanatory copy).
 - **Control / support:** regular button and field labels, preset descriptions and secondary actions. Home Play is a larger Outfit role with a smaller explanatory line.
-- **Player name / count:** names are 16px desktop and 12px compact; counts are 13px desktop and 11px compact. Inline status is 11px desktop and 10px compact. Tabular numerals keep counts and the clock stable.
+- **Player name / count:** names are 13px desktop, 12px on landscape phones and 11px on the shortest screens. Counts are 11px, then 10px on the shortest screens; status shares the count line at 10px or 9px. Outfit carries both name and count. Tabular numerals keep counts and the clock stable.
 - **Cue:** title is 18px, 16px under 680px height, and 13px under 460px height; helper copy is 12px then 10px. Clock numerals are 16px then 12px.
 - **Native deck:** face values and corner indices scale together through `--card-scale`. Preserve the native card-back Outfit wordmark and Barlow Condensed face numerals.
 
@@ -304,7 +304,7 @@ Home is a centered title/start composition: main width capped at 760px, play lan
 
 The arena fills `100dvh`, clips page overflow and caps its internal stage at 1600px. Opponents occupy the upper/perimeter field; central tilted draw/discard piles sit directly above the bottom-held hand. The hand owns horizontal overflow, headroom and paging controls. Use safe-area insets at the screen edges. Legal cards rise; focus/inspection rises further without clipping. Contextual decisions sit beside the centered turn cue rather than displacing piles.
 
-Height determines live density: large desktop starts at 900px height with width ≥701px; compact stages apply below 680px; landscape phone applies below 460px with width ≥541px; the shortest variant applies below 360px. Portrait badges hold a comfortable single-row token on large stages and compact below 680px height, then become 126px then 100px wide at the phone thresholds while retaining a 44px minimum target, exact count and inline status. The name/status wrapper stays a row. Compact opponent back fans shrink in place rather than disappearing, and pointer hover magnifies the hovered back with its neighbors dock-style; on five- and six-seat landscape phones the top seat drops its decorative fan so its badge clears the piles. Native card indices remain readable. Phone gameplay uses a rotate gate in portrait.
+Height determines live density: large desktop starts at 900px height with width ≥701px; compact stages apply below 680px; landscape phone applies below 460px with width ≥541px; the shortest variant applies below 360px. Portrait badges are 128px wide and 44px high, then become 112px and 96px wide at the phone thresholds. A 32px portrait sits beside a two-line name/count group; compact portraits shrink to 28px and 24px. Status shares the count line, and the 44px catch target remains available. Opponent cards grow to scale .62 on desktop, .47 below 680px height and .38 on landscape phones; each fan remains centered above its badge. Compact opponent back fans shrink in place rather than disappearing, and pointer hover magnifies the hovered back with its neighbors dock-style; on five- and six-seat landscape phones the top seat drops its decorative fan so its badge clears the piles. Native card indices remain readable. Phone gameplay uses a rotate gate in portrait.
 
 The observed spacing vocabulary runs from micro/detail gaps through compact, regular, section and dialog steps. It is not an instruction to normalize every card-specific overlap. See the two surface briefs for geometry and the sidecar for exact responsive conditions.
 
@@ -345,6 +345,8 @@ Home's supported-preset selector is a dark blue rounded track with cream selecte
 
 Setup uses a centered rounded theme-aware panel. Native dialogs are fixed light surfaces with Outfit headings, explicit Close and reachable decisions in short landscape. Settings, rules, results and earned progress use the same shared palette/control vocabulary; progress always reflects completed-round device-local data. Keep the native `Modal` primitive.
 
+Settings and results bound their scrolling to the content body: the Settings heading, category tabs and Done remain visible, as do result rematch/home decisions. Related rule toggles use native fieldsets with ordinary Outfit legends. Profile save feedback distinguishes drafts from applied names. Bot setup keeps rule editing in a native disclosure, names the active preset/hand size beside the deal action, and uses the same portraits as the subsequent round. At 390×844 the full primary deal action fits before the supporting footnote.
+
 ### Inputs / fields
 
 Theme-aware fields use UI surface/text, a two-pixel divider border, 50px height and a darker text-colored focus stroke. Invalid fields use accent red. Labels remain explicit; room codes and room links share the existing input flow.
@@ -355,7 +357,7 @@ Small wordmark and restrained Settings/Menu chrome sit at the perimeter. Setting
 
 ### Portrait identities
 
-`PlayerAvatar` selects one of six original human portraits from `/artwork/player-portraits.webp`; preserve its companion prompt provenance. Opaque dark blue nameplates are compact single-row tokens — portrait, name/status row and a Barlow Condensed count chip — sized under the card backs they annotate. The active player's badge turns cream and portrait gains an amber outline; a catchable badge turns amber. Compact tiers keep the 44px floor and inline status, shrinking width and type instead of creating a third text tier.
+`PlayerAvatar` selects one of six original human portraits from `/artwork/player-portraits.webp`; preserve its companion prompt provenance. Opaque dark blue nameplates pair a small portrait with the name above a quiet Outfit card-count line. Status sits beside the count. This compact two-line structure gives names more space and lets the larger native back fans lead; the oversized count chip is removed. The active player's badge turns cream and portrait gains an amber outline; a catchable badge turns amber. Compact tiers keep the 44px floor and inline status, shrinking width and type instead of creating a third text tier.
 
 ### Held cards and live turn cue
 

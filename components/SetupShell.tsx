@@ -17,7 +17,7 @@ export default function SetupShell({
       {controls}
       <main className="setup-content" aria-label={subtitle}>
         {children}
-        <footer className="setup-footer">{footer}</footer>
+        {footer && <footer className="setup-footer">{footer}</footer>}
       </main>
       <div className="page-footnote">
         A seat for everyone. A rule for every table.

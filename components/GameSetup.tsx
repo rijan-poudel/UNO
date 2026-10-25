@@ -3,6 +3,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { ArrowRight, Minus, Plus } from "lucide-react";
 import type { GameRules } from "../types/rules";
+import { RULE_PRESETS, matchesPreset } from "../lib/rulePresets";
 import PlayerAvatar from "./PlayerAvatar";
 import SetupShell from "./SetupShell";
 import { SetupIntro } from "./ui/PageChrome";
@@ -32,6 +33,7 @@ export default function GameSetup({
   onOpenRules: () => void;
 }) {
   const [names, setNames] = useState(getSavedPlayerNames);
+  const preset = RULE_PRESETS.find((item) => matchesPreset(rules, item.rules));
   useEffect(
     () =>
       subscribePlayerName(() => {
@@ -54,7 +56,8 @@ export default function GameSetup({
       footer={
         <>
           <p className="muted">
-            {startingHandSize} cards each. First to an empty hand wins.
+            {preset?.label ?? "Custom rules"} · {startingHandSize} cards each.
+            First to an empty hand wins.
           </p>
           <button
             className="button primary wide"
@@ -125,8 +128,8 @@ export default function GameSetup({
       <div className="crew-line" aria-label="Your bot opponents">
         {names.slice(1).map((name, i) => (
           <div key={i}>
-            <PlayerAvatar seed={String(i + 1)} />
-            <span>{name || NAMES[i + 1]}</span>
+            <PlayerAvatar seed={`player_${i + 1}`} />
+            <span title={name || NAMES[i + 1]}>{name || NAMES[i + 1]}</span>
           </div>
         ))}
       </div>
@@ -149,11 +152,16 @@ export default function GameSetup({
           ))}
         </div>
       </details>
-      <TableRules
-        rules={rules}
-        onChange={onRulesChange}
-        onOpenRules={onOpenRules}
-      />
+      <details className="setup-disclosure bot-rule-disclosure">
+        <summary>
+          Table rules <span>{preset?.label ?? "Custom rules"}</span>
+        </summary>
+        <TableRules
+          rules={rules}
+          onChange={onRulesChange}
+          onOpenRules={onOpenRules}
+        />
+      </details>
     </SetupShell>
   );
 }

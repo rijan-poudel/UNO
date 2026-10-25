@@ -49,6 +49,29 @@ async function main() {
       { roomId, playerName: 'Smoke guest', deviceId: guestDevice },
     );
     assert.equal(joined.room.players.length, 2);
+    const roomRules = {
+      startingHandSize: 5,
+      stackDraw2: true,
+      mustDeclareUno: false,
+    };
+    await request(host, 'room:set-rules', { roomId, rules: roomRules });
+    const published = await request<{ room: RoomSnapshot }>(
+      guest,
+      'room:ready',
+      { roomId },
+    );
+    assert.equal(published.room.rules?.startingHandSize, 5);
+    assert.equal(published.room.rules?.mustDeclareUno, false);
+    assert.equal(published.room.rules?.stackDraw2, true);
+    const guestEdit = (await guest.timeout(5000).emitWithAck('room:set-rules', {
+      roomId,
+      rules: { startingHandSize: 9 },
+    })) as Ack<unknown>;
+    assert.equal(
+      guestEdit.ok,
+      false,
+      'Only the host can change published room rules',
+    );
     for (const rules of [
       { startingHandSize: 1e100 },
       { stackDraw2: 'false' },

@@ -1,15 +1,7 @@
 // Room creation, joining, invitations, and seats share a single lobby flow.
 "use client";
 import { useEffect, useState, type ReactNode } from "react";
-import {
-  ArrowRight,
-  Check,
-  ChevronsLeftRight,
-  Copy,
-  Link,
-  Plus,
-  X,
-} from "lucide-react";
+import { ArrowRight, Check, Copy, Link, Plus, WifiOff, X } from "lucide-react";
 import { toast } from "sonner";
 import type {
   FriendInvite,
@@ -27,7 +19,7 @@ import {
   subscribePlayerName,
 } from "../lib/playerNames";
 import SetupShell from "./SetupShell";
-import { SegmentedToggle, SetupIntro } from "./ui/PageChrome";
+import { CountBadge, SegmentedToggle, SetupIntro } from "./ui/PageChrome";
 interface Props {
   rules: Partial<GameRules>;
   onRulesChange: (rules: Partial<GameRules>) => void;
@@ -109,11 +101,15 @@ export default function OnlineLobby(props: Props) {
   } = props;
   const [name, setName] = useState(getPlayerName);
   const [code, setCode] = useState(() => {
-    const params = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams(
+      typeof window === "undefined" ? "" : window.location.search,
+    );
     return parseRoomCode(params.get("room") ?? read("uno.online.roomCode"));
   });
   const [panel, setPanel] = useState<"create" | "join">(() =>
-    new URLSearchParams(window.location.search).has("room")
+    new URLSearchParams(
+      typeof window === "undefined" ? "" : window.location.search,
+    ).has("room")
       ? "join"
       : (props.initialPanel ?? "create"),
   );
@@ -234,34 +230,7 @@ export default function OnlineLobby(props: Props) {
       subtitle="Friends’ table"
       controls={props.controls}
       footer={
-        room ? (
-          <>
-            <p className="muted">
-              {isHost
-                ? "Everyone here? You can add bots to fill the table."
-                : "Your host will deal when everyone is here."}
-            </p>
-            {isHost ? (
-              <button
-                className="button primary wide"
-                disabled={busy || !connected || room.players.length < 2}
-                onClick={() => void run(props.onStartGame)}
-              >
-                {busy
-                  ? "Getting ready…"
-                  : room.players.length < 2
-                    ? "Waiting for another player"
-                    : "Deal everyone in"}
-                <ArrowRight size={19} />
-              </button>
-            ) : (
-              <div className="waiting-host">
-                <span className="presence-dot online" />
-                Waiting for the host to deal
-              </div>
-            )}
-          </>
-        ) : (
+        !room && (
           <p className="setup-hint">
             Your room is private. Share the code with the people you want at
             your table.
@@ -279,6 +248,7 @@ export default function OnlineLobby(props: Props) {
         onBack={() => void leave()}
         trailing={
           <span
+            role="status"
             className={`connection-state ${connected ? "online" : "offline"}`}
           >
             <i className={`presence-dot ${connected ? "online" : "offline"}`} />
@@ -295,6 +265,36 @@ export default function OnlineLobby(props: Props) {
               <ArrowRight size={16} />
             </button>
           )}
+        </div>
+      )}
+      {manualCopy && (
+        <div
+          className="manual-copy-box"
+          role="region"
+          aria-label={`Manual copy ${manualCopy.label}`}
+        >
+          <div className="manual-copy-header">
+            <span className="manual-copy-hint">
+              Select and copy your {manualCopy.label.toLowerCase()}:
+            </span>
+            <button
+              type="button"
+              className="icon-button"
+              aria-label="Close manual copy input"
+              onClick={() => setManualCopy(null)}
+            >
+              <X size={15} />
+            </button>
+          </div>
+          <input
+            type="text"
+            readOnly
+            value={manualCopy.value}
+            aria-label={manualCopy.label}
+            autoFocus
+            onFocus={(e) => e.target.select()}
+            className="manual-copy-input"
+          />
         </div>
       )}
       {!room && (
@@ -417,45 +417,25 @@ export default function OnlineLobby(props: Props) {
                 {copiedLink ? "Copied link!" : "Copy link"}
               </button>
             </div>
-            {manualCopy && (
-              <div
-                className="manual-copy-box"
-                role="region"
-                aria-label={`Manual copy ${manualCopy.label}`}
-              >
-                <div className="manual-copy-header">
-                  <span className="manual-copy-hint">
-                    Select and copy your {manualCopy.label.toLowerCase()}:
-                  </span>
-                  <button
-                    type="button"
-                    className="icon-button"
-                    aria-label="Close manual copy input"
-                    onClick={() => setManualCopy(null)}
-                  >
-                    <X size={15} />
-                  </button>
-                </div>
-                <input
-                  type="text"
-                  readOnly
-                  value={manualCopy.value}
-                  aria-label={manualCopy.label}
-                  autoFocus
-                  onFocus={(e) => e.target.select()}
-                  className="manual-copy-input"
-                />
-              </div>
-            )}
           </div>
-          <div className="seat-list">
+          <div className="section-heading room-seats-heading">
+            <h2>At the table</h2>
+            <CountBadge current={room.players.length} total={6} />
+          </div>
+          <div
+            className="seat-list room-seat-list"
+            role="list"
+            aria-label="Players at this table"
+          >
             {room.players.map((p) => (
-              <div className="seat-row" key={p.playerId}>
+              <div className="seat-row" role="listitem" key={p.playerId}>
                 <PlayerAvatar seed={p.playerId} />
                 <span className="lobby-seat-name">
                   <strong>
                     {p.name}
-                    {p.playerId === playerId ? " (you)" : ""}
+                    {p.playerId === playerId && p.name.toLowerCase() !== "you"
+                      ? " (you)"
+                      : ""}
                   </strong>
                   <small>
                     {p.isBot
@@ -471,7 +451,7 @@ export default function OnlineLobby(props: Props) {
                   <button
                     className="icon-button"
                     aria-label={`Remove ${p.name}`}
-                    disabled={busy}
+                    disabled={busy || !connected}
                     onClick={() =>
                       void run(() => props.onKickPlayer(p.playerId))
                     }
@@ -479,7 +459,19 @@ export default function OnlineLobby(props: Props) {
                     <X size={17} />
                   </button>
                 ) : (
-                  <Check size={17} className="muted" />
+                  <span
+                    role="img"
+                    aria-label={
+                      p.connected || p.isBot ? "At the table" : "Reconnecting"
+                    }
+                    className="muted"
+                  >
+                    {p.connected || p.isBot ? (
+                      <Check size={17} aria-hidden="true" />
+                    ) : (
+                      <WifiOff size={17} aria-hidden="true" />
+                    )}
+                  </span>
                 )}
               </div>
             ))}
@@ -487,7 +479,7 @@ export default function OnlineLobby(props: Props) {
           {isHost && room.players.length < 6 && (
             <button
               className="button secondary"
-              disabled={busy}
+              disabled={busy || !connected}
               onClick={() => void run(props.onAddBotSeat)}
             >
               <Plus size={17} />
@@ -495,6 +487,38 @@ export default function OnlineLobby(props: Props) {
             </button>
           )}
         </>
+      )}
+      {room && (
+        <div className="room-start-actions">
+          <>
+            <p className="muted">
+              {isHost
+                ? room.players.length < 2
+                  ? "Share your code or add a bot to start."
+                  : "Everyone here? Your table is ready to deal."
+                : "Your host will deal when everyone is here."}
+            </p>
+            {isHost ? (
+              <button
+                className="button primary wide"
+                disabled={busy || !connected || room.players.length < 2}
+                onClick={() => void run(props.onStartGame)}
+              >
+                {busy
+                  ? "Getting ready…"
+                  : room.players.length < 2
+                    ? "Waiting for another player"
+                    : "Deal everyone in"}
+                <ArrowRight size={19} />
+              </button>
+            ) : (
+              <div className="waiting-host">
+                <span className="presence-dot online" />
+                Waiting for the host to deal
+              </div>
+            )}
+          </>
+        </div>
       )}
       {room && isHost && (
         <TableRules
@@ -506,127 +530,93 @@ export default function OnlineLobby(props: Props) {
       {room &&
         !isHost &&
         (() => {
-          const activeRules: Partial<GameRules> =
-            room.rules ?? props.rules ?? defaultRules;
-          const matchingPreset = RULE_PRESETS.find((p) =>
-            matchesPreset(activeRules, p.rules),
+          const activeRules = {
+            ...defaultRules,
+            ...props.rules,
+            ...room.rules,
+          };
+          const preset = RULE_PRESETS.find((item) =>
+            matchesPreset(activeRules, item.rules),
           );
-          const presetLabel = matchingPreset
-            ? matchingPreset.label
-            : "Custom rules";
-          const presetDesc = matchingPreset
-            ? matchingPreset.description
-            : "Custom table rules selected by host.";
-          const enabledHouseRules: Array<{
-            key: string;
-            label: string;
-            desc: string;
-          }> = [];
-          if (activeRules.stackDraw2)
-            enabledHouseRules.push({
-              key: "stackDraw2",
-              label: "Stack +2",
-              desc: "Answer +2 with another +2",
-            });
-          if (activeRules.stackWild4)
-            enabledHouseRules.push({
-              key: "stackWild4",
-              label: "Stack +4",
-              desc: "Pass +4 with another +4",
-            });
-          if (activeRules.allowWild4OnDraw2)
-            enabledHouseRules.push({
-              key: "allowWild4OnDraw2",
-              label: "Wild +4 on +2",
-              desc: "Four beats two",
-            });
-          if (activeRules.allowJumpIn)
-            enabledHouseRules.push({
-              key: "allowJumpIn",
-              label: "Jump-in",
-              desc: "Exact matches play out of turn",
-            });
-          if (activeRules.allowDoublePlaySameNumber)
-            enabledHouseRules.push({
-              key: "doublePlay",
-              label: "Double-play",
-              desc: "Play matching numbers together",
-            });
-          if (activeRules.allowShuffleCard)
-            enabledHouseRules.push({
-              key: "allowShuffleCard",
-              label: "Shuffle hands",
-              desc: "Wild redistributes cards",
-            });
-          if (activeRules.allowDiscardAll)
-            enabledHouseRules.push({
-              key: "allowDiscardAll",
-              label: "Discard all",
-              desc: "Discard one full color",
-            });
-          if (activeRules.drawUntilPlayable)
-            enabledHouseRules.push({
-              key: "drawUntilPlayable",
-              label: "Draw until playable",
-              desc: "Draw until matching card",
-            });
-
+          const stacking = [
+            activeRules.stackDraw2 && "+2 on +2",
+            activeRules.stackWild4 && "+4 on +4",
+            activeRules.allowWild4OnDraw2 && "+4 on +2",
+          ]
+            .filter(Boolean)
+            .join(" · ");
+          const extras = [
+            activeRules.allowJumpIn && "Jump-in",
+            activeRules.allowShuffleCard && "Shuffle hands",
+            activeRules.allowDiscardAll && "Discard all",
+          ]
+            .filter(Boolean)
+            .join(" · ");
+          const summary = [
+            ["Cards dealt", `${activeRules.startingHandSize} each`],
+            [
+              "Drawing",
+              activeRules.drawUntilPlayable
+                ? "Until you can play"
+                : "One card per draw",
+            ],
+            ["Draw stacking", stacking || "Off"],
+            [
+              "UNO call",
+              activeRules.mustDeclareUno
+                ? "Call with one card left"
+                : "Not required",
+            ],
+            [
+              "Last card",
+              activeRules.canFinishWithActionCard
+                ? "Any card can win"
+                : "Finish with a number",
+            ],
+            ["Extra rules", extras || "None"],
+            [
+              "Two-player reverse",
+              activeRules.reverseActsAsSkipInTwoPlayer
+                ? "Skips your opponent"
+                : "Changes direction",
+            ],
+            [
+              "Opening card",
+              activeRules.allowStartingActionCard
+                ? "Numbers or actions"
+                : "Numbers only",
+            ],
+            [
+              "False call-out",
+              activeRules.penalizeFalseCallOut
+                ? "Draw two cards"
+                : "No penalty",
+            ],
+          ];
           return (
             <section
-              className="setup-rules guest-table-rules"
+              className="setup-rules room-rules-summary"
               aria-label="Table rules for this room"
             >
               <div className="section-heading">
                 <h2>Table rules</h2>
-                <span className="rules-host-pill">Chosen by host</span>
+                <span className="muted">Chosen by host</span>
               </div>
-              <div className="guest-rules-card">
-                <div className="guest-preset-banner">
-                  <span className="guest-preset-badge" aria-hidden="true">
-                    {matchingPreset?.id === "wild" ? (
-                      <ChevronsLeftRight strokeWidth={2.5} size={16} />
-                    ) : (
-                      (matchingPreset?.symbol ?? "⚙️")
-                    )}
-                  </span>
-                  <div className="guest-preset-info">
-                    <strong>{presetLabel}</strong>
-                    <small>{presetDesc}</small>
+              <p>
+                <strong>{preset?.label ?? "Custom rules"}</strong>
+              </p>
+              <dl>
+                {summary.map(([label, value]) => (
+                  <div key={label}>
+                    <dt>{label}</dt>
+                    <dd>{value}</dd>
                   </div>
-                </div>
-                <div className="guest-rules-breakdown">
-                  <div className="guest-rule-row">
-                    <span className="guest-rule-metric">Cards dealt</span>
-                    <strong>{activeRules.startingHandSize ?? 7} each</strong>
-                  </div>
-                  <div className="guest-rule-row">
-                    <span className="guest-rule-metric">House rules</span>
-                    <div className="guest-rule-tags">
-                      {enabledHouseRules.length > 0 ? (
-                        enabledHouseRules.map((r) => (
-                          <span
-                            key={r.key}
-                            className="guest-rule-tag"
-                            title={r.desc}
-                          >
-                            {r.label}
-                          </span>
-                        ))
-                      ) : (
-                        <span className="guest-rule-tag tag-standard">
-                          Standard rules only
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-                <p className="muted">
-                  The host controls table rules before dealing.
-                </p>
-              </div>
+                ))}
+              </dl>
             </section>
           );
         })()}
+
       <details
         className="lobby-friends setup-disclosure"
         key={outgoingInvites.length ? "invited" : "friends"}

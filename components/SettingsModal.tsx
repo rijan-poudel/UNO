@@ -1,6 +1,6 @@
 // Preferences use the same controls and typography as the rest of the club.
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import {
   AudioLines,
@@ -31,6 +31,7 @@ interface Props {
   open: boolean;
   initialTab?: "profile" | "controls" | "audio";
   rules: Partial<GameRules>;
+  editingRoom?: boolean;
   friendCode?: string;
   themeLabel?: string;
   onSelectTheme?: (theme: string) => void;
@@ -40,66 +41,79 @@ interface Props {
 }
 const RULES: Array<{
   key: keyof GameRules;
+  group: string;
   label: string;
   description: string;
 }> = [
   {
     key: "stackDraw2",
+    group: "Drawing & stacking",
     label: "Stack draw two",
     description: "Answer a +2 with another +2.",
   },
   {
     key: "stackWild4",
+    group: "Drawing & stacking",
     label: "Stack draw four",
     description: "Pass a +4 along with another +4.",
   },
   {
     key: "allowWild4OnDraw2",
+    group: "Drawing & stacking",
     label: "Four beats two",
     description: "Answer a +2 with a wild +4.",
   },
   {
     key: "drawUntilPlayable",
+    group: "Drawing & stacking",
     label: "Draw until you can play",
     description: "Keep drawing until a card matches.",
   },
   {
     key: "mustDeclareUno",
+    group: "UNO & finishing",
     label: "Call UNO",
     description: "One card left? Say it before someone catches you.",
   },
   {
     key: "penalizeFalseCallOut",
+    group: "UNO & finishing",
     label: "False call-out penalty",
     description: "A wrong accusation costs two cards.",
   },
   {
     key: "allowJumpIn",
+    group: "Special cards & moves",
     label: "Jump in",
     description: "An exact matching card can interrupt another turn.",
   },
   {
     key: "allowDiscardAll",
+    group: "Special cards & moves",
     label: "Discard all cards",
     description: "Add a special card that clears one color from your hand.",
   },
   {
     key: "allowShuffleCard",
+    group: "Special cards & moves",
     label: "Shuffle hands",
     description: "Add a wild that redistributes everyone’s cards.",
   },
   {
     key: "reverseActsAsSkipInTwoPlayer",
+    group: "Table flow",
     label: "Heads-up reverse",
     description: "Reverse acts as Skip with two players.",
   },
   {
     key: "allowStartingActionCard",
+    group: "Table flow",
     label: "Start with an action",
     description: "Allow a special card to open the round.",
   },
   {
     key: "canFinishWithActionCard",
+    group: "UNO & finishing",
     label: "Finish on anything",
     description: "Win with a number, action, or wild card.",
   },
@@ -145,6 +159,7 @@ export default function SettingsModal({
   onCopyFriendCode,
   onChange,
   onClose,
+  editingRoom = false,
 }: Props) {
   const [tab, setTab] = useState<"profile" | "controls" | "audio" | "look">(
     initialTab,
@@ -152,9 +167,23 @@ export default function SettingsModal({
   const [audio, setAudio] = useState(getAudioSettings);
   const [music, setMusic] = useState(getMusicContextSettings);
   const [name, setName] = useState(getPlayerName);
+  const [savedName, setSavedName] = useState(getPlayerName);
   const [saved, setSaved] = useState(false);
   const [copiedFriendCode, setCopiedFriendCode] = useState(false);
   const [manualFriendCode, setManualFriendCode] = useState(false);
+  const nameChanged = name.trim() !== savedName;
+  useEffect(() => {
+    const sync = () => {
+      setAudio(getAudioSettings());
+      setMusic(getMusicContextSettings());
+    };
+    window.addEventListener("uno:audio-settings", sync);
+    window.addEventListener("storage", sync);
+    return () => {
+      window.removeEventListener("uno:audio-settings", sync);
+      window.removeEventListener("storage", sync);
+    };
+  }, []);
   const updateAudio = (partial: Partial<AudioSettings>) => {
     setAudioSettings(partial);
     setAudio(getAudioSettings());
@@ -162,6 +191,7 @@ export default function SettingsModal({
   const saveName = () => {
     const next = savePlayerName(name);
     setName(next);
+    setSavedName(next);
     setSaved(true);
   };
   return (
@@ -215,7 +245,9 @@ export default function SettingsModal({
         ))}
       </div>
       <div
+        key={tab}
         role="tabpanel"
+        tabIndex={0}
         id={`panel-${tab}`}
         aria-labelledby={`settings-${tab}`}
         className="settings-panel"
@@ -257,6 +289,7 @@ export default function SettingsModal({
               </label>
               <input
                 id="profile-name"
+                autoComplete="nickname"
                 value={name}
                 maxLength={18}
                 onChange={(e) => {
@@ -264,7 +297,11 @@ export default function SettingsModal({
                   setSaved(false);
                 }}
               />
-              <button className="button primary" style={{ marginTop: 16 }}>
+              <button
+                className="button primary"
+                style={{ marginTop: 16 }}
+                disabled={!nameChanged}
+              >
                 {saved ? "Name saved" : "Save name"}
               </button>
             </form>
@@ -326,8 +363,9 @@ export default function SettingsModal({
         {tab === "controls" && (
           <>
             <p className="muted">
-              Changes apply when you set up your next table. Rematches keep the
-              current table’s rules.
+              {editingRoom
+                ? "Changes are shared with everyone in this room before dealing."
+                : "Changes apply when you set up your next table. Rematches keep the current table’s rules."}
             </p>
             <RulePresets rules={rules} onChange={onChange} />
             <label className="preference-row">
@@ -352,14 +390,19 @@ export default function SettingsModal({
                 ))}
               </select>
             </label>
-            {RULES.map((r) => (
-              <Toggle
-                key={r.key}
-                label={r.label}
-                description={r.description}
-                checked={Boolean(rules[r.key] ?? defaultRules[r.key])}
-                onChange={(v) => onChange({ ...rules, [r.key]: v })}
-              />
+            {[...new Set(RULES.map((rule) => rule.group))].map((group) => (
+              <fieldset className="settings-rule-group" key={group}>
+                <legend>{group}</legend>
+                {RULES.filter((rule) => rule.group === group).map((r) => (
+                  <Toggle
+                    key={r.key}
+                    label={r.label}
+                    description={r.description}
+                    checked={Boolean(rules[r.key] ?? defaultRules[r.key])}
+                    onChange={(v) => onChange({ ...rules, [r.key]: v })}
+                  />
+                ))}
+              </fieldset>
             ))}
             <button
               className="text-button"
@@ -373,14 +416,18 @@ export default function SettingsModal({
         {tab === "audio" && (
           <>
             <p className="muted">
-              Quick card sounds by default. Music and the announcer are
-              optional.
+              Choose card sounds, voice and background music.
             </p>
             <Toggle
               label="Mute everything"
               checked={audio.muted}
               onChange={(v) => updateAudio({ muted: v })}
             />
+            {audio.muted && (
+              <p className="audio-muted-note" role="status">
+                Everything is muted. Your sound preferences are kept.
+              </p>
+            )}
             <Toggle
               label="Card sounds"
               description="Soft, immediate feedback for plays and draws."
@@ -396,7 +443,9 @@ export default function SettingsModal({
             <div className="volume-row">
               <label htmlFor="sfx-volume">
                 Effects & voice
-                <output>{Math.round(audio.sfxVolume * 100)}%</output>
+                <output aria-hidden="true">
+                  {Math.round(audio.sfxVolume * 100)}%
+                </output>
               </label>
               <input
                 id="sfx-volume"
@@ -405,6 +454,7 @@ export default function SettingsModal({
                 max="1"
                 step="0.01"
                 value={audio.sfxVolume}
+                aria-valuetext={`${Math.round(audio.sfxVolume * 100)} percent`}
                 onChange={(e) =>
                   updateAudio({ sfxVolume: Number(e.target.value) })
                 }
@@ -447,7 +497,9 @@ export default function SettingsModal({
             <div className="volume-row">
               <label htmlFor="music-volume">
                 Music volume
-                <output>{Math.round(audio.musicVolume * 100)}%</output>
+                <output aria-hidden="true">
+                  {Math.round(audio.musicVolume * 100)}%
+                </output>
               </label>
               <input
                 id="music-volume"
@@ -456,6 +508,7 @@ export default function SettingsModal({
                 max="1"
                 step="0.01"
                 value={audio.musicVolume}
+                aria-valuetext={`${Math.round(audio.musicVolume * 100)} percent`}
                 onChange={(e) =>
                   updateAudio({ musicVolume: Number(e.target.value) })
                 }
@@ -465,7 +518,13 @@ export default function SettingsModal({
         )}
       </div>
       <div className="modal-footer">
-        <span className="muted">Saved on this device</span>
+        <span className="muted" role="status">
+          {tab === "profile" && nameChanged
+            ? "Name not saved yet"
+            : editingRoom && tab === "controls"
+              ? "Rules for this room"
+              : "Saved on this device"}
+        </span>
         <button className="button secondary small" onClick={onClose}>
           Done
         </button>

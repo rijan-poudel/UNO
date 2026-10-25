@@ -34,6 +34,10 @@ The online hook keeps an active room in sessionStorage, with a persistent random
 
 Rules, themes, names, friends, and audio preferences are local to the browser. Storage failure must not prevent play. The current casual-room protocol sends full game snapshots; UI concealment of opponent faces is not anti-cheat protection.
 
+Before a room starts, host rule edits from either the lobby or Settings publish through `updateRoomRules`. The lobby and initial deal use the published room rules, including after reconnect; preferences edited during a round still apply to future tables. Guests see a theme-aware summary of those rules. The roster reports actual seats and reconnecting players, and the deal decision precedes optional rules and invitations. Clipboard fallback inputs remain reachable even before joining a room.
+
+Settings keeps its heading, tabs and Done action outside a keyboard-scrollable panel. Related rules use native fieldsets; switching tabs resets the panel scroll without discarding profile drafts. Profile edits explicitly distinguish unsaved names, and audio controls subscribe to preference changes while open. Results likewise scroll inside a bounded body while rematch/home actions remain visible. Bot setup discloses optional rule editing and seeds crew portraits with the same `player_<index>` identities as local rounds.
+
 ## Verification
 
 Use `check:audio` for gesture-resume races, expired feedback, mute, hidden tabs, offline fallback and recorded-sample signal levels. Use `check:game` for immutable transitions, deck conservation, wild color validation, UNO penalties, and simulated completed rounds. Use `check:multiplayer` against a running socket server for the actual protocol. The socket watcher explicitly includes `lib/**/*.ts` and `types/**/*.ts`; engine edits must restart that process too. Live socket checks cover opening action penalties and direction, so a stale development server cannot silently pass. Run lint, type checks, and a production build. Browser checks should cover home, local setup, a six-seat table, a large hand, a wild picker, settings, room creation, and reconnect after refresh at desktop and phone widths.

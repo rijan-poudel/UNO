@@ -76,32 +76,18 @@
 .title-card-fan {
   position: relative;
   width: 240px;
-  height: 118px;
+  height: 142px;
   margin: 20px auto 0;
   pointer-events: none;
 }
 .title-card-fan > span {
   position: absolute;
-  bottom: 0;
+  bottom: 24px;
   left: calc(50% + (var(--title-i) - 1.5) * 38px);
   transform: translateX(-50%)
     translateY(calc((var(--title-i) - 1.5) * (var(--title-i) - 1.5) * 8px))
     rotate(calc((var(--title-i) - 1.5) * 13deg));
   transform-origin: 50% 110%;
-  transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-@media (hover: hover) and (pointer: fine) {
-  .title-card-fan {
-    pointer-events: auto;
-  }
-  .title-card-fan > span:hover {
-    transform: translateX(-50%)
-      translateY(
-        calc((var(--title-i) - 1.5) * (var(--title-i) - 1.5) * 8px - 10px)
-      )
-      rotate(calc((var(--title-i) - 1.5) * 13deg)) scale(1.05);
-    z-index: 10;
-  }
 }
 .title-card-fan .uno-card {
   --card-scale: 0.88 !important;
@@ -315,7 +301,7 @@
     font-size: 17px;
   }
   .title-card-fan {
-    height: 128px;
+    height: 152px;
     margin-top: 24px;
   }
   .title-card-fan .uno-card {
@@ -347,7 +333,7 @@
   }
   .title-card-fan {
     width: 190px;
-    height: 100px;
+    height: 124px;
     margin-top: 14px;
   }
   .title-card-fan > span {
@@ -400,5 +386,9 @@
   .launch-screen button {
     transition: none;
     animation: none;
+  }
+  .launch-rules-wrapper,
+  .launch-text-action > svg:last-child {
+    transition: none;
   }
 }

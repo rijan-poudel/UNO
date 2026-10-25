@@ -168,6 +168,16 @@ export default function Home() {
   };
 
   const label = THEMES[theme].label;
+  const editingRoom =
+    mode === "online" &&
+    !!online.room &&
+    !online.room.started &&
+    online.room.hostPlayerId === online.playerId;
+  const lobbyRules = online.room?.rules ?? rules;
+  const changeRules = (newRules: Partial<GameRules>) => {
+    setRules(newRules);
+    if (editingRoom) void online.updateRoomRules(newRules);
+  };
 
   const openSettingsAt = (tab: "profile" | "controls" | "audio") => {
     setSettingsTab(tab);
@@ -181,12 +191,13 @@ export default function Home() {
       initialTab={settingsTab}
       themeLabel={label}
       onSelectTheme={selectTheme}
-      rules={rules}
+      rules={editingRoom ? lobbyRules : rules}
+      editingRoom={editingRoom}
       friendCode={online.friendCode}
       onCopyFriendCode={() => {
         void copyCode();
       }}
-      onChange={setRules}
+      onChange={changeRules}
       onClose={() => setShowS(false)}
     />
   );
@@ -242,9 +253,9 @@ export default function Home() {
                 currentGame.rules,
                 currentGame.players.map((player) => player.isBot),
               );
-              return;
+              return true;
             }
-            void online.startOnlineGame(currentGame.rules);
+            return online.startOnlineGame(currentGame.rules);
           }}
           onOpenSettings={(tab) => openSettingsAt(tab ?? "controls")}
         />
@@ -328,13 +339,8 @@ export default function Home() {
     content = (
       <>
         <OnlineLobby
-          rules={rules}
-          onRulesChange={(newRules) => {
-            setRules(newRules);
-            if (online.room && online.room.hostPlayerId === online.playerId) {
-              void online.updateRoomRules(newRules);
-            }
-          }}
+          rules={lobbyRules}
+          onRulesChange={changeRules}
           onOpenRules={() => openSettingsAt("controls")}
           onPlayBots={() => {
             setMode("computer");
@@ -359,7 +365,7 @@ export default function Home() {
           onLeaveRoom={online.leaveRoom}
           onStartGame={() => {
             setMode("online");
-            return online.startOnlineGame(rules);
+            return online.startOnlineGame(lobbyRules);
           }}
           onAddBotSeat={online.addBotToRoom}
           onKickPlayer={online.kickPlayer}

@@ -230,14 +230,19 @@
   top: 35%;
 }
 .game-main .opponent-hand {
-  height: 66px;
-  width: 96px;
+  --opponent-card-scale: 0.62;
+  --opponent-card-step: 15px;
+  height: 80px;
+  width: 120px;
 }
 .game-main .opponent-hand > span {
-  left: calc(22px + (var(--back-i) - (var(--back-count) - 1) / 2) * 14px);
+  left: calc(
+    50% - 41px * var(--opponent-card-scale) +
+      (var(--back-i) - (var(--back-count) - 1) / 2) * var(--opponent-card-step)
+  );
 }
 .game-main .opponent-hand .uno-card {
-  --card-scale: 0.5 !important;
+  --card-scale: var(--opponent-card-scale) !important;
 }
 /* Dock-style hover magnification on the decorative back fans: the hovered
    card rises, neighbors lean in, and the far cards breathe. Pointer-only. */
@@ -840,10 +845,10 @@
     gap: 32px;
   }
   .game-main .opponent-hand {
-    height: 52px;
-  }
-  .game-main .opponent-hand .uno-card {
-    --card-scale: 0.4 !important;
+    --opponent-card-scale: 0.47;
+    --opponent-card-step: 12px;
+    height: 62px;
+    width: 104px;
   }
 }
 @media (max-height: 460px) and (min-width: 541px) {
@@ -870,14 +875,10 @@
     padding-inline: 16px;
   }
   .game-main .opponent-hand {
-    height: 46px;
+    --opponent-card-scale: 0.38;
+    --opponent-card-step: 10px;
+    height: 48px;
     width: 84px;
-  }
-  .game-main .opponent-hand > span {
-    left: calc(16px + (var(--back-i) - (var(--back-count) - 1) / 2) * 11px);
-  }
-  .game-main .opponent-hand .uno-card {
-    --card-scale: 0.34 !important;
   }
   /* On crowded five/six-seat tables the top seat sits directly over the
      piles; its badge clears them only without the decorative fan. */
@@ -1174,6 +1175,9 @@
   min-width: 0;
 }
 .turn-message strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-size: 13.5px;
   font-weight: 750;
   line-height: 1.15;
@@ -1587,7 +1591,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 5px 10px 5px 12px;
+  padding: 2px 4px 2px 12px;
   border-radius: 999px;
   background: #0e2038;
   border: 1px solid #2e4d7a;
@@ -1596,7 +1600,6 @@
   font-size: 12px;
   line-height: 1.25;
   max-width: min(580px, calc(100vw - 32px));
-  white-space: nowrap;
   pointer-events: auto;
   animation: hint-fade-in 180ms cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -1619,32 +1622,33 @@
   flex-shrink: 0;
 }
 .action-hint-text {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  min-width: 0;
+  text-wrap: pretty;
 }
 .action-hint-dismiss {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 18px;
-  height: 18px;
+  width: 44px;
+  height: 44px;
   padding: 0;
   border: 0;
-  border-radius: 50%;
-  background: #ffffff1f;
+  border-radius: 999px;
+  background: transparent;
   color: #fff7e7;
   cursor: pointer;
   flex-shrink: 0;
   transition: background 140ms ease;
 }
-.action-hint-dismiss:hover {
-  background: #ffffff3d;
+@media (hover: hover) and (pointer: fine) {
+  .action-hint-dismiss:hover {
+    background: #ffffff1f;
+  }
 }
 @media (max-height: 460px) and (min-width: 541px) {
   .action-hint-banner {
     bottom: calc(100% + 40px);
-    padding: 3px 8px 3px 10px;
+    padding: 0 2px 0 10px;
     font-size: 11px;
     gap: 6px;
     max-width: min(500px, calc(100vw - 24px));
@@ -1653,7 +1657,7 @@
 @media (max-height: 360px) and (min-width: 541px) {
   .action-hint-banner {
     bottom: calc(100% + 34px);
-    padding: 2px 6px 2px 8px;
+    padding: 0 2px 0 8px;
     font-size: 10px;
     max-width: min(440px, calc(100vw - 20px));
   }
@@ -1814,91 +1818,4 @@
   background: #143522 !important;
   color: #38e285 !important;
   border: 1px solid #277747 !important;
-}
-
-/* ── Guest Room Table Rules Summary ── */
-.guest-table-rules {
-  margin-top: 14px;
-  text-align: left;
-}
-.rules-host-pill {
-  font-size: 11px;
-  font-weight: 600;
-  padding: 2px 8px;
-  border-radius: 999px;
-  background: #ffffff1f;
-  color: #cfe0fa;
-}
-.guest-rules-card {
-  padding: 14px 16px;
-  border-radius: 12px;
-  background: #15253c;
-  border: 1px solid #283e5e;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-.guest-preset-banner {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.guest-preset-badge {
-  display: grid;
-  place-items: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  background: #ffd000;
-  color: #392700;
-  font-family: var(--font-card), sans-serif;
-  font-size: 18px;
-  font-weight: 800;
-  flex-shrink: 0;
-}
-.guest-preset-info strong {
-  display: block;
-  font-size: 15px;
-  color: #fff7e7;
-}
-.guest-preset-info small {
-  display: block;
-  font-size: 12px;
-  color: #a4bcdb;
-}
-.guest-rules-breakdown {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 10px 12px;
-  background: #0c1827;
-  border-radius: 8px;
-}
-.guest-rule-row {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  font-size: 13px;
-}
-.guest-rule-metric {
-  color: #8fa7c7;
-  min-width: 90px;
-  font-size: 12px;
-}
-.guest-rule-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-.guest-rule-tag {
-  font-size: 11px;
-  padding: 2px 7px;
-  border-radius: 6px;
-  background: #203550;
-  color: #dbe8fb;
-  border: 1px solid #324c70;
-}
-.guest-rule-tag.tag-standard {
-  background: #15283e;
-  color: #8fa7c7;
 }
