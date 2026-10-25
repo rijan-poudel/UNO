@@ -266,6 +266,17 @@ export default function Home() {
     content = (
       <>
         <HomeScreen
+          savedGame={local.savedGame}
+          onResume={() => {
+            if (!local.resumeGame()) {
+              toast.error(
+                "This saved round is no longer available. Start a new one.",
+              );
+              return;
+            }
+            if (online.room) void online.leaveRoom();
+            setMode("computer");
+          }}
           rules={rules}
           onRulesChange={setRules}
           themeLabel={label}

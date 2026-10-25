@@ -29,6 +29,7 @@ import {
 import { canPlayCard, getPlayableCards } from '../lib/gameRules';
 import { getBotMove } from '../lib/botSupport';
 import { resolvePlayerName } from '../lib/playerNames';
+import { readSavedRound, saveRound, resumeRound } from '../lib/savedRound';
 import {
   BOT_TURN_MS,
   FORCED_DRAW_DELAY_MS,
@@ -90,6 +91,7 @@ export interface UnoUIState {
 
 type UIAction =
   | { type: 'INIT'; game: GameState }
+  | { type: 'RESTORE'; game: GameState }
   | { type: 'PLAY'; game: GameState } // turn-advancing action (play / pass / forced-draw)
   | { type: 'META'; game: GameState }
   | { type: 'CLOCK'; game: GameState }
@@ -134,6 +136,14 @@ function describeAction(game: GameState): string {
 
 function reducer(state: UnoUIState, action: UIAction): UnoUIState {
   switch (action.type) {
+    case 'RESTORE':
+      return {
+        game: resumeRound(action.game),
+        pendingWild: null,
+        drawnThisTurn: action.game.drawnThisTurn,
+        botThinking: false,
+        log: ['Round resumed.'],
+      };
     case 'INIT':
       return {
         game: withTurnDeadline(null, action.game),
@@ -204,6 +214,7 @@ function reducer(state: UnoUIState, action: UIAction): UnoUIState {
 
 export function useUnoGame(paused = false) {
   const [localPlayerIndex, setLocalPlayerIndex] = useState<number>(0);
+  const [savedGame, setSavedGame] = useState(readSavedRound);
 
   const [state, dispatch] = useReducer(reducer, {
     game: null,
@@ -214,6 +225,11 @@ export function useUnoGame(paused = false) {
   });
 
   const { game, pendingWild, drawnThisTurn, botThinking, log } = state;
+
+  useEffect(() => {
+    // The empty home state must not erase a round waiting to be resumed.
+    if (game) saveRound(game);
+  }, [game]);
 
   // Ref to always access latest game state in async callbacks
   const gameRef = useRef<GameState | null>(game);
@@ -233,10 +249,23 @@ export function useUnoGame(paused = false) {
       const newGame = initializeGame(playerNames, rules, botFlags);
       const firstHuman = newGame.players.findIndex((p) => !p.isBot);
       setLocalPlayerIndex(firstHuman >= 0 ? firstHuman : 0);
+      setSavedGame(null);
       dispatch({ type: 'INIT', game: newGame });
     },
     [],
   );
+
+  const resumeGame = useCallback(() => {
+    const saved = readSavedRound();
+    if (!saved) {
+      setSavedGame(null);
+      return false;
+    }
+    setLocalPlayerIndex(saved.players.findIndex((player) => !player.isBot));
+    setSavedGame(null);
+    dispatch({ type: 'RESTORE', game: saved });
+    return true;
+  }, []);
 
   // ── Human: select card to play ────────────────────────────────────────────
 
@@ -343,7 +372,11 @@ export function useUnoGame(paused = false) {
 
   // ── Reset ─────────────────────────────────────────────────────────────────
 
-  const resetGame = useCallback(() => dispatch({ type: 'RESET' }), []);
+  const resetGame = useCallback(() => {
+    saveRound(null);
+    setSavedGame(null);
+    dispatch({ type: 'RESET' });
+  }, []);
 
   // ── Bot auto-play ─────────────────────────────────────────────────────────
   // Triggered whenever the current player changes or a turn completes.
@@ -548,6 +581,8 @@ export function useUnoGame(paused = false) {
     hasPendingStackOption,
     // Actions
     startGame,
+    savedGame,
+    resumeGame,
     selectCard,
     confirmWildColor,
     cancelWild,

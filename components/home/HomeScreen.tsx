@@ -20,8 +20,11 @@ import NotificationPanel from "../NotificationPanel";
 import PlayerProgress from "../PlayerProgress";
 import UnoCard from "../UnoCard";
 import type { Card } from "../../types/card";
+import type { GameState } from "../../types/game";
 
 interface Props {
+  savedGame?: GameState | null;
+  onResume?: () => void;
   rules: Partial<GameRules>;
   onRulesChange: (rules: Partial<GameRules>) => void;
   themeLabel: string;
@@ -50,7 +53,7 @@ export default function HomeScreen(props: Props) {
   );
   return (
     <div
-      className={`launch-screen mood-${getTableMood(props.rules)}`}
+      className={`launch-screen mood-${getTableMood(props.rules)}${props.savedGame ? " has-saved-round" : ""}`}
       data-design-contract="color-play"
     >
       <div className="launch-header">
@@ -77,6 +80,31 @@ export default function HomeScreen(props: Props) {
           </div>
         </div>
         <section className="launch-play" aria-label="Choose how to play">
+          {props.savedGame && (
+            <button className="launch-resume" onClick={props.onResume}>
+              <span className="launch-resume-card" aria-hidden="true">
+                <UnoCard
+                  card={
+                    props.savedGame.discardPile[
+                      props.savedGame.discardPile.length - 1
+                    ]
+                  }
+                  sizeMultiplier={0.32}
+                />
+              </span>
+              <span>
+                <strong>Resume your round</strong>
+                <small>
+                  {
+                    props.savedGame.players.find((player) => !player.isBot)
+                      ?.hand.length
+                  }{" "}
+                  cards in hand · {props.savedGame.players.length} players
+                </small>
+              </span>
+              <ArrowRight size={20} aria-hidden="true" />
+            </button>
+          )}
           <div
             className="launch-presets"
             role="group"
@@ -107,7 +135,12 @@ export default function HomeScreen(props: Props) {
             onClick={props.onQuickPlay}
           >
             <span>
-              Let’s play <small>Jump in with bots</small>
+              {props.savedGame ? "New round" : "Let’s play"}
+              <small>
+                {props.savedGame
+                  ? "Replace your saved bot round"
+                  : "Jump in with bots"}
+              </small>
             </span>
             <ArrowRight size={25} aria-hidden="true" />
           </button>

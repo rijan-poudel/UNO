@@ -95,6 +95,45 @@
 .launch-play {
   width: min(400px, 100%);
 }
+.launch-resume {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  min-height: 72px;
+  margin-bottom: 16px;
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 12px;
+  background: #fff7e7;
+  color: #17345f;
+  box-shadow: 0 5px 14px #061e4c35;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 140ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.launch-resume-card {
+  flex: none;
+  transform: rotate(-8deg);
+}
+.launch-resume strong {
+  display: block;
+  font-size: 17px;
+  font-weight: 750;
+}
+.launch-resume small {
+  display: block;
+  margin-top: 3px;
+  color: #58687a;
+  font-size: 12px;
+}
+.launch-resume > svg {
+  flex: none;
+  margin-left: auto;
+}
+.launch-resume:active {
+  transform: scale(0.98);
+}
 .launch-presets {
   display: flex;
   justify-content: center;
@@ -311,6 +350,18 @@
     font-size: 13px;
   }
 }
+@media (min-width: 701px) and (min-height: 541px) and (max-height: 800px) {
+  .has-saved-round .launch-heading h1 {
+    font-size: 80px;
+  }
+  .has-saved-round .title-card-fan {
+    height: 102px;
+    margin-top: 12px;
+  }
+  .has-saved-round .title-card-fan .uno-card {
+    --card-scale: 0.68 !important;
+  }
+}
 @media (orientation: landscape) and (max-height: 540px) and (min-width: 541px) {
   .launch-header .app-header {
     height: 48px;
@@ -344,6 +395,21 @@
   }
   .launch-play {
     width: 100%;
+  }
+  .has-saved-round .launch-resume {
+    min-height: 60px;
+    padding: 8px 12px;
+    margin-bottom: 8px;
+    gap: 10px;
+  }
+  .has-saved-round .launch-resume strong {
+    font-size: 15px;
+  }
+  .has-saved-round .launch-presets {
+    margin-bottom: 10px;
+  }
+  .has-saved-round .launch-preset-description {
+    display: none;
   }
   .launch-preset-description {
     margin: 6px auto 8px;
