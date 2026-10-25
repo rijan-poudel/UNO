@@ -318,6 +318,20 @@ function createRoomForPlayer(
   return { room, playerId };
 }
 
+// Keep a connected human in control. During an empty room's reconnect window,
+// retain a human seat so bots can never strand the table's host-only controls.
+function ensureHumanHost(room: ServerRoom): void {
+  const host = room.players.find(
+    (player) => player.playerId === room.hostPlayerId && !player.isBot,
+  );
+  if (host?.connected) return;
+  const nextHost =
+    room.players.find((player) => !player.isBot && player.connected) ??
+    host ??
+    room.players.find((player) => !player.isBot);
+  if (nextHost) room.hostPlayerId = nextHost.playerId;
+}
+
 function joinRoomAsPlayer(
   room: ServerRoom,
   socketId: string,
@@ -352,6 +366,8 @@ function joinRoomAsPlayer(
       roomId: room.roomId,
       playerId: existingPlayerForDevice.playerId,
     });
+    ensureHumanHost(room);
+    runOfflineBotTurns(room);
     return existingPlayerForDevice.playerId;
   }
 
@@ -371,6 +387,8 @@ function joinRoomAsPlayer(
     ready: false,
   });
   playerBySocket.set(socketId, { roomId: room.roomId, playerId });
+  ensureHumanHost(room);
+  runOfflineBotTurns(room);
   return playerId;
 }
 
@@ -499,28 +517,12 @@ function leaveRoomForSocket(socketId: string, ioServer: Server): void {
     player.socketId = '';
     player.ready = true;
 
-    if (room.hostPlayerId === player.playerId) {
-      const nextHost =
-        room.players.find(
-          (p) => p.playerId !== player.playerId && p.connected,
-        ) ?? room.players.find((p) => p.playerId !== player.playerId);
-      if (nextHost) {
-        room.hostPlayerId = nextHost.playerId;
-      }
-    }
-
     runOfflineBotTurns(room);
   } else {
     room.players.splice(playerIndex, 1);
     room.tableScore = undefined;
-    if (room.hostPlayerId === player.playerId && room.players.length > 0) {
-      const nextHost =
-        room.players.find((entry) => !entry.isBot && entry.connected) ??
-        room.players.find((entry) => !entry.isBot) ??
-        room.players[0];
-      room.hostPlayerId = nextHost.playerId;
-    }
   }
+  ensureHumanHost(room);
 
   const hasConnectedPlayers = room.players.some((p) => p.connected);
   if (!hasConnectedPlayers) {
@@ -1281,6 +1283,11 @@ io.on('connection', (socket) => {
         const actor = room.players.find((p) => p.socketId === socket.id);
         if (!actor || actor.playerId !== room.hostPlayerId) {
           reply?.(ackError('Only the host can start the game.'));
+          return;
+        }
+
+        if (room.started && !room.game?.winnerId) {
+          reply?.(ackError('Finish the current round before dealing again.'));
           return;
         }
 

@@ -117,12 +117,27 @@ async function main() {
       .timeout(5000)
       .emitWithAck('room:add-bot', { roomId })) as Ack<unknown>;
     assert.equal(full.ok, false, 'Six-seat limit is enforced');
-    // The live socket process must use the same opener semantics as the pure engine.
+    // Sample fresh tables; an active round must never be replaced to get a new opener.
+    const openerHost = await connect();
     for (let deal = 0; deal < 24; deal++) {
-      const opened = await request<{ room: RoomSnapshot }>(host, 'room:start', {
-        roomId,
-        rules: { maxPlayers: 6, allowStartingActionCard: true },
-      });
+      const fresh = await request<{ room: RoomSnapshot }>(
+        openerHost,
+        'room:create',
+        {
+          playerName: 'Opener host',
+          deviceId: randomBytes(12).toString('hex'),
+        },
+      );
+      const openerRoomId = fresh.room.roomId;
+      await request(openerHost, 'room:add-bot', { roomId: openerRoomId });
+      const opened = await request<{ room: RoomSnapshot }>(
+        openerHost,
+        'room:start',
+        {
+          roomId: openerRoomId,
+          rules: { maxPlayers: 6, allowStartingActionCard: true },
+        },
+      );
       const game = opened.room.game;
       assert.ok(game);
       const opener = game.discardPile[0];
@@ -134,6 +149,7 @@ async function main() {
       );
       assert.equal(game.direction, opener.value === 'reverse' ? -1 : 1);
       if (opener.value === 'skip') assert.equal(game.currentPlayerIndex, 1);
+      await request(openerHost, 'room:leave', { roomId: openerRoomId });
     }
     const updates: Array<{ at: number; room: RoomSnapshot }> = [];
     host.on('room:update', (room: RoomSnapshot) =>
@@ -153,6 +169,32 @@ async function main() {
       'Initial deal is broadcast before bot actions',
     );
     assert.equal(started.room.game?.rules.botDifficulty, 'tactical');
+    const repeatedDeals = await Promise.all(
+      [host, host, guest].map(
+        (socket) =>
+          socket.timeout(5000).emitWithAck('room:start', {
+            roomId,
+            rules: { startingHandSize: 9 },
+          }) as Promise<Ack<unknown>>,
+      ),
+    );
+    assert.ok(
+      repeatedDeals.every((ack) => !ack.ok),
+      'Duplicate or guest deals cannot replace an active round',
+    );
+    const intact = await request<{ room: RoomSnapshot }>(host, 'room:ready', {
+      roomId,
+    });
+    assert.deepEqual(
+      intact.room.game,
+      started.room.game,
+      'Rejected deals preserve cards, clock, round identity and score',
+    );
+    assert.deepEqual(
+      intact.room.rules,
+      started.room.rules,
+      'Rejected deals cannot change the next table rules',
+    );
     const before = started.room.game;
     assert.ok(before);
     const currentId = before.players[before.currentPlayerIndex].id;
@@ -226,6 +268,159 @@ async function main() {
       6,
       'Reconnect does not add a seat',
     );
+    await request(host, 'room:leave', { roomId });
+    const promoted = await request<{ room: RoomSnapshot }>(
+      replacement,
+      'room:ready',
+      { roomId },
+    );
+    assert.equal(
+      promoted.room.hostPlayerId,
+      rejoined.playerId,
+      'Leaving passes hosting to a connected human',
+    );
+    const oldHost = await request<{ room: RoomSnapshot; playerId: string }>(
+      host,
+      'room:join',
+      {
+        roomId,
+        playerName: 'Smoke host',
+        deviceId: hostDevice,
+      },
+    );
+    assert.equal(oldHost.playerId, created.playerId);
+    assert.equal(
+      oldHost.room.hostPlayerId,
+      rejoined.playerId,
+      'A returning former host does not take over from the current human host',
+    );
+    await request(replacement, 'room:leave', { roomId });
+    await request(host, 'room:leave', { roomId });
+    const firstBack = await request<{ room: RoomSnapshot; playerId: string }>(
+      replacement,
+      'room:join',
+      {
+        roomId,
+        playerName: 'Smoke guest',
+        deviceId: guestDevice,
+      },
+    );
+    assert.equal(
+      firstBack.room.hostPlayerId,
+      rejoined.playerId,
+      'The first human back can host even when earlier seats are bots',
+    );
+    const formerHostRequest = (await host
+      .timeout(5000)
+      .emitWithAck('room:start', { roomId })) as Ack<unknown>;
+    assert.equal(
+      formerHostRequest.ok,
+      false,
+      'A departed socket cannot control the table',
+    );
+    const absentRoom = await request<{ room: RoomSnapshot; playerId: string }>(
+      openerHost,
+      'room:create',
+      { playerName: 'Absent host', deviceId: randomBytes(12).toString('hex') },
+    );
+    const waitingDevice = randomBytes(12).toString('hex');
+    const waiting = await request<{ room: RoomSnapshot; playerId: string }>(
+      host,
+      'room:join',
+      {
+        roomId: absentRoom.room.roomId,
+        playerName: 'Returning guest',
+        deviceId: waitingDevice,
+      },
+    );
+    await request(openerHost, 'room:start', {
+      roomId: absentRoom.room.roomId,
+      rules: { allowStartingActionCard: false },
+    });
+    await request(openerHost, 'room:leave', { roomId: absentRoom.room.roomId });
+    await request(host, 'room:leave', { roomId: absentRoom.room.roomId });
+    const continued = new Promise<RoomSnapshot>((resolve, reject) => {
+      const timer = setTimeout(() => {
+        host.off('room:update', onUpdate);
+        reject(
+          new Error('An absent player’s turn did not resume after reconnect'),
+        );
+      }, 4000);
+      const onUpdate = (room: RoomSnapshot) => {
+        if (
+          room.roomId === absentRoom.room.roomId &&
+          room.game &&
+          room.game.lastAction.type !== 'init'
+        ) {
+          clearTimeout(timer);
+          host.off('room:update', onUpdate);
+          resolve(room);
+        }
+      };
+      host.on('room:update', onUpdate);
+    });
+    const returningGuest = await request<{
+      room: RoomSnapshot;
+      playerId: string;
+    }>(host, 'room:join', {
+      roomId: absentRoom.room.roomId,
+      playerName: 'Returning guest',
+      deviceId: waitingDevice,
+    });
+    assert.equal(returningGuest.room.hostPlayerId, waiting.playerId);
+    assert.equal(
+      returningGuest.room.game?.players[
+        returningGuest.room.game.currentPlayerIndex
+      ].id,
+      absentRoom.playerId,
+    );
+    const resumedTurn = await continued;
+    assert.equal(
+      resumedTurn.game?.roundId,
+      returningGuest.room.game?.roundId,
+      'Resuming bots continues the same round',
+    );
+    assert.ok(
+      resumedTurn.game?.players
+        .filter((player) => player.id !== waiting.playerId)
+        .every((player) => !player.hand),
+      'Reconnecting cannot expose absent players’ hands',
+    );
+    await request(host, 'room:leave', { roomId: absentRoom.room.roomId });
+
+    const waitingRoom = await request<{ room: RoomSnapshot }>(
+      openerHost,
+      'room:create',
+      {
+        playerName: 'Waiting host',
+        deviceId: randomBytes(12).toString('hex'),
+      },
+    );
+    await request(openerHost, 'room:add-bot', {
+      roomId: waitingRoom.room.roomId,
+    });
+    await request(openerHost, 'room:leave', {
+      roomId: waitingRoom.room.roomId,
+    });
+    const lateArrival = await request<{ room: RoomSnapshot; playerId: string }>(
+      host,
+      'room:join',
+      {
+        roomId: waitingRoom.room.roomId,
+        playerName: 'New host',
+        deviceId: randomBytes(12).toString('hex'),
+      },
+    );
+    assert.equal(
+      lateArrival.room.hostPlayerId,
+      lateArrival.playerId,
+      'A new human can host a lobby left with only bots',
+    );
+    await request(host, 'room:set-rules', {
+      roomId: waitingRoom.room.roomId,
+      rules: { startingHandSize: 5 },
+    });
+    await request(host, 'room:leave', { roomId: waitingRoom.room.roomId });
     const solo = await connect();
     const soloDevice = randomBytes(12).toString('hex');
     const soloRoom = await request<{ room: RoomSnapshot; playerId: string }>(
@@ -252,6 +447,11 @@ async function main() {
       restoredSolo.playerId,
       soloRoom.playerId,
       'The last human can refresh without losing the room',
+    );
+    assert.equal(
+      restoredSolo.room.hostPlayerId,
+      restoredSolo.playerId,
+      'The last human returns as host rather than leaving control with a bot',
     );
     await new Promise((resolve) => setTimeout(resolve, 900));
     const afterReconnect = await request<{ room: RoomSnapshot }>(
@@ -320,8 +520,13 @@ async function main() {
       true,
       'Late old disconnect cannot evict the new connection',
     );
+    assert.equal(
+      afterOldDisconnect.room.hostPlayerId,
+      transferred.playerId,
+      'An overlapping refresh preserves hosting',
+    );
     console.log(
-      'Passed: create/join/kick, six seats, stable IDs, separate bot broadcasts, turn pacing, reconnect, last-human refresh, and overlapping connection handoff.',
+      'Passed: create/join/kick, six seats, stable IDs, protected active rounds, human host succession, resumed absent-player turns, separate bot broadcasts, turn pacing, reconnect, last-human refresh, and overlapping connection handoff.',
     );
   } finally {
     sockets.forEach((socket) => socket.disconnect());

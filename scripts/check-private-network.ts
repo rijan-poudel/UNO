@@ -31,6 +31,41 @@ async function request(socket: Socket, event: string, payload: unknown) {
   assert.equal(ack.ok, true, ack.ok ? '' : ack.error);
   return ack.data;
 }
+
+// Find a real opening wild without ever replacing an unfinished round.
+async function openWildTable(host: Socket, guest: Socket, guestDevice: string) {
+  for (let attempt = 0; attempt < 100; attempt++) {
+    const created = await request(host, 'room:create', {
+      playerName: 'Private host',
+      deviceId: device(),
+    });
+    const roomId = created.room.roomId;
+    const joined = await request(guest, 'room:join', {
+      roomId,
+      playerName: 'Private guest',
+      deviceId: guestDevice,
+    });
+    const started = await request(host, 'room:start', {
+      roomId,
+      roundId: 'client-forged-id',
+      tableScore: {
+        completedRounds: 99,
+        wins: { player_0: 99 },
+        lastRoundId: 'forged',
+      },
+      rules: { allowStartingActionCard: false, mustDeclareUno: false },
+    });
+    if (
+      started.room.game?.players[0].hand?.some((card) => card.color === 'wild')
+    ) {
+      return { created, joined, started };
+    }
+    await request(host, 'room:leave', { roomId });
+    await request(guest, 'room:leave', { roomId });
+  }
+  throw new Error('No opening wild found in 100 fresh tables');
+}
+
 function privateFor(room: RoomSnapshot, playerId: string) {
   const game = room.game;
   if (!game) return;
@@ -76,16 +111,12 @@ async function main() {
     const host = await connect();
     let guest = await connect();
     const guestDevice = device();
-    const created = await request(host, 'room:create', {
-      playerName: 'Private host',
-      deviceId: device(),
-    });
+    const { created, joined, started } = await openWildTable(
+      host,
+      guest,
+      guestDevice,
+    );
     const roomId = created.room.roomId;
-    const joined = await request(guest, 'room:join', {
-      roomId,
-      playerName: 'Private guest',
-      deviceId: guestDevice,
-    });
     let packets = 0;
     const watch = (socket: Socket, id: string) =>
       socket.on('room:update', (room: RoomSnapshot) => {
@@ -94,16 +125,6 @@ async function main() {
       });
     watch(host, created.playerId);
     watch(guest, joined.playerId);
-    const started = await request(host, 'room:start', {
-      roomId,
-      roundId: 'client-forged-id',
-      tableScore: {
-        completedRounds: 99,
-        wins: { player_0: 99 },
-        lastRoundId: 'forged',
-      },
-      rules: { allowStartingActionCard: false, mustDeclareUno: false },
-    });
     privateFor(started.room, created.playerId);
     assert.notEqual(started.room.game?.roundId, 'client-forged-id');
     assert.equal(
@@ -139,18 +160,7 @@ async function main() {
       false,
       'Table editing cannot interrupt an active round',
     );
-    // A bounded redeal selects a real hand containing a wild; do not rely on
-    // a random full round happening to play one before it ends.
-    let opening = unchanged.room;
-    for (
-      let attempt = 0;
-      attempt < 100 &&
-      !opening.game?.players[0].hand?.some((card) => card.color === 'wild');
-      attempt++
-    ) {
-      opening = (await request(host, 'room:start', { roomId })).room;
-    }
-    const wild = opening.game?.players[0].hand?.find(
+    const wild = unchanged.room.game?.players[0].hand?.find(
       (card) => card.color === 'wild',
     );
     assert.ok(wild);
@@ -160,6 +170,21 @@ async function main() {
     });
     privateFor(prepared.room, created.playerId);
     assert.equal(prepared.room.pendingColorChoice?.cardId, wild.id);
+    const interrupted = (await host.timeout(5000).emitWithAck('room:start', {
+      roomId,
+      rules: { startingHandSize: 9 },
+    })) as Ack<unknown>;
+    assert.equal(
+      interrupted.ok,
+      false,
+      'Deal cannot interrupt a pending wild choice',
+    );
+    const intactChoice = await request(host, 'room:ready', { roomId });
+    assert.deepEqual(intactChoice.room.game, prepared.room.game);
+    assert.deepEqual(
+      intactChoice.room.pendingColorChoice,
+      prepared.room.pendingColorChoice,
+    );
     privateFor(
       (await request(guest, 'room:ready', { roomId })).room,
       joined.playerId,
@@ -278,6 +303,15 @@ async function main() {
     );
     const finishedAgain = await finishRound(fresh.room.game);
     assert.equal(finishedAgain.tableScore?.completedRounds, 1);
+    const directRematch = await request(host, 'room:start', { roomId });
+    assert.notEqual(
+      directRematch.room.game?.roundId,
+      finishedAgain.roundId,
+      'A completed round still allows a direct rematch',
+    );
+    assert.deepEqual(directRematch.room.tableScore, finishedAgain.tableScore);
+    const rematchFinished = await finishRound(directRematch.room.game);
+    assert.equal(rematchFinished.tableScore?.completedRounds, 2);
     await request(host, 'room:return-to-lobby', { roomId });
     await request(host, 'room:set-rules', {
       roomId,
@@ -290,7 +324,7 @@ async function main() {
     privateFor(rematch.room, created.playerId);
     assert.deepEqual(
       rematch.room.tableScore,
-      finishedAgain.tableScore,
+      rematchFinished.tableScore,
       'Same-crew re-deal retains completed wins',
     );
     assert.notEqual(rematch.room.game?.roundId, finishedAgain.roundId);
@@ -312,7 +346,7 @@ async function main() {
     privateFor(restored.room, joined.playerId);
     assert.deepEqual(
       restored.room.tableScore,
-      finishedAgain.tableScore,
+      rematchFinished.tableScore,
       'Reconnect retains the public score',
     );
     assert.equal(restored.playerId, joined.playerId);
@@ -332,7 +366,7 @@ async function main() {
     })) as Ack<{ room: Omit<RoomSnapshot, 'game'> & { game: GameState } }>;
     assert.equal(legacyAck.ok, true);
     const legacyGame = legacyAck.data.room.game;
-    assert.deepEqual(legacyGame.tableScore, finishedAgain.tableScore);
+    assert.deepEqual(legacyGame.tableScore, rematchFinished.tableScore);
     assert.deepEqual(
       legacyGame.players.find((player) => player.id === joined.playerId)?.hand,
       hand,

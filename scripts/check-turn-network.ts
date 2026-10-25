@@ -42,10 +42,23 @@ async function main() {
     });
     const updates: RoomSnapshot[] = [];
     host.on('room:update', (room: RoomSnapshot) => updates.push(room));
+    const penaltyHost = await connect();
+    const penaltyUpdates: RoomSnapshot[] = [];
+    penaltyHost.on('room:update', (room: RoomSnapshot) =>
+      penaltyUpdates.push(room),
+    );
     let penaltyGame: RoomSnapshot['game'] = null;
+    let penaltyRoomId = '';
     for (let attempt = 0; attempt < 200 && !penaltyGame; attempt++) {
-      const deal = await request(host, 'room:start', {
-        roomId,
+      penaltyUpdates.length = 0;
+      const fresh = await request(penaltyHost, 'room:create', {
+        playerName: 'Penalty host',
+        deviceId: randomBytes(12).toString('hex'),
+      });
+      penaltyRoomId = fresh.room.roomId;
+      await request(penaltyHost, 'room:add-bot', { roomId: penaltyRoomId });
+      const deal = await request(penaltyHost, 'room:start', {
+        roomId: penaltyRoomId,
         rules: {
           allowStartingActionCard: true,
           stackDraw2: false,
@@ -53,10 +66,11 @@ async function main() {
         },
       });
       if (deal.room.game?.pendingDraw === 2) penaltyGame = deal.room.game;
+      else await request(penaltyHost, 'room:leave', { roomId: penaltyRoomId });
     }
     assert.ok(penaltyGame, 'Exercise a real draw-two opener');
     await new Promise((resolve) => setTimeout(resolve, 1250));
-    const paid = updates.find(
+    const paid = penaltyUpdates.find(
       (room) =>
         room.game?.lastAction.type === 'draw' &&
         room.game.lastAction.count === 2,
@@ -69,6 +83,7 @@ async function main() {
       paid.players[0].handCount,
       penaltyGame.players[0].handCount + 2,
     );
+    await request(penaltyHost, 'room:leave', { roomId: penaltyRoomId });
     updates.length = 0;
     const started = await request(host, 'room:start', {
       roomId,

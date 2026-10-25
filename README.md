@@ -24,6 +24,7 @@ Open [localhost:3000](http://localhost:3000). The frontend and socket server sta
 - A running table score tracks completed-round wins across rematches. See it in results, table activity, and the online lobby; changing the crew starts a fresh score.
 - Unfinished bot rounds save on the device and can be resumed from home after a refresh.
 - A 45-second reconnect window, including a refresh by the last connected human.
+- Active online rounds are protected from repeat Deal requests. Hosting follows connected humans, and temporary bots resume absent players’ turns when someone returns.
 - House rules for stacking, jump-in, drawing, UNO calls, special cards, and finishing.
 - Immediate card sounds, optional music, optional voice, master mute, and saved volume preferences.
 - Transform-based card travel and hand repositioning, with reduced-motion support.
