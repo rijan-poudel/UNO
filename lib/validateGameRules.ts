@@ -11,7 +11,12 @@ export function validateGameRules(input: unknown = {}): GameRules {
   for (const key of Object.keys(defaultRules) as Array<keyof GameRules>) {
     const value = values[key];
     if (value === undefined) continue;
-    if (key === 'startingHandSize') {
+    if (key === 'botDifficulty') {
+      if (value !== 'casual' && value !== 'standard' && value !== 'tactical') {
+        throw new Error('Bot challenge must be Casual, Standard or Tactical.');
+      }
+      result.botDifficulty = value;
+    } else if (key === 'startingHandSize') {
       if (
         typeof value !== 'number' ||
         !Number.isSafeInteger(value) ||

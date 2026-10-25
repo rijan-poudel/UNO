@@ -2,6 +2,7 @@ import './check-gesture';
 import './check-turn-flow';
 import './check-saved-round';
 import './check-game-view';
+import './check-bot-difficulty';
 import './check-turn-cue';
 import './check-lobby';
 import {

@@ -50,6 +50,7 @@ export function matchesPreset(
     ([key, value]) =>
       key === 'startingHandSize' ||
       key === 'maxPlayers' ||
+      key === 'botDifficulty' ||
       (rules[key as keyof GameRules] ??
         defaultRules[key as keyof GameRules]) === value,
   );

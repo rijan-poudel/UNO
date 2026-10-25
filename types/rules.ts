@@ -8,7 +8,11 @@
  * GameRules is the single source of truth for every configurable behaviour.
  * Pass a Partial<GameRules> to initializeGame() to override only what you need.
  */
+export type BotDifficulty = "casual" | "standard" | "tactical";
+
 export interface GameRules {
+  /** Card-selection strategy for bot seats; does not change turn timing. */
+  botDifficulty: BotDifficulty;
   // ── Hand size ────────────────────────────────────────────────────────────
   /** How many cards each player receives at the start of the game. Default: 7. */
   startingHandSize: number;
@@ -112,6 +116,7 @@ export interface GameRules {
 
 /** Sensible defaults matching standard UNO rules. */
 export const defaultRules: GameRules = {
+  botDifficulty: "standard",
   startingHandSize: 7,
   stackDraw2: false,
   stackWild4: false,

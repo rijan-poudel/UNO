@@ -735,6 +735,9 @@ input[type="range"] {
   gap: 16px;
   padding-block: 18px;
 }
+.preference-row .bot-challenge-select {
+  font-size: 16px;
+}
 .preference-row strong {
   font-size: 15px;
   font-weight: 650;

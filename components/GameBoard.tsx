@@ -38,6 +38,7 @@ import { isActionCard } from "../types/card";
 import type { GameState } from "../types/game";
 import { canJumpInPlay, canPlayCard } from "../lib/gameRules";
 import { getTableMood } from "../lib/rulePresets";
+import { getBotDifficultyLabel } from "../lib/botSupport";
 import TurnCue from "./TurnCue";
 import { getPlayerExpression } from "../lib/playerExpression";
 import { getAudioSettings, setAudioSettings } from "../lib/audioSettings";
@@ -1021,6 +1022,8 @@ export default function GameBoard({
                 ].name
               }
               .
+              {game.players.some((player) => player.isBot) &&
+                ` ${getBotDifficultyLabel(game.rules.botDifficulty)} bots.`}
             </p>
             {online?.room && (
               <div className="menu-room-code-group">

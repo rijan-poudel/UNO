@@ -21,6 +21,7 @@ export default function RulePresets({
             onChange({
               ...p.rules,
               startingHandSize: rules.startingHandSize ?? 7,
+              botDifficulty: rules.botDifficulty ?? "standard",
             })
           }
         >

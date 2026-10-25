@@ -2,14 +2,17 @@
 "use client";
 import type { GameRules } from "../types/rules";
 import RulePresets from "./RulePresets";
+import BotDifficultyControl from "./BotDifficultyControl";
 export default function TableRules({
   rules,
   onChange,
   onOpenRules,
+  showBotChallenge = true,
 }: {
   rules: Partial<GameRules>;
   onChange: (rules: Partial<GameRules>) => void;
   onOpenRules: () => void;
+  showBotChallenge?: boolean;
 }) {
   return (
     <section className="setup-rules">
@@ -36,6 +39,9 @@ export default function TableRules({
           ))}
         </select>
       </label>
+      {showBotChallenge && (
+        <BotDifficultyControl rules={rules} onChange={onChange} />
+      )}
     </section>
   );
 }

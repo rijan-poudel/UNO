@@ -11,6 +11,7 @@ import type {
 import { defaultRules, type GameRules } from "../types/rules";
 import { parseRoomCode, isRoomCode } from "../lib/roomCodes";
 import { RULE_PRESETS, matchesPreset } from "../lib/rulePresets";
+import { getBotDifficultyLabel } from "../lib/botSupport";
 import TableRules from "./TableRules";
 import PlayerAvatar from "./PlayerAvatar";
 import {
@@ -554,6 +555,14 @@ export default function OnlineLobby(props: Props) {
             .join(" · ");
           const summary = [
             ["Cards dealt", `${activeRules.startingHandSize} each`],
+            ...(room.players.some((player) => player.isBot)
+              ? [
+                  [
+                    "Bot challenge",
+                    getBotDifficultyLabel(activeRules.botDifficulty),
+                  ],
+                ]
+              : []),
             [
               "Drawing",
               activeRules.drawUntilPlayable

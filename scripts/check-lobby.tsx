@@ -131,6 +131,19 @@ const audio = renderToStaticMarkup(
 );
 assert.match(audio, /aria-valuetext="55 percent"/);
 assert.match(audio, /aria-valuetext="24 percent"/);
+assert.match(rulesPanel, /aria-label="Bot challenge"/);
+assert.match(rulesPanel, /value="standard" selected=""/);
+const tactical = renderToStaticMarkup(
+  <SettingsModal
+    {...settingsProps}
+    rules={{ ...defaultRules, botDifficulty: 'tactical' }}
+  />,
+);
+assert.match(tactical, /value="tactical" selected=""/);
+assert.match(
+  tactical,
+  /Saves wilds, builds color runs and watches hand counts/,
+);
 console.log(
   'Supporting UI checks passed: published room rules, settings groups, profile save state and audio value labels.',
 );

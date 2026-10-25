@@ -27,6 +27,7 @@ import {
 } from "../lib/tableChimes";
 import Modal from "./Modal";
 import RulePresets from "./RulePresets";
+import BotDifficultyControl from "./BotDifficultyControl";
 interface Props {
   open: boolean;
   initialTab?: "profile" | "controls" | "audio";
@@ -390,6 +391,7 @@ export default function SettingsModal({
                 ))}
               </select>
             </label>
+            <BotDifficultyControl rules={rules} onChange={onChange} />
             {[...new Set(RULES.map((rule) => rule.group))].map((group) => (
               <fieldset className="settings-rule-group" key={group}>
                 <legend>{group}</legend>
@@ -406,7 +408,13 @@ export default function SettingsModal({
             ))}
             <button
               className="text-button"
-              onClick={() => onChange({ ...defaultRules, maxPlayers: 6 })}
+              onClick={() =>
+                onChange({
+                  ...defaultRules,
+                  maxPlayers: 6,
+                  botDifficulty: rules.botDifficulty ?? "standard",
+                })
+              }
             >
               <RotateCcw size={16} />
               Reset to classic rules

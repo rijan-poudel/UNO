@@ -12,6 +12,35 @@ import type { Card, CardColor } from '../types/card';
 import type { GameState } from '../types/game';
 import { STANDARD_COLORS } from '../types/card';
 import { getPlayableCards } from './gameRules';
+import { getNextPlayerIndex } from './turns';
+import type { BotDifficulty } from '../types/rules';
+
+export const BOT_DIFFICULTY_OPTIONS = [
+  {
+    value: 'casual',
+    label: 'Casual',
+    description: 'Plays the first matching card.',
+  },
+  {
+    value: 'standard',
+    label: 'Standard',
+    description: 'Favors action cards and high numbers.',
+  },
+  {
+    value: 'tactical',
+    label: 'Tactical',
+    description: 'Saves wilds, builds color runs and watches hand counts.',
+  },
+] satisfies Array<{ value: BotDifficulty; label: string; description: string }>;
+
+export function getBotDifficultyLabel(
+  value: BotDifficulty = 'standard',
+): string {
+  return (
+    BOT_DIFFICULTY_OPTIONS.find((option) => option.value === value)?.label ??
+    'Standard'
+  );
+}
 
 // ── Bot action descriptor ─────────────────────────────────────────────────────
 
@@ -97,12 +126,58 @@ function scoreCard(card: Card): number {
   }
 }
 
+// Tactical strategy uses only this hand and public counts, never opponents'
+// faces or the draw pile. No simulation through the authoritative hidden deck.
+function scoreTacticalCard(card: Card, hand: Card[], state: GameState): number {
+  const remaining = hand.filter(
+    (entry) =>
+      entry.id !== card.id &&
+      !(card.value === 'discardAll' && entry.color === card.color),
+  );
+  if (remaining.length === 0) return 10_000;
+  if (card.value === 'shuffle') {
+    const total =
+      state.players.reduce((sum, player) => sum + player.hand.length, 0) - 1;
+    return 45 * (hand.length - Math.ceil(total / state.players.length));
+  }
+  const color =
+    card.color === 'wild' ? getBotPreferredColor(remaining) : card.color;
+  let score = (hand.length - remaining.length) * 50;
+  score += remaining.filter((entry) => entry.color === color).length * 6;
+  if (card.value === 'wild') score -= 25;
+  else if (card.value === 'wild4') score -= 12;
+  else if (['draw2', 'skip', 'reverse'].includes(card.value)) score += 8;
+  else if (/^\d$/.test(card.value)) score += Number(card.value);
+
+  const nextCount = state.players[getNextPlayerIndex(state)].hand.length;
+  const previousCount =
+    state.players[getNextPlayerIndex(state, -1)].hand.length;
+  if (nextCount <= 2) {
+    if (card.value === 'draw2' || card.value === 'wild4') score += 65;
+    if (card.value === 'skip') score += 60;
+    if (
+      card.value === 'reverse' &&
+      (state.players.length === 2
+        ? state.rules.reverseActsAsSkipInTwoPlayer
+        : previousCount > 2)
+    )
+      score += 60;
+  } else if (
+    card.value === 'reverse' &&
+    state.players.length > 2 &&
+    previousCount <= 2
+  ) {
+    score -= 30;
+  }
+  return score;
+}
+
 // ── Public API ────────────────────────────────────────────────────────────────
 
 /**
  * Returns the bot's recommended action for `playerIndex` in the given state.
  *
- * Strategy (greedy):
+ * Standard strategy (greedy):
  *   1. If there is a pending forced draw — recommend drawing required cards.
  *   2. Find all playable cards in the bot's hand.
  *   3. If at least one exists, play the highest-scoring playable card.
@@ -135,9 +210,16 @@ export function getBotMove(state: GameState, playerIndex: number): BotAction {
     return { action: state.drawnThisTurn ? 'pass' : 'draw' };
   }
 
-  // Sort descending by score and pick the best.
-  const sorted = [...playable].sort((a, b) => scoreCard(b) - scoreCard(a));
-  const best = sorted[0];
+  const difficulty = state.rules.botDifficulty ?? 'standard';
+  const best =
+    difficulty === 'casual'
+      ? playable[0]
+      : [...playable].sort((a, b) =>
+          difficulty === 'tactical'
+            ? scoreTacticalCard(b, player.hand, state) -
+              scoreTacticalCard(a, player.hand, state)
+            : scoreCard(b) - scoreCard(a),
+        )[0];
 
   const chosenColor =
     best.color === 'wild' ? getBotPreferredColor(player.hand) : undefined;

@@ -15,6 +15,8 @@ import {
   subscribePlayerName,
 } from "../lib/playerNames";
 import TableRules from "./TableRules";
+import BotDifficultyControl from "./BotDifficultyControl";
+import { getBotDifficultyLabel } from "../lib/botSupport";
 export default function GameSetup({
   onStart,
   controls,
@@ -56,8 +58,9 @@ export default function GameSetup({
       footer={
         <>
           <p className="muted">
-            {preset?.label ?? "Custom rules"} · {startingHandSize} cards each.
-            First to an empty hand wins.
+            {preset?.label ?? "Custom rules"} ·{" "}
+            {getBotDifficultyLabel(rules.botDifficulty)} bots ·{" "}
+            {startingHandSize} cards each. First to an empty hand wins.
           </p>
           <button
             className="button primary wide"
@@ -134,7 +137,10 @@ export default function GameSetup({
         ))}
       </div>
       <details className="setup-disclosure">
-        <summary>Rename bots</summary>
+        <summary>
+          Bot options <span>{getBotDifficultyLabel(rules.botDifficulty)}</span>
+        </summary>
+        <BotDifficultyControl rules={rules} onChange={onRulesChange} />
         <div className="seat-list">
           {names.slice(1).map((name, i) => (
             <label className="bot-name-field" key={i}>
@@ -157,6 +163,7 @@ export default function GameSetup({
           Table rules <span>{preset?.label ?? "Custom rules"}</span>
         </summary>
         <TableRules
+          showBotChallenge={false}
           rules={rules}
           onChange={onRulesChange}
           onOpenRules={onOpenRules}

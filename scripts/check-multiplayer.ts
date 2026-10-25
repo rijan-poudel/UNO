@@ -54,6 +54,7 @@ async function main() {
     );
     assert.equal(joined.room.players.length, 2);
     const roomRules = {
+      botDifficulty: 'tactical',
       startingHandSize: 5,
       stackDraw2: true,
       mustDeclareUno: false,
@@ -67,6 +68,7 @@ async function main() {
     assert.equal(published.room.rules?.startingHandSize, 5);
     assert.equal(published.room.rules?.mustDeclareUno, false);
     assert.equal(published.room.rules?.stackDraw2, true);
+    assert.equal(published.room.rules?.botDifficulty, 'tactical');
     const guestEdit = (await guest.timeout(5000).emitWithAck('room:set-rules', {
       roomId,
       rules: { startingHandSize: 9 },
@@ -80,6 +82,7 @@ async function main() {
       { startingHandSize: 1e100 },
       { stackDraw2: 'false' },
       { maxPlayers: 100 },
+      { botDifficulty: 'impossible' },
     ]) {
       const rejected = (await host
         .timeout(5000)
@@ -149,6 +152,7 @@ async function main() {
       0,
       'Initial deal is broadcast before bot actions',
     );
+    assert.equal(started.room.game?.rules.botDifficulty, 'tactical');
     const before = started.room.game;
     assert.ok(before);
     const currentId = before.players[before.currentPlayerIndex].id;

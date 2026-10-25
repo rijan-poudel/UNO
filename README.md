@@ -17,6 +17,7 @@ Open [localhost:3000](http://localhost:3000). The frontend and socket server sta
 
 - A playful illustrated interface with four themes, readable card faces, and a touch-friendly scrolling hand.
 - Local games with one human and one to five bots.
+- Casual, Standard and Tactical bot challenges, shared by local play and online bot seats. Standard preserves the original strategy; Tactical uses only its own hand and public information.
 - Private online tables with room codes, invitation links, friend codes, bot seats, and rematches.
 - Private online hands: each browser receives its own cards, public counts and discards; opponents’ hands and the draw deck remain on the server.
 - After a round, hosts can edit the table and deal again in the same room, keeping everyone’s seats and invitation code.
@@ -26,6 +27,8 @@ Open [localhost:3000](http://localhost:3000). The frontend and socket server sta
 - Immediate card sounds, optional music, optional voice, master mute, and saved volume preferences.
 - Transform-based card travel and hand repositioning, with reduced-motion support.
 - Keyboard shortcuts: **D** draw, **P** pass, **U** call UNO. Cards also work with Tab and Enter/Space; Left/Right/Home/End browse the hand. UNO may be declared with two cards before a play or with one card afterward.
+
+Choose a challenge under **Set up bots → Bot options**, in **Settings → Rules**, or in the host’s table rules before an online deal. Quick play uses the saved choice. Preset changes preserve the challenge; rematches and resumed local rounds keep the challenge they started with. Online bot choices require the updated socket service.
 
 ## Verify changes
 

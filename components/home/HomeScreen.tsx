@@ -21,6 +21,7 @@ import PlayerProgress from "../PlayerProgress";
 import UnoCard from "../UnoCard";
 import type { Card } from "../../types/card";
 import type { GameState } from "../../types/game";
+import { getBotDifficultyLabel } from "../../lib/botSupport";
 
 interface Props {
   savedGame?: GameState | null;
@@ -119,6 +120,7 @@ export default function HomeScreen(props: Props) {
                     ...item.rules,
                     startingHandSize: props.rules.startingHandSize ?? 7,
                     maxPlayers: props.rules.maxPlayers ?? 6,
+                    botDifficulty: props.rules.botDifficulty ?? "standard",
                   })
                 }
               >
@@ -139,7 +141,7 @@ export default function HomeScreen(props: Props) {
               <small>
                 {props.savedGame
                   ? "Replace your saved bot round"
-                  : "Jump in with bots"}
+                  : `Jump in with ${getBotDifficultyLabel(props.rules.botDifficulty).toLowerCase()} bots`}
               </small>
             </span>
             <ArrowRight size={25} aria-hidden="true" />

@@ -30,7 +30,10 @@ export function parseRulePreferences(
     });
     // Upgrade the old default once. Explicit choices made after this version persist.
     const wasClassic = Object.entries(defaultRules).every(
-      ([key, value]) => key === 'maxPlayers' || (saved[key] ?? value) === value,
+      ([key, value]) =>
+        key === 'maxPlayers' ||
+        key === 'botDifficulty' ||
+        (saved[key] ?? value) === value,
     );
     return version !== RULES_VERSION && wasClassic
       ? { ...rules, stackDraw2: true, stackWild4: true }

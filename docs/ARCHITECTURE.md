@@ -14,6 +14,10 @@ Online room seat IDs can differ from array positions after kicking/replacing pla
 
 ## Timing
 
+`GameRules.botDifficulty` selects Casual, Standard or Tactical card decisions in the shared `getBotMove` strategy. Rule validation rejects unknown values; older rules default to Standard. Casual takes the first legal card, Standard retains the original greedy ranking, and Tactical values color continuity, wild conservation, actual Discard All shedding, shuffle hand-count estimates and threats in the current direction. Tactical never reads an opponent’s card faces or the draw pile. `check-bot-difficulty` compares every recommendation against a recipient-only view across all presets and levels, and checks complete rounds, legality, immutable inputs and deck conservation. Bot pacing, automatic UNO declarations, penalties and human clocks are unchanged.
+
+The native BotDifficultyControl is shared by bot options, host table rules and Settings. Difficulty is excluded from preset identity and preserved by preset switches. Preferences apply to future tables; saved rounds and rematches retain their own rules. Online guests see the published challenge when the room has bot seats, and the game menu names the active challenge. Both local and server controllers already call the shared strategy, so the setting does not introduce a second bot loop or client-authoritative online actions.
+
 Local and online bots wait about 760 ms. The online server publishes the triggering human action before scheduling one automated turn; it does not run a synchronous chain that hides intermediate actions. A pending callback rechecks current state and connection status before acting.
 
 Human turns are not driven by a UI idle timer. A voluntary draw with no playable option automatically passes after a short delay. A playable draw leaves the choice to the player. Online disconnected seats are temporarily driven by bots while other humans remain. If no humans are connected, bot progression stops and the room has a 45-second reconnect window.
