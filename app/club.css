@@ -722,6 +722,9 @@ input[type="range"] {
     height: 64px;
     margin-block: 0;
   }
+  .winner-modal.has-table-score .round-winner-art {
+    display: none;
+  }
   .winner-modal .round-winner-art .uno-card {
     --card-scale: 0.4 !important;
   }
@@ -853,6 +856,11 @@ input[type="range"] {
 }
 .round-scorecard ul {
   padding: 0;
+}
+.table-score-caption {
+  margin-bottom: 12px;
+  font-size: 13px;
+  line-height: 1.4;
 }
 .scorecard-heading h3 {
   font-family: var(--font-body), sans-serif;

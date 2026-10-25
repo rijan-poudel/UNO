@@ -4,6 +4,7 @@ import { ACTION_VALUES, NUMBER_VALUES, STANDARD_COLORS } from '../types/card';
 import type { GameState } from '../types/game';
 import { validateGameRules } from './validateGameRules';
 import { withTurnDeadline } from './turnFlow';
+import { parseTableScore } from './tableScore';
 
 export const SAVED_ROUND_KEY = 'uno.localRound.v1';
 
@@ -107,7 +108,18 @@ export function parseSavedRound(raw: string | null): GameState | null {
     if (top.color !== 'wild' && top.color !== game.activeColor) return null;
 
     // Transient presentation and an expired wall clock must not replay on return.
+    const roundId =
+      typeof game.roundId === 'string' &&
+      game.roundId.length > 0 &&
+      game.roundId.length <= 100
+        ? game.roundId
+        : undefined;
+    const tableScore = roundId
+      ? parseTableScore(game.tableScore, players)
+      : undefined;
     return {
+      ...(roundId ? { roundId } : {}),
+      ...(tableScore ? { tableScore } : {}),
       players,
       rules,
       drawPile: game.drawPile,

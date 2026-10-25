@@ -13,6 +13,7 @@ import { parseRoomCode, isRoomCode } from "../lib/roomCodes";
 import { RULE_PRESETS, matchesPreset } from "../lib/rulePresets";
 import { getBotDifficultyLabel } from "../lib/botSupport";
 import TableRules from "./TableRules";
+import TableScoreCard from "./TableScoreCard";
 import PlayerAvatar from "./PlayerAvatar";
 import {
   getPlayerName,
@@ -520,6 +521,16 @@ export default function OnlineLobby(props: Props) {
             )}
           </>
         </div>
+      )}
+      {room && (
+        <TableScoreCard
+          score={room.tableScore}
+          players={room.players.map((player) => ({
+            id: player.playerId,
+            name: player.name,
+          }))}
+          localPlayerId={props.playerId}
+        />
       )}
       {room && isHost && (
         <TableRules

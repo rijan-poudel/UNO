@@ -4,6 +4,7 @@ import { Server } from 'socket.io';
 import { initializeGame } from '../lib/gameSetup';
 import { validateGameRules } from '../lib/validateGameRules';
 import { toGameView, toPresentationGame } from '../lib/gameView';
+import { recordTableWin, startTableRound } from '../lib/tableScore';
 import { defaultRules, type GameRules } from '../types/rules';
 import {
   playCard,
@@ -22,7 +23,7 @@ import {
   hasForcedPenalty,
   withTurnDeadline,
 } from '../lib/turnFlow';
-import type { GameState } from '../types/game';
+import type { GameState, TableScore } from '../types/game';
 import type {
   Ack,
   AddBotPayload,
@@ -82,6 +83,7 @@ interface ServerRoomPlayer extends RoomPlayer {
 }
 
 interface ServerRoom {
+  tableScore?: TableScore;
   roomId: string;
   hostPlayerId: string;
   players: ServerRoomPlayer[];
@@ -156,11 +158,16 @@ function toSnapshot(
   viewerId: string,
   socketId: string,
 ): RoomSnapshot {
+  if (room.game) {
+    room.game = recordTableWin(room.game);
+    room.tableScore = room.game.tableScore;
+  }
   synchronizeRoomTurn(room);
   const view = room.game ? toGameView(room.game, viewerId) : null;
   const privateFormat =
     io.sockets.sockets.get(socketId)?.handshake.auth.protocolVersion === 2;
   return {
+    tableScore: room.tableScore,
     roomId: room.roomId,
     hostPlayerId: room.hostPlayerId,
     players: room.players.map((p) => {
@@ -353,6 +360,7 @@ function joinRoomAsPlayer(
   }
 
   const playerId = makeNextPlayerId(room.players);
+  room.tableScore = undefined;
   room.players.push({
     playerId,
     socketId,
@@ -372,6 +380,7 @@ function nextBotName(room: ServerRoom): string {
 }
 
 function addBotSeat(room: ServerRoom): void {
+  room.tableScore = undefined;
   const playerId = makeNextPlayerId(room.players);
   room.players.push({
     playerId,
@@ -503,6 +512,7 @@ function leaveRoomForSocket(socketId: string, ioServer: Server): void {
     runOfflineBotTurns(room);
   } else {
     room.players.splice(playerIndex, 1);
+    room.tableScore = undefined;
     if (room.hostPlayerId === player.playerId && room.players.length > 0) {
       const nextHost =
         room.players.find((entry) => !entry.isBot && entry.connected) ??
@@ -1294,13 +1304,17 @@ io.on('connection', (socket) => {
         );
         room.rules = effectiveRules;
         // Preserve room identities when a lobby seat has been removed or replaced.
-        room.game = {
-          ...newGame,
-          players: newGame.players.map((player, index) => ({
-            ...player,
-            id: room.players[index].playerId,
-          })),
-        };
+        room.game = startTableRound(
+          {
+            ...newGame,
+            players: newGame.players.map((player, index) => ({
+              ...player,
+              id: room.players[index].playerId,
+            })),
+          },
+          randomBytes(16).toString('hex'),
+          room.tableScore,
+        );
         room.started = true;
         room.pendingColorChoice = null;
         const timer = botTimers.get(room.roomId);
@@ -1454,6 +1468,7 @@ io.on('connection', (socket) => {
         }
 
         const [removed] = room.players.splice(targetIndex, 1);
+        room.tableScore = undefined;
         if (removed.socketId) {
           const kickedSocket = io.sockets.sockets.get(removed.socketId);
           if (kickedSocket) {

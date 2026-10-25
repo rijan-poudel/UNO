@@ -34,6 +34,13 @@ async function request(socket: Socket, event: string, payload: unknown) {
 function privateFor(room: RoomSnapshot, playerId: string) {
   const game = room.game;
   if (!game) return;
+  assert.ok(game.roundId);
+  assert.ok(game.tableScore);
+  assert.deepEqual(room.tableScore, game.tableScore);
+  assert.equal(
+    Object.values(game.tableScore.wins).reduce((a, b) => a + b, 0),
+    game.tableScore.completedRounds,
+  );
   assert.equal(
     'drawPile' in game,
     false,
@@ -89,9 +96,21 @@ async function main() {
     watch(guest, joined.playerId);
     const started = await request(host, 'room:start', {
       roomId,
+      roundId: 'client-forged-id',
+      tableScore: {
+        completedRounds: 99,
+        wins: { player_0: 99 },
+        lastRoundId: 'forged',
+      },
       rules: { allowStartingActionCard: false, mustDeclareUno: false },
     });
     privateFor(started.room, created.playerId);
+    assert.notEqual(started.room.game?.roundId, 'client-forged-id');
+    assert.equal(
+      started.room.tableScore?.completedRounds,
+      0,
+      'Clients cannot set their own score',
+    );
     const guestTable = await request(guest, 'room:ready', { roomId });
     privateFor(guestTable.room, joined.playerId);
     const guestCard = guestTable.room.game?.players.find(
@@ -150,47 +169,66 @@ async function main() {
       action: { type: 'cancelWildChoice' },
     });
     assert.equal(cancelled.room.pendingColorChoice, null);
-    // Complete a real round using only the acting client's private view.
-    let game: GameView | null = cancelled.room.game;
-    for (let step = 0; step < 2000 && game && !game.winnerId; step++) {
-      const actorId = game.players[game.currentPlayerIndex].id;
-      const socket = actorId === created.playerId ? host : guest;
-      const own = await request(socket, 'room:ready', { roomId });
-      privateFor(own.room, actorId);
-      const table = toPresentationGame(own.room.game);
-      assert.ok(table);
-      const move = getBotMove(table, table.currentPlayerIndex);
-      if (move.action === 'play') {
-        const card = table.players[table.currentPlayerIndex].hand.find(
-          (entry) => entry.id === move.cardId,
-        );
-        if (card?.color === 'wild') {
-          const prepared = await request(socket, 'game:action', {
-            roomId,
-            action: { type: 'prepareWild', cardId: card.id },
-          });
-          privateFor(prepared.room, actorId);
-          assert.equal(prepared.room.pendingColorChoice?.cardId, card.id);
-          const observer = await request(
-            socket === host ? guest : host,
-            'room:ready',
-            { roomId },
+    // Drive real rounds from the acting client's private view.
+    async function finishRound(initial: GameView | null): Promise<GameView> {
+      let game = initial;
+      for (let step = 0; step < 2000 && game && !game.winnerId; step++) {
+        const actorId = game.players[game.currentPlayerIndex].id;
+        const socket = actorId === created.playerId ? host : guest;
+        const own = await request(socket, 'room:ready', { roomId });
+        privateFor(own.room, actorId);
+        const table = toPresentationGame(own.room.game);
+        assert.ok(table);
+        const move = getBotMove(table, table.currentPlayerIndex);
+        if (move.action === 'play') {
+          const card = table.players[table.currentPlayerIndex].hand.find(
+            (entry) => entry.id === move.cardId,
           );
-          privateFor(
-            observer.room,
-            socket === host ? joined.playerId : created.playerId,
-          );
+          if (card?.color === 'wild') {
+            const prepared = await request(socket, 'game:action', {
+              roomId,
+              action: { type: 'prepareWild', cardId: card.id },
+            });
+            privateFor(prepared.room, actorId);
+            assert.equal(prepared.room.pendingColorChoice?.cardId, card.id);
+            const observer = await request(
+              socket === host ? guest : host,
+              'room:ready',
+              { roomId },
+            );
+            privateFor(
+              observer.room,
+              socket === host ? joined.playerId : created.playerId,
+            );
+          }
         }
+        const action =
+          move.action === 'play'
+            ? {
+                type: 'play',
+                cardId: move.cardId,
+                chosenColor: move.chosenColor,
+              }
+            : { type: move.action === 'drawRequired' ? 'draw' : move.action };
+        const next = await request(socket, 'game:action', { roomId, action });
+        privateFor(next.room, actorId);
+        game = next.room.game;
       }
-      const action =
-        move.action === 'play'
-          ? { type: 'play', cardId: move.cardId, chosenColor: move.chosenColor }
-          : { type: move.action === 'drawRequired' ? 'draw' : move.action };
-      const next = await request(socket, 'game:action', { roomId, action });
-      privateFor(next.room, actorId);
-      game = next.room.game;
+      assert.ok(game?.winnerId, 'Recipient views can drive a full round');
+      return game;
     }
-    assert.ok(game?.winnerId, 'Recipient views can drive a full round');
+    const game = await finishRound(cancelled.room.game);
+    assert.equal(game.tableScore?.completedRounds, 1);
+    assert.equal(game.tableScore?.wins[game.winnerId ?? ''], 1);
+    assert.deepEqual(
+      (await request(host, 'room:ready', { roomId })).room.tableScore,
+      game.tableScore,
+    );
+    assert.deepEqual(
+      (await request(guest, 'room:ready', { roomId })).room.tableScore,
+      game.tableScore,
+      'Repeated packets cannot duplicate a win',
+    );
     const guestEdit = (await guest
       .timeout(5000)
       .emitWithAck('room:return-to-lobby', { roomId })) as Ack<unknown>;
@@ -198,6 +236,11 @@ async function main() {
     const lobby = await request(host, 'room:return-to-lobby', { roomId });
     assert.equal(lobby.room.roomId, roomId);
     assert.equal(lobby.room.game, null);
+    assert.deepEqual(
+      lobby.room.tableScore,
+      game.tableScore,
+      'Editing rules keeps wins for the same crew',
+    );
     assert.equal(lobby.room.started, false);
     assert.deepEqual(
       lobby.room.players.map((player) => player.playerId),
@@ -215,6 +258,27 @@ async function main() {
       false,
       'Retrying lobby return is idempotent',
     );
+    const added = await request(host, 'room:add-bot', { roomId });
+    assert.equal(
+      added.room.tableScore,
+      undefined,
+      'A changed crew starts a new score',
+    );
+    const addedBot = added.room.players.find((player) => player.isBot);
+    assert.ok(addedBot);
+    await request(host, 'room:kick', {
+      roomId,
+      targetPlayerId: addedBot.playerId,
+    });
+    const fresh = await request(host, 'room:start', { roomId });
+    assert.equal(
+      fresh.room.tableScore?.completedRounds,
+      0,
+      'Reused seats cannot inherit a departed crew’s wins',
+    );
+    const finishedAgain = await finishRound(fresh.room.game);
+    assert.equal(finishedAgain.tableScore?.completedRounds, 1);
+    await request(host, 'room:return-to-lobby', { roomId });
     await request(host, 'room:set-rules', {
       roomId,
       rules: { startingHandSize: 5 },
@@ -224,6 +288,12 @@ async function main() {
       roomId,
     });
     privateFor(rematch.room, created.playerId);
+    assert.deepEqual(
+      rematch.room.tableScore,
+      finishedAgain.tableScore,
+      'Same-crew re-deal retains completed wins',
+    );
+    assert.notEqual(rematch.room.game?.roundId, finishedAgain.roundId);
     assert.equal(rematch.room.game?.rules.startingHandSize, 5);
     assert.ok(
       rematch.room.game?.players.every((player) => player.handCount === 5),
@@ -240,6 +310,11 @@ async function main() {
       deviceId: guestDevice,
     });
     privateFor(restored.room, joined.playerId);
+    assert.deepEqual(
+      restored.room.tableScore,
+      finishedAgain.tableScore,
+      'Reconnect retains the public score',
+    );
     assert.equal(restored.playerId, joined.playerId);
     assert.deepEqual(
       restored.room.game?.players.find(
@@ -257,6 +332,7 @@ async function main() {
     })) as Ack<{ room: Omit<RoomSnapshot, 'game'> & { game: GameState } }>;
     assert.equal(legacyAck.ok, true);
     const legacyGame = legacyAck.data.room.game;
+    assert.deepEqual(legacyGame.tableScore, finishedAgain.tableScore);
     assert.deepEqual(
       legacyGame.players.find((player) => player.id === joined.playerId)?.hand,
       hand,

@@ -248,12 +248,7 @@ export default function Home() {
           }}
           onDealAgain={() => {
             if (mode === "computer") {
-              local.startGame(
-                currentGame.players.map((player) => player.name),
-                currentGame.rules,
-                currentGame.players.map((player) => player.isBot),
-              );
-              return true;
+              return local.startRematch();
             }
             return online.startOnlineGame(currentGame.rules);
           }}

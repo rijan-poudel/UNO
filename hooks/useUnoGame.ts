@@ -30,6 +30,7 @@ import { canPlayCard, getPlayableCards } from '../lib/gameRules';
 import { getBotMove } from '../lib/botSupport';
 import { resolvePlayerName } from '../lib/playerNames';
 import { readSavedRound, saveRound, resumeRound } from '../lib/savedRound';
+import { recordTableWin, startTableRound } from '../lib/tableScore';
 import {
   BOT_TURN_MS,
   FORCED_DRAW_DELAY_MS,
@@ -41,6 +42,13 @@ import {
 const BOT_ACTION_DELAY_MS = BOT_TURN_MS;
 const AUTO_PASS_AFTER_DRAW_MS = 650;
 const POST_ACTION_HANDOFF_DELAY_MS = 180;
+
+function localRoundId(): string {
+  return (
+    globalThis.crypto?.randomUUID?.() ??
+    `local-${Date.now()}-${Math.random().toString(36).slice(2)}`
+  );
+}
 
 function reportHookError(context: string, error: unknown): void {
   if (process.env.NODE_ENV !== 'production') {
@@ -146,7 +154,7 @@ function reducer(state: UnoUIState, action: UIAction): UnoUIState {
       };
     case 'INIT':
       return {
-        game: withTurnDeadline(null, action.game),
+        game: withTurnDeadline(null, recordTableWin(action.game)),
         pendingWild: null,
         drawnThisTurn: false,
         botThinking: false,
@@ -157,7 +165,7 @@ function reducer(state: UnoUIState, action: UIAction): UnoUIState {
       const entry = describeAction(action.game);
       return {
         ...state,
-        game: withTurnDeadline(state.game, action.game),
+        game: withTurnDeadline(state.game, recordTableWin(action.game)),
         pendingWild: null,
         drawnThisTurn: false,
         botThinking: false,
@@ -171,7 +179,7 @@ function reducer(state: UnoUIState, action: UIAction): UnoUIState {
     case 'META':
       return {
         ...state,
-        game: withTurnDeadline(state.game, action.game),
+        game: withTurnDeadline(state.game, recordTableWin(action.game)),
         log: [describeAction(action.game), ...state.log].slice(0, 30),
       };
 
@@ -179,7 +187,7 @@ function reducer(state: UnoUIState, action: UIAction): UnoUIState {
       const entry = describeAction(action.game);
       return {
         ...state,
-        game: withTurnDeadline(state.game, action.game),
+        game: withTurnDeadline(state.game, recordTableWin(action.game)),
         pendingWild: null,
         drawnThisTurn: true, // keeps turn on the current player
         botThinking: false,
@@ -246,7 +254,10 @@ export function useUnoGame(paused = false) {
 
   const startGame = useCallback(
     (playerNames: string[], rules: Partial<GameRules>, botFlags: boolean[]) => {
-      const newGame = initializeGame(playerNames, rules, botFlags);
+      const newGame = startTableRound(
+        initializeGame(playerNames, rules, botFlags),
+        localRoundId(),
+      );
       const firstHuman = newGame.players.findIndex((p) => !p.isBot);
       setLocalPlayerIndex(firstHuman >= 0 ? firstHuman : 0);
       setSavedGame(null);
@@ -254,6 +265,22 @@ export function useUnoGame(paused = false) {
     },
     [],
   );
+
+  const startRematch = useCallback(() => {
+    const current = gameRef.current;
+    if (!current?.winnerId) return false;
+    const finished = recordTableWin(current);
+    const next = initializeGame(
+      finished.players.map((player) => player.name),
+      finished.rules,
+      finished.players.map((player) => player.isBot),
+    );
+    dispatch({
+      type: 'INIT',
+      game: startTableRound(next, localRoundId(), finished.tableScore),
+    });
+    return true;
+  }, []);
 
   const resumeGame = useCallback(() => {
     const saved = readSavedRound();
@@ -263,7 +290,12 @@ export function useUnoGame(paused = false) {
     }
     setLocalPlayerIndex(saved.players.findIndex((player) => !player.isBot));
     setSavedGame(null);
-    dispatch({ type: 'RESTORE', game: saved });
+    dispatch({
+      type: 'RESTORE',
+      game: saved.tableScore
+        ? saved
+        : startTableRound(saved, saved.roundId ?? localRoundId()),
+    });
     return true;
   }, []);
 
@@ -581,6 +613,7 @@ export function useUnoGame(paused = false) {
     hasPendingStackOption,
     // Actions
     startGame,
+    startRematch,
     savedGame,
     resumeGame,
     selectCard,

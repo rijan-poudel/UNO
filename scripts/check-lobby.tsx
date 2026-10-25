@@ -5,6 +5,7 @@ import type { ComponentProps } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import type OnlineLobbyComponent from '../components/OnlineLobby';
 import type SettingsModalComponent from '../components/SettingsModal';
+import type TableScoreCardComponent from '../components/TableScoreCard';
 import { defaultRules } from '../types/rules';
 
 // The assertions inspect rendered content; Next owns CSS module compilation.
@@ -15,6 +16,8 @@ const OnlineLobby: typeof OnlineLobbyComponent =
   require('../components/OnlineLobby').default;
 const SettingsModal: typeof SettingsModalComponent =
   require('../components/SettingsModal').default;
+const TableScoreCard: typeof TableScoreCardComponent =
+  require('../components/TableScoreCard').default;
 if (cssLoader) require.extensions['.css'] = cssLoader;
 else delete require.extensions['.css'];
 
@@ -140,6 +143,48 @@ const tactical = renderToStaticMarkup(
   />,
 );
 assert.match(tactical, /value="tactical" selected=""/);
+const scorePlayers = [
+  { id: 'one', name: 'Alex' },
+  { id: 'two', name: 'Jo' },
+];
+assert.equal(
+  renderToStaticMarkup(<TableScoreCard players={scorePlayers} />),
+  '',
+);
+const scores = renderToStaticMarkup(
+  <TableScoreCard
+    players={scorePlayers}
+    localPlayerId="one"
+    score={{ completedRounds: 3, wins: { one: 1, two: 2 }, lastRoundId: 'r3' }}
+  />,
+);
+assert.match(scores, /3 completed rounds/);
+assert.match(scores, /aria-label="1 win"/);
+assert.match(scores, /aria-label="2 wins"/);
+assert.ok(
+  scores.indexOf('Jo') < scores.indexOf('Alex'),
+  'Actual win totals determine display order',
+);
+assert.ok(props.room);
+const scoredLobby = renderToStaticMarkup(
+  <OnlineLobby
+    {...props}
+    room={{
+      ...props.room,
+      tableScore: {
+        completedRounds: 1,
+        wins: { host: 1, guest: 0 },
+        lastRoundId: 'lobby-round',
+      },
+    }}
+  />,
+);
+assert.match(scoredLobby, /aria-label="Wins at this table"/);
+assert.ok(
+  scoredLobby.indexOf('Deal everyone in') <
+    scoredLobby.indexOf('Wins at this table'),
+  'Dealing remains ahead of the score in the lobby',
+);
 assert.match(
   tactical,
   /Saves wilds, builds color runs and watches hand counts/,

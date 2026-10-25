@@ -1,4 +1,4 @@
-import type { GameState, Player } from "./game";
+import type { GameState, Player, TableScore } from "./game";
 import type { GameRules } from "./rules";
 import type { CardColor, CardValue } from "./card";
 import type { Card } from "./card";
@@ -30,6 +30,7 @@ export interface RoomPlayer {
 }
 
 export interface RoomSnapshot {
+  tableScore?: TableScore;
   roomId: string;
   hostPlayerId: string;
   players: RoomPlayer[];

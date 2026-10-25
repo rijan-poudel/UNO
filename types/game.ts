@@ -44,6 +44,13 @@ export type LastAction =
 
 // ── Game State ────────────────────────────────────────────────────────────────
 
+/** Completed-round wins for the current crew, not official card points. */
+export interface TableScore {
+  completedRounds: number;
+  wins: Record<string, number>;
+  lastRoundId: string | null;
+}
+
 /**
  * GameState is the single immutable snapshot of everything needed to render
  * the game and compute the next state. Pure functions in the lib/ layer
@@ -56,6 +63,9 @@ export type LastAction =
  *   - Replay games from a move log
  */
 export interface GameState {
+  /** Controller-owned identity and score; engine actions preserve this metadata. */
+  roundId?: string;
+  tableScore?: TableScore;
   /** Absolute human-turn deadline; controllers set it, pure actions preserve it. */
   turnDeadlineAt?: number | null;
   /** All participants in order. Index positions are stable for the game's life. */

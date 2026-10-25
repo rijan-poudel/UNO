@@ -66,14 +66,16 @@ export function readProgressSnapshot(): string {
 }
 export function recordRound(game: GameState, playerId: string): void {
   if (!game.winnerId || !game.players.some((p) => p.id === playerId)) return;
-  // A full terminal snapshot distinguishes rounds even when card counters restart.
-  const id = JSON.stringify([
-    game.winnerId,
-    game.turnCount,
-    game.players.map((p) => [p.id, p.hand.map((c) => c.id)]),
-    game.discardPile.map((c) => c.id),
-    game.drawPile.map((c) => c.id),
-  ]);
+  // Prefer the round identity; older games fall back to their terminal snapshot.
+  const id =
+    game.roundId ??
+    JSON.stringify([
+      game.winnerId,
+      game.turnCount,
+      game.players.map((p) => [p.id, p.hand.map((c) => c.id)]),
+      game.discardPile.map((c) => c.id),
+      game.drawPile.map((c) => c.id),
+    ]);
   try {
     const previous = parseProgress(readProgressSnapshot());
     const next = addRoundResult(previous, id, game.winnerId === playerId);

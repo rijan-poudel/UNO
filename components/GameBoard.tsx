@@ -47,6 +47,7 @@ import { useGamePresentation } from "../hooks/useGamePresentation";
 import { useHandNavigation } from "../hooks/useHandNavigation";
 import PlayerProgress from "./PlayerProgress";
 import RoundSummary from "./RoundSummary";
+import TableScoreCard from "./TableScoreCard";
 import OpponentSeat from "./OpponentSeat";
 import PlayerAvatar from "./PlayerAvatar";
 import GameFeedback, { VictoryBurst } from "./GameFeedback";
@@ -1208,6 +1209,11 @@ export default function GameBoard({
       )}
       {history && (
         <Modal title="Around the table." onClose={() => setHistory(false)}>
+          <TableScoreCard
+            score={game.tableScore}
+            players={game.players}
+            localPlayerId={localPlayer.id}
+          />
           <ol className="activity-list">
             {api.log.map((entry, i) => (
               <li key={`${i}:${entry}`}>{entry}</li>
@@ -1220,7 +1226,11 @@ export default function GameBoard({
           title={
             winner.id === localPlayer.id ? "You win." : `${winner.name} wins.`
           }
-          className="winner-modal"
+          className={
+            game.tableScore?.completedRounds
+              ? "winner-modal has-table-score"
+              : "winner-modal"
+          }
         >
           {winner.id === localPlayer.id && <VictoryBurst />}
           <div

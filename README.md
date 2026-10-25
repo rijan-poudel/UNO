@@ -21,6 +21,7 @@ Open [localhost:3000](http://localhost:3000). The frontend and socket server sta
 - Private online tables with room codes, invitation links, friend codes, bot seats, and rematches.
 - Private online hands: each browser receives its own cards, public counts and discards; opponents’ hands and the draw deck remain on the server.
 - After a round, hosts can edit the table and deal again in the same room, keeping everyone’s seats and invitation code.
+- A running table score tracks completed-round wins across rematches. See it in results, table activity, and the online lobby; changing the crew starts a fresh score.
 - Unfinished bot rounds save on the device and can be resumed from home after a refresh.
 - A 45-second reconnect window, including a refresh by the last connected human.
 - House rules for stacking, jump-in, drawing, UNO calls, special cards, and finishing.
@@ -29,6 +30,8 @@ Open [localhost:3000](http://localhost:3000). The frontend and socket server sta
 - Keyboard shortcuts: **D** draw, **P** pass, **U** call UNO. Cards also work with Tab and Enter/Space; Left/Right/Home/End browse the hand. UNO may be declared with two cards before a play or with one card afterward.
 
 Choose a challenge under **Set up bots → Bot options**, in **Settings → Rules**, or in the host’s table rules before an online deal. Quick play uses the saved choice. Preset changes preserve the challenge; rematches and resumed local rounds keep the challenge they started with. Online bot choices require the updated socket service.
+
+Table scores count wins, not official card points or account rankings. Local rematches and unfinished-round recovery retain the score; starting a fresh local table clears it. Online scores belong to the room and survive reconnects and rule editing, while adding or removing players resets them. Device-local completed-round history remains separate. In results, expand **Cards left this round** for the terminal hand counts.
 
 ## Verify changes
 

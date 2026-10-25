@@ -5,6 +5,8 @@ import type { GameView } from '../types/multiplayer';
 
 export function toGameView(game: GameState, viewerId: string): GameView {
   return {
+    roundId: game.roundId,
+    tableScore: game.tableScore,
     players: game.players.map(({ hand, id, name, saidUno, isBot }) => ({
       id,
       name,
