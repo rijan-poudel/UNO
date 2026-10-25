@@ -18,6 +18,9 @@ Open [localhost:3000](http://localhost:3000). The frontend and socket server sta
 - A playful illustrated interface with four themes, readable card faces, and a touch-friendly scrolling hand.
 - Local games with one human and one to five bots.
 - Private online tables with room codes, invitation links, friend codes, bot seats, and rematches.
+- Private online hands: each browser receives its own cards, public counts and discards; opponents’ hands and the draw deck remain on the server.
+- After a round, hosts can edit the table and deal again in the same room, keeping everyone’s seats and invitation code.
+- Unfinished bot rounds save on the device and can be resumed from home after a refresh.
 - A 45-second reconnect window, including a refresh by the last connected human.
 - House rules for stacking, jump-in, drawing, UNO calls, special cards, and finishing.
 - Immediate card sounds, optional music, optional voice, master mute, and saved volume preferences.
@@ -34,7 +37,7 @@ npm run check:audio
 npm run build
 ```
 
-For real socket acknowledgements, reconnects, six-seat limits, and bot pacing:
+For real socket acknowledgements, private-hand delivery, full rounds, room editing, reconnects, six-seat limits, and bot pacing:
 
 ```sh
 # In one terminal
@@ -97,13 +100,13 @@ For a phone on the same Wi-Fi, use the network URL printed by `npm run dev`. Bot
 
 ## Current boundaries
 
-- Casual private rooms: snapshots currently include the full game state. Hidden information is concealed by the UI, not protected from a modified client. Anti-cheat transport is separate work.
-- Rooms and match results are not durable across a socket server restart. Local rounds are not saved across reloads.
+- Rooms and match results are not durable across a socket server restart. Unfinished local bot rounds are saved in the current browser; they do not sync across devices.
+- Hand privacy requires the updated socket service. Both deployment orders remain playable: the new client accepts legacy servers, and the new server sends anonymous card backs in the previous packet shape to older clients.
 - Double-play pair detection exists in the engine, but playing a pair is not implemented as an action. The interface deliberately does not offer that rule.
 - `agent/` is a separate legacy tool and remains excluded from lint/type checks.
 - The production dependency audit is clean. The lint toolchain still reports an upstream `braces` advisory; npm’s proposed force fix downgrades Next’s ESLint configuration. Do not apply that incompatible downgrade.
 
-Home centers Play/Create/Join beneath original illustrated card-club artwork, with sharp action controls. The game uses a baize table with a leather rail, vivid card faces, a curved hand, Outfit UI type and Barlow Condensed card numerals. Tap a legal card or drag it upward to play; nonmatching cards remain inspectable. Draw from the physical deck. Pass and UNO appear only when eligible; a previously inspected card can retain a named Play fallback when it becomes legal. Sorting and activity live in the menu. Original card-face players react to real turns and penalties. Pickup feedback starts on actual activation, followed by snapshot contact audio; optional music and voice never hold up turns. Wins and streaks are honest device-local history. Choose Classic, Stack party, or Wild table before dealing, then fine-tune individual house rules in Settings. No Mercy, Flip and Flex remain future implementations; these presets do not claim to implement those editions.
+Home centers Play/Create/Join beneath a small fan of native cards. The Color play arena uses a blue field, human portraits, amber turn cues, vivid card faces, a curved hand, Outfit UI type and Barlow Condensed card numerals. Tap a legal card or drag it upward to play; nonmatching cards remain inspectable. Draw from the physical deck. Pass and UNO appear only when eligible; a previously inspected card can retain a named Play fallback when it becomes legal. Sorting and activity live in the menu. Pickup feedback starts on actual activation, followed by snapshot contact audio; optional music and voice never hold up turns. Wins and streaks are honest device-local history. Choose Classic, Stack party, or Wild table before dealing, then fine-tune individual house rules in Settings. No Mercy, Flip and Flex remain future implementations; these presets do not claim to implement those editions.
 
 ### Persistent multiplayer host
 

@@ -1,6 +1,24 @@
-import type { GameState } from "./game";
+import type { GameState, Player } from "./game";
 import type { GameRules } from "./rules";
 import type { CardColor, CardValue } from "./card";
+import type { Card } from "./card";
+
+/** A private hand is absent, rather than populated with fake card faces. */
+export interface PlayerView extends Omit<Player, "hand"> {
+  handCount: number;
+  hand?: Card[];
+}
+
+export interface GameView extends Omit<GameState, "players" | "drawPile"> {
+  players: PlayerView[];
+  drawPileCount: number;
+}
+
+export interface PendingColorChoice {
+  playerId: string;
+  cardId: string;
+  cardValue: CardValue;
+}
 
 export interface RoomPlayer {
   playerId: string;
@@ -16,12 +34,11 @@ export interface RoomSnapshot {
   hostPlayerId: string;
   players: RoomPlayer[];
   started: boolean;
-  game: GameState | null;
-  pendingColorChoice: {
-    playerId: string;
-    cardId: string;
-    cardValue: CardValue;
-  } | null;
+  game: GameView | null;
+  pendingColorChoice:
+    | (Pick<PendingColorChoice, "playerId"> &
+        Partial<Omit<PendingColorChoice, "playerId">>)
+    | null;
   rules?: Partial<GameRules>;
 }
 
@@ -85,6 +102,10 @@ export interface LeaveRoomPayload {
 }
 
 export interface ReadyPayload {
+  roomId: string;
+}
+
+export interface ReturnToLobbyPayload {
   roomId: string;
 }
 

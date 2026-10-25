@@ -6,7 +6,11 @@ import type { Ack, RoomSnapshot } from '../types/multiplayer';
 const url = process.env.UNO_CHECK_SOCKET_URL ?? 'http://localhost:3001';
 const sockets: Socket[] = [];
 async function connect() {
-  const socket = io(url, { transports: ['websocket'], forceNew: true });
+  const socket = io(url, {
+    transports: ['websocket'],
+    forceNew: true,
+    auth: { protocolVersion: 2 },
+  });
   sockets.push(socket);
   await new Promise<void>((resolve, reject) => {
     socket.once('connect', resolve);

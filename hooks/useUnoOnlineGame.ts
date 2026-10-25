@@ -14,6 +14,7 @@ import type {
 } from '../types/multiplayer';
 import { toast } from 'sonner';
 import { getPlayableCards } from '../lib/gameRules';
+import { toPresentationGame } from '../lib/gameView';
 import { resolvePlayerName } from '../lib/playerNames';
 import {
   ONLINE_UNAVAILABLE_MESSAGE,
@@ -256,7 +257,10 @@ interface FeedState {
   connected: boolean;
 }
 
-function describeAction(game: GameState): string {
+function describeAction(game: {
+  lastAction: GameState['lastAction'];
+  players: Array<{ id: string; name: string }>;
+}): string {
   const action = game.lastAction;
 
   switch (action.type) {
@@ -336,6 +340,7 @@ export function useUnoOnlineGame() {
 
     const socket = io(socketUrl, {
       transports: ['websocket'],
+      auth: { protocolVersion: 2 },
     });
 
     socketRef.current = socket;
@@ -388,7 +393,7 @@ export function useUnoOnlineGame() {
               setState((prev) => ({
                 ...prev,
                 room: ack.data.room,
-                game: ack.data.room.game,
+                game: toPresentationGame(ack.data.room.game),
                 playerId: ack.data.playerId,
                 drawnThisTurn: Boolean(
                   ack.data.room.game?.drawnThisTurn &&
@@ -423,7 +428,7 @@ export function useUnoOnlineGame() {
       setState((prev) => {
         // Late bot/action broadcasts cannot re-open a table after leaving.
         if (!prev.room || prev.room.roomId !== room.roomId) return prev;
-        let nextLog = prev.log;
+        let nextLog = room.started ? prev.log : [];
         if (room.game) {
           const actionLine = describeAction(room.game);
           nextLog = [
@@ -440,7 +445,7 @@ export function useUnoOnlineGame() {
         return {
           ...prev,
           room,
-          game: room.game,
+          game: toPresentationGame(room.game),
           log: nextLog,
           drawnThisTurn,
           error: null,
@@ -658,7 +663,7 @@ export function useUnoOnlineGame() {
       setState((prev) => ({
         ...prev,
         room: ack.data.room,
-        game: ack.data.room.game,
+        game: toPresentationGame(ack.data.room.game),
         playerId: ack.data.playerId,
         error: null,
         log: ['Room created'],
@@ -685,7 +690,7 @@ export function useUnoOnlineGame() {
       setState((prev) => ({
         ...prev,
         room: ack.data.room,
-        game: ack.data.room.game,
+        game: toPresentationGame(ack.data.room.game),
         error: null,
       }));
       return true;
@@ -710,7 +715,7 @@ export function useUnoOnlineGame() {
       setState((prev) => ({
         ...prev,
         room: ack.data.room,
-        game: ack.data.room.game,
+        game: toPresentationGame(ack.data.room.game),
         playerId: ack.data.playerId,
         error: null,
         log: [`Joined room ${ack.data.room.roomId}`],
@@ -737,7 +742,7 @@ export function useUnoOnlineGame() {
       setState((prev) => ({
         ...prev,
         room: ack.data.room,
-        game: ack.data.room.game,
+        game: toPresentationGame(ack.data.room.game),
         error: null,
         log: ['Game started', ...prev.log].slice(0, 30),
       }));
@@ -763,7 +768,7 @@ export function useUnoOnlineGame() {
       setState((prev) => ({
         ...prev,
         room: ack.data.room,
-        game: ack.data.room.game,
+        game: toPresentationGame(ack.data.room.game),
         error: null,
         log: ['Player removed by host', ...prev.log].slice(0, 30),
       }));
@@ -787,7 +792,7 @@ export function useUnoOnlineGame() {
     setState((prev) => ({
       ...prev,
       room: ack.data.room,
-      game: ack.data.room.game,
+      game: toPresentationGame(ack.data.room.game),
       error: null,
       log: ['Bot seat added', ...prev.log].slice(0, 30),
     }));
@@ -809,9 +814,25 @@ export function useUnoOnlineGame() {
     setState((prev) => ({
       ...prev,
       room: ack.data.room,
-      game: ack.data.room.game,
+      game: toPresentationGame(ack.data.room.game),
       error: null,
     }));
+    return true;
+  }, [callAck, discardStaleMembership, state.room]);
+
+  const returnToLobby = useCallback(async () => {
+    if (!state.room) return false;
+    const revision = membershipRevision.current;
+    const ack = await callAck<{ room: RoomSnapshot }>('room:return-to-lobby', {
+      roomId: state.room.roomId,
+    });
+    if (discardStaleMembership(revision)) return false;
+    if (!ack.ok) {
+      setState((prev) => ({ ...prev, error: ack.error }));
+      return false;
+    }
+    // The ordered room:update broadcast owns the transition. A delayed reply
+    // must not overwrite a new round dealt from the returned lobby.
     return true;
   }, [callAck, discardStaleMembership, state.room]);
 
@@ -838,7 +859,7 @@ export function useUnoOnlineGame() {
       setState((prev) => ({
         ...prev,
         room: ack.data.room,
-        game: ack.data.room.game,
+        game: toPresentationGame(ack.data.room.game),
         playerId: ack.data.playerId,
         outgoingInvites: [
           {
@@ -886,7 +907,7 @@ export function useUnoOnlineGame() {
       setState((prev) => ({
         ...prev,
         room: ack.data.room,
-        game: ack.data.room.game,
+        game: toPresentationGame(ack.data.room.game),
         playerId: ack.data.playerId,
         incomingInvites: prev.incomingInvites.filter(
           (invite) => invite.inviteId !== inviteId,
@@ -1177,6 +1198,7 @@ export function useUnoOnlineGame() {
     kickPlayer,
     addBotToRoom,
     toggleReady,
+    returnToLobby,
     sendFriendInvite,
     acceptFriendInvite,
     declineFriendInvite,

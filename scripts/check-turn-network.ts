@@ -6,7 +6,11 @@ import type { Ack, RoomSnapshot } from '../types/multiplayer';
 const url = process.env.UNO_CHECK_SOCKET_URL ?? 'http://localhost:3001';
 const sockets: Socket[] = [];
 async function connect() {
-  const socket = io(url, { transports: ['websocket'], forceNew: true });
+  const socket = io(url, {
+    transports: ['websocket'],
+    forceNew: true,
+    auth: { protocolVersion: 2 },
+  });
   sockets.push(socket);
   await new Promise<void>((resolve, reject) => {
     socket.once('connect', resolve);
@@ -62,8 +66,8 @@ async function main() {
       'The server resolves an unavoidable penalty without a client pressing Draw',
     );
     assert.equal(
-      paid.players[0].hand.length,
-      penaltyGame.players[0].hand.length + 2,
+      paid.players[0].handCount,
+      penaltyGame.players[0].handCount + 2,
     );
     updates.length = 0;
     const started = await request(host, 'room:start', {
@@ -86,10 +90,7 @@ async function main() {
       'An idle connected human expires without a client action',
     );
     assert.equal(expired.currentPlayerIndex, 1);
-    assert.equal(
-      expired.players[0].hand.length,
-      before.players[0].hand.length + 1,
-    );
+    assert.equal(expired.players[0].handCount, before.players[0].handCount + 1);
     assert.equal(expired.lastAction.type, 'draw');
     assert.ok(
       expired.turnDeadlineAt && expired.turnDeadlineAt > before.turnDeadlineAt,

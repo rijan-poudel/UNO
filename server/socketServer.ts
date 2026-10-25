@@ -3,6 +3,7 @@ import { randomBytes } from 'node:crypto';
 import { Server } from 'socket.io';
 import { initializeGame } from '../lib/gameSetup';
 import { validateGameRules } from '../lib/validateGameRules';
+import { toGameView, toPresentationGame } from '../lib/gameView';
 import { defaultRules, type GameRules } from '../types/rules';
 import {
   playCard,
@@ -36,15 +37,22 @@ import type {
   RespondFriendInvitePayload,
   RoomActionPayload,
   RoomPlayer,
-  RoomSnapshot,
+  RoomSnapshot as PrivateRoomSnapshot,
   SendFriendInvitePayload,
   StartRoomPayload,
   ReadyPayload,
   UpdateRulesPayload,
+  PendingColorChoice,
+  ReturnToLobbyPayload,
 } from '../types/multiplayer';
 
 const PORT = Number(process.env.PORT ?? process.env.UNO_SOCKET_PORT ?? 3001);
 const MAX_ROOM_PLAYERS = 6;
+
+// Legacy browsers receive anonymous backs in the old shape, never secret faces.
+type RoomSnapshot = Omit<PrivateRoomSnapshot, 'game'> & {
+  game: PrivateRoomSnapshot['game'] | GameState;
+};
 
 const configuredCorsOrigins = (process.env.UNO_CORS_ORIGINS ?? '')
   .split(',')
@@ -78,8 +86,8 @@ interface ServerRoom {
   hostPlayerId: string;
   players: ServerRoomPlayer[];
   started: boolean;
-  game: RoomSnapshot['game'];
-  pendingColorChoice: RoomSnapshot['pendingColorChoice'];
+  game: GameState | null;
+  pendingColorChoice: PendingColorChoice | null;
   rules?: Partial<GameRules>;
 }
 
@@ -143,8 +151,15 @@ function makeNextPlayerId(players: ServerRoomPlayer[]): string {
   return `player_${cursor}`;
 }
 
-function toSnapshot(room: ServerRoom): RoomSnapshot {
+function toSnapshot(
+  room: ServerRoom,
+  viewerId: string,
+  socketId: string,
+): RoomSnapshot {
   synchronizeRoomTurn(room);
+  const view = room.game ? toGameView(room.game, viewerId) : null;
+  const privateFormat =
+    io.sockets.sockets.get(socketId)?.handshake.auth.protocolVersion === 2;
   return {
     roomId: room.roomId,
     hostPlayerId: room.hostPlayerId,
@@ -162,10 +177,28 @@ function toSnapshot(room: ServerRoom): RoomSnapshot {
       };
     }),
     started: room.started,
-    game: room.game,
-    pendingColorChoice: room.pendingColorChoice,
+    game: privateFormat ? view : toPresentationGame(view),
+    pendingColorChoice: room.pendingColorChoice
+      ? room.pendingColorChoice.playerId === viewerId
+        ? room.pendingColorChoice
+        : { playerId: room.pendingColorChoice.playerId }
+      : null,
     rules: room.rules ?? defaultRules,
   };
+}
+
+function snapshotForSocket(room: ServerRoom, socketId: string): RoomSnapshot {
+  const member = playerBySocket.get(socketId);
+  if (
+    !member ||
+    member.roomId !== room.roomId ||
+    !room.players.some(
+      (player) =>
+        player.playerId === member.playerId && player.socketId === socketId,
+    )
+  )
+    throw new Error('You are not in this room.');
+  return toSnapshot(room, member.playerId, socketId);
 }
 
 // One authoritative deadline per turn, shared by all clients and reconnects.
@@ -513,7 +546,14 @@ function leaveRoomForSocket(socketId: string, ioServer: Server): void {
 }
 
 function broadcastRoom(io: Server, room: ServerRoom): void {
-  io.to(room.roomId).emit('room:update', toSnapshot(room));
+  for (const player of room.players) {
+    if (player.connected && !player.isBot && player.socketId) {
+      io.to(player.socketId).emit(
+        'room:update',
+        toSnapshot(room, player.playerId, player.socketId),
+      );
+    }
+  }
 }
 
 function ackError<T>(message: string): Ack<T> {
@@ -548,7 +588,7 @@ function handleGameAction(
   socketId: string,
   payload: RoomActionPayload,
   ioServer: Server,
-): RoomSnapshot {
+): void {
   if (!room.started || !room.game) {
     throw new Error('Game has not started.');
   }
@@ -690,8 +730,6 @@ function handleGameAction(
       );
     }
   }
-
-  return toSnapshot(room);
 }
 
 const botTimers = new Map<string, ReturnType<typeof setTimeout>>();
@@ -920,7 +958,10 @@ io.on('connection', (socket) => {
         );
         socket.join(room.roomId);
 
-        reply?.({ ok: true, data: { room: toSnapshot(room), playerId } });
+        reply?.({
+          ok: true,
+          data: { room: snapshotForSocket(room, socket.id), playerId },
+        });
         broadcastRoom(io, room);
       } catch (error) {
         reply?.(ackError((error as Error).message));
@@ -972,7 +1013,10 @@ io.on('connection', (socket) => {
         );
         socket.join(roomId);
 
-        reply?.({ ok: true, data: { room: toSnapshot(room), playerId } });
+        reply?.({
+          ok: true,
+          data: { room: snapshotForSocket(room, socket.id), playerId },
+        });
         broadcastRoom(io, room);
       } catch (error) {
         reply?.(ackError((error as Error).message));
@@ -1084,7 +1128,11 @@ io.on('connection', (socket) => {
 
         reply?.({
           ok: true,
-          data: { room: toSnapshot(room), playerId, invite: inviteRecord },
+          data: {
+            room: snapshotForSocket(room, socket.id),
+            playerId,
+            invite: inviteRecord,
+          },
         });
       } catch (error) {
         reply?.(ackError((error as Error).message));
@@ -1155,7 +1203,7 @@ io.on('connection', (socket) => {
             targetName: playerName,
           });
         }
-        const snapshot = toSnapshot(room);
+        const snapshot = snapshotForSocket(room, socket.id);
         broadcastRoom(io, room);
         reply?.({ ok: true, data: { room: snapshot, playerId } });
       } catch (error) {
@@ -1267,8 +1315,8 @@ io.on('connection', (socket) => {
 
         runOfflineBotTurns(room);
 
-        const snapshot = toSnapshot(room);
-        io.to(roomId).emit('room:update', snapshot);
+        const snapshot = snapshotForSocket(room, socket.id);
+        broadcastRoom(io, room);
         reply?.({ ok: true, data: { room: snapshot } });
       } catch (error) {
         reply?.(ackError((error as Error).message));
@@ -1307,8 +1355,8 @@ io.on('connection', (socket) => {
         });
         room.rules = merged;
 
-        const snapshot = toSnapshot(room);
-        io.to(room.roomId).emit('room:update', snapshot);
+        const snapshot = snapshotForSocket(room, socket.id);
+        broadcastRoom(io, room);
         reply?.({ ok: true, data: { room: snapshot } });
       } catch (error) {
         reply?.(ackError((error as Error).message));
@@ -1352,8 +1400,8 @@ io.on('connection', (socket) => {
         }
 
         addBotSeat(room);
-        const snapshot = toSnapshot(room);
-        io.to(room.roomId).emit('room:update', snapshot);
+        const snapshot = snapshotForSocket(room, socket.id);
+        broadcastRoom(io, room);
         reply?.({ ok: true, data: { room: snapshot } });
       } catch (error) {
         reply?.(ackError((error as Error).message));
@@ -1418,8 +1466,8 @@ io.on('connection', (socket) => {
           playerBySocket.delete(removed.socketId);
         }
 
-        const snapshot = toSnapshot(room);
-        io.to(room.roomId).emit('room:update', snapshot);
+        const snapshot = snapshotForSocket(room, socket.id);
+        broadcastRoom(io, room);
         reply?.({ ok: true, data: { room: snapshot } });
       } catch (error) {
         reply?.(ackError((error as Error).message));
@@ -1477,8 +1525,45 @@ io.on('connection', (socket) => {
           player.ready = !player.ready;
         }
 
-        const snapshot = toSnapshot(room);
-        io.to(room.roomId).emit('room:update', snapshot);
+        const snapshot = snapshotForSocket(room, socket.id);
+        broadcastRoom(io, room);
+        reply?.({ ok: true, data: { room: snapshot } });
+      } catch (error) {
+        reply?.(ackError((error as Error).message));
+      }
+    },
+  );
+
+  socket.on(
+    'room:return-to-lobby',
+    (
+      payload: ReturnToLobbyPayload,
+      reply?: (ack: Ack<{ room: RoomSnapshot }>) => void,
+    ) => {
+      try {
+        const room = rooms.get(payload.roomId?.trim().toUpperCase());
+        if (!room) throw new Error('Room not found.');
+        const member = playerBySocket.get(socket.id);
+        if (
+          member?.roomId !== room.roomId ||
+          member.playerId !== room.hostPlayerId
+        ) {
+          throw new Error('Only the host can return everyone to the room.');
+        }
+        if (room.started && !room.game?.winnerId) {
+          throw new Error(
+            'Finish the current round before changing the table.',
+          );
+        }
+        const timer = botTimers.get(room.roomId);
+        if (timer) clearTimeout(timer);
+        botTimers.delete(room.roomId);
+        room.started = false;
+        room.game = null;
+        room.pendingColorChoice = null;
+        for (const player of room.players) player.ready = player.isBot;
+        const snapshot = snapshotForSocket(room, socket.id);
+        broadcastRoom(io, room);
         reply?.({ ok: true, data: { room: snapshot } });
       } catch (error) {
         reply?.(ackError((error as Error).message));
@@ -1501,8 +1586,8 @@ io.on('connection', (socket) => {
 
         handleGameAction(room, socket.id, payload, io);
         runOfflineBotTurns(room);
-        const snapshot = toSnapshot(room);
-        io.to(room.roomId).emit('room:update', snapshot);
+        const snapshot = snapshotForSocket(room, socket.id);
+        broadcastRoom(io, room);
         reply?.({ ok: true, data: { room: snapshot } });
       } catch (error) {
         reply?.(ackError((error as Error).message));

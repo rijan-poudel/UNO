@@ -142,6 +142,7 @@ export default function GameBoard({
   const [copiedRoomCode, setCopiedRoomCode] = useState(false);
   const [manualRoomCode, setManualRoomCode] = useState(false);
   const [startingRematch, setStartingRematch] = useState(false);
+  const [returningToLobby, setReturningToLobby] = useState(false);
   const [dismissedTips, setDismissedTips] = useState<Record<string, boolean>>(
     () => {
       try {
@@ -1369,7 +1370,11 @@ export default function GameBoard({
                     setStartingRematch(false);
                   }
                 }}
-                disabled={startingRematch || (!!online && !online.connected)}
+                disabled={
+                  startingRematch ||
+                  returningToLobby ||
+                  (!!online && !online.connected)
+                }
               >
                 {startingRematch ? "Dealing cards…" : "One more round"}
                 <ArrowRight size={18} />
@@ -1390,7 +1395,33 @@ export default function GameBoard({
                 <Check size={17} />
               </button>
             )}
-            <button className="button secondary" onClick={onReset}>
+            {online && online.room?.hostPlayerId === online.playerId && (
+              <button
+                className="button secondary"
+                disabled={
+                  startingRematch || returningToLobby || !online.connected
+                }
+                onClick={async () => {
+                  setReturningToLobby(true);
+                  try {
+                    if (!(await online.returnToLobby())) {
+                      toast.error("Couldn’t return to the room. Try again.");
+                    }
+                  } catch {
+                    toast.error("Couldn’t return to the room. Try again.");
+                  } finally {
+                    setReturningToLobby(false);
+                  }
+                }}
+              >
+                {returningToLobby ? "Returning to room…" : "Edit table"}
+              </button>
+            )}
+            <button
+              className="button secondary"
+              disabled={startingRematch || returningToLobby}
+              onClick={onReset}
+            >
               Back to home
             </button>
           </div>
