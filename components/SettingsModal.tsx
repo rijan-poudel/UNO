@@ -28,6 +28,7 @@ import {
 import Modal from "./Modal";
 import RulePresets from "./RulePresets";
 import BotDifficultyControl from "./BotDifficultyControl";
+import AvatarPicker from "./AvatarPicker";
 interface Props {
   open: boolean;
   initialTab?: "profile" | "controls" | "audio";
@@ -46,6 +47,20 @@ const RULES: Array<{
   label: string;
   description: string;
 }> = [
+  {
+    key: "allowDoublePlaySameNumber",
+    group: "Special cards & moves",
+    label: "Play matching numbers together",
+    description:
+      "Tap either matching number to choose a legal pair. The card matching the pile goes first.",
+  },
+  {
+    key: "allowDoublePlayExactMatchOnly",
+    group: "Special cards & moves",
+    label: "Pairs must match color too",
+    description:
+      "When matching-number play is enabled, both cards must also share a color.",
+  },
   {
     key: "stackDraw2",
     group: "Drawing & stacking",
@@ -276,6 +291,7 @@ export default function SettingsModal({
         )}
         {tab === "profile" && (
           <>
+            <AvatarPicker />
             <p className="muted">
               The name your friends will see at the table.
             </p>
@@ -399,7 +415,22 @@ export default function SettingsModal({
                   <Toggle
                     key={r.key}
                     label={r.label}
-                    description={r.description}
+                    description={
+                      r.key === "allowDoublePlayExactMatchOnly" &&
+                      !(
+                        rules.allowDoublePlaySameNumber ??
+                        defaultRules.allowDoublePlaySameNumber
+                      )
+                        ? "Enable matching-number play to change this option."
+                        : r.description
+                    }
+                    disabled={
+                      r.key === "allowDoublePlayExactMatchOnly" &&
+                      !(
+                        rules.allowDoublePlaySameNumber ??
+                        defaultRules.allowDoublePlaySameNumber
+                      )
+                    }
                     checked={Boolean(rules[r.key] ?? defaultRules[r.key])}
                     onChange={(v) => onChange({ ...rules, [r.key]: v })}
                   />

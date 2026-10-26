@@ -1,3 +1,5 @@
+import './check-hand-layout';
+import './check-card-plays';
 import './check-gesture';
 import './check-turn-flow';
 import './check-saved-round';
@@ -349,7 +351,7 @@ import { getPlayerExpression } from '../lib/playerExpression';
       { ...state, lastAction: { type: 'declareUno', playerId: jules.id } },
       jules.id,
     ),
-    'happy',
+    'uno',
   );
   assert.equal(
     getPlayerExpression({ ...state, winnerId: cleo.id }, cleo.id),

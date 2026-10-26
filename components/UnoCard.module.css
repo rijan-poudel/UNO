@@ -143,3 +143,21 @@
     transition: none;
   }
 }
+
+/* A quiet action cue belongs to the held face; it never replaces the number. */
+.playHint {
+  position: absolute;
+  z-index: 4;
+  top: calc(30px * var(--card-scale));
+  left: calc(5px * var(--card-scale));
+  padding: 3px 6px;
+  border-radius: 6px;
+  background: #fff7e7;
+  color: #17345f;
+  box-shadow: 0 2px 5px #061e4c40;
+  font:
+    750 clamp(10px, calc(11px * var(--card-scale)), 18px)/1 "Outfit",
+    sans-serif;
+  pointer-events: none;
+  white-space: nowrap;
+}

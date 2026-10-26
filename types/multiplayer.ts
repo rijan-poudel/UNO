@@ -23,6 +23,7 @@ export interface PendingColorChoice {
 export interface RoomPlayer {
   playerId: string;
   name: string;
+  avatarId?: string;
   connected: boolean;
   isBot: boolean;
   friendCode?: string;
@@ -53,9 +54,16 @@ export interface FriendInvite {
 }
 
 export type MultiplayerAction =
+  | { type: "resumeControl" }
   | { type: "prepareWild"; cardId: string }
   | { type: "cancelWildChoice" }
-  | { type: "play"; cardId: string; chosenColor?: CardColor }
+  | {
+      type: "play";
+      cardId: string;
+      chosenColor?: CardColor;
+      secondCardId?: string;
+      declareUno?: boolean;
+    }
   | { type: "draw" }
   | { type: "pass" }
   | { type: "sayUno" }

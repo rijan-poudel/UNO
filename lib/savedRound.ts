@@ -161,5 +161,9 @@ export function saveRound(game: GameState | null): void {
 }
 
 export function resumeRound(game: GameState, now = Date.now()): GameState {
-  return withTurnDeadline(null, game, now);
+  return withTurnDeadline(
+    null,
+    { ...game, autoPlayPlayerIds: [], turnDeadlineAt: null },
+    now,
+  );
 }

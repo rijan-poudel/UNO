@@ -2,7 +2,7 @@
 import type { GameState } from '../types/game';
 
 export type PlayerExpression =
-  'neutral' | 'thinking' | 'happy' | 'surprised' | 'celebrate';
+  'neutral' | 'thinking' | 'happy' | 'surprised' | 'celebrate' | 'uno';
 
 export function getPlayerExpression(
   game: GameState,
@@ -18,12 +18,14 @@ export function getPlayerExpression(
     (action.type === 'callOut' && action.targetId === playerId)
   )
     return 'surprised';
-  if (game.players[game.currentPlayerIndex]?.id === playerId)
-    return game.pendingDraw > 0 ? 'surprised' : 'thinking';
   if (
-    (action.type === 'play' || action.type === 'declareUno') &&
+    (action.type === 'declareUno' ||
+      (action.type === 'play' && action.declaredUno)) &&
     action.playerId === playerId
   )
-    return 'happy';
+    return 'uno';
+  if (game.players[game.currentPlayerIndex]?.id === playerId)
+    return game.pendingDraw > 0 ? 'surprised' : 'thinking';
+  if (action.type === 'play' && action.playerId === playerId) return 'happy';
   return 'neutral';
 }

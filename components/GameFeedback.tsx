@@ -6,7 +6,9 @@ export default function GameFeedback({ game }: { game: GameState }) {
   const action = game.lastAction;
   const value =
     action.type === "play"
-      ? action.card.value
+      ? action.declaredUno
+        ? "uno"
+        : action.card.value
       : action.type === "declareUno"
         ? "uno"
         : action.type === "callOut"

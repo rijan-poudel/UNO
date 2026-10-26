@@ -65,6 +65,8 @@ export default function OpponentSeat({
       >
         <PlayerAvatar
           seed={player.id}
+          avatarId={player.avatarId}
+          isBot={player.isBot}
           expression={offline ? "neutral" : expression}
         />
         <span className={styles.name}>

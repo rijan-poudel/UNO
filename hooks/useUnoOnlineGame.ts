@@ -5,6 +5,7 @@ import { io, type Socket } from 'socket.io-client';
 import type { GameState } from '../types/game';
 import type { Card, CardColor } from '../types/card';
 import type { GameRules } from '../types/rules';
+import type { PlayOptions } from '../lib/gameActions';
 import type {
   Ack,
   FriendInvite,
@@ -16,6 +17,8 @@ import { toast } from 'sonner';
 import { getPlayableCards } from '../lib/gameRules';
 import { toPresentationGame } from '../lib/gameView';
 import { resolvePlayerName } from '../lib/playerNames';
+import { getPlayerAvatar, subscribePlayerAvatar } from '../lib/playerAvatars';
+import { usePlayerActivity } from './usePlayerActivity';
 import {
   ONLINE_UNAVAILABLE_MESSAGE,
   resolveSocketEndpoint,
@@ -266,6 +269,8 @@ function describeAction(game: {
   switch (action.type) {
     case 'play': {
       const extras: string[] = [];
+      if (action.playedCards) extras.push('played both matching numbers');
+      if (action.declaredUno) extras.push('called UNO');
       if (action.discardAllCount && action.discardAllCount > 0) {
         extras.push(`discarded ${action.discardAllCount} extra`);
       }
@@ -340,7 +345,7 @@ export function useUnoOnlineGame() {
 
     const socket = io(socketUrl, {
       transports: ['websocket'],
-      auth: { protocolVersion: 2 },
+      auth: { protocolVersion: 2, avatarId: getPlayerAvatar() },
     });
 
     socketRef.current = socket;
@@ -544,6 +549,35 @@ export function useUnoOnlineGame() {
       socketRef.current = null;
     };
   }, [deviceId, discardStaleMembership]);
+
+  useEffect(
+    () =>
+      subscribePlayerAvatar(() => {
+        const socket = socketRef.current;
+        if (!socket) return;
+        const avatarId = getPlayerAvatar();
+        socket.auth = { ...socket.auth, avatarId };
+        if (socket.connected)
+          socket
+            .timeout(6000)
+            .emit(
+              'profile:avatar',
+              { avatarId },
+              (error: Error | null, ack?: Ack<{ updated: true }>) => {
+                if (error || !ack?.ok)
+                  setState((prev) => ({
+                    ...prev,
+                    error: error
+                      ? 'Could not update your avatar. Reconnect to try again.'
+                      : ack && !ack.ok
+                        ? ack.error
+                        : 'Could not update your avatar.',
+                  }));
+              },
+            );
+      }),
+    [],
+  );
 
   useEffect(() => {
     if (!state.room || !state.playerId) return;
@@ -1032,6 +1066,16 @@ export function useUnoOnlineGame() {
   const localPlayer = game?.players[localPlayerIndex] ?? null;
   const isLocalTurn = !!game && game.currentPlayerIndex === localPlayerIndex;
 
+  const resumeControl = useCallback(() => {
+    void sendAction({ type: 'resumeControl' });
+  }, [sendAction]);
+  usePlayerActivity(
+    state.connected &&
+      !!state.playerId &&
+      !!game?.autoPlayPlayerIds?.includes(state.playerId),
+    resumeControl,
+  );
+
   const playableCardIds = useMemo(
     () =>
       new Set(
@@ -1078,6 +1122,7 @@ export function useUnoOnlineGame() {
 
   useEffect(() => {
     if (!state.connected || !game || !localPlayer || !isLocalTurn) return;
+    if (game.autoPlayPlayerIds?.includes(localPlayer.id)) return;
     if (!state.drawnThisTurn) return;
     if ((game.pendingDraw ?? 0) > 0) return;
     if (playableCardIds.size > 0) return;
@@ -1100,13 +1145,13 @@ export function useUnoOnlineGame() {
   ]);
 
   const selectCard = useCallback(
-    (card: Card) => {
+    (card: Card, options: PlayOptions = {}) => {
       if (!game) return;
       if (card.color === 'wild') {
         void sendAction({ type: 'prepareWild', cardId: card.id });
         return;
       }
-      void sendAction({ type: 'play', cardId: card.id });
+      void sendAction({ type: 'play', cardId: card.id, ...options });
     },
     [game, sendAction],
   );

@@ -6,7 +6,7 @@
   grid-template-columns: auto minmax(0, 1fr);
   align-items: center;
   column-gap: 7px;
-  width: 128px;
+  width: var(--seat-width, 128px);
   min-width: 0;
   max-width: none;
   min-height: 44px;
@@ -22,8 +22,8 @@
 :global(.game-main) .seat .label :global(.player-avatar) {
   grid-column: 1;
   grid-row: 1;
-  width: 32px;
-  height: 32px;
+  width: var(--seat-avatar, 32px);
+  height: var(--seat-avatar, 32px);
   border-width: 2px;
   margin: 0;
   border-radius: 50%;
@@ -44,7 +44,7 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   color: inherit;
-  font-size: 13px;
+  font-size: var(--seat-name-size, 13px);
   font-weight: 700;
   line-height: 1.25;
 }
@@ -139,45 +139,7 @@
 :global(.game-main) .seat .label:global(.catch-seat):active {
   transform: scale(0.96);
 }
-/* Keep a 44px catch target; shrink the portrait before sacrificing the name. */
-@media (max-height: 460px) and (min-width: 541px) {
-  :global(.game-main) .seat .label {
-    width: 112px;
-    column-gap: 6px;
-    border-radius: 11px;
-  }
-  :global(.game-main) .seat .label :global(.player-avatar) {
-    width: 28px;
-    height: 28px;
-  }
-  :global(.game-main) .seat .label strong {
-    font-size: 12px;
-  }
-  :global(.game-main) .seat .label small {
-    font-size: 9px;
-  }
-  :global(.game-main) .seat .label .countUnit {
-    display: none;
-  }
-}
-@media (max-height: 360px) and (min-width: 541px) {
-  :global(.game-main) .seat .label {
-    width: 96px;
-    column-gap: 5px;
-    padding-inline: 4px;
-    border-radius: 9px;
-  }
-  :global(.game-main) .seat .label :global(.player-avatar) {
-    width: 24px;
-    height: 24px;
-  }
-  :global(.game-main) .seat .label strong {
-    font-size: 11px;
-  }
-  :global(.game-main) .seat .label .details {
-    gap: 4px;
-  }
-  :global(.game-main) .seat .label .count {
-    font-size: 10px;
-  }
+
+:global(.game-main) .seat .label .countUnit {
+  display: var(--seat-unit, inline);
 }

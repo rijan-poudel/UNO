@@ -9,7 +9,12 @@ export default function TableScoreCard({
   localPlayerId,
 }: {
   score?: TableScore;
-  players: ReadonlyArray<{ id: string; name: string }>;
+  players: ReadonlyArray<{
+    id: string;
+    name: string;
+    avatarId?: string;
+    isBot?: boolean;
+  }>;
   localPlayerId?: string | null;
 }) {
   if (!score?.completedRounds) return null;
@@ -32,7 +37,11 @@ export default function TableScoreCard({
           const wins = score.wins[player.id] ?? 0;
           return (
             <li key={player.id}>
-              <PlayerAvatar seed={player.id} />
+              <PlayerAvatar
+                seed={player.id}
+                avatarId={player.avatarId}
+                isBot={player.isBot}
+              />
               <span className="result-player-name">
                 {player.name}
                 {player.id === localPlayerId && player.name !== "You" && (

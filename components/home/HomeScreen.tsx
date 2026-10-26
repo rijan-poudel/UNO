@@ -1,14 +1,7 @@
 // A quiet game title screen: one immediate Play action and room choices.
 "use client";
 import { useState, type CSSProperties } from "react";
-import {
-  ArrowRight,
-  Bot,
-  ChevronDown,
-  BookOpen,
-  Users,
-  LogIn,
-} from "lucide-react";
+import { ArrowRight, Bot, BookOpen, Users, LogIn } from "lucide-react";
 import type { FriendInvite } from "../../types/multiplayer";
 import type { GameRules } from "../../types/rules";
 import {
@@ -19,6 +12,7 @@ import {
 import NotificationPanel from "../NotificationPanel";
 import PlayerProgress from "../PlayerProgress";
 import UnoCard from "../UnoCard";
+import HowToPlayModal from "../HowToPlayModal";
 import type { Card } from "../../types/card";
 import type { GameState } from "../../types/game";
 import { getBotDifficultyLabel } from "../../lib/botSupport";
@@ -163,35 +157,29 @@ export default function HomeScreen(props: Props) {
             </button>
             <button
               className="launch-text-action"
-              onClick={() => setHelp(!help)}
-              aria-expanded={help}
-              aria-controls="launch-quick-rules"
+              onClick={() => setHelp(true)}
+              aria-haspopup="dialog"
             >
               <BookOpen size={16} aria-hidden="true" />
               How to play
-              <ChevronDown size={14} aria-hidden="true" />
+              <span className="launch-pill-hint">1 min</span>
             </button>
           </div>
-          <div
-            className={`launch-rules-wrapper ${help ? "open" : ""}`}
-            id="launch-quick-rules"
-            aria-hidden={!help}
-          >
-            <div className="launch-rules-inner">
-              <div className="launch-rules">
-                <p>
-                  Match the top card’s <strong>color or number</strong>. Tap a
-                  lifted card to play, or draw from the deck. Wilds let you
-                  choose the color.
-                </p>
-                <p>
-                  Call <strong>UNO</strong> with one card left. You have 30
-                  seconds per turn; time runs out, you draw and pass.
-                  Unavoidable draw penalties arrive automatically.
-                </p>
-              </div>
-            </div>
-          </div>
+          {help && (
+            <HowToPlayModal
+              open={help}
+              rules={props.rules}
+              onClose={() => setHelp(false)}
+              onPracticeWithBots={() => {
+                setHelp(false);
+                props.onQuickPlay();
+              }}
+              onPlayWithFriends={() => {
+                setHelp(false);
+                props.onFriends();
+              }}
+            />
+          )}
         </section>
         <div className="launch-progress">
           <PlayerProgress />

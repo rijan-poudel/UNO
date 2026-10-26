@@ -5,6 +5,7 @@ import { ArrowRight, Minus, Plus } from "lucide-react";
 import type { GameRules } from "../types/rules";
 import { RULE_PRESETS, matchesPreset } from "../lib/rulePresets";
 import PlayerAvatar from "./PlayerAvatar";
+import AvatarPicker from "./AvatarPicker";
 import SetupShell from "./SetupShell";
 import { SetupIntro } from "./ui/PageChrome";
 import {
@@ -128,10 +129,11 @@ export default function GameSetup({
           }
         />
       </div>
+      <AvatarPicker />
       <div className="crew-line" aria-label="Your bot opponents">
         {names.slice(1).map((name, i) => (
           <div key={i}>
-            <PlayerAvatar seed={`player_${i + 1}`} />
+            <PlayerAvatar seed={`player_${i + 1}`} isBot />
             <span title={name || NAMES[i + 1]}>{name || NAMES[i + 1]}</span>
           </div>
         ))}

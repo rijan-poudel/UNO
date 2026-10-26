@@ -126,9 +126,6 @@ export function getPlayableCards(
  *   - If allowDoublePlayExactMatchOnly is also true, both cards must share
  *     the same color in addition to the same value ("exact match").
  *
- * This helper is designed to be consumed by a future playMultipleCards() action
- * without modification.
- *
  * @returns An array of [Card, Card] pairs, each representing a valid double-play.
  */
 export function getPlayableMultiCardCombos(
@@ -178,4 +175,152 @@ export function getPlayableMultiCardCombos(
   }
 
   return combos;
+}
+
+export interface CardPlayChoice {
+  cards: Card[];
+  remaining: number;
+  secondCardId?: string;
+}
+
+/** A compact, truthful cue for special moves available on this card now. */
+export function getCardPlayHint(
+  state: GameState,
+  playerIndex: number,
+  card: Card,
+): { badge: string; description: string } | undefined {
+  const choices = getCardPlayChoices(state, playerIndex, card);
+  if (choices.some((choice) => choice.secondCardId))
+    return {
+      badge: '×2',
+      description: choices.some((choice) => !choice.secondCardId)
+        ? 'Matching pair · play one or both'
+        : 'Matching pair · play both together',
+    };
+  const choice = choices[0];
+  if (card.value !== 'discardAll' || !choice || choice.cards.length < 2)
+    return undefined;
+  return {
+    badge: `−${choice.cards.length}`,
+    description: `${choice.cards.length} out · ${choice.remaining === 0 ? 'empty hand — you win' : `${choice.remaining} left${choice.remaining === 1 && state.rules.mustDeclareUno && !state.players[playerIndex].saidUno ? ' · call UNO' : ''}`}`,
+  };
+}
+
+/** Legal outcomes for one activated card, including optional number pairs. */
+export function getCardPlayChoices(
+  state: GameState,
+  playerIndex: number,
+  card: Card,
+): CardPlayChoice[] {
+  const player = state.players[playerIndex];
+  if (
+    !player ||
+    !player.hand.some((entry) => entry.id === card.id) ||
+    state.winnerId
+  )
+    return [];
+  const removed =
+    card.value === 'discardAll' && state.rules.allowDiscardAll
+      ? player.hand.filter((entry) => entry.color === card.color)
+      : [card];
+  const singlePlayable = canPlayCard(card, state, playerIndex);
+  const choices: CardPlayChoice[] = singlePlayable
+    ? [{ cards: removed, remaining: player.hand.length - removed.length }]
+    : [];
+  const top = state.discardPile.at(-1);
+  if (playerIndex !== state.currentPlayerIndex || state.pendingDraw > 0 || !top)
+    return choices;
+  for (const pair of getPlayableMultiCardCombos(
+    player.hand,
+    top,
+    state.activeColor,
+    state.rules,
+  )) {
+    if (!pair.some((entry) => entry.id === card.id)) continue;
+    const second = pair.find((entry) => entry.id !== card.id);
+    if (second)
+      choices.push({
+        cards: singlePlayable ? [card, second] : [second, card],
+        remaining: player.hand.length - 2,
+        secondCardId: singlePlayable ? second.id : card.id,
+      });
+  }
+  return choices;
+}
+
+/** Rule-specific guidance for inspection; legal plays never need an extra tap. */
+export function getCardPlayBlockReason(
+  state: GameState,
+  playerIndex: number,
+  card: Card,
+): string | undefined {
+  if (getCardPlayChoices(state, playerIndex, card).length > 0) return undefined;
+  const player = state.players[playerIndex];
+  if (!player || !player.hand.some((entry) => entry.id === card.id))
+    return 'That card is no longer in your hand.';
+  if (state.winnerId) return 'This round is over. Deal again to play.';
+  if (card.value === 'discardAll' && !state.rules.allowDiscardAll)
+    return 'Discard All is off at this table.';
+  if (card.value === 'shuffle' && !state.rules.allowShuffleCard)
+    return 'Shuffle Hands is off at this table.';
+  if (
+    !state.rules.canFinishWithActionCard &&
+    isActionCard(card) &&
+    (player.hand.length === 1 ||
+      (card.value === 'discardAll' &&
+        player.hand.every((entry) => entry.color === card.color)))
+  ) {
+    return 'Finish with a number card.';
+  }
+  if (playerIndex !== state.currentPlayerIndex)
+    return !state.rules.allowJumpIn
+      ? 'Jump-ins are off here.'
+      : state.pendingDraw > 0
+        ? `Jump-in blocked by +${state.pendingDraw}.`
+        : 'Jump-in needs an exact match.';
+  if (state.pendingDraw > 0) {
+    const stackingAllowed =
+      state.pendingDrawType === 'draw2'
+        ? state.rules.stackDraw2 || state.rules.allowWild4OnDraw2
+        : state.rules.stackWild4;
+    if (!stackingAllowed) return `Stacking is off. Draw ${state.pendingDraw}.`;
+    return getPlayableCards(player.hand, state, playerIndex).length > 0
+      ? 'Only draw cards can stack.'
+      : `No stack. Draw ${state.pendingDraw}.`;
+  }
+  if (
+    NUMBER_VALUES.includes(card.value) &&
+    player.hand.some(
+      (entry) =>
+        entry.id !== card.id &&
+        entry.value === card.value &&
+        canPlayCard(entry, state, playerIndex),
+    )
+  ) {
+    if (!state.rules.allowDoublePlaySameNumber)
+      return 'Pairs are off. Play a match or draw.';
+    if (state.rules.allowDoublePlayExactMatchOnly)
+      return 'Pairs need the same color.';
+  }
+  return undefined;
+}
+
+/** Pre-calls also cover pairs and Discard All plays that leave one card. */
+export function canDeclareUno(state: GameState, playerIndex: number): boolean {
+  const player = state.players[playerIndex];
+  if (
+    !player ||
+    state.winnerId ||
+    !state.rules.mustDeclareUno ||
+    player.saidUno
+  )
+    return false;
+  return (
+    (player.hand.length >= 1 && player.hand.length <= 2) ||
+    player.hand.some((card) =>
+      getCardPlayChoices(state, playerIndex, card).some(
+        (choice) => choice.remaining === 1,
+      ),
+    )
+  );
 }

@@ -13,7 +13,7 @@
     "lint": "eslint",
     "check:types": "tsc --noEmit",
     "check:game": "tsx scripts/check-game.ts",
-    "check:multiplayer": "tsx scripts/check-multiplayer.ts && tsx scripts/check-turn-network.ts && tsx scripts/check-private-network.ts",
+    "check:multiplayer": "tsx scripts/check-card-network.ts && tsx scripts/check-multiplayer.ts && tsx scripts/check-turn-network.ts && tsx scripts/check-private-network.ts",
     "audio:prepare": "node scripts/prepare-audio.mjs",
     "format": "prettier --write app components hooks lib server scripts types docs .github *.json *.ts *.mjs *.md",
     "format:check": "prettier --check app components hooks lib server scripts types docs .github *.json *.ts *.mjs *.md",

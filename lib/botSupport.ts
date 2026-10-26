@@ -2,10 +2,8 @@
 // lib/botSupport.ts
 // Simple deterministic bot strategy layer.
 //
-// The bot does NOT execute actions — it returns a recommendation
-// that the game loop can pass to the appropriate action function.
-// This keeps AI logic decoupled from state mutation and makes it
-// trivial to swap in smarter strategies later (minimax, MCTS, etc.).
+// Strategy returns recommendations; playBotStep applies one through
+// the immutable engine for local, online and unattended human seats.
 // ============================================================
 
 import type { Card, CardColor } from '../types/card';
@@ -13,6 +11,14 @@ import type { GameState } from '../types/game';
 import { STANDARD_COLORS } from '../types/card';
 import { getPlayableCards } from './gameRules';
 import { getNextPlayerIndex } from './turns';
+import {
+  callOutUno,
+  declareUno,
+  drawOneCard,
+  drawRequiredCards,
+  passTurn,
+  playCard,
+} from './gameActions';
 import type { BotDifficulty } from '../types/rules';
 
 export const BOT_DIFFICULTY_OPTIONS = [
@@ -225,4 +231,25 @@ export function getBotMove(state: GameState, playerIndex: number): BotAction {
     best.color === 'wild' ? getBotPreferredColor(player.hand) : undefined;
 
   return { action: 'play', cardId: best.id, chosenColor };
+}
+
+/** Execute one recommendation, publishing draws before any follow-up play. */
+export function playBotStep(game: GameState): GameState {
+  if (game.winnerId) return game;
+  const index = game.currentPlayerIndex;
+  const target = game.players.findIndex(
+    (player, seat) =>
+      seat !== index && player.hand.length === 1 && !player.saidUno,
+  );
+  const state = target < 0 ? game : callOutUno(game, index, target);
+  const move = getBotMove(state, index);
+  let next: GameState;
+  if (move.action === 'drawRequired') next = drawRequiredCards(state, index);
+  else if (move.action === 'pass') next = passTurn(state, index);
+  else if (move.action === 'draw') next = drawOneCard(state, index);
+  else next = playCard(state, index, move.cardId, move.chosenColor);
+
+  return !next.winnerId && next.players[index].hand.length === 1
+    ? { ...declareUno(next, index), lastAction: next.lastAction }
+    : next;
 }

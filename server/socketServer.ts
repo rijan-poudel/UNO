@@ -2,6 +2,7 @@ import { createServer } from 'node:http';
 import { randomBytes } from 'node:crypto';
 import { Server } from 'socket.io';
 import { initializeGame } from '../lib/gameSetup';
+import { isAvatarId } from '../lib/playerAvatars';
 import { validateGameRules } from '../lib/validateGameRules';
 import { toGameView, toPresentationGame } from '../lib/gameView';
 import { recordTableWin, startTableRound } from '../lib/tableScore';
@@ -14,13 +15,14 @@ import {
   declareUno,
   callOutUno,
 } from '../lib/gameActions';
-import { getBotMove } from '../lib/botSupport';
+import { playBotStep } from '../lib/botSupport';
 import { canJumpInPlay, canPlayCard } from '../lib/gameRules';
 import {
   BOT_TURN_MS,
   FORCED_DRAW_DELAY_MS,
   expireTurn,
   hasForcedPenalty,
+  resumePlayerControl,
   withTurnDeadline,
 } from '../lib/turnFlow';
 import type { GameState, TableScore } from '../types/game';
@@ -177,6 +179,7 @@ function toSnapshot(
       return {
         playerId: p.playerId,
         name: p.name,
+        avatarId: p.avatarId,
         connected: p.connected,
         isBot: p.isBot,
         friendCode: presence?.friendCode,
@@ -281,6 +284,11 @@ function synchronizeRoomTurn(room: ServerRoom): void {
   }, delay);
 }
 
+function socketAvatar(socketId: string): string {
+  const avatarId = io.sockets.sockets.get(socketId)?.handshake.auth.avatarId;
+  return isAvatarId(avatarId) ? avatarId : 'initials';
+}
+
 function createRoomForPlayer(
   socketId: string,
   playerName: string,
@@ -301,6 +309,7 @@ function createRoomForPlayer(
         playerId,
         socketId,
         name: playerName,
+        avatarId: socketAvatar(socketId),
         connected: true,
         deviceId,
         isBot: false,
@@ -362,10 +371,25 @@ function joinRoomAsPlayer(
     existingPlayerForDevice.connected = true;
     existingPlayerForDevice.ready = false;
     existingPlayerForDevice.name = playerName;
+    existingPlayerForDevice.avatarId = socketAvatar(socketId);
+    if (room.game)
+      room.game = {
+        ...room.game,
+        players: room.game.players.map((player) =>
+          player.id === existingPlayerForDevice.playerId
+            ? { ...player, avatarId: existingPlayerForDevice.avatarId }
+            : player,
+        ),
+      };
     playerBySocket.set(socketId, {
       roomId: room.roomId,
       playerId: existingPlayerForDevice.playerId,
     });
+    if (room.game)
+      room.game = resumePlayerControl(
+        room.game,
+        existingPlayerForDevice.playerId,
+      );
     ensureHumanHost(room);
     runOfflineBotTurns(room);
     return existingPlayerForDevice.playerId;
@@ -381,6 +405,7 @@ function joinRoomAsPlayer(
     playerId,
     socketId,
     name: playerName,
+    avatarId: socketAvatar(socketId),
     connected: true,
     deviceId,
     isBot: false,
@@ -618,6 +643,11 @@ function handleGameAction(
 
   const action = payload.action;
 
+  if (action.type === 'resumeControl') {
+    room.game = resumePlayerControl(state, actorPlayerId);
+    return;
+  }
+
   if (activeChoice && activeChoice.playerId !== actorPlayerId) {
     throw new Error('Waiting for active player to choose a color.');
   }
@@ -700,6 +730,7 @@ function handleGameAction(
         actorIndex,
         action.cardId,
         action.chosenColor,
+        { secondCardId: action.secondCardId, declareUno: action.declareUno },
       );
       room.pendingColorChoice = null;
       break;
@@ -742,6 +773,7 @@ function handleGameAction(
       );
     }
   }
+  room.game = resumePlayerControl(room.game, actorPlayerId);
 }
 
 const botTimers = new Map<string, ReturnType<typeof setTimeout>>();
@@ -783,46 +815,7 @@ function runOfflineBotTurns(room: ServerRoom): void {
       try {
         room.pendingColorChoice = null;
 
-        const currentIndex = state.currentPlayerIndex;
-        let botState: GameState = state;
-        const callOutTargetIndex = botState.players.findIndex(
-          (player, idx) =>
-            idx !== currentIndex && player.hand.length === 1 && !player.saidUno,
-        );
-
-        if (callOutTargetIndex >= 0) {
-          botState = callOutUno(botState, currentIndex, callOutTargetIndex);
-        }
-
-        const move = getBotMove(botState, currentIndex);
-        let nextState: GameState = botState;
-
-        if (move.action === 'drawRequired') {
-          nextState = drawRequiredCards(botState, currentIndex);
-        } else if (move.action === 'pass') {
-          nextState = passTurn(botState, currentIndex);
-        } else if (move.action === 'draw') {
-          nextState = drawOneCard(botState, currentIndex);
-        } else {
-          nextState = playCard(
-            botState,
-            currentIndex,
-            move.cardId,
-            move.chosenColor,
-          );
-        }
-
-        if (
-          !nextState.winnerId &&
-          nextState.players[currentIndex]?.hand.length === 1
-        ) {
-          nextState = {
-            ...declareUno(nextState, currentIndex),
-            lastAction: nextState.lastAction,
-          };
-        }
-
-        room.game = nextState;
+        room.game = playBotStep(state);
 
         broadcastRoom(io, room);
         runOfflineBotTurns(room);
@@ -892,6 +885,39 @@ setInterval(() => {
 }, CLEANUP_INTERVAL_MS);
 
 io.on('connection', (socket) => {
+  socket.on(
+    'profile:avatar',
+    (
+      payload: { avatarId?: unknown },
+      reply?: (ack: Ack<{ updated: true }>) => void,
+    ) => {
+      try {
+        const avatarId = payload?.avatarId;
+        if (!isAvatarId(avatarId))
+          throw new Error('Choose one of the available avatars.');
+        socket.handshake.auth.avatarId = avatarId;
+        const membership = playerBySocket.get(socket.id);
+        const room = membership ? rooms.get(membership.roomId) : undefined;
+        const actor = room?.players.find(
+          (player) => player.socketId === socket.id,
+        );
+        if (room && actor) {
+          actor.avatarId = avatarId;
+          if (room.game)
+            room.game = {
+              ...room.game,
+              players: room.game.players.map((player) =>
+                player.id === actor.playerId ? { ...player, avatarId } : player,
+              ),
+            };
+          broadcastRoom(io, room);
+        }
+        reply?.({ ok: true, data: { updated: true } });
+      } catch (error) {
+        reply?.(ackError((error as Error).message));
+      }
+    },
+  );
   socket.on(
     'friend:status',
     (
@@ -1317,6 +1343,7 @@ io.on('connection', (socket) => {
             players: newGame.players.map((player, index) => ({
               ...player,
               id: room.players[index].playerId,
+              avatarId: room.players[index].avatarId,
             })),
           },
           randomBytes(16).toString('hex'),

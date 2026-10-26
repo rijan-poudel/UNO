@@ -333,6 +333,16 @@ export function announceBoardFromTransition(
 
     case 'play': {
       const { card, chosenColor, discardAllCount, shuffledHands } = action;
+      if (action.declaredUno) {
+        playVoiceStem(pickStem(POOLS.unoDeclare, seed), {
+          category: 'board',
+          audience: { type: 'room' },
+          localPlayerId,
+          channel: 'board:uno',
+          minGapMs: 4500,
+        });
+        return;
+      }
 
       if (shuffledHands) {
         const mapped = normalizeActionColor(chosenColor);

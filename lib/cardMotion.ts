@@ -1,5 +1,21 @@
 import type { GameState } from '../types/game';
 
+/** Public faces in landing order; the last one stays on top of the pile. */
+export function getPlayedCards(game: GameState) {
+  const action = game.lastAction;
+  if (action.type !== 'play') return [];
+  return game.discardPile.slice(
+    -(action.playedCards?.length ?? 1 + (action.discardAllCount ?? 0)),
+  );
+}
+
+/** One short throw, even when Discard All clears a large hand. */
+export function getMultiPlayDelay(index: number, count: number): number {
+  return count < 2
+    ? 0
+    : Math.round((index / (count - 1)) * Math.min(120, (count - 1) * 35));
+}
+
 // Card flight geometry is independent of React and never controls game timing.
 export interface CardPose {
   x: number;

@@ -7,14 +7,17 @@ export function toGameView(game: GameState, viewerId: string): GameView {
   return {
     roundId: game.roundId,
     tableScore: game.tableScore,
-    players: game.players.map(({ hand, id, name, saidUno, isBot }) => ({
-      id,
-      name,
-      saidUno,
-      isBot,
-      handCount: hand.length,
-      ...(id === viewerId ? { hand } : {}),
-    })),
+    players: game.players.map(
+      ({ hand, id, name, avatarId, saidUno, isBot }) => ({
+        id,
+        name,
+        avatarId,
+        saidUno,
+        isBot,
+        handCount: hand.length,
+        ...(id === viewerId ? { hand } : {}),
+      }),
+    ),
     drawPileCount: game.drawPile.length,
     discardPile: game.discardPile,
     currentPlayerIndex: game.currentPlayerIndex,
@@ -27,6 +30,7 @@ export function toGameView(game: GameState, viewerId: string): GameView {
     rules: game.rules,
     turnCount: game.turnCount,
     turnDeadlineAt: game.turnDeadlineAt,
+    autoPlayPlayerIds: game.autoPlayPlayerIds,
     lastAction: game.lastAction,
   };
 }

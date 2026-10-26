@@ -16,6 +16,7 @@ interface UnoCardProps {
   onClick?: () => void;
   ariaLabel?: string;
   tabIndex?: number;
+  cornerHint?: string;
 }
 const LABELS: Record<string, string> = {
   skip: "Skip",
@@ -61,6 +62,7 @@ export default function UnoCard({
   onClick,
   ariaLabel,
   tabIndex,
+  cornerHint,
 }: UnoCardProps) {
   const label = faceDown
     ? "Face-down card"
@@ -117,6 +119,11 @@ export default function UnoCard({
       tabIndex={tabIndex}
     >
       {content}
+      {cornerHint && (
+        <span className={styles.playHint} data-card-hint aria-hidden="true">
+          {cornerHint}
+        </span>
+      )}
       <span className={styles.finish} aria-hidden="true" />
     </button>
   ) : (

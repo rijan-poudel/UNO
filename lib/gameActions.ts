@@ -12,11 +12,21 @@
 import type { GameState, Player, LastAction } from '../types/game';
 import type { Card, CardColor } from '../types/card';
 import { isWildCard } from '../types/card';
-import { canJumpInPlay, canPlayCard } from './gameRules';
+import {
+  canDeclareUno,
+  canJumpInPlay,
+  canPlayCard,
+  getCardPlayChoices,
+} from './gameRules';
 import { advanceTurn } from './turns';
 import { shuffleDeck } from './deck';
 
 const MAX_DRAW_UNTIL_PLAYABLE = 20;
+
+export interface PlayOptions {
+  secondCardId?: string;
+  declareUno?: boolean;
+}
 
 // ── Internal utilities ────────────────────────────────────────────────────────
 
@@ -267,6 +277,7 @@ export function playCard(
   playerIndex: number,
   cardId: string,
   chosenColor?: CardColor,
+  options: PlayOptions = {},
 ): GameState {
   if (state.winnerId) throw new Error('Game is already over.');
 
@@ -280,6 +291,26 @@ export function playCard(
 
   // Remove the card from hand — throws if not found.
   const { card, newHand } = removeCardById(player.hand, cardId);
+  if (
+    options.declareUno !== undefined &&
+    typeof options.declareUno !== 'boolean'
+  ) {
+    throw new Error('UNO declaration must be a boolean.');
+  }
+  const choice = getCardPlayChoices(state, playerIndex, card).find(
+    (entry) => entry.secondCardId === options.secondCardId,
+  );
+  if (!choice)
+    throw new Error(
+      'That card or matching-number pair cannot be played in the current state.',
+    );
+  if (
+    options.declareUno &&
+    (!state.rules.mustDeclareUno || choice.remaining !== 1)
+  ) {
+    throw new Error('Call UNO with a play that leaves exactly one card.');
+  }
+  const second = options.secondCardId ? choice.cards[1] : undefined;
 
   // Validate legality (also checks turn ownership).
   if (!canPlayCard(card, effectiveState, playerIndex)) {
@@ -309,27 +340,19 @@ export function playCard(
   // Determine new active color (resolveCardEffect may override this for wild4).
   const newActiveColor: CardColor = isWildCard(card)
     ? (chosenColor ?? card.color)
-    : card.color;
-
-  // When a player plays down to 1 card, reset their UNO declaration flag so
-  // they need to declare UNO again (they didn't on this turn yet).
-  // When they play down to 0, flag is irrelevant.
-  const updatedPlayer: Player = {
-    ...player,
-    hand: newHand,
-    // Playing a card resets the UNO flag unless they still have 1 card AND already said it.
-    saidUno: newHand.length === 1 ? player.saidUno : false,
-  };
+    : (second ?? card).color;
 
   const lastAction: LastAction = {
     type: 'play',
     playerId: player.id,
-    card,
+    card: second ?? card,
     chosenColor,
+    ...(second ? { playedCards: [card, second] } : {}),
+    ...(options.declareUno ? { declaredUno: true } : {}),
   };
 
   let discardAllCount = 0;
-  let postPlayHand = [...newHand];
+  let postPlayHand = newHand.filter((entry) => entry.id !== second?.id);
   const discardExtra: Card[] = [];
 
   const isDiscardAllCard = card.value === 'discardAll' && card.color !== 'wild';
@@ -347,9 +370,12 @@ export function playCard(
   }
 
   const postPlayPlayer: Player = {
-    ...updatedPlayer,
+    ...player,
     hand: postPlayHand,
-    saidUno: postPlayHand.length === 1 ? updatedPlayer.saidUno : false,
+    saidUno:
+      postPlayHand.length === 1
+        ? player.saidUno || options.declareUno === true
+        : false,
   };
 
   if (discardAllCount > 0) {
@@ -362,7 +388,12 @@ export function playCard(
     players: effectiveState.players.map((p, i) =>
       i === playerIndex ? postPlayPlayer : p,
     ),
-    discardPile: [...effectiveState.discardPile, card, ...discardExtra],
+    discardPile: [
+      ...effectiveState.discardPile,
+      ...discardExtra,
+      card,
+      ...(second ? [second] : []),
+    ],
     activeColor: newActiveColor,
     // Clear pending draw only for non-draw cards; draw cards add to it in resolveCardEffect.
     pendingDraw:
@@ -551,9 +582,8 @@ export function passTurn(state: GameState, playerIndex: number): GameState {
 /**
  * Declare "UNO!".
  *
- * This engine allows declaration when the player has 2 cards (pre-declare)
- * or 1 card (standard declare). Declaring at 2 lets players press UNO before
- * a play that will leave them with a single card.
+ * Allows declaration at one or two cards, or before a legal pair / Discard All
+ * that leaves one card. Plays can also declare atomically via PlayOptions.
  * If mustDeclareUno is true and the player fails to declare before an opponent
  * calls them out, they receive a penalty via callOutUno().
  *
@@ -565,10 +595,7 @@ export function declareUno(state: GameState, playerIndex: number): GameState {
   const player = state.players[playerIndex];
   if (!player) throw new Error('Player not found.');
 
-  if (player.hand.length > 2 || player.hand.length < 1) {
-    // Only allow UNO declaration at 2 cards (pre-declare) or 1 card (standard).
-    return state;
-  }
+  if (!canDeclareUno(state, playerIndex)) return state;
 
   const updated = updatePlayer(state, playerIndex, { saidUno: true });
   return {

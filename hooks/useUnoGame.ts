@@ -25,10 +25,13 @@ import {
   passTurn,
   declareUno,
   callOutUno,
+  type PlayOptions,
 } from '../lib/gameActions';
 import { canPlayCard, getPlayableCards } from '../lib/gameRules';
-import { getBotMove } from '../lib/botSupport';
+import { playBotStep } from '../lib/botSupport';
+import { usePlayerActivity } from './usePlayerActivity';
 import { resolvePlayerName } from '../lib/playerNames';
+import { getPlayerAvatar, subscribePlayerAvatar } from '../lib/playerAvatars';
 import { readSavedRound, saveRound, resumeRound } from '../lib/savedRound';
 import { recordTableWin, startTableRound } from '../lib/tableScore';
 import {
@@ -36,12 +39,22 @@ import {
   FORCED_DRAW_DELAY_MS,
   expireTurn,
   hasForcedPenalty,
+  resumePlayerControl,
   withTurnDeadline,
 } from '../lib/turnFlow';
 
 const BOT_ACTION_DELAY_MS = BOT_TURN_MS;
 const AUTO_PASS_AFTER_DRAW_MS = 650;
 const POST_ACTION_HANDOFF_DELAY_MS = 180;
+
+function withLocalAvatar(game: GameState): GameState {
+  return {
+    ...game,
+    players: game.players.map((player) =>
+      player.isBot ? player : { ...player, avatarId: getPlayerAvatar() },
+    ),
+  };
+}
 
 function localRoundId(): string {
   return (
@@ -117,6 +130,8 @@ function describeAction(game: GameState): string {
   switch (a.type) {
     case 'play': {
       const extras: string[] = [];
+      if (a.playedCards) extras.push('played both matching numbers');
+      if (a.declaredUno) extras.push('called UNO');
       if (a.discardAllCount && a.discardAllCount > 0) {
         extras.push(`discarded ${a.discardAllCount} extra`);
       }
@@ -167,7 +182,7 @@ function reducer(state: UnoUIState, action: UIAction): UnoUIState {
         ...state,
         game: withTurnDeadline(state.game, recordTableWin(action.game)),
         pendingWild: null,
-        drawnThisTurn: false,
+        drawnThisTurn: action.game.drawnThisTurn,
         botThinking: false,
         log: [entry, ...state.log].slice(0, 30),
       };
@@ -241,6 +256,14 @@ export function useUnoGame(paused = false) {
 
   // Ref to always access latest game state in async callbacks
   const gameRef = useRef<GameState | null>(game);
+  useEffect(
+    () =>
+      subscribePlayerAvatar(() => {
+        const live = gameRef.current;
+        if (live) dispatch({ type: 'CLOCK', game: withLocalAvatar(live) });
+      }),
+    [],
+  );
   const pausedRef = useRef(paused);
   const pendingWildRef = useRef(pendingWild);
   const pausedAt = useRef<number | null>(null);
@@ -250,12 +273,45 @@ export function useUnoGame(paused = false) {
     pendingWildRef.current = pendingWild;
   }, [game, paused, pendingWild]);
 
+  const resumeControl = useCallback(() => {
+    const live = gameRef.current;
+    if (!live) return;
+    const next = resumePlayerControl(live, live.players[localPlayerIndex].id);
+    if (next === live) return;
+    gameRef.current = next;
+    dispatch({ type: 'CLOCK', game: next });
+  }, [localPlayerIndex]);
+
+  usePlayerActivity(
+    !!game?.autoPlayPlayerIds?.includes(game.players[localPlayerIndex].id),
+    resumeControl,
+  );
+
+  // Human actions can also arrive directly, without a preceding browser event.
+  const dispatchHuman = useCallback(
+    (action: UIAction) => {
+      if ('game' in action) {
+        dispatch({
+          ...action,
+          game: resumePlayerControl(
+            action.game,
+            action.game.players[localPlayerIndex].id,
+          ),
+        });
+      } else {
+        resumeControl();
+        dispatch(action);
+      }
+    },
+    [localPlayerIndex, resumeControl],
+  );
+
   // ── Start ─────────────────────────────────────────────────────────────────
 
   const startGame = useCallback(
     (playerNames: string[], rules: Partial<GameRules>, botFlags: boolean[]) => {
       const newGame = startTableRound(
-        initializeGame(playerNames, rules, botFlags),
+        withLocalAvatar(initializeGame(playerNames, rules, botFlags)),
         localRoundId(),
       );
       const firstHuman = newGame.players.findIndex((p) => !p.isBot);
@@ -277,7 +333,11 @@ export function useUnoGame(paused = false) {
     );
     dispatch({
       type: 'INIT',
-      game: startTableRound(next, localRoundId(), finished.tableScore),
+      game: startTableRound(
+        withLocalAvatar(next),
+        localRoundId(),
+        finished.tableScore,
+      ),
     });
     return true;
   }, []);
@@ -292,9 +352,11 @@ export function useUnoGame(paused = false) {
     setSavedGame(null);
     dispatch({
       type: 'RESTORE',
-      game: saved.tableScore
-        ? saved
-        : startTableRound(saved, saved.roundId ?? localRoundId()),
+      game: withLocalAvatar(
+        saved.tableScore
+          ? saved
+          : startTableRound(saved, saved.roundId ?? localRoundId()),
+      ),
     });
     return true;
   }, []);
@@ -302,21 +364,27 @@ export function useUnoGame(paused = false) {
   // ── Human: select card to play ────────────────────────────────────────────
 
   const selectCard = useCallback(
-    (card: Card) => {
+    (card: Card, options: PlayOptions = {}) => {
       if (!game || !canPlayCard(card, game, localPlayerIndex)) return;
       if (card.color === 'wild') {
         // Wild cards need a color choice first — open the picker
-        dispatch({ type: 'SELECT_WILD', card });
+        dispatchHuman({ type: 'SELECT_WILD', card });
       } else {
         try {
-          const next = enginePlayCard(game, localPlayerIndex, card.id);
-          dispatch({ type: 'PLAY', game: next });
+          const next = enginePlayCard(
+            game,
+            localPlayerIndex,
+            card.id,
+            undefined,
+            options,
+          );
+          dispatchHuman({ type: 'PLAY', game: next });
         } catch (e) {
           reportHookError('playCard error', e);
         }
       }
     },
-    [game, localPlayerIndex],
+    [game, localPlayerIndex, dispatchHuman],
   );
 
   // ── Human: confirm wild color selection ───────────────────────────────────
@@ -331,15 +399,18 @@ export function useUnoGame(paused = false) {
           pendingWild.id,
           color,
         );
-        dispatch({ type: 'PLAY', game: next });
+        dispatchHuman({ type: 'PLAY', game: next });
       } catch (e) {
         reportHookError('confirmWildColor error', e);
       }
     },
-    [game, pendingWild, localPlayerIndex],
+    [game, pendingWild, localPlayerIndex, dispatchHuman],
   );
 
-  const cancelWild = useCallback(() => dispatch({ type: 'CANCEL_WILD' }), []);
+  const cancelWild = useCallback(
+    () => dispatchHuman({ type: 'CANCEL_WILD' }),
+    [dispatchHuman],
+  );
 
   // ── Human: draw card(s) ───────────────────────────────────────────────────
 
@@ -351,7 +422,7 @@ export function useUnoGame(paused = false) {
       // Forced draw — draws all pending and advances turn
       try {
         const next = drawRequiredCards(game, idx);
-        dispatch({ type: 'PLAY', game: next });
+        dispatchHuman({ type: 'PLAY', game: next });
       } catch (e) {
         reportHookError('drawRequiredCards error', e);
       }
@@ -360,7 +431,7 @@ export function useUnoGame(paused = false) {
       // auto-pass after a short delay once the drawn card is visible.
       try {
         const afterDraw = drawOneCard(game, idx);
-        dispatch({
+        dispatchHuman({
           type: afterDraw.currentPlayerIndex === idx ? 'DRAW_ONE' : 'PLAY',
           game: afterDraw,
         });
@@ -368,7 +439,7 @@ export function useUnoGame(paused = false) {
         reportHookError('drawOneCard error', e);
       }
     }
-  }, [game]);
+  }, [game, dispatchHuman]);
 
   // ── Human: pass after drawing ─────────────────────────────────────────────
 
@@ -376,11 +447,11 @@ export function useUnoGame(paused = false) {
     if (!game) return;
     try {
       const next = passTurn(game, game.currentPlayerIndex);
-      dispatch({ type: 'PLAY', game: next });
+      dispatchHuman({ type: 'PLAY', game: next });
     } catch (e) {
       reportHookError('passTurn error', e);
     }
-  }, [game]);
+  }, [game, dispatchHuman]);
 
   // ── UNO declaration & call-out ────────────────────────────────────────────
 
@@ -388,18 +459,18 @@ export function useUnoGame(paused = false) {
     (playerIndex: number) => {
       if (!game) return;
       const next = declareUno(game, playerIndex);
-      dispatch({ type: 'META', game: next });
+      dispatchHuman({ type: 'META', game: next });
     },
-    [game],
+    [game, dispatchHuman],
   );
 
   const callOut = useCallback(
     (callerIndex: number, targetIndex: number) => {
       if (!game) return;
       const next = callOutUno(game, callerIndex, targetIndex);
-      dispatch({ type: 'META', game: next });
+      dispatchHuman({ type: 'META', game: next });
     },
-    [game],
+    [game, dispatchHuman],
   );
 
   // ── Reset ─────────────────────────────────────────────────────────────────
@@ -440,42 +511,7 @@ export function useUnoGame(paused = false) {
         const current = currentGame.players[currentGame.currentPlayerIndex];
         if (!current.isBot) return;
 
-        let botState = currentGame;
-        const botIndex = botState.currentPlayerIndex;
-
-        const callOutTarget = botState.players.findIndex(
-          (player, idx) =>
-            idx !== botIndex && player.hand.length === 1 && !player.saidUno,
-        );
-
-        if (callOutTarget >= 0) {
-          botState = callOutUno(botState, botIndex, callOutTarget);
-        }
-
-        const move = getBotMove(botState, botIndex);
-        let next: GameState;
-
-        if (move.action === 'drawRequired') {
-          next = drawRequiredCards(botState, botIndex);
-        } else if (move.action === 'pass') {
-          next = passTurn(botState, botIndex);
-        } else if (move.action === 'draw') {
-          next = drawOneCard(botState, botIndex);
-        } else {
-          next = enginePlayCard(
-            botState,
-            botIndex,
-            move.cardId,
-            move.chosenColor,
-          );
-        }
-
-        // Auto-declare UNO for bot when hand drops to 1 card
-        if (!next.winnerId && next.players[botIndex].hand.length === 1) {
-          next = { ...declareUno(next, botIndex), lastAction: next.lastAction };
-        }
-
-        dispatch({ type: 'PLAY', game: next });
+        dispatch({ type: 'PLAY', game: playBotStep(currentGame) });
       } catch (e) {
         reportHookError('bot action error', e);
         dispatch({ type: 'BOT_THINKING', value: false });
@@ -529,7 +565,8 @@ export function useUnoGame(paused = false) {
         live.winnerId ||
         pausedRef.current ||
         live.currentPlayerIndex !== game.currentPlayerIndex ||
-        live.turnCount !== game.turnCount
+        live.turnCount !== game.turnCount ||
+        live.turnDeadlineAt !== game.turnDeadlineAt
       )
         return;
       if (forced && (pendingWildRef.current || !hasForcedPenalty(live))) return;
@@ -577,6 +614,7 @@ export function useUnoGame(paused = false) {
 
     const player = game.players[localPlayerIndex];
     if (player.isBot) return;
+    if (game.autoPlayPlayerIds?.includes(player.id)) return;
     if (!drawnThisTurn) return;
     if ((game.pendingDraw ?? 0) > 0) return;
 

@@ -1,0 +1,35 @@
+[
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/arena.css",
+    "line": 137,
+    "snippet": "Undocumented color rgba(14, 25, 46, 0.9) is outside DESIGN.md colors",
+    "ignoreValue": "rgba(14, 25, 46, 0.9)"
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/arena.css",
+    "line": 152,
+    "snippet": "Undocumented color rgba(28, 20, 5, 0.95) is outside DESIGN.md colors",
+    "ignoreValue": "rgba(28, 20, 5, 0.95)"
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/arena.css",
+    "line": 2133,
+    "snippet": "Undocumented color #8ba7cf is outside DESIGN.md colors",
+    "ignoreValue": "#8ba7cf"
+  }
+]

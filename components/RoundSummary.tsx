@@ -31,7 +31,11 @@ export default function RoundSummary({
             className={player.id === winner.id ? "round-winner-row" : ""}
             key={player.id}
           >
-            <PlayerAvatar seed={player.id} />
+            <PlayerAvatar
+              seed={player.id}
+              avatarId={player.avatarId}
+              isBot={player.isBot}
+            />
             <span className="result-player-name">
               {player.name}
               {player.id === localPlayerId && player.name !== "You" && (
@@ -71,7 +75,13 @@ export default function RoundSummary({
             sizeMultiplier={0.66}
           />
         </span>
-        <PlayerAvatar seed={winner.id} large expression="celebrate" />
+        <PlayerAvatar
+          seed={winner.id}
+          avatarId={winner.avatarId}
+          isBot={winner.isBot}
+          large
+          expression="celebrate"
+        />
         <Trophy className="winner-crown" size={27} />
       </div>
       {game.tableScore?.completedRounds ? (

@@ -185,11 +185,15 @@ input[type="range"] {
 }
 .setup-page {
   position: relative;
-  min-height: 100dvh;
-  padding-bottom: 24px;
+  height: 100dvh;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
   background: radial-gradient(ellipse at 50% 20%, #2259a1, #123d86 80%);
 }
 .setup-page > .app-header {
+  flex-shrink: 0;
   width: min(1280px, 100%);
   height: 76px;
   margin-inline: auto;
@@ -203,11 +207,15 @@ input[type="range"] {
 }
 .setup-content {
   position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
   width: min(780px, calc(100% - 48px));
   max-width: none;
   margin-inline: auto;
-  padding: 36px 44px;
-  gap: 24px;
+  padding: 24px 44px 20px;
+  gap: 16px;
   background: var(--ui-surface);
   border: 0;
   border-radius: 20px;
@@ -277,8 +285,85 @@ input[type="range"] {
   font-size: 14px;
 }
 .setup-footer {
-  padding-top: 22px;
-  gap: 14px;
+  flex-shrink: 0;
+  padding-top: 14px;
+  gap: 10px;
+}
+.setup-body {
+  min-height: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #58687a transparent;
+  padding: 2px 4px 12px;
+  scroll-padding-block: 12px;
+}
+.setup-body > * {
+  flex-shrink: 0;
+}
+.setup-body input {
+  font-size: 16px;
+}
+.setup-footer p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.4;
+}
+.setup-footer .room-start-actions {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.setup-page > .page-footnote {
+  flex-shrink: 0;
+  padding: 10px 16px 0;
+}
+.room-connection-note {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 8px 12px;
+  padding: 14px;
+  background: #e5eaf0;
+  border-radius: 12px;
+  color: #17345f;
+}
+.room-connection-note p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.45;
+}
+.room-connection-note .text-button {
+  grid-column: 2;
+  justify-self: start;
+}
+.rules-summary {
+  margin: 12px 0;
+}
+.rules-summary > div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr);
+  gap: 8px 16px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--ui-line);
+}
+.rules-summary dt {
+  font-weight: 600;
+}
+.rules-summary dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.rules-preset-name {
+  margin-block: 10px;
+}
+.rules-combined-uno {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ui-muted);
 }
 .setup-footer > .button.primary,
 .room-form > .button.primary {
@@ -1044,6 +1129,39 @@ input[type="range"] {
     gap: 4px;
     min-height: 62px;
     font-size: 13px;
+  }
+}
+@media (max-height: 540px) {
+  .setup-page > .app-header {
+    height: 44px;
+    min-height: 44px;
+  }
+  .setup-content,
+  .setup-content:has(.bot-rule-disclosure) {
+    width: calc(100% - 24px);
+    padding: 12px 20px;
+    gap: 10px;
+  }
+  .setup-body {
+    gap: 16px;
+  }
+  .setup-intro h1 {
+    font-size: 30px;
+  }
+  .setup-intro p {
+    font-size: 14px;
+  }
+  .setup-footer,
+  .setup-content:has(.bot-rule-disclosure) .setup-footer {
+    padding-top: 10px;
+    gap: 6px;
+  }
+  .setup-footer > .button.primary {
+    min-height: 44px;
+    font-size: 22px;
+  }
+  .setup-page > .page-footnote {
+    display: none;
   }
 }
 @media (orientation: landscape) and (max-height: 540px) and (min-width: 541px) {

@@ -6,6 +6,7 @@ import {
   type CSSProperties,
   type PointerEvent,
 } from "react";
+import { getHandFan } from "../lib/handLayout";
 import type { Card } from "../types/card";
 import UnoCard from "./UnoCard";
 import {
@@ -29,6 +30,8 @@ interface Props {
   onLift: (element: HTMLElement) => ReturnType<typeof readCardPose>;
   onPlay: (element: HTMLElement) => void;
   onDragChange: (state: "lifting" | "ready" | null) => void;
+  playHint?: { badge: string; description: string };
+  onPreview?: (cardId: string | null) => void;
 }
 export default function HandCard({
   card,
@@ -43,6 +46,8 @@ export default function HandCard({
   onLift,
   onPlay,
   onDragChange,
+  playHint,
+  onPreview,
 }: Props) {
   const root = useRef<HTMLDivElement>(null);
   const gesture = useRef<{
@@ -81,16 +86,7 @@ export default function HandCard({
       interrupt();
     };
   }, [playable, disabled, onDragChange]);
-  // A held fan: cards lean a fixed amount per card away from the grip, so a
-  // short hand stays compact and a long one opens to the same capped spread.
-  const fromCenter = count < 2 ? 0 : index - (count - 1) / 2;
-  const half = Math.max(1, (count - 1) / 2);
-  const step = Math.min(5, 12 / half);
-  const angle = fromCenter * step;
-  const edge = fromCenter / half;
-  // Edge cards droop along the grip arc plus a little gravity sag.
-  const droop =
-    520 * (1 - Math.cos((angle * Math.PI) / 180)) + edge * edge * 16;
+  const { angle, drop: droop } = getHandFan(index, count);
   const face = () => root.current?.querySelector<HTMLElement>(".uno-card");
   function moveHeldCard(dx: number, dy: number, angle: number) {
     const lifted = ghost.current;
@@ -177,7 +173,16 @@ export default function HandCard({
       ref={root}
       className={`hand-card ${playable ? "legal-card" : "quiet-card"} ${selected ? "inspected-card" : ""}`}
       data-hand-card={card.id}
+      data-playable={playable || undefined}
       onFocus={onFocus}
+      onBlur={() => onPreview?.(null)}
+      onPointerEnter={(event) => {
+        if (event.pointerType === "mouse") onPreview?.(card.id);
+      }}
+      onPointerLeave={(event) => {
+        if (!event.currentTarget.contains(document.activeElement))
+          onPreview?.(null);
+      }}
       style={
         {
           "--fan-angle": `${angle.toFixed(2)}deg`,
@@ -280,7 +285,8 @@ export default function HandCard({
         isSelected={selected}
         tabIndex={tabIndex}
         disabled={disabled}
-        ariaLabel={`${playable ? "Play" : "Inspect"} ${card.color === "wild" ? "" : card.color + " "}${({ skip: "skip", reverse: "reverse", draw2: "draw two", wild4: "wild draw four", wild: "wild", shuffle: "shuffle hands", discardAll: "discard all" } as Record<string, string>)[card.value] ?? card.value}${playable ? "" : ", not playable now"}`}
+        cornerHint={playHint?.badge}
+        ariaLabel={`${playable ? "Play" : "Inspect"} ${card.color === "wild" ? "" : card.color + " "}${({ skip: "skip", reverse: "reverse", draw2: "draw two", wild4: "wild draw four", wild: "wild", shuffle: "shuffle hands", discardAll: "discard all" } as Record<string, string>)[card.value] ?? card.value}${playable ? "" : ", not playable now"}${playHint ? `. ${playHint.description}` : ""}`}
         onClick={() => {
           if (disabled) return;
           if (suppressClick.current) {

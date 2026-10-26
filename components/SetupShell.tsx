@@ -16,7 +16,7 @@ export default function SetupShell({
     <div className="setup-page">
       {controls}
       <main className="setup-content" aria-label={subtitle}>
-        {children}
+        <div className="setup-body">{children}</div>
         {footer && <footer className="setup-footer">{footer}</footer>}
       </main>
       <div className="page-footnote">

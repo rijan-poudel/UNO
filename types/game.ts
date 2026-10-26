@@ -15,6 +15,8 @@ export interface Player {
   id: string;
   /** Display name shown in the UI. */
   name: string;
+  /** Chosen portrait; omitted human portraits render a neutral player token. */
+  avatarId?: string;
   /** Cards currently held by this player. */
   hand: Card[];
   /** Whether this player has declared "UNO!" this turn cycle. */
@@ -36,6 +38,8 @@ export type LastAction =
       chosenColor?: CardColor;
       discardAllCount?: number;
       shuffledHands?: boolean;
+      playedCards?: Card[];
+      declaredUno?: boolean;
     }
   | { type: "draw"; playerId: string; count: number }
   | { type: "pass"; playerId: string }
@@ -68,6 +72,8 @@ export interface GameState {
   tableScore?: TableScore;
   /** Absolute human-turn deadline; controllers set it, pure actions preserve it. */
   turnDeadlineAt?: number | null;
+  /** Human seats temporarily driven by bots after missing their deadline. */
+  autoPlayPlayerIds?: string[];
   /** All participants in order. Index positions are stable for the game's life. */
   players: Player[];
 

@@ -128,6 +128,53 @@
   font-weight: 700;
   color: #ffffff;
 }
+.game-main .pile-label.draw-available {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: rgba(14, 25, 46, 0.9);
+  border: 1px solid rgba(255, 208, 0, 0.45);
+  color: #ffd000;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  box-shadow:
+    0 2px 8px rgba(3, 9, 18, 0.6),
+    0 0 10px rgba(255, 208, 0, 0.25);
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+.game-main .pile-label.draw-available.must-draw {
+  border-color: #ffd000;
+  background: rgba(28, 20, 5, 0.95);
+  color: #ffdc33;
+  box-shadow:
+    0 2px 10px rgba(3, 9, 18, 0.7),
+    0 0 14px rgba(255, 208, 0, 0.5);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .game-main .pile-label.draw-available.must-draw {
+    animation: draw-label-pulse 1.8s ease-in-out infinite;
+  }
+}
+@keyframes draw-label-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow:
+      0 2px 10px rgba(3, 9, 18, 0.7),
+      0 0 10px rgba(255, 208, 0, 0.35);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow:
+      0 3px 12px rgba(3, 9, 18, 0.8),
+      0 0 16px rgba(255, 208, 0, 0.65);
+  }
+}
 .game-main .draw-pile {
   min-width: 44px;
   min-height: 44px;
@@ -136,13 +183,58 @@
 .game-main .draw-pile:not(:disabled) {
   transform: rotate(-5deg);
 }
+@media (prefers-reduced-motion: no-preference) {
+  .game-main .draw-pile:not(:disabled) {
+    animation: draw-pile-breathe 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  }
+  .game-main .draw-pile:not(:disabled) .uno-card {
+    animation: draw-pile-glow 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  }
+  .game-main .draw-pile.penalty-deck:not(:disabled) .uno-card {
+    animation: draw-pile-penalty-glow 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  }
+  .game-main .draw-pile.must-draw:not(:disabled) {
+    animation: draw-pile-must-breathe 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  }
+  .game-main .draw-pile.must-draw:not(:disabled) .uno-card {
+    animation: draw-pile-must-glow 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .game-main .draw-pile:not(:disabled) .uno-card {
+    box-shadow:
+      inset 0 1px 2px #ffffffb0,
+      0 0 0 2px #ffd00088,
+      0 0 12px #ffd00044,
+      1px 3px 1px #d5dcec,
+      3px 6px 1px #7d8ba8,
+      4px 10px 1px #35435e,
+      4px 17px 18px #03091270;
+  }
+}
 @media (hover: hover) and (pointer: fine) {
   .game-main .draw-pile:not(:disabled):hover {
+    animation: none;
     transform: rotate(-5deg) translateY(-4px);
+  }
+  .game-main .draw-pile:not(:disabled):hover .uno-card {
+    animation: none;
+    box-shadow:
+      inset 0 1px 2px #ffffffb0,
+      0 0 0 2px #ffd000bb,
+      0 0 20px #ffd00077,
+      1px 4px 2px #d5dcec,
+      3px 7px 2px #7d8ba8,
+      4px 11px 2px #35435e,
+      4px 20px 22px #03091290;
   }
 }
 .game-main .draw-pile:not(:disabled):active {
+  animation: none;
   transform: rotate(-5deg) translateY(2px) scale(0.97);
+}
+.game-main .draw-pile:not(:disabled):active .uno-card {
+  animation: none;
 }
 .game-main .draw-pile:disabled {
   transform: rotate(-5deg);
@@ -165,6 +257,85 @@
     0 0 0 3px #ffd000,
     0 0 16px #ffd00070,
     4px 17px 18px #03091270;
+}
+@keyframes draw-pile-breathe {
+  0%,
+  100% {
+    transform: rotate(-5deg) translateY(0) scale(1);
+  }
+  50% {
+    transform: rotate(-5deg) translateY(-5px) scale(1.045);
+  }
+}
+@keyframes draw-pile-glow {
+  0%,
+  100% {
+    box-shadow:
+      inset 0 1px 2px #ffffffb0,
+      1px 3px 1px #d5dcec,
+      3px 6px 1px #7d8ba8,
+      4px 10px 1px #35435e,
+      4px 17px 18px #03091270;
+  }
+  50% {
+    box-shadow:
+      inset 0 1px 2px #ffffffb0,
+      0 0 0 2px #ffd00099,
+      0 0 18px #ffd00066,
+      1px 5px 2px #d5dcec,
+      3px 8px 2px #7d8ba8,
+      4px 12px 2px #35435e,
+      4px 22px 24px #03091295;
+  }
+}
+@keyframes draw-pile-must-breathe {
+  0%,
+  100% {
+    transform: rotate(-5deg) translateY(0) scale(1);
+  }
+  50% {
+    transform: rotate(-5deg) translateY(-7px) scale(1.06);
+  }
+}
+@keyframes draw-pile-must-glow {
+  0%,
+  100% {
+    box-shadow:
+      inset 0 1px 2px #ffffffb0,
+      0 0 0 1.5px #ffd00080,
+      0 0 12px #ffd00040,
+      1px 3px 1px #d5dcec,
+      3px 6px 1px #7d8ba8,
+      4px 10px 1px #35435e,
+      4px 17px 18px #03091270;
+  }
+  50% {
+    box-shadow:
+      inset 0 1px 2px #ffffffb0,
+      0 0 0 2.5px #ffd000cc,
+      0 0 26px #ffd00088,
+      1px 5px 2px #d5dcec,
+      3px 8px 2px #7d8ba8,
+      4px 12px 2px #35435e,
+      4px 24px 28px #03091295;
+  }
+}
+@keyframes draw-pile-penalty-glow {
+  0%,
+  100% {
+    box-shadow:
+      inset 0 1px 2px #ffffffb0,
+      0 0 0 3px #ffd000,
+      0 0 16px #ffd00070,
+      4px 17px 18px #03091270;
+  }
+  50% {
+    box-shadow:
+      inset 0 1px 2px #ffffffb0,
+      0 0 0 3.5px #ffd000,
+      0 0 28px #ffd000aa,
+      4px 22px 26px #03091295;
+  }
 }
 .game-main .discard-pile .uno-card,
 .game-main .hand-card .uno-card {
@@ -280,7 +451,6 @@
 }
 .game-main .last-card-stamp,
 .game-main .catch-button,
-.game-main .hand-uno.uno-button,
 .game-page .button.primary.play-selected {
   color: #392700 !important;
   background: #ffd000;
@@ -494,38 +664,6 @@
 .game-main .hand-page:active:not(:disabled) {
   transform: scale(0.92);
 }
-.game-main .hand-uno {
-  position: absolute;
-  right: 12px;
-  top: -15px;
-  z-index: 100;
-  min-height: 44px;
-  margin: 0;
-  transition: transform 140ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-.game-main .hand-uno.uno-ready:active {
-  transform: scale(0.95);
-}
-@keyframes uno-button-breathe {
-  0%,
-  100% {
-    transform: scale(1);
-    box-shadow:
-      inset 0 -3px 2px #bd7600,
-      0 4px 10px #03091260;
-  }
-  50% {
-    transform: scale(1.06);
-    box-shadow:
-      inset 0 -3px 2px #bd7600,
-      0 6px 18px #ffd00080;
-  }
-}
-@media (prefers-reduced-motion: no-preference) {
-  .game-main .hand-uno.uno-ready {
-    animation: uno-button-breathe 1.5s cubic-bezier(0.16, 1, 0.3, 1) infinite;
-  }
-}
 .game-main .play-selected svg {
   transition: transform 160ms cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -533,13 +671,6 @@
   .game-main .play-selected:hover svg {
     transform: translateX(3px);
   }
-}
-.game-main .uno-called.hand-uno {
-  padding: 8px 12px;
-  background: #1c293c;
-  border-radius: 6px;
-  font-size: 12px;
-  color: #ffe329 !important;
 }
 /* Only a decision or an invalid inspection earns visible helper copy.
    The normal turn and color are available to screen readers without a HUD. */
@@ -821,252 +952,10 @@
 }
 @media (hover: hover) and (pointer: fine) {
   .game-main .draw-pile:not(:disabled):hover {
+    animation: none;
     transform: translateY(-4px) rotate(-3deg);
   }
 }
-@media (min-height: 900px) and (min-width: 701px) {
-  .game-page {
-    --hand-scale: 2.15;
-    --pile-scale: 1.6;
-    --hand-height: 250px;
-  }
-  .game-main .table-center {
-    gap: 50px;
-  }
-}
-@media (max-height: 680px) {
-  .game-page {
-    --hand-scale: 1.35;
-    --pile-scale: 1.08;
-    --hand-height: 182px;
-  }
-  .game-main .table-center {
-    bottom: 82px;
-    gap: 32px;
-  }
-  .game-main .opponent-hand {
-    --opponent-card-scale: 0.47;
-    --opponent-card-step: 12px;
-    height: 62px;
-    width: 104px;
-  }
-}
-@media (max-height: 460px) and (min-width: 541px) {
-  .game-page {
-    --hand-scale: 1.08;
-    --pile-scale: 0.7;
-    --hand-height: 136px;
-    --hand-headroom: 36px;
-    --hand-ready-lift: 12px;
-    --hand-inspect-lift: 28px;
-    --hand-sink: 6px;
-    --hand-fan-depth: 0.5;
-    --hand-fan-rotation: 0.5;
-  }
-  .game-header {
-    height: 44px;
-    padding-inline: max(12px, env(safe-area-inset-left))
-      max(12px, env(safe-area-inset-right));
-  }
-  .game-header .wordmark {
-    font-size: 28px;
-  }
-  .game-main {
-    padding-inline: 16px;
-  }
-  .game-main .opponent-hand {
-    --opponent-card-scale: 0.38;
-    --opponent-card-step: 10px;
-    height: 48px;
-    width: 84px;
-  }
-  /* On crowded five/six-seat tables the top seat sits directly over the
-     piles; its badge clears them only without the decorative fan. */
-  .game-main .seats-5 .seat-top .opponent-hand,
-  .game-main .seats-6 .seat-top .opponent-hand {
-    display: none;
-  }
-  .game-main .opponent {
-    width: 120px;
-  }
-  .game-main .seat-top,
-  .game-main .seat-upper-left,
-  .game-main .seat-upper-right,
-  .game-main .seat-left,
-  .game-main .seat-right {
-    top: 44px;
-  }
-  .game-main .seat-left {
-    left: 10%;
-  }
-  .game-main .seat-upper-left,
-  .game-main .seats-5 .seat-upper-left,
-  .game-main .seats-6 .seat-upper-left {
-    left: 30%;
-  }
-  .game-main .seat-top {
-    left: 50%;
-  }
-  .game-main .seat-upper-right,
-  .game-main .seats-5 .seat-upper-right,
-  .game-main .seats-6 .seat-upper-right {
-    left: 70%;
-  }
-  .game-main .seat-right {
-    left: 90%;
-  }
-  /* In crowded 5/6 player landscape, arc flank seats downward to give top seats ample horizontal clearance */
-  .game-main .seats-5 .seat-left,
-  .game-main .seats-6 .seat-left {
-    left: 9%;
-    top: clamp(48px, 32%, 85px);
-  }
-  .game-main .seats-5 .seat-right,
-  .game-main .seats-6 .seat-right {
-    left: 91%;
-    top: clamp(48px, 32%, 85px);
-  }
-  .game-main .seats-5 .seat-upper-left,
-  .game-main .seats-6 .seat-upper-left {
-    left: 29%;
-    top: 24px;
-  }
-  .game-main .seats-5 .seat-top,
-  .game-main .seats-6 .seat-top {
-    left: 50%;
-    top: 18px;
-  }
-  .game-main .seats-5 .seat-upper-right,
-  .game-main .seats-6 .seat-upper-right {
-    left: 71%;
-    top: 24px;
-  }
-  .game-main .table-center {
-    bottom: clamp(44px, 12vh, 50px);
-    gap: 32px;
-  }
-  .game-main .move-buttons {
-    bottom: calc(100% + 4px);
-    left: 16px;
-    max-width: calc(50% - 95px);
-  }
-  .game-main .move-buttons .button {
-    min-height: 34px;
-    padding: 4px 10px;
-    font-size: 12px;
-  }
-  .game-main .seat-top .catch-button {
-    top: auto;
-    bottom: calc(100% + 3px);
-  }
-  .game-main .count-icon {
-    display: none;
-  }
-  .game-main .pile-zone {
-    padding-bottom: 22px;
-  }
-  .game-main .pile-label,
-  .game-main .wild-color {
-    height: 14px;
-    font-size: 11px;
-  }
-  .game-main .pile-label,
-  .game-main .wild-color {
-    top: calc(100% - 18px);
-  }
-  .game-main .hand-scroll {
-    margin-inline: -16px;
-    padding: var(--hand-headroom) 24px 0;
-  }
-  .game-main .hand-uno {
-    top: -12px;
-    right: 4px;
-  }
-  .game-main .card-landing {
-    inset: 46px 20% 4px;
-    padding-bottom: 4px;
-  }
-  .game-main .move-dock {
-    bottom: calc(100% + 4px);
-  }
-  .game-main .move-hint:not(.sr-only) {
-    padding: 3px 8px;
-  }
-  .game-main .has-hand-actions .move-hint {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-  }
-}
-@media (max-height: 360px) and (min-width: 541px) {
-  .game-page {
-    --hand-scale: 0.88;
-    --pile-scale: 0.44;
-    --hand-height: 108px;
-    --hand-headroom: 32px;
-    --hand-ready-lift: 10px;
-    --hand-inspect-lift: 24px;
-    --hand-sink: 4px;
-  }
-  .game-main .opponent {
-    width: 96px;
-  }
-  .game-main .seat-top,
-  .game-main .seat-upper-left,
-  .game-main .seat-upper-right,
-  .game-main .seat-left,
-  .game-main .seat-right {
-    top: 36px;
-  }
-  .game-main .seats-5 .seat-left,
-  .game-main .seats-6 .seat-left {
-    left: 8.5%;
-    top: clamp(38px, 30%, 75px);
-  }
-  .game-main .seats-5 .seat-right,
-  .game-main .seats-6 .seat-right {
-    left: 91.5%;
-    top: clamp(38px, 30%, 75px);
-  }
-  .game-main .seats-5 .seat-upper-left,
-  .game-main .seats-6 .seat-upper-left {
-    left: 29%;
-    top: 18px;
-  }
-  .game-main .seats-5 .seat-top,
-  .game-main .seats-6 .seat-top {
-    left: 50%;
-    top: 14px;
-  }
-  .game-main .seats-5 .seat-upper-right,
-  .game-main .seats-6 .seat-upper-right {
-    left: 71%;
-    top: 18px;
-  }
-  .game-main .table-center {
-    bottom: 48px;
-  }
-  .game-main .move-buttons {
-    bottom: calc(100% + 3px);
-    left: 10px;
-    max-width: calc(50% - 85px);
-  }
-  .game-main .move-buttons .button {
-    min-height: 30px;
-    padding: 3px 8px;
-    font-size: 11px;
-  }
-  .game-main .pile-label {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-  }
-}
-/* A four-color decision fits in landscape without scrolling a tiny dialog. */
 @media (orientation: landscape) and (max-height: 460px) {
   .game-menu-modal {
     width: min(720px, calc(100vw - 24px));
@@ -1818,4 +1707,741 @@
   background: #143522 !important;
   color: #38e285 !important;
   border: 1px solid #277747 !important;
+}
+
+/* One action lane keeps the declaration beside Play / Pass. */
+.game-main .move-buttons {
+  flex-wrap: wrap;
+}
+.game-main .move-buttons .button {
+  min-height: 44px;
+}
+.game-main .move-buttons .uno-button {
+  color: #392700 !important;
+  background: #ffd000;
+  box-shadow:
+    inset 0 -3px 2px #bd7600,
+    0 4px 8px #03091260;
+  min-width: 68px;
+}
+.game-main .move-buttons .uno-called {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #fff7e7;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.game-profile-trigger {
+  display: inline-flex;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  min-width: 44px;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+}
+.game-profile-trigger:hover {
+  filter: brightness(1.1);
+}
+.game-profile-trigger:active {
+  transform: scale(0.96);
+}
+.card-play-dialog {
+  width: min(540px, calc(100vw - 32px));
+}
+.card-play-options {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+}
+.card-play-option {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 80px;
+  padding: 12px 16px;
+  background: var(--ui-bg);
+  color: var(--ui-text);
+  border: 1px solid var(--ui-line);
+  border-radius: 12px;
+  text-align: left;
+  cursor: pointer;
+}
+.card-play-option:hover {
+  background: var(--ui-surface);
+  border-color: var(--ui-text);
+}
+.card-play-option:active {
+  transform: translateY(1px);
+}
+.card-play-preview {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  pointer-events: none;
+}
+.card-play-preview > :not(:first-child) {
+  margin-left: -12px;
+}
+.card-play-preview > b {
+  margin-left: 4px;
+  font-size: 13px;
+}
+.card-play-copy {
+  display: grid;
+  gap: 4px;
+  flex: 1;
+  min-width: 130px;
+}
+.card-play-copy strong {
+  font-size: 16px;
+  line-height: 1.25;
+}
+.card-play-copy small {
+  font-size: 13px;
+  color: var(--ui-muted);
+}
+@media (max-height: 500px) and (orientation: landscape) {
+  .card-play-options {
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  }
+  .card-play-option {
+    gap: 8px;
+    padding: 10px;
+  }
+  .game-profile-trigger .player-avatar {
+    width: 34px;
+    height: 34px;
+  }
+  .card-play-dialog {
+    max-height: calc(100dvh - 24px);
+  }
+  .card-play-dialog .modal-content {
+    padding: 16px;
+    gap: 10px;
+  }
+  .card-play-dialog .modal-heading h2 {
+    font-size: 24px;
+  }
+  .card-play-dialog .modal-content > .muted {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.4;
+  }
+  .card-play-option > svg {
+    display: none;
+  }
+}
+
+/* Fixed slots preserve the UNO / Pass relationship as each becomes available. */
+.game-main .move-buttons {
+  display: grid;
+  grid-template-columns: 72px 84px;
+  gap: 8px;
+}
+.game-main .move-buttons .uno-button,
+.game-main .move-buttons .uno-called {
+  grid-column: 1;
+  grid-row: 1;
+  justify-content: center;
+  min-height: 44px;
+  white-space: normal;
+  text-align: center;
+}
+.game-main .move-buttons .pass-button {
+  grid-column: 2;
+  grid-row: 1;
+}
+.game-main .move-buttons .play-selected {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  max-width: 164px;
+}
+
+.game-menu .game-sort-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 6px 8px;
+  min-width: 0;
+  border-radius: 6px;
+  background: #263a50;
+  color: #fff7e7;
+}
+.game-sort-control > svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+.game-sort-control > span {
+  flex: 1;
+  font-weight: 650;
+}
+.game-sort-control select {
+  width: auto;
+  max-width: 128px;
+  min-height: 44px;
+  padding: 6px 20px 6px 8px;
+  background: var(--ui-surface);
+  color: var(--ui-text);
+  border: 1px solid var(--ui-line);
+  border-radius: 8px;
+  font: inherit;
+  font-size: 13px;
+}
+@media (max-height: 500px) and (orientation: landscape) {
+  .game-menu .game-sort-control {
+    padding-block: 0;
+    gap: 8px;
+  }
+}
+
+/* ── Centered table: one space budget, with a quarter-cropped hand ──
+   Container sizing follows an unobstructed panel on foldable browsers too. */
+.game-page.centered-board {
+  container: board / size;
+  width: 100%;
+  height: 100dvh;
+  min-height: 0;
+  padding-block: env(safe-area-inset-top) env(safe-area-inset-bottom);
+}
+.centered-board .game-header {
+  flex: 0 0 56px;
+  height: 56px;
+  padding-inline: max(20px, env(safe-area-inset-left))
+    max(20px, env(safe-area-inset-right));
+}
+.centered-board .game-main {
+  --hand-scale: 1.35;
+  --pile-scale: 1.25;
+  --hand-headroom: calc(30.5px * var(--hand-scale) + 16px);
+  --hand-ready-lift: 12px;
+  --hand-inspect-lift: calc(30.5px * var(--hand-scale) + 8px);
+  --hand-sink: 0px;
+  --hand-fan-depth: 0.45;
+  --hand-fan-rotation: 0.5;
+  --seat-width: 128px;
+  --seat-avatar: 32px;
+  --seat-name-size: 13px;
+  --seat-unit: inline;
+  --opponent-card-scale: 0.55;
+  --opponent-fan-height: 72px;
+  --board-header-height: 56px;
+  --table-center-y: min(
+    calc(48cqh - var(--board-header-height)),
+    calc(100% + var(--hand-headroom) - 61px * var(--pile-scale) - 12px)
+  );
+  --toolbar-height: 60px;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 0 max(16px, env(safe-area-inset-left)) 0
+    max(16px, env(safe-area-inset-right));
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 0;
+}
+.centered-board .playing-table {
+  min-height: 0;
+  position: relative;
+}
+.centered-board .table-center {
+  top: var(--table-center-y);
+  bottom: auto;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  align-items: center;
+  gap: clamp(28px, 4cqw, 48px);
+  padding: 0;
+}
+.centered-board .pile-zone {
+  padding: 0;
+  gap: 0;
+}
+.centered-board .pile-label,
+.centered-board .wild-color {
+  top: calc(100% + 12px);
+  height: auto;
+  min-height: 18px;
+  width: max-content;
+  max-width: 160px;
+  clip-path: none;
+  overflow: visible;
+  font-size: 12px;
+}
+.centered-board .direction-orbit {
+  --orbit-r: calc(82px * var(--pile-scale) + 24px);
+}
+.centered-board .opponent {
+  width: var(--seat-width);
+  transform: translateX(-50%);
+}
+.centered-board .opponent-hand {
+  --opponent-card-step: 13px;
+  --opponent-card-scale: inherit;
+  width: 112px;
+  height: var(--opponent-fan-height);
+}
+.centered-board .seat-top,
+.centered-board .seat-upper-left,
+.centered-board .seat-upper-right {
+  top: 3%;
+}
+.centered-board .seat-top {
+  left: 50%;
+}
+.centered-board .seat-upper-left {
+  left: 30%;
+}
+.centered-board .seat-upper-right {
+  left: 70%;
+}
+.centered-board .seat-left {
+  left: 10%;
+  top: 48%;
+}
+.centered-board .seat-right {
+  left: 90%;
+  top: 48%;
+}
+.centered-board .card-landing {
+  inset: 20% 24% 8%;
+}
+.centered-board .table-waiting {
+  top: auto;
+  bottom: 4px;
+}
+.centered-board .hand-section {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  height: auto;
+  margin: 0;
+  padding: 0;
+}
+.centered-board .hand-toolbar {
+  position: relative;
+  z-index: 85;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  column-gap: 20px;
+  min-height: var(--toolbar-height);
+  padding-inline: 20px;
+}
+.centered-board .hand-caption {
+  grid-area: 1 / 1;
+  display: grid;
+  gap: 3px;
+  color: #fff7e7;
+}
+.centered-board .hand-caption strong {
+  font-size: 14px;
+  font-weight: 650;
+}
+.centered-board .hand-caption strong span {
+  margin-left: 6px;
+  font-variant-numeric: tabular-nums;
+  color: #ffd45a;
+}
+.centered-board .hand-caption small {
+  font-size: 12px;
+  color: #cfe0fa;
+}
+.centered-board .hand-toolbar .action-hint-banner {
+  grid-area: 1 / 1;
+  position: static;
+  transform: none;
+  width: auto;
+  min-width: 0;
+  max-width: 300px;
+  margin: 0;
+  padding: 4px 0;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+.centered-board .hand-toolbar:has(.action-hint-banner) .hand-caption {
+  visibility: hidden;
+}
+.centered-board .turn-cue,
+.centered-board .move-dock {
+  grid-area: 1 / 2;
+  position: static;
+  transform: none;
+  width: auto;
+  max-width: 280px;
+  margin: 0;
+  text-align: left;
+}
+.centered-board .hand-toolbar:has(.move-hint:not(.sr-only)) .turn-cue {
+  visibility: hidden;
+}
+.centered-board .move-dock:has(.sr-only) {
+  width: 0;
+  height: 0;
+}
+.centered-board .move-hint:not(.sr-only) {
+  position: relative;
+  min-height: 44px;
+  padding: 6px 44px 6px 10px;
+  font-size: 12px;
+}
+.centered-board .inspection-dismiss {
+  min-width: 44px;
+  min-height: 44px;
+  right: 0;
+  top: 0;
+}
+.centered-board .move-buttons {
+  grid-area: 1 / 3;
+  position: static;
+  justify-self: end;
+  align-self: center;
+  width: max-content;
+  max-width: none;
+  margin: 0;
+}
+.centered-board .move-buttons .button {
+  min-height: 44px;
+}
+.centered-board .hand-scroll {
+  height: calc(122px * var(--hand-scale) + var(--hand-headroom) + 26px);
+  min-height: 0;
+  margin: 0 44px calc(-1 * var(--hand-crop-margin, 0px));
+  padding: var(--hand-headroom) 24px 24px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-padding-inline: 24px;
+  scrollbar-width: thin;
+  scrollbar-color: #cfe0fa transparent;
+}
+.centered-board .hand-scroll::-webkit-scrollbar {
+  display: block;
+  height: 4px;
+}
+.centered-board .hand-scroll::-webkit-scrollbar-thumb {
+  background: #cfe0fa;
+  border-radius: 4px;
+}
+.centered-board .hand-cards {
+  width: max-content;
+  min-width: 100%;
+  height: auto;
+  min-height: 0;
+  padding: 0;
+  transform: none;
+}
+.centered-board .hand-card.legal-card {
+  --card-growth: 1.04;
+  z-index: 0;
+}
+.centered-board .hand-card:is(.inspected-card, :has(.uno-card:focus-visible)) {
+  --card-growth: 1;
+}
+.centered-board .hand-navigation {
+  inset: var(--toolbar-height) 0 0;
+}
+.centered-board .hand-page {
+  top: calc(var(--hand-headroom) + 122px * var(--hand-scale) / 2 - 22px);
+  height: 44px;
+  width: 44px;
+  border: 0;
+}
+.centered-board .hand-page:disabled {
+  visibility: hidden;
+}
+.centered-board .hand-page-previous {
+  left: 0;
+}
+.centered-board .hand-page-next {
+  right: 0;
+}
+.centered-board .game-feedback {
+  top: 40%;
+  bottom: auto;
+}
+@media (hover: hover) and (pointer: fine) {
+  .centered-board .hand-card:hover .uno-card {
+    --card-hover-lift: 8px;
+    --card-hover-growth: 1.02;
+    --card-hover-angle: 0deg;
+  }
+}
+.centered-board
+  .hand-card:is(.inspected-card, :has(.uno-card:focus-visible))
+  .uno-card {
+  --card-hover-lift: 0px;
+  --card-hover-growth: 1;
+  --card-hover-angle: 0deg;
+}
+@container board (min-height: 900px) and (min-width: 1000px) {
+  .centered-board .game-main {
+    --hand-scale: 1.55;
+    --pile-scale: 1.5;
+    --opponent-card-scale: 0.65;
+    --opponent-fan-height: 86px;
+  }
+}
+@container board (max-height: 700px) {
+  .centered-board .game-main {
+    --hand-scale: 1.1;
+    --pile-scale: 1;
+    --opponent-card-scale: 0.42;
+    --opponent-fan-height: 56px;
+    --toolbar-height: 54px;
+    --board-header-height: 48px;
+  }
+  .centered-board .game-header {
+    flex-basis: 48px;
+    height: 48px;
+  }
+}
+@container board (max-width: 1000px) {
+  .centered-board .hand-caption {
+    display: none;
+  }
+  .centered-board .hand-toolbar .action-hint-banner {
+    display: none;
+  }
+  .centered-board .game-main {
+    --seat-width: 112px;
+    --seat-avatar: 28px;
+    --seat-name-size: 12px;
+    --seat-unit: none;
+  }
+}
+@container board (max-height: 600px) {
+  .centered-board .game-header {
+    flex-basis: 44px;
+    height: 44px;
+    padding-inline: max(12px, env(safe-area-inset-left))
+      max(12px, env(safe-area-inset-right));
+  }
+  .centered-board .game-header .wordmark {
+    font-size: 28px;
+  }
+  .centered-board .game-main {
+    --hand-scale: 0.94;
+    --pile-scale: 0.78;
+    --hand-ready-lift: 8px;
+    --hand-fan-depth: 0.2;
+    --hand-fan-rotation: 0.3;
+    --seat-width: 104px;
+    --seat-avatar: 26px;
+    --seat-name-size: 12px;
+    --seat-unit: none;
+    --opponent-card-scale: 0.28;
+    --opponent-fan-height: 30px;
+    --board-header-height: 44px;
+    --toolbar-height: 0px;
+    padding-inline: max(12px, env(safe-area-inset-left))
+      max(12px, env(safe-area-inset-right));
+  }
+  .centered-board .hand-toolbar {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    right: 0;
+    --pile-lane-width: 200px;
+    height: 58px;
+    min-height: 58px;
+    grid-template-rows: 52px;
+    grid-template-columns: minmax(0, 1fr) var(--pile-lane-width) minmax(0, 1fr);
+    column-gap: 8px;
+    padding: 0 4px 6px;
+  }
+  .centered-board .hand-caption,
+  .centered-board .hand-toolbar .action-hint-banner {
+    display: none;
+  }
+  .centered-board .turn-cue,
+  .centered-board .move-dock {
+    grid-area: 1 / 1;
+    max-width: 100%;
+    justify-self: start;
+  }
+  .centered-board .turn-message {
+    padding: 5px 10px 6px 5px;
+    gap: 6px;
+    border-radius: 12px;
+    min-height: 44px;
+  }
+  .centered-board .turn-message strong {
+    font-size: 12px;
+  }
+  .centered-board .turn-message small {
+    font-size: 10px;
+    white-space: normal;
+    max-width: none;
+  }
+  .centered-board .turn-countdown,
+  .centered-board .thinking-dots {
+    width: 28px;
+    height: 28px;
+    flex: none;
+  }
+  .centered-board .thinking-dots {
+    display: none;
+  }
+  .centered-board .move-dock {
+    position: absolute;
+    left: 4px;
+    right: auto;
+    bottom: -8px;
+    width: calc((100% - var(--pile-lane-width) - 24px) / 2);
+    max-width: 184px;
+  }
+  .centered-board .move-hint:not(.sr-only) {
+    height: 56px;
+    max-height: 56px;
+    padding: 5px 44px 5px 10px;
+    font-size: 11px;
+    line-height: 1.2;
+    overflow-y: auto;
+  }
+  .centered-board .inspected-label {
+    font-size: 12px;
+    margin-bottom: 2px;
+  }
+  .centered-board .hand-scroll {
+    margin-inline: 44px;
+    padding-inline: 18px;
+  }
+  .centered-board .hand-page {
+    width: 44px;
+    min-width: 44px;
+  }
+  .centered-board .seat-left,
+  .centered-board .seat-right {
+    top: 22%;
+  }
+  .centered-board .seat-top,
+  .centered-board .seat-upper-left,
+  .centered-board .seat-upper-right {
+    top: 0;
+  }
+  .centered-board .seats-5 .opponent-hand,
+  .centered-board .seats-6 .opponent-hand,
+  .centered-board .seat-left .opponent-hand,
+  .centered-board .seat-right .opponent-hand {
+    display: none;
+  }
+  .centered-board .pile-label,
+  .centered-board .wild-color {
+    top: calc(100% + 9px);
+    font-size: 11px;
+  }
+  .centered-board .pile-label,
+  .centered-board .wild-color {
+    top: auto;
+    bottom: calc(100% + 8px);
+  }
+  .centered-board .direction-orbit-ring i {
+    width: 16px;
+    height: 11px;
+  }
+}
+@container board (min-width: 1000px) and (min-height: 501px) and (max-height: 600px) {
+  .centered-board .game-main {
+    --hand-scale: 1.1;
+    --pile-scale: 1.05;
+  }
+}
+@container board (max-height: 360px) {
+  .centered-board .game-main {
+    --hand-scale: 0.78;
+    --pile-scale: 0.66;
+    --seat-width: 96px;
+    --seat-avatar: 24px;
+    --seat-name-size: 11px;
+  }
+  .centered-board .opponent-hand {
+    display: none;
+  }
+  .centered-board .hand-toolbar {
+    --pile-lane-width: 180px;
+  }
+  .centered-board .pile-zone:has([data-draw-pile]) .pile-label {
+    top: 8px;
+    left: 50%;
+    right: auto;
+    bottom: auto;
+    transform: translateX(-50%);
+    min-height: 16px;
+    padding: 1px 5px;
+    font-size: 10px;
+    line-height: 1.2;
+    background: #1c293c;
+    color: #ffd45a;
+  }
+  .centered-board .wild-color {
+    z-index: 5;
+    top: calc(100% - 20px);
+    left: 50%;
+    bottom: auto;
+    transform: translateX(-50%);
+    min-height: 20px;
+    max-width: 80px;
+    padding: 2px 5px;
+    gap: 4px;
+    border-radius: 6px;
+    background: #1c293c;
+  }
+  .centered-board .wild-color i {
+    width: 12px;
+    height: 12px;
+  }
+}
+/* Browser chrome can leave less than 300px of usable landscape height. */
+@container board (max-height: 300px) {
+  .centered-board .game-main {
+    --pile-scale: 0.6;
+    --table-center-y: calc(45cqh - var(--board-header-height));
+  }
+  .centered-board .seat-top,
+  .centered-board .seat-upper-left,
+  .centered-board .seat-upper-right {
+    top: -8px;
+  }
+  .centered-board .seat-left,
+  .centered-board .seat-right {
+    top: 6%;
+  }
+  .centered-board .game-main .draw-pile:not(:disabled) {
+    animation: none;
+  }
+}
+/* A hardware seam must never bisect a card or action. Browsers without segment
+   reporting retain the ordinary responsive viewport layout. */
+@media (horizontal-viewport-segments: 2), (vertical-viewport-segments: 2) {
+  .game-page.centered-board {
+    position: fixed;
+    left: env(viewport-segment-left 0 0, 0px);
+    top: env(viewport-segment-top 0 0, 0px);
+    width: env(viewport-segment-width 0 0, 100vw);
+    height: env(viewport-segment-height 0 0, 100dvh);
+  }
+  body:has(.centered-board) .modal {
+    top: calc(env(viewport-segment-top 0 0, 0px) + 12px);
+    left: calc(env(viewport-segment-left 0 0, 0px) + 12px);
+    right: calc(100vw - env(viewport-segment-right 0 0, 100vw) + 12px);
+    bottom: calc(100dvh - env(viewport-segment-bottom 0 0, 100dvh) + 12px);
+    max-width: calc(env(viewport-segment-width 0 0, 100vw) - 24px);
+    max-height: calc(env(viewport-segment-height 0 0, 100dvh) - 24px);
+    margin: auto;
+  }
+}
+.centered-board.needs-landscape
+  > :is(.game-header, .game-main, .reconnect-banner, .game-error) {
+  display: none;
 }

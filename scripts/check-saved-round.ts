@@ -45,6 +45,16 @@ assert.equal(
 assert.equal(resumed.turnCount, drawn.turnCount);
 assert.deepEqual(resumed.players, drawn.players);
 assert.deepEqual(resumed.drawPile, drawn.drawPile);
+const returned = resumeRound(
+  { ...afterDraw, autoPlayPlayerIds: ['player_0'], turnDeadlineAt: 1 },
+  2000,
+);
+assert.deepEqual(returned.autoPlayPlayerIds, []);
+assert.equal(
+  returned.turnDeadlineAt,
+  2000 + HUMAN_TURN_MS,
+  'Resuming gives control back for a full human turn',
+);
 assert.equal(
   resumeRound({ ...initial, currentPlayerIndex: 1 }, 1000).turnDeadlineAt,
   null,

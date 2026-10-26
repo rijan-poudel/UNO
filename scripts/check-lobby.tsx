@@ -6,6 +6,10 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import type OnlineLobbyComponent from '../components/OnlineLobby';
 import type SettingsModalComponent from '../components/SettingsModal';
 import type TableScoreCardComponent from '../components/TableScoreCard';
+import type PlayerAvatarComponent from '../components/PlayerAvatar';
+import type RulesSummaryComponent from '../components/RulesSummary';
+import type HowToPlayModalComponent from '../components/HowToPlayModal';
+import type CardPlayDialogComponent from '../components/CardPlayDialog';
 import { defaultRules } from '../types/rules';
 
 // The assertions inspect rendered content; Next owns CSS module compilation.
@@ -18,6 +22,14 @@ const SettingsModal: typeof SettingsModalComponent =
   require('../components/SettingsModal').default;
 const TableScoreCard: typeof TableScoreCardComponent =
   require('../components/TableScoreCard').default;
+const PlayerAvatar: typeof PlayerAvatarComponent =
+  require('../components/PlayerAvatar').default;
+const CardPlayDialog: typeof CardPlayDialogComponent =
+  require('../components/CardPlayDialog').default;
+const RulesSummary: typeof RulesSummaryComponent =
+  require('../components/RulesSummary').default;
+const HowToPlayModal: typeof HowToPlayModalComponent =
+  require('../components/HowToPlayModal').default;
 if (cssLoader) require.extensions['.css'] = cssLoader;
 else delete require.extensions['.css'];
 
@@ -73,7 +85,8 @@ const props: ComponentProps<typeof OnlineLobby> = {
   },
 };
 const host = renderToStaticMarkup(<OnlineLobby {...props} />);
-assert.ok(host.indexOf('Deal everyone in') < host.indexOf('Table rules'));
+assert.match(host, /<footer class="setup-footer">[\s\S]*Deal everyone in/);
+assert.equal((host.match(/Deal everyone in/g) ?? []).length, 1);
 assert.doesNotMatch(host, /You \(you\)/);
 const guest = renderToStaticMarkup(<OnlineLobby {...props} playerId="guest" />);
 assert.match(
@@ -118,7 +131,7 @@ for (const group of [
 }
 assert.equal(
   (rulesPanel.match(/role="switch"/g) ?? []).length,
-  12,
+  14,
   'Every supported rule remains configurable',
 );
 const profile = renderToStaticMarkup(
@@ -128,6 +141,25 @@ assert.match(
   profile,
   /disabled=""[^>]*>Save name/,
   'An unchanged name is already saved',
+);
+assert.equal(
+  (profile.match(/aria-pressed=/g) ?? []).length,
+  13,
+  'Twelve original portraits and a neutral option are selectable',
+);
+assert.match(
+  profile,
+  /class="avatar-preview"/,
+  'Selection has a larger portrait preview',
+);
+const extendedPortrait = renderToStaticMarkup(
+  <PlayerAvatar seed="portrait-check" avatarId="portrait-11" />,
+);
+assert.match(extendedPortrait, /player-portraits-extended.webp/);
+assert.match(
+  extendedPortrait,
+  /background-position:100% 100%/,
+  'Two-digit portrait IDs select the correct sheet cell',
 );
 const audio = renderToStaticMarkup(
   <SettingsModal {...settingsProps} initialTab="audio" />,
@@ -180,10 +212,9 @@ const scoredLobby = renderToStaticMarkup(
   />,
 );
 assert.match(scoredLobby, /aria-label="Wins at this table"/);
-assert.ok(
-  scoredLobby.indexOf('Deal everyone in') <
-    scoredLobby.indexOf('Wins at this table'),
-  'Dealing remains ahead of the score in the lobby',
+assert.match(
+  scoredLobby,
+  /<footer class="setup-footer">[\s\S]*Deal everyone in/,
 );
 assert.match(
   tactical,
@@ -191,4 +222,92 @@ assert.match(
 );
 console.log(
   'Supporting UI checks passed: published room rules, settings groups, profile save state and audio value labels.',
+);
+
+// Duplicate physical lead cards must not create duplicate pair-only choices.
+const bluePairCard = { id: 'blue-pair', color: 'blue', value: '8' } as const;
+const pairOnly = renderToStaticMarkup(
+  <CardPlayDialog
+    card={bluePairCard}
+    choices={['red-a', 'red-b'].map((id) => ({
+      cards: [{ id, color: 'red' as const, value: '8' as const }, bluePairCard],
+      remaining: 1,
+      secondCardId: bluePairCard.id,
+    }))}
+    mustDeclareUno
+    saidUno={false}
+    onPlay={() => {}}
+    onClose={() => {}}
+  />,
+);
+assert.equal((pairOnly.match(/class="card-play-option"/g) ?? []).length, 1);
+assert.equal(
+  pairOnly.includes('Play just blue'),
+  false,
+  'A pair-only activation never offers an illegal single',
+);
+assert.ok(pairOnly.includes('blue is next'));
+
+const publishedOnly = renderToStaticMarkup(
+  <OnlineLobby
+    {...props}
+    playerId="guest"
+    rules={{
+      ...defaultRules,
+      allowDoublePlaySameNumber: true,
+      allowDiscardAll: true,
+    }}
+  />,
+);
+assert.match(publishedOnly, /Off — play one card/);
+assert.match(publishedOnly, /Not in this deck/);
+const recovery = renderToStaticMarkup(
+  <OnlineLobby
+    {...props}
+    room={null}
+    connected={false}
+    error={null}
+    onPlayBots={() => {}}
+  />,
+);
+assert.match(recovery, /Connecting to rooms/);
+assert.match(recovery, /Play with bots/);
+assert.match(recovery, /form="[^"]+"/);
+const pairsOffRow = rulesPanel.slice(
+  rulesPanel.indexOf('Pairs must match color too'),
+  rulesPanel.indexOf(
+    '</label>',
+    rulesPanel.indexOf('Pairs must match color too'),
+  ),
+);
+assert.match(pairsOffRow, /disabled=""/);
+const guide = renderToStaticMarkup(
+  <HowToPlayModal
+    open
+    inGame
+    rules={{
+      startingHandSize: 12,
+      allowDoublePlaySameNumber: true,
+      allowDiscardAll: true,
+      mustDeclareUno: false,
+    }}
+    onClose={() => {}}
+  />,
+);
+assert.match(guide, /<h2[^>]*>How to play<\/h2>/);
+assert.doesNotMatch(guide, /<h2[^>]*><\/h2>/);
+assert.match(guide, /12 each/);
+assert.match(guide, /Same number; either color/);
+assert.match(guide, /Not required/);
+assert.match(guide, /practice examples show basic play/);
+assert.match(guide, /aria-current="step"/);
+const optionalRules = renderToStaticMarkup(
+  <RulesSummary
+    rules={{ startingHandSize: undefined, mustDeclareUno: undefined }}
+  />,
+);
+assert.match(optionalRules, /7 each/);
+assert.match(optionalRules, /Call with one card left/);
+console.log(
+  'Setup, room recovery, published-only rule help, rule dependencies and native help naming passed.',
 );

@@ -13,6 +13,8 @@ import { getAudioSettings } from "../lib/audioSettings";
 import {
   getCardFlight,
   getDealDelay,
+  getPlayedCards,
+  getMultiPlayDelay,
   CARD_MOTION_EASE,
   hasCardLayoutChanged,
   type CardFlightKind,
@@ -37,6 +39,7 @@ export function useGamePresentation(
 ) {
   const previous = useRef<GameState | null>(null);
   const handPositions = useRef<Map<string, HandPosition>>(new Map());
+  const handCardPoses = useRef(new Map<string, CardPose>());
   const selectedOrigin = useRef<{
     cardId: string;
     pose: CardPose;
@@ -66,6 +69,17 @@ export function useGamePresentation(
     return pose;
   };
   const rememberOrigin = (cardId: string, element: HTMLElement) => {
+    root.current
+      ?.querySelectorAll<HTMLElement>("[data-hand-card]")
+      .forEach((wrapper) => {
+        const face = wrapper.querySelector<HTMLElement>(".uno-card");
+        if (face && wrapper.dataset.handCard) {
+          handCardPoses.current.set(
+            wrapper.dataset.handCard,
+            cardPose(flights.current.get(face)?.ghost ?? face),
+          );
+        }
+      });
     const wrapper = element.closest<HTMLElement>("[data-hand-card]");
     const neighbor =
       wrapper?.nextElementSibling ?? wrapper?.previousElementSibling;
@@ -101,6 +115,7 @@ export function useGamePresentation(
     const board = root.current;
     if (!before) {
       handPositions.current.clear();
+      handCardPoses.current.clear();
       selectedOrigin.current = null;
     }
     const reduced =
@@ -170,6 +185,7 @@ export function useGamePresentation(
       const resize = to.width / element.offsetWidth;
       const height = element.offsetHeight * resize;
       const ghost = element.cloneNode(true) as HTMLElement;
+      ghost.querySelector("[data-card-hint]")?.remove();
       ghost.removeAttribute("aria-label");
       ghost.setAttribute("aria-hidden", "true");
       ghost.tabIndex = -1;
@@ -186,6 +202,7 @@ export function useGamePresentation(
         animation: "none",
         transformOrigin: "50% 50%",
         opacity: "1",
+        visibility: "visible",
         filter: "none",
         zIndex: "90",
       });
@@ -228,6 +245,11 @@ export function useGamePresentation(
         .catch(() => {})
         .finally(() => {
           entry.stop();
+          const cardId =
+            element.closest<HTMLElement>("[data-hand-card]")?.dataset.handCard;
+          if (cardId && element.isConnected && !flights.current.has(element)) {
+            handCardPoses.current.set(cardId, destinationPose(element));
+          }
         });
     }
     const top = game.discardPile.at(-1);
@@ -242,16 +264,32 @@ export function useGamePresentation(
       top.id !== oldTop?.id &&
       discard
     ) {
-      const from =
-        origin?.cardId === action.card.id
-          ? origin.pose
-          : playerCardPose(action.playerId);
-      if (from) fly(discard, from);
+      const played = getPlayedCards(game);
+      played.forEach((card, index) => {
+        const element =
+          card.id === top.id
+            ? discard
+            : Array.from(
+                board.querySelectorAll<HTMLElement>("[data-discard-card]"),
+              )
+                .find((entry) => entry.dataset.discardCard === card.id)
+                ?.querySelector<HTMLElement>(".uno-card");
+        const from =
+          origin?.cardId === card.id
+            ? origin.pose
+            : action.playerId === localPlayerId
+              ? handCardPoses.current.get(card.id)
+              : playerCardPose(action.playerId);
+        if (element && from)
+          fly(element, from, getMultiPlayDelay(index, played.length));
+      });
     }
     if (
       changed &&
       action.type === "play" &&
-      origin?.cardId === action.card.id &&
+      (origin?.cardId === action.card.id ||
+        action.playedCards?.some((card) => card.id === origin?.cardId)) &&
+      origin &&
       origin.restoreFocus
     ) {
       queueMicrotask(() => {
@@ -427,6 +465,21 @@ export function useGamePresentation(
             reflowing.current.delete(element);
         });
     });
+    // Cache rendered pickup poses before the next snapshot removes these faces.
+    const nextPoses = new Map<string, CardPose>();
+    board
+      .querySelectorAll<HTMLElement>("[data-hand-card]")
+      .forEach((wrapper) => {
+        const element = wrapper.querySelector<HTMLElement>(".uno-card");
+        if (element && wrapper.dataset.handCard && element.offsetWidth) {
+          const flight = flights.current.get(element);
+          nextPoses.set(
+            wrapper.dataset.handCard,
+            flight ? cardPose(flight.ghost) : destinationPose(element),
+          );
+        }
+      });
+    handCardPoses.current = nextPoses;
     // Effects describe the current snapshot immediately; no queue or duration wait.
     if (changed && !before) playTableChime("deal");
     else if (
@@ -443,6 +496,8 @@ export function useGamePresentation(
       );
       if (game.winnerId && !before.winnerId)
         playTableChime(game.winnerId === localPlayerId ? "win" : "lose");
+      else if (action.type === "play" && action.declaredUno)
+        playTableChime("uno");
       else if (action.type === "play" && top?.id !== oldTop?.id)
         playTableChime(ACTION_SOUNDS[action.card.value] ?? "cardPlay");
       else if (action.type === "draw") playTableChime("draw");
@@ -482,6 +537,7 @@ export function useGamePresentation(
       interrupt();
       // A rotated phone starts a new layout, not a flight from its old fan.
       handPositions.current.clear();
+      handCardPoses.current.clear();
     };
     window.addEventListener("uno:audio-settings", onSettings);
     window.addEventListener("resize", onResize);

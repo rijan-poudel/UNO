@@ -34,9 +34,20 @@ import { toast } from "sonner";
 import type { useUnoGame } from "../hooks/useUnoGame";
 import type { useUnoOnlineGame } from "../hooks/useUnoOnlineGame";
 import type { Card } from "../types/card";
-import { isActionCard } from "../types/card";
 import type { GameState } from "../types/game";
-import { canJumpInPlay, canPlayCard } from "../lib/gameRules";
+import {
+  canDeclareUno,
+  canJumpInPlay,
+  canPlayCard,
+  getCardPlayChoices,
+  getCardPlayHint,
+  getCardPlayBlockReason,
+} from "../lib/gameRules";
+import type { PlayOptions } from "../lib/gameActions";
+import { getPlayedCards } from "../lib/cardMotion";
+import { getHandSort, saveHandSort, sortHand } from "../lib/handSorting";
+import { getHandOverlap, getHandCropMargin } from "../lib/handLayout";
+import CardPlayDialog from "./CardPlayDialog";
 import { getTableMood } from "../lib/rulePresets";
 import { getBotDifficultyLabel } from "../lib/botSupport";
 import TurnCue from "./TurnCue";
@@ -62,6 +73,7 @@ import {
 import ColorPicker from "./ColorPicker";
 import ChoiceDialog from "./ChoiceDialog";
 import Modal from "./Modal";
+import HowToPlayModal from "./HowToPlayModal";
 import { UnoWordmark } from "./ui/PageChrome";
 export type GameApi =
   ReturnType<typeof useUnoGame> | ReturnType<typeof useUnoOnlineGame>;
@@ -84,13 +96,6 @@ function revealHandCard(scroller: HTMLElement, card: HTMLElement) {
   if (delta) scroller.scrollBy({ left: delta, behavior: "instant" });
 }
 
-const COLORS: Record<string, number> = {
-  red: 0,
-  yellow: 1,
-  green: 2,
-  blue: 3,
-  wild: 4,
-};
 const VALUES: Record<string, string> = {
   skip: "Skip",
   reverse: "Reverse",
@@ -111,7 +116,7 @@ function describeAction(game: GameState) {
   const name = (id: string) =>
     game.players.find((p) => p.id === id)?.name ?? "A player";
   if (a.type === "play")
-    return `${name(a.playerId)} played ${a.card.color === "wild" ? "" : `${a.card.color} `}${VALUES[a.card.value] ?? a.card.value}${a.chosenColor ? ` · ${a.chosenColor} is up` : ""}`;
+    return `${name(a.playerId)} ${a.declaredUno ? "called UNO and " : ""}played ${a.playedCards ? a.playedCards.map(cardLabel).join(" and ") : `${a.card.color === "wild" ? "" : `${a.card.color} `}${VALUES[a.card.value] ?? a.card.value}`}${a.discardAllCount ? `, clearing ${a.discardAllCount + 1} cards` : ""}${a.chosenColor ? ` · ${a.chosenColor} is up` : ""}`;
   if (a.type === "draw")
     return `${name(a.playerId)} drew ${a.count} ${a.count === 1 ? "card" : "cards"}`;
   if (a.type === "pass") return `${name(a.playerId)} passed`;
@@ -140,7 +145,7 @@ export default function GameBoard({
   const [menu, setMenu] = useState(false);
   const [help, setHelp] = useState(false);
   const [history, setHistory] = useState(false);
-  const [sort, setSort] = useState(true);
+  const [sort, setSort] = useState(getHandSort);
   const [copiedRoomCode, setCopiedRoomCode] = useState(false);
   const [manualRoomCode, setManualRoomCode] = useState(false);
   const [startingRematch, setStartingRematch] = useState(false);
@@ -187,6 +192,12 @@ export default function GameBoard({
   );
   const soundIntent = useRef<"enable" | "mute" | null>(null);
   const [inspectedId, setInspectedId] = useState<string | null>(null);
+  const [previewedId, setPreviewedId] = useState<string | null>(null);
+  const [playChoice, setPlayChoice] = useState<{
+    cardId: string;
+    turnCount: number;
+    playerIndex: number;
+  } | null>(null);
   const [pendingAction, setPendingAction] = useState(false);
   const pendingRef = useRef(false);
   const actionTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -196,69 +207,39 @@ export default function GameBoard({
     root,
   );
   const online = "room" in api ? api : null;
-  const cards = useMemo(() => {
-    const cards = localPlayer?.hand ?? [];
-    return sort
-      ? [...cards].sort(
-          (a, b) =>
-            COLORS[a.color] - COLORS[b.color] ||
-            a.value.localeCompare(b.value, undefined, { numeric: true }),
-        )
-      : cards;
-  }, [localPlayer?.hand, sort]);
+  const cards = useMemo(
+    () => sortHand(localPlayer?.hand ?? [], sort),
+    [localPlayer?.hand, sort],
+  );
   const handNavigation = useHandNavigation(cards);
   const { hand } = handNavigation;
-  // The hand compacts to its scrollport: deeper overlap first, then a bounded
-  // scale step-down, so a normal hand never needs the paging arrows. Scale 0
-  // means "no override" and lets the CSS media queries own the size.
-  const [handFit, setHandFit] = useState({ scale: 0, overlap: -44 });
-  const handFitRef = useRef(handFit);
+  // Fit by overlap only. A larger hand scrolls at the same readable card size.
+  const [handFit, setHandFit] = useState({ overlap: -36, crop: 0 });
   useLayoutEffect(() => {
     const scroller = hand.current;
-    const count = cards.length;
-    const reset = () => {
-      if (handFitRef.current.scale !== 0) {
-        handFitRef.current = { scale: 0, overlap: -44 };
-        setHandFit({ scale: 0, overlap: -44 });
-      }
-    };
-    if (!scroller || !scroller.clientWidth || count < 2) {
-      reset();
-      return;
-    }
+    if (!scroller) return;
     const measure = () => {
-      const scrollerStyle = getComputedStyle(scroller);
-      const base =
-        parseFloat(scrollerStyle.getPropertyValue("--hand-scale")) || 1.65;
-      const inner = scroller.firstElementChild;
-      const innerStyle = inner ? getComputedStyle(inner) : null;
+      if (!scroller.clientWidth || !scroller.clientHeight) return;
+      const style = getComputedStyle(scroller);
+      const scale = parseFloat(style.getPropertyValue("--hand-scale")) || 1;
       const available =
         scroller.clientWidth -
-        parseFloat(scrollerStyle.paddingLeft) -
-        parseFloat(scrollerStyle.paddingRight) -
-        (innerStyle
-          ? parseFloat(innerStyle.paddingLeft) +
-            parseFloat(innerStyle.paddingRight)
-          : 0);
-      let fit = { scale: base, overlap: -44 };
-      for (let step = 1; step >= 0.61; step -= 0.065) {
-        const cardWidth = 82 * base * step;
-        const needed = (available - cardWidth) / (count - 1) - cardWidth;
-        // Show at least 30% of each face; a short hand keeps a light overlap.
-        const overlap = Math.max(-0.7 * cardWidth, Math.min(-40, needed));
-        const advance = cardWidth + overlap;
-        fit = { scale: base * step, overlap };
-        // A 1px tolerance absorbs float drift; the side padding hides it.
-        if (cardWidth + (count - 1) * advance <= available + 1) break;
-      }
-      const prior = handFitRef.current;
-      if (
-        Math.abs(prior.scale - fit.scale) > 0.005 ||
-        Math.abs(prior.overlap - fit.overlap) > 0.5
-      ) {
-        handFitRef.current = fit;
-        setHandFit(fit);
-      }
+        parseFloat(style.paddingLeft) -
+        parseFloat(style.paddingRight);
+      const face = scroller.querySelector<HTMLElement>(".hand-card .uno-card");
+      const fit = {
+        overlap: getHandOverlap(available, cards.length, 82 * scale),
+        crop: getHandCropMargin(
+          cards.length,
+          face?.offsetWidth ?? 82 * scale,
+          face?.offsetHeight ?? 122 * scale,
+          parseFloat(style.getPropertyValue("--hand-fan-depth")) || 0,
+          parseFloat(style.getPropertyValue("--hand-fan-rotation")) || 0,
+        ),
+      };
+      setHandFit((prior) =>
+        prior.overlap === fit.overlap && prior.crop === fit.crop ? prior : fit,
+      );
     };
     measure();
     const observer = new ResizeObserver(measure);
@@ -323,10 +304,7 @@ export default function GameBoard({
     !pendingWild &&
     !pendingAction &&
     (!online || online.connected) &&
-    game.rules.mustDeclareUno &&
-    localPlayer.hand.length >= 1 &&
-    localPlayer.hand.length <= 2 &&
-    !localPlayer.saidUno
+    canDeclareUno(game, localPlayerIndex)
   );
   useEffect(() => {
     function onKey(event: KeyboardEvent) {
@@ -398,8 +376,24 @@ export default function GameBoard({
                 "seat-upper-right",
                 "seat-right",
               ];
-  const playable = cards.filter((c) => canPlayCard(c, game, localPlayerIndex));
+  const playable = cards.filter(
+    (card) => getCardPlayChoices(game, localPlayerIndex, card).length > 0,
+  );
   const top = game.discardPile.at(-1);
+  const playedCards = getPlayedCards(game);
+  const historyCards = game.discardPile.slice(
+    -Math.max(3, playedCards.length),
+    -1,
+  );
+  const previewedCard = cards.find((card) => card.id === previewedId);
+  const previewHint =
+    previewedCard &&
+    !pendingAction &&
+    !pendingWild &&
+    !winner &&
+    (!online || online.connected)
+      ? getCardPlayHint(game, localPlayerIndex, previewedCard)
+      : undefined;
   const drawDisabled =
     !isLocalTurn ||
     drawnThisTurn ||
@@ -407,6 +401,7 @@ export default function GameBoard({
     !!winner ||
     pendingAction ||
     !!(online && !online.connected);
+  const mustDraw = isLocalTurn && !drawDisabled && playable.length === 0;
   const activeColor =
     game.activeColor && game.activeColor !== "wild" ? game.activeColor : "red";
   const turnTitle = winner
@@ -424,18 +419,44 @@ export default function GameBoard({
               ? "Your move."
               : "No match? Take a card."
         : `${currentPlayer.name}’s turn`;
-  const select = (card: Card, element: HTMLElement) => {
+  const commitCard = (card: Card, options: PlayOptions = {}) => {
+    setPlayChoice(null);
     setInspectedId(null);
     primeTableAudioFromUserGesture();
-    rememberOrigin(card.id, element);
     if (!isLocalTurn && canJumpInPlay(card, game)) {
       dismissTip("jumpIn");
     }
     if (isLocalTurn && game.pendingDraw > 0) {
       dismissTip("stacking");
     }
-    act(() => api.selectCard(card));
+    act(() => api.selectCard(card, options));
   };
+  const select = (card: Card, element: HTMLElement) => {
+    // Capture before a choice moves focus or a released drag ghost is removed.
+    rememberOrigin(card.id, element);
+    const choices = getCardPlayChoices(game, localPlayerIndex, card);
+    if (choices.length > 1 || choices[0]?.cards.length > 1) {
+      setPlayChoice({
+        cardId: card.id,
+        turnCount: game.turnCount,
+        playerIndex: game.currentPlayerIndex,
+      });
+    } else commitCard(card);
+  };
+  const choiceCard =
+    playChoice &&
+    !phonePortrait &&
+    !pendingWild &&
+    !winner &&
+    !pendingAction &&
+    (!online || online.connected) &&
+    playChoice.turnCount === game.turnCount &&
+    playChoice.playerIndex === game.currentPlayerIndex
+      ? cards.find((card) => card.id === playChoice.cardId)
+      : undefined;
+  const playChoices = choiceCard
+    ? getCardPlayChoices(game, localPlayerIndex, choiceCard)
+    : [];
   const selectedCard = cards.find((card) => card.id === inspectedId);
   const canPlaySelected =
     selectedCard &&
@@ -503,6 +524,9 @@ export default function GameBoard({
     }
     return null;
   })();
+  const blockedReason = selectedCard
+    ? getCardPlayBlockReason(game, localPlayerIndex, selectedCard)
+    : undefined;
   const moveHint =
     online && !online.connected
       ? "Reconnecting. Your hand is safe."
@@ -510,47 +534,37 @@ export default function GameBoard({
         ? "Choose a color to finish your move."
         : pendingAction
           ? "Making your move…"
-          : canPlaySelected
-            ? isLocalTurn
-              ? "Ready to play. You can also drag it onto the table."
-              : "Exact match. Play now to jump in."
-            : !isLocalTurn
-              ? "Browse your hand while they play."
-              : drawnThisTurn
-                ? playable.length
-                  ? drawnCard
-                    ? `Drew ${cardLabel(drawnCard)}. Play a match or pass.`
-                    : "Play a matching card, or pass to end your turn."
-                  : "No match. Passing…"
-                : selectedCard
-                  ? game.pendingDraw
-                    ? playable.length
-                      ? `That card can’t stack. Choose a highlighted draw card or draw ${game.pendingDraw}.`
-                      : `Draw ${game.pendingDraw} to take the penalty. No cards in your hand can stack.`
-                    : !game.rules.canFinishWithActionCard &&
-                        isActionCard(selectedCard) &&
-                        (cards.length === 1 ||
-                          (selectedCard.value === "discardAll" &&
-                            cards.every(
-                              (card) => card.color === selectedCard.color,
-                            )))
-                      ? "This table needs a number card to finish. Draw to keep playing."
-                      : `Match ${activeColor}${top?.color !== "wild" && top ? ` or ${VALUES[top.value] ?? top.value}` : ""}, or play a wild.`
-                  : game.pendingDraw
-                    ? playable.length
-                      ? "Stack a matching draw card, or take the penalty."
-                      : `Draw ${game.pendingDraw} to take the penalty.`
-                    : playable.length
-                      ? "Tap a match, or flick it onto the table."
-                      : "No matching card. Draw to keep the round moving.";
+          : blockedReason
+            ? blockedReason
+            : canPlaySelected
+              ? isLocalTurn
+                ? "Ready to play. You can also drag it onto the table."
+                : "Exact match. Play now to jump in."
+              : !isLocalTurn
+                ? "Browse your hand while they play."
+                : drawnThisTurn
+                  ? playable.length
+                    ? drawnCard
+                      ? `Drew ${cardLabel(drawnCard)}. Play a match or pass.`
+                      : "Play a matching card, or pass to end your turn."
+                    : "No match. Passing…"
+                  : selectedCard
+                    ? `Match ${activeColor}${top?.color !== "wild" && top ? ` or ${VALUES[top.value] ?? top.value}` : ""}, or play a wild.`
+                    : game.pendingDraw
+                      ? playable.length
+                        ? "Stack a matching draw card, or take the penalty."
+                        : `Draw ${game.pendingDraw} to take the penalty.`
+                      : playable.length
+                        ? "Tap a match, or flick it onto the table."
+                        : "No matching card. Draw to keep the round moving.";
   return (
     <div
-      className={`game-page mood-${getTableMood(game.rules)} seats-${game.players.length} ${phonePortrait ? "needs-landscape" : ""} ${isLocalTurn ? "local-turn" : ""}`}
+      className={`game-page centered-board mood-${getTableMood(game.rules)} seats-${game.players.length} ${phonePortrait ? "needs-landscape" : ""} ${isLocalTurn ? "local-turn" : ""}`}
       ref={root}
       onPointerDownCapture={(event) => {
         if (
           inspectedId &&
-          !(event.target as HTMLElement).closest(".hand-card, .move-dock")
+          !(event.target as HTMLElement).closest(".hand-card, .move-buttons")
         )
           setInspectedId(null);
       }}
@@ -591,6 +605,18 @@ export default function GameBoard({
         </button>
         <div className="header-actions">
           <button
+            className="game-profile-trigger"
+            aria-label="Choose your avatar"
+            title="Choose your avatar"
+            onClick={() => onOpenSettings("profile")}
+          >
+            <PlayerAvatar
+              seed={localPlayer.id}
+              avatarId={localPlayer.avatarId}
+              expression={getPlayerExpression(game, localPlayer.id)}
+            />
+          </button>
+          <button
             className="icon-button game-menu-trigger"
             aria-label="Game menu"
             title="Game menu"
@@ -610,7 +636,7 @@ export default function GameBoard({
           {online.error}
         </div>
       )}
-      <main className="game-main" data-design-contract="uno-play-field">
+      <main className="game-main" data-design-contract="centered-table">
         <section
           className={`playing-table color-${activeColor} seats-${game.players.length} ${draggingCard ? "receiving-card" : ""}`}
           aria-label="Playing table"
@@ -676,7 +702,8 @@ export default function GameBoard({
             <div className="pile-zone">
               <button
                 data-draw-pile
-                className={`draw-pile ${game.pendingDraw ? "penalty-deck" : ""}`}
+                data-must-draw={mustDraw || undefined}
+                className={`draw-pile ${game.pendingDraw ? "penalty-deck" : ""} ${!drawDisabled ? "turn-hint" : ""} ${mustDraw ? "must-draw" : ""}`}
                 disabled={drawDisabled}
                 aria-label={
                   game.pendingDraw
@@ -698,7 +725,7 @@ export default function GameBoard({
                 )}
               </button>
               <span
-                className={`pile-label ${!drawDisabled ? "draw-available" : "sr-only"}`}
+                className={`pile-label ${!drawDisabled ? "draw-available" : "sr-only"} ${mustDraw ? "must-draw" : ""}`}
               >
                 {!drawDisabled
                   ? game.pendingDraw
@@ -710,10 +737,22 @@ export default function GameBoard({
             <div className="pile-zone">
               <div className="discard-stack">
                 <div className="discard-history" aria-hidden="true">
-                  {game.discardPile.slice(-3, -1).map((card, index) => (
+                  {historyCards.map((card, index) => (
                     <span
                       key={card.id}
-                      style={{ "--stack-i": index } as CSSProperties}
+                      data-discard-card={card.id}
+                      style={
+                        {
+                          "--stack-i": Math.max(
+                            0,
+                            index - historyCards.length + 2,
+                          ),
+                          visibility:
+                            index < historyCards.length - 2
+                              ? "hidden"
+                              : undefined,
+                        } as CSSProperties
+                      }
                     >
                       <UnoCard card={card} sizeMultiplier={1.25} />
                     </span>
@@ -756,85 +795,132 @@ export default function GameBoard({
           className={`hand-section ${isLocalTurn ? "your-turn" : ""} ${canPass || canPlaySelected ? "has-hand-actions" : ""}`}
           aria-label={`Your hand, ${cards.length} ${cards.length === 1 ? "card" : "cards"}`}
           data-seat={localPlayer.id}
+          style={{ "--hand-crop-margin": `${handFit.crop}px` } as CSSProperties}
         >
           {canSayUno && <span className="sr-only">You can call UNO.</span>}
-          {activeTip && (
-            <div
-              className="action-hint-banner"
-              role="status"
-              aria-live="polite"
-            >
-              <activeTip.icon
-                size={15}
-                className="action-hint-icon"
-                aria-hidden="true"
-              />
-              <span className="action-hint-text">
-                <strong>{activeTip.title}:</strong> {activeTip.message}
-              </span>
-              <button
-                type="button"
-                className="action-hint-dismiss"
-                aria-label={`Dismiss ${activeTip.title} hint`}
-                onClick={() => dismissTip(activeTip.key)}
+          <div className="hand-toolbar">
+            <div className="hand-caption">
+              <strong>
+                Your hand <span>{cards.length}</span>
+              </strong>
+              <small>
+                {handNavigation.edges.before || handNavigation.edges.after
+                  ? "Scroll to see every card"
+                  : "Tap a match to play"}
+              </small>
+            </div>
+            {activeTip && (
+              <div
+                className="action-hint-banner"
+                role="status"
+                aria-live="polite"
               >
-                <X size={13} aria-hidden="true" />
-              </button>
-            </div>
-          )}
-          {(isLocalTurn || canPlaySelected) && !pendingWild && !winner && (
-            <div className="move-buttons">
-              {canPlaySelected && (
+                <activeTip.icon
+                  size={15}
+                  className="action-hint-icon"
+                  aria-hidden="true"
+                />
+                <span className="action-hint-text">
+                  <strong>{activeTip.title}:</strong> {activeTip.message}
+                </span>
                 <button
-                  className="button primary play-selected"
-                  onClick={() => {
-                    const element = hand.current?.querySelector<HTMLElement>(
-                      `[data-hand-card="${selectedCard.id}"] .uno-card`,
-                    );
-                    if (element) select(selectedCard, element);
-                  }}
+                  type="button"
+                  className="action-hint-dismiss"
+                  aria-label={`Dismiss ${activeTip.title} hint`}
+                  onClick={() => dismissTip(activeTip.key)}
                 >
-                  <span className="play-card-label">Play {selectedLabel}</span>
-                  <ArrowRight size={18} />
+                  <X size={13} aria-hidden="true" />
                 </button>
+              </div>
+            )}
+            {(isLocalTurn ||
+              canPlaySelected ||
+              canSayUno ||
+              localPlayer.saidUno) &&
+              !pendingWild &&
+              !winner && (
+                <div
+                  className="move-buttons"
+                  role="group"
+                  aria-label="Your turn actions"
+                >
+                  {canSayUno && (
+                    <button
+                      className="button uno-button uno-ready"
+                      aria-keyshortcuts="U"
+                      onClick={() => {
+                        primeTableAudioFromUserGesture();
+                        act(() => api.sayUno(localPlayerIndex));
+                      }}
+                    >
+                      UNO!
+                    </button>
+                  )}
+                  {localPlayer.saidUno && (
+                    <span className="uno-called" role="status">
+                      <Check size={13} /> UNO called
+                    </span>
+                  )}
+                  {isLocalTurn &&
+                    (canPass ? (
+                      <button
+                        className={`button pass-button ${canPlaySelected ? "secondary" : "primary"}`}
+                        disabled={
+                          pendingAction || !!(online && !online.connected)
+                        }
+                        aria-keyshortcuts="P"
+                        onClick={() => act(api.pass)}
+                      >
+                        Pass <ArrowRight size={18} />
+                      </button>
+                    ) : null)}
+                  {canPlaySelected && (
+                    <button
+                      className="button primary play-selected"
+                      onClick={() => {
+                        const element =
+                          hand.current?.querySelector<HTMLElement>(
+                            `[data-hand-card="${selectedCard.id}"] .uno-card`,
+                          );
+                        if (element) select(selectedCard, element);
+                      }}
+                    >
+                      <span className="play-card-label">
+                        Play {selectedLabel}
+                      </span>
+                      <ArrowRight size={18} />
+                    </button>
+                  )}
+                </div>
               )}
-              {isLocalTurn &&
-                (canPass ? (
+            <TurnCue
+              game={game}
+              local={isLocalTurn}
+              choosing={!!pendingWild}
+              playableCount={playable.length}
+              connected={!online || online.connected}
+            />
+            <div className="move-dock">
+              <div
+                className={`move-hint ${previewHint || selectedCard || drawnThisTurn || (online && !online.connected) ? "" : "sr-only"}`}
+                role="status"
+              >
+                {selectedCard && !previewHint && (
+                  <strong className="inspected-label">{selectedLabel}</strong>
+                )}
+                <span>{previewHint?.description ?? moveHint}</span>
+                {selectedCard && (
                   <button
-                    className={`button ${canPlaySelected ? "secondary" : "primary"}`}
-                    disabled={pendingAction || !!(online && !online.connected)}
-                    aria-keyshortcuts="P"
-                    onClick={() => act(api.pass)}
+                    className="inspection-dismiss"
+                    aria-label="Clear card inspection"
+                    onClick={() => setInspectedId(null)}
                   >
-                    Pass <ArrowRight size={18} />
+                    <X size={16} aria-hidden="true" />
                   </button>
-                ) : null)}
+                )}
+              </div>
             </div>
-          )}
-          <TurnCue
-            game={game}
-            local={isLocalTurn}
-            choosing={!!pendingWild}
-            playableCount={playable.length}
-            connected={!online || online.connected}
-          />
-          {canSayUno && (
-            <button
-              className="button uno-button uno-ready hand-uno"
-              aria-keyshortcuts="U"
-              onClick={() => {
-                primeTableAudioFromUserGesture();
-                api.sayUno(localPlayerIndex);
-              }}
-            >
-              UNO!
-            </button>
-          )}
-          {localPlayer.saidUno && cards.length === 1 && (
-            <span className="uno-called hand-uno" role="status">
-              <Check size={13} /> UNO called
-            </span>
-          )}
+          </div>
           <div
             id={handNavigation.id}
             className="hand-scroll"
@@ -879,19 +965,15 @@ export default function GameBoard({
             <div
               className={`hand-cards ${cards.length > 10 ? "large-hand" : ""}`}
               style={
-                handFit.scale
-                  ? ({
-                      "--hand-scale": handFit.scale,
-                      "--hand-overlap": `${handFit.overlap.toFixed(1)}px`,
-                    } as CSSProperties)
-                  : undefined
+                { "--hand-overlap": `${handFit.overlap}px` } as CSSProperties
               }
             >
               {cards.map((card, i) => {
                 // Request locks block interaction without making the whole hand
                 // briefly lose/reacquire its legal-card lift and color.
                 const legal =
-                  canPlayCard(card, game, localPlayerIndex) && !winner;
+                  getCardPlayChoices(game, localPlayerIndex, card).length > 0 &&
+                  !winner;
                 const disabled =
                   !!pendingWild ||
                   !!winner ||
@@ -909,6 +991,7 @@ export default function GameBoard({
                     tabIndex={handNavigation.tabStop === card.id ? 0 : -1}
                     onFocus={() => {
                       handNavigation.setFocusedId(card.id);
+                      setPreviewedId(card.id);
                       const element = hand.current?.querySelector<HTMLElement>(
                         `[data-hand-card="${card.id}"] .uno-card`,
                       );
@@ -921,6 +1004,8 @@ export default function GameBoard({
                     onPlay={(element) => select(card, element)}
                     onLift={takeCard}
                     onDragChange={onDragChange}
+                    playHint={getCardPlayHint(game, localPlayerIndex, card)}
+                    onPreview={setPreviewedId}
                   />
                 );
               })}
@@ -952,26 +1037,6 @@ export default function GameBoard({
               </button>
             </div>
           )}
-          <div className="move-dock">
-            <div
-              className={`move-hint ${selectedCard || drawnThisTurn || (online && !online.connected) ? "" : "sr-only"}`}
-              role="status"
-            >
-              {selectedCard && (
-                <strong className="inspected-label">{selectedLabel}</strong>
-              )}
-              <span>{moveHint}</span>
-              {selectedCard && (
-                <button
-                  className="inspection-dismiss"
-                  aria-label="Clear card inspection"
-                  onClick={() => setInspectedId(null)}
-                >
-                  <X size={16} aria-hidden="true" />
-                </button>
-              )}
-            </div>
-          </div>
         </section>
       </main>
       {pendingWild && !phonePortrait && (
@@ -1119,11 +1184,29 @@ export default function GameBoard({
               </b>
             </button>
 
-            <button aria-pressed={sort} onClick={() => setSort((s) => !s)}>
-              <Layers />
-              <span>Sort by color</span>
-              <Check size={17} style={{ opacity: sort ? 1 : 0 }} />
-            </button>
+            <label className="game-sort-control">
+              <Layers aria-hidden="true" />
+              <span>Sort hand</span>
+              <select
+                aria-label="Sort your hand"
+                value={sort}
+                onChange={(event) => {
+                  const order = event.target.value;
+                  if (
+                    order === "color" ||
+                    order === "number" ||
+                    order === "original"
+                  ) {
+                    setSort(order);
+                    saveHandSort(order);
+                  }
+                }}
+              >
+                <option value="color">By color</option>
+                <option value="number">By number</option>
+                <option value="original">Original order</option>
+              </select>
+            </label>
             <button
               onClick={() => {
                 setMenu(false);
@@ -1168,44 +1251,23 @@ export default function GameBoard({
           </div>
         </Modal>
       )}
+      {choiceCard && playChoices.length > 0 && playChoice && (
+        <CardPlayDialog
+          card={choiceCard}
+          choices={playChoices}
+          mustDeclareUno={game.rules.mustDeclareUno}
+          saidUno={localPlayer.saidUno}
+          onClose={() => setPlayChoice(null)}
+          onPlay={(lead, options) => commitCard(lead, options)}
+        />
+      )}
       {help && (
-        <Modal title="A good hand starts here." onClose={() => setHelp(false)}>
-          <div className="help-rules">
-            <p>
-              <strong>Match it.</strong> Tap a card with the same color or value
-              as the top card. Wild cards let you choose the next color.
-            </p>
-            <p>
-              <strong>Draw it.</strong> If you can’t play, draw a card. Play a
-              matching card or pass. Draw penalties follow your table’s house
-              rules.
-            </p>
-            <p>
-              <strong>Call it.</strong> One card left? Tap UNO. Catch another
-              player’s missed call to give them a penalty.
-            </p>
-            <p>
-              <strong>Win it.</strong> Get rid of every card in your hand.
-            </p>
-            <p>
-              <strong>Make it move.</strong> Tap a lifted card to play, or drag
-              it upward and release. Swipe sideways to browse a large hand.
-            </p>
-            <p>
-              <strong>Use your keyboard.</strong> Arrow keys browse cards; Enter
-              or Space plays. D draws, P passes, U calls UNO. Escape clears an
-              inspection. R, Y, G or B chooses a wild color.
-            </p>
-          </div>
-          <div className="modal-footer">
-            <button
-              className="button primary small"
-              onClick={() => setHelp(false)}
-            >
-              Let’s play
-            </button>
-          </div>
-        </Modal>
+        <HowToPlayModal
+          open={help}
+          rules={game.rules}
+          onClose={() => setHelp(false)}
+          inGame={true}
+        />
       )}
       {history && (
         <Modal title="Around the table." onClose={() => setHistory(false)}>
@@ -1332,7 +1394,11 @@ export default function GameBoard({
                             key={p.playerId}
                             className={`rematch-seat-item status-${badgeState}`}
                           >
-                            <PlayerAvatar seed={p.playerId} />
+                            <PlayerAvatar
+                              seed={p.playerId}
+                              avatarId={p.avatarId}
+                              isBot={p.isBot}
+                            />
                             <span className="rematch-seat-name">
                               <strong>{p.name}</strong>
                               <small>

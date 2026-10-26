@@ -1,6 +1,6 @@
 // Room creation, joining, invitations, and seats share a single lobby flow.
 "use client";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { ArrowRight, Check, Copy, Link, Plus, WifiOff, X } from "lucide-react";
 import { toast } from "sonner";
 import type {
@@ -8,13 +8,14 @@ import type {
   FriendPresenceState,
   RoomSnapshot,
 } from "../types/multiplayer";
-import { defaultRules, type GameRules } from "../types/rules";
+import { type GameRules } from "../types/rules";
 import { parseRoomCode, isRoomCode } from "../lib/roomCodes";
-import { RULE_PRESETS, matchesPreset } from "../lib/rulePresets";
-import { getBotDifficultyLabel } from "../lib/botSupport";
 import TableRules from "./TableRules";
+import RulesSummary from "./RulesSummary";
+import HowToPlayModal from "./HowToPlayModal";
 import TableScoreCard from "./TableScoreCard";
 import PlayerAvatar from "./PlayerAvatar";
+import AvatarPicker from "./AvatarPicker";
 import {
   getPlayerName,
   savePlayerName,
@@ -122,7 +123,11 @@ export default function OnlineLobby(props: Props) {
   const [presence, setPresence] = useState<Record<string, FriendPresenceState>>(
     {},
   );
-  const [busy, setBusy] = useState(false);
+  const formId = useId();
+  const pending = useRef(false);
+  const [pendingLabel, setPendingLabel] = useState("");
+  const busy = Boolean(pendingLabel);
+  const [help, setHelp] = useState(false);
   const [localError, setLocalError] = useState("");
   const [copiedCode, setCopiedCode] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
@@ -181,8 +186,13 @@ export default function OnlineLobby(props: Props) {
       return next;
     });
   };
-  const run = async (action: () => Promise<boolean>) => {
-    setBusy(true);
+  const run = async (
+    action: () => Promise<boolean>,
+    label = "Updating room…",
+  ) => {
+    if (pending.current) return false;
+    pending.current = true;
+    setPendingLabel(label);
     setLocalError("");
     try {
       return await action();
@@ -190,12 +200,14 @@ export default function OnlineLobby(props: Props) {
       setLocalError("That didn’t go through. Please try again.");
       return false;
     } finally {
-      setBusy(false);
+      pending.current = false;
+      setPendingLabel("");
     }
   };
   const invite = async (targetCode: string) => {
-    const ok = await run(() =>
-      props.onSendFriendInvite(targetCode, name.trim() || "You"),
+    const ok = await run(
+      () => props.onSendFriendInvite(targetCode, name.trim() || "You"),
+      "Sending invitation…",
     );
     if (ok) {
       remember(targetCode);
@@ -225,18 +237,89 @@ export default function OnlineLobby(props: Props) {
       // Back also cancels a create/join whose acknowledgement is still in flight.
       void props.onLeaveRoom();
       props.onBack?.();
-    } else if (await run(props.onLeaveRoom)) props.onBack?.();
+    } else if (await run(props.onLeaveRoom, "Leaving room…")) props.onBack?.();
   };
+  const reconnectingPlayers =
+    room?.players.filter((player) => !player.connected && !player.isBot)
+      .length ?? 0;
+  const roomControls = room && (
+    <div className="room-start-actions">
+      <>
+        <p className="muted">
+          {!connected
+            ? "Reconnecting to your room…"
+            : isHost
+              ? room.players.length < 2
+                ? "Share your code or add a bot to start."
+                : reconnectingPlayers > 0
+                  ? `${reconnectingPlayers} ${reconnectingPlayers === 1 ? "player is" : "players are"} reconnecting. You can wait or deal.`
+                  : "Everyone here? Your table is ready to deal."
+              : "Your host will deal when everyone is here."}
+        </p>
+        {isHost ? (
+          <button
+            className="button primary wide"
+            disabled={busy || !connected || room.players.length < 2}
+            onClick={() => void run(props.onStartGame, "Dealing cards…")}
+          >
+            {busy
+              ? pendingLabel
+              : room.players.length < 2
+                ? "Waiting for another player"
+                : "Deal everyone in"}
+            <ArrowRight size={19} />
+          </button>
+        ) : (
+          <div className="waiting-host" role="status">
+            <span
+              className={`presence-dot ${connected ? "online" : "offline"}`}
+            />
+            {connected
+              ? "Waiting for the host to deal"
+              : "Reconnecting to your room…"}
+          </div>
+        )}
+      </>
+    </div>
+  );
   return (
     <SetupShell
       subtitle="Friends’ table"
       controls={props.controls}
       footer={
-        !room && (
-          <p className="setup-hint">
-            Your room is private. Share the code with the people you want at
-            your table.
-          </p>
+        room ? (
+          roomControls
+        ) : (
+          <>
+            <p className="setup-hint">
+              {!connected
+                ? "Room actions will be available when the connection returns."
+                : !name.trim()
+                  ? "Enter your name above to continue."
+                  : panel === "join" && !isRoomCode(code)
+                    ? "Paste an invitation link or enter a 6-character room code."
+                    : "Your room is private. Share the code with the people you want at your table."}
+            </p>
+            <button
+              type="submit"
+              form={formId}
+              className="button primary wide"
+              disabled={
+                busy ||
+                !connected ||
+                !name.trim() ||
+                (panel === "join" && !isRoomCode(code))
+              }
+              aria-busy={busy}
+            >
+              {busy
+                ? pendingLabel
+                : panel === "create"
+                  ? "Open a table"
+                  : "Join the table"}
+              <ArrowRight size={18} />
+            </button>
+          </>
         )
       }
     >
@@ -261,12 +344,19 @@ export default function OnlineLobby(props: Props) {
       {(error || localError) && (
         <div className="error-message connection-recovery" role="alert">
           <p>{localError || error}</p>
-          {!connected && !room && props.onPlayBots && (
-            <button className="text-button" onClick={props.onPlayBots}>
-              Play with bots
-              <ArrowRight size={16} />
-            </button>
-          )}
+        </div>
+      )}
+      {!connected && !room && props.onPlayBots && (
+        <div className="room-connection-note" role="status">
+          <WifiOff size={20} aria-hidden="true" />
+          <p>Connecting to rooms. You can play with bots while we reconnect.</p>
+          <button
+            type="button"
+            className="text-button"
+            onClick={props.onPlayBots}
+          >
+            Play with bots <ArrowRight size={16} />
+          </button>
         </div>
       )}
       {manualCopy && (
@@ -310,13 +400,23 @@ export default function OnlineLobby(props: Props) {
             onChange={setPanel}
           />
           <form
+            id={formId}
             className="room-form"
+            aria-busy={busy}
             onSubmit={(e) => {
               e.preventDefault();
-              void run(() =>
-                panel === "create"
-                  ? props.onCreateRoom(name.trim())
-                  : props.onJoinRoom(code, name.trim()),
+              if (
+                !connected ||
+                !name.trim() ||
+                (panel === "join" && !isRoomCode(code))
+              )
+                return;
+              void run(
+                () =>
+                  panel === "create"
+                    ? props.onCreateRoom(name.trim())
+                    : props.onJoinRoom(code, name.trim()),
+                panel === "create" ? "Opening room…" : "Joining room…",
               );
             }}
           >
@@ -356,22 +456,6 @@ export default function OnlineLobby(props: Props) {
                 </p>
               </>
             )}
-            <button
-              className="button primary wide"
-              disabled={
-                busy ||
-                !connected ||
-                !name.trim() ||
-                (panel === "join" && !isRoomCode(code))
-              }
-            >
-              {busy
-                ? "One moment…"
-                : panel === "create"
-                  ? "Open a table"
-                  : "Join the table"}
-              <ArrowRight size={18} />
-            </button>
           </form>
         </>
       )}
@@ -431,7 +515,11 @@ export default function OnlineLobby(props: Props) {
           >
             {room.players.map((p) => (
               <div className="seat-row" role="listitem" key={p.playerId}>
-                <PlayerAvatar seed={p.playerId} />
+                <PlayerAvatar
+                  seed={p.playerId}
+                  avatarId={p.avatarId}
+                  isBot={p.isBot}
+                />
                 <span className="lobby-seat-name">
                   <strong>
                     {p.name}
@@ -455,7 +543,10 @@ export default function OnlineLobby(props: Props) {
                     aria-label={`Remove ${p.name}`}
                     disabled={busy || !connected}
                     onClick={() =>
-                      void run(() => props.onKickPlayer(p.playerId))
+                      void run(
+                        () => props.onKickPlayer(p.playerId),
+                        "Removing player…",
+                      )
                     }
                   >
                     <X size={17} />
@@ -482,7 +573,7 @@ export default function OnlineLobby(props: Props) {
             <button
               className="button secondary"
               disabled={busy || !connected}
-              onClick={() => void run(props.onAddBotSeat)}
+              onClick={() => void run(props.onAddBotSeat, "Adding bot…")}
             >
               <Plus size={17} />
               Add a bot
@@ -490,44 +581,15 @@ export default function OnlineLobby(props: Props) {
           )}
         </>
       )}
-      {room && (
-        <div className="room-start-actions">
-          <>
-            <p className="muted">
-              {isHost
-                ? room.players.length < 2
-                  ? "Share your code or add a bot to start."
-                  : "Everyone here? Your table is ready to deal."
-                : "Your host will deal when everyone is here."}
-            </p>
-            {isHost ? (
-              <button
-                className="button primary wide"
-                disabled={busy || !connected || room.players.length < 2}
-                onClick={() => void run(props.onStartGame)}
-              >
-                {busy
-                  ? "Getting ready…"
-                  : room.players.length < 2
-                    ? "Waiting for another player"
-                    : "Deal everyone in"}
-                <ArrowRight size={19} />
-              </button>
-            ) : (
-              <div className="waiting-host">
-                <span className="presence-dot online" />
-                Waiting for the host to deal
-              </div>
-            )}
-          </>
-        </div>
-      )}
+      <AvatarPicker />
       {room && (
         <TableScoreCard
           score={room.tableScore}
           players={room.players.map((player) => ({
             id: player.playerId,
             name: player.name,
+            avatarId: player.avatarId,
+            isBot: player.isBot,
           }))}
           localPlayerId={props.playerId}
         />
@@ -539,103 +601,36 @@ export default function OnlineLobby(props: Props) {
           onOpenRules={props.onOpenRules}
         />
       )}
-      {room &&
-        !isHost &&
-        (() => {
-          const activeRules = {
-            ...defaultRules,
-            ...props.rules,
-            ...room.rules,
-          };
-          const preset = RULE_PRESETS.find((item) =>
-            matchesPreset(activeRules, item.rules),
-          );
-          const stacking = [
-            activeRules.stackDraw2 && "+2 on +2",
-            activeRules.stackWild4 && "+4 on +4",
-            activeRules.allowWild4OnDraw2 && "+4 on +2",
-          ]
-            .filter(Boolean)
-            .join(" · ");
-          const extras = [
-            activeRules.allowJumpIn && "Jump-in",
-            activeRules.allowShuffleCard && "Shuffle hands",
-            activeRules.allowDiscardAll && "Discard all",
-          ]
-            .filter(Boolean)
-            .join(" · ");
-          const summary = [
-            ["Cards dealt", `${activeRules.startingHandSize} each`],
-            ...(room.players.some((player) => player.isBot)
-              ? [
-                  [
-                    "Bot challenge",
-                    getBotDifficultyLabel(activeRules.botDifficulty),
-                  ],
-                ]
-              : []),
-            [
-              "Drawing",
-              activeRules.drawUntilPlayable
-                ? "Until you can play"
-                : "One card per draw",
-            ],
-            ["Draw stacking", stacking || "Off"],
-            [
-              "UNO call",
-              activeRules.mustDeclareUno
-                ? "Call with one card left"
-                : "Not required",
-            ],
-            [
-              "Last card",
-              activeRules.canFinishWithActionCard
-                ? "Any card can win"
-                : "Finish with a number",
-            ],
-            ["Extra rules", extras || "None"],
-            [
-              "Two-player reverse",
-              activeRules.reverseActsAsSkipInTwoPlayer
-                ? "Skips your opponent"
-                : "Changes direction",
-            ],
-            [
-              "Opening card",
-              activeRules.allowStartingActionCard
-                ? "Numbers or actions"
-                : "Numbers only",
-            ],
-            [
-              "False call-out",
-              activeRules.penalizeFalseCallOut
-                ? "Draw two cards"
-                : "No penalty",
-            ],
-          ];
-          return (
-            <section
-              className="setup-rules room-rules-summary"
-              aria-label="Table rules for this room"
+      {room && !isHost && (
+        <section
+          className="setup-rules room-rules-summary"
+          aria-label="Table rules for this room"
+        >
+          <div className="section-heading">
+            <h2>Table rules</h2>
+            <button
+              type="button"
+              className="text-button"
+              onClick={() => setHelp(true)}
             >
-              <div className="section-heading">
-                <h2>Table rules</h2>
-                <span className="muted">Chosen by host</span>
-              </div>
-              <p>
-                <strong>{preset?.label ?? "Custom rules"}</strong>
-              </p>
-              <dl>
-                {summary.map(([label, value]) => (
-                  <div key={label}>
-                    <dt>{label}</dt>
-                    <dd>{value}</dd>
-                  </div>
-                ))}
-              </dl>
-            </section>
-          );
-        })()}
+              How to play
+            </button>
+          </div>
+          <p className="muted">Chosen by host</p>
+          <RulesSummary
+            rules={room.rules ?? {}}
+            includeBots={room.players.some((player) => player.isBot)}
+          />
+        </section>
+      )}
+      {help && (
+        <HowToPlayModal
+          open
+          rules={room ? (room.rules ?? {}) : props.rules}
+          inGame
+          onClose={() => setHelp(false)}
+        />
+      )}
 
       <details
         className="lobby-friends setup-disclosure"
