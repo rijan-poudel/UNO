@@ -55,7 +55,9 @@ export default function TurnCue({
               : "No match · Passing automatically"
             : playableCount === 0
               ? "No match · Tap the deck to draw"
-              : `Match ${game.activeColor}${top?.color !== "wild" && value ? ` or ${value}` : ""}`;
+              : game.rules.gameMode === "all_wild"
+                ? "Play any one card"
+                : `Match ${game.activeColor}${top?.color !== "wild" && value ? ` or ${value}` : ""}`;
   return (
     <div
       className={`turn-cue ${local ? "turn-cue-local" : ""} ${seconds !== null && seconds <= 5 ? "turn-urgent" : ""}`}
@@ -91,7 +93,7 @@ export default function TurnCue({
           <strong title={local ? "Your turn" : `${player.name}’s turn`}>
             {local ? "Your turn" : `${player.name}’s turn`}
           </strong>
-          <small>{hint}</small>
+          <small className="sr-only">{hint}</small>
         </span>
       </div>
     </div>

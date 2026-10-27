@@ -65,8 +65,15 @@ export function recordTableWin(game: GameState): GameState {
     !game.roundId ||
     !game.winnerId ||
     score.lastRoundId === game.roundId ||
-    game.players.find((player) => player.id === game.winnerId)?.hand.length !==
-      0 ||
+    !game.players.some(
+      (player) =>
+        player.id === game.winnerId &&
+        !player.eliminated &&
+        (player.hand.length === 0 ||
+          game.players.every(
+            (other) => other.id === player.id || other.eliminated,
+          )),
+    ) ||
     !Object.hasOwn(score.wins, game.winnerId) ||
     !Number.isSafeInteger(score.completedRounds + 1)
   )

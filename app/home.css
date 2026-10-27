@@ -15,6 +15,18 @@
     var(--stage) 75%
   );
 }
+.mood-classic {
+  --stage: #123d86;
+  --stage-light: #1d56a3;
+}
+.mood-no-mercy {
+  --stage: #140c12;
+  --stage-light: #2c121d;
+}
+.mood-all-wild {
+  --stage: #26163b;
+  --stage-light: #482366;
+}
 .mood-stack {
   --stage: #143975;
   --stage-light: #2259a1;
@@ -28,24 +40,13 @@
   padding-inline: clamp(20px, 4vw, 60px);
   color: inherit;
 }
-.launch-screen .launch-header .settings-trigger {
-  color: #fff7e7;
-  background: #ffffff12;
-  border: 0;
-  font:
-    600 14px var(--font-body),
-    sans-serif;
-  text-transform: none;
-  min-height: 44px;
-  border-radius: 12px;
-}
 .launch-header .wordmark {
   color: inherit;
 }
 .launch-main {
   width: min(760px, 100%);
   margin: auto;
-  padding: 12px 24px 20px;
+  padding: 24px 24px 76px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -144,6 +145,8 @@
 }
 .launch-presets button {
   flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
   min-height: 44px;
   padding: 8px;
   background: transparent;
@@ -220,75 +223,6 @@
 .launch-screen .launch-rooms .button:active {
   transform: scale(0.97);
 }
-.launch-extras {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  margin-top: 12px;
-}
-.launch-text-action {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  min-height: 44px;
-  padding: 6px 4px;
-  border: 0;
-  background: transparent;
-  color: #dce9ff;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  transition:
-    color 140ms ease,
-    opacity 140ms ease;
-}
-.launch-pill-hint {
-  font-family: var(--font-card, "Barlow Condensed"), "Outfit", sans-serif;
-  font-size: 11px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  padding: 2px 7px;
-  border-radius: 9999px;
-  background: #ffd45a;
-  color: #1a1a24;
-  margin-left: 2px;
-  box-shadow: 0 1px 3px #00000030;
-}
-.launch-text-action > svg:last-child {
-  transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-.launch-text-action[aria-expanded="true"] > svg:last-child {
-  transform: rotate(180deg);
-}
-.launch-rules-wrapper {
-  display: grid;
-  grid-template-rows: 0fr;
-  opacity: 0;
-  overflow: hidden;
-  transition:
-    grid-template-rows 220ms cubic-bezier(0.16, 1, 0.3, 1),
-    opacity 200ms ease-out;
-}
-.launch-rules-wrapper.open {
-  grid-template-rows: 1fr;
-  opacity: 1;
-}
-.launch-rules-inner {
-  min-height: 0;
-}
-.launch-rules {
-  margin-top: 12px;
-  padding: 16px 0;
-  border-top: 1px solid #b1d1ff55;
-  font-size: 14px;
-  line-height: 1.6;
-  color: #e2edff;
-}
-.launch-rules p + p {
-  margin-top: 8px;
-}
 @media (hover: hover) and (pointer: fine) {
   .launch-screen .launch-primary:hover svg {
     transform: translateX(4px);
@@ -298,37 +232,7 @@
   outline: 3px solid #ffd45a;
   outline-offset: 4px;
 }
-.launch-progress {
-  width: min(420px, 100%);
-  text-align: center;
-}
-.launch-progress:empty {
-  display: none;
-}
-.launch-progress .player-progress {
-  --ui-text: #fff7e7;
-  --ui-muted: #dce9ff;
-  --ui-line: #b1d1ff55;
-  margin: 0;
-}
-.launch-progress .progress-record,
-.launch-progress .milestone-collection summary {
-  justify-content: center;
-}
-.launch-progress .milestone-collection summary {
-  margin-inline: auto;
-}
-.launch-footer {
-  padding: 16px 20px 24px;
-  text-align: center;
-  color: #c6dcff;
-  font-size: 13px;
-}
 @media (hover: hover) and (pointer: fine) {
-  .launch-screen .launch-header .settings-trigger:hover {
-    color: #fff7e7;
-    background: #ffffff20;
-  }
   .launch-screen .launch-rooms .button:hover,
   .launch-text-action:hover {
     background: #ffffff1c;
@@ -443,31 +347,15 @@
     padding: 6px;
     min-height: 44px;
   }
-  .launch-extras {
-    margin-top: 4px;
-  }
-  .launch-text-action {
-    font-size: 12px;
-  }
   .launch-presets button {
     min-height: 36px;
     font-size: 12px;
     padding: 6px 2px;
-  }
-  .launch-progress {
-    grid-column: 1/-1;
-  }
-  .launch-footer {
-    display: none;
   }
 }
 @media (prefers-reduced-motion: reduce) {
   .launch-screen button {
     transition: none;
     animation: none;
-  }
-  .launch-rules-wrapper,
-  .launch-text-action > svg:last-child {
-    transition: none;
   }
 }

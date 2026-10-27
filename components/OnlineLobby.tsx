@@ -1,363 +1,271 @@
-// Room creation, joining, invitations, and seats share a single lobby flow.
+// Join first. Once inside, share the room and fill its seats.
 "use client";
-import { useEffect, useId, useRef, useState, type ReactNode } from "react";
-import { ArrowRight, Check, Copy, Link, Plus, WifiOff, X } from "lucide-react";
-import { toast } from "sonner";
-import type {
-  FriendInvite,
-  FriendPresenceState,
-  RoomSnapshot,
-} from "../types/multiplayer";
-import { type GameRules } from "../types/rules";
-import { parseRoomCode, isRoomCode } from "../lib/roomCodes";
-import TableRules from "./TableRules";
-import RulesSummary from "./RulesSummary";
-import HowToPlayModal from "./HowToPlayModal";
-import TableScoreCard from "./TableScoreCard";
-import PlayerAvatar from "./PlayerAvatar";
-import AvatarPicker from "./AvatarPicker";
+import dynamic from "next/dynamic";
+import { useId, useRef, useState, type ReactNode } from "react";
 import {
-  getPlayerName,
-  savePlayerName,
-  subscribePlayerName,
-} from "../lib/playerNames";
+  ArrowRight,
+  Check,
+  Copy,
+  Link,
+  Plus,
+  SlidersHorizontal,
+  UserPlus,
+  Users,
+  WifiOff,
+  X,
+} from "lucide-react";
+import { toast } from "sonner";
+import { getRuleSetLabel } from "../lib/customRuleProfiles";
+import type { RoomSnapshot, SocialSnapshot } from "../types/multiplayer";
+import type { GameRules } from "../types/rules";
+import { parseRoomCode, isRoomCode } from "../lib/roomCodes";
+import { getPlayerName } from "../lib/playerNames";
 import SetupShell from "./SetupShell";
-import { CountBadge, SegmentedToggle, SetupIntro } from "./ui/PageChrome";
+import { CountBadge, SetupIntro } from "./ui/PageChrome";
+import PlayerAvatar from "./PlayerAvatar";
+const FriendInvitePicker = dynamic(() => import("./FriendInvitePicker"), {
+  loading: () => null,
+});
 interface Props {
   rules: Partial<GameRules>;
-  onRulesChange: (rules: Partial<GameRules>) => void;
+  savingRules?: boolean;
   onOpenRules: () => void;
   connected: boolean;
   room: RoomSnapshot | null;
   playerId: string | null;
-  friendCode: string;
-  incomingInvites: FriendInvite[];
-  outgoingInvites: Array<{
-    inviteId: string;
-    targetFriendCode: string;
-    targetName?: string;
-  }>;
+  social: SocialSnapshot;
+  invitedCodes: string[];
   error: string | null;
   initialPanel?: "create" | "join";
   controls?: ReactNode;
   onBack?: () => void;
   onPlayBots?: () => void;
-  onSyncPresence: (name: string) => Promise<boolean>;
-  onCheckFriendOnline: (
-    codes: string[],
-  ) => Promise<Record<string, FriendPresenceState>>;
   onCreateRoom: (name: string) => Promise<boolean>;
   onJoinRoom: (room: string, name: string) => Promise<boolean>;
-  onSendFriendInvite: (code: string, name: string) => Promise<boolean>;
-  onAcceptFriendInvite: (id: string, name: string) => Promise<boolean>;
-  onDeclineFriendInvite: (id: string) => Promise<boolean>;
+  onRequestFriend: (code: string) => Promise<boolean>;
+  onInviteFriend: (code: string) => Promise<boolean>;
+  onOpenFriends: () => void;
   onLeaveRoom: () => Promise<boolean>;
   onStartGame: () => Promise<boolean>;
   onAddBotSeat: () => Promise<boolean>;
   onKickPlayer: (id: string) => Promise<boolean>;
 }
-interface Friend {
-  friendCode: string;
-  name: string;
-  lastSeenAt: number;
-}
-function read(key: string, fallback = "") {
+function readRoomCode(): string {
   try {
-    return localStorage.getItem(key) ?? fallback;
+    return parseRoomCode(
+      new URLSearchParams(window.location.search).get("room") ??
+        localStorage.getItem("uno.online.roomCode") ??
+        "",
+    );
   } catch {
-    return fallback;
+    return "";
   }
-}
-function loadFriends(): Friend[] {
-  try {
-    const value: unknown = JSON.parse(read("uno.online.friends", "[]"));
-    return Array.isArray(value)
-      ? value
-          .filter(
-            (f): f is Friend =>
-              f &&
-              typeof f.friendCode === "string" &&
-              typeof f.name === "string",
-          )
-          .slice(0, 16)
-      : [];
-  } catch {
-    return [];
-  }
-}
-function normalize(code: string) {
-  return code
-    .toUpperCase()
-    .replace(/[^A-Z0-9]/g, "")
-    .slice(0, 8);
 }
 export default function OnlineLobby(props: Props) {
-  const {
-    room,
-    connected,
-    playerId,
-    error,
-    incomingInvites,
-    outgoingInvites,
-    onSyncPresence,
-    onCheckFriendOnline,
-  } = props;
-  const [name, setName] = useState(getPlayerName);
-  const [code, setCode] = useState(() => {
-    const params = new URLSearchParams(
-      typeof window === "undefined" ? "" : window.location.search,
-    );
-    return parseRoomCode(params.get("room") ?? read("uno.online.roomCode"));
-  });
-  const [panel, setPanel] = useState<"create" | "join">(() =>
-    new URLSearchParams(
-      typeof window === "undefined" ? "" : window.location.search,
-    ).has("room")
-      ? "join"
-      : (props.initialPanel ?? "create"),
+  const { room, connected, playerId, social } = props;
+  const [code, setCode] = useState(readRoomCode);
+  const [panel] = useState(
+    () =>
+      props.initialPanel ??
+      (typeof window !== "undefined" &&
+      new URLSearchParams(window.location.search).has("room")
+        ? "join"
+        : "create"),
   );
-  const [friendCode, setFriendCode] = useState(() =>
-    read("uno.online.prefill.friendCode"),
-  );
-  const [friends, setFriends] = useState(loadFriends);
-  const [presence, setPresence] = useState<Record<string, FriendPresenceState>>(
-    {},
-  );
-  const formId = useId();
+  const [busy, setBusy] = useState("");
   const pending = useRef(false);
-  const [pendingLabel, setPendingLabel] = useState("");
-  const busy = Boolean(pendingLabel);
-  const [help, setHelp] = useState(false);
-  const [localError, setLocalError] = useState("");
-  const [copiedCode, setCopiedCode] = useState(false);
-  const [copiedLink, setCopiedLink] = useState(false);
-  const [copiedFriendCode, setCopiedFriendCode] = useState(false);
+  const [error, setError] = useState("");
+  const [inviteOpen, setInviteOpen] = useState(false);
+  const [copied, setCopied] = useState("");
   const [manualCopy, setManualCopy] = useState<{
     label: string;
     value: string;
   } | null>(null);
+  const formId = useId();
   const isHost = room?.hostPlayerId === playerId;
-  useEffect(() => subscribePlayerName(() => setName(getPlayerName())), []);
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (name.trim()) void onSyncPresence(name.trim());
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [name, onSyncPresence]);
-  useEffect(() => {
-    try {
-      localStorage.setItem("uno.online.playerName", name.trim());
-      localStorage.setItem("uno.online.roomCode", code);
-    } catch {}
-  }, [name, code]);
-  useEffect(() => {
-    if (!friends.length) return;
-    let alive = true;
-    const refresh = async () => {
-      try {
-        const statuses = await onCheckFriendOnline(
-          friends.map((f) => f.friendCode),
-        );
-        if (alive) setPresence(statuses);
-      } catch {}
-    };
-    void refresh();
-    const timer = setInterval(refresh, 15000);
-    return () => {
-      alive = false;
-      clearInterval(timer);
-    };
-  }, [friends, onCheckFriendOnline]);
-  const remember = (friendCode: string, friendName?: string) => {
-    setFriends((prev) => {
-      const existing = prev.find((f) => f.friendCode === friendCode);
-      const next = [
-        {
-          friendCode,
-          name: friendName ?? existing?.name ?? friendCode,
-          lastSeenAt: Date.now(),
-        },
-        ...prev.filter((f) => f.friendCode !== friendCode),
-      ].slice(0, 16);
-      try {
-        localStorage.setItem("uno.online.friends", JSON.stringify(next));
-        localStorage.removeItem("uno.online.prefill.friendCode");
-      } catch {}
-      return next;
-    });
-  };
-  const run = async (
-    action: () => Promise<boolean>,
-    label = "Updating room…",
-  ) => {
+  const publishedRules = room?.rules ?? props.rules;
+
+  const run = async (label: string, action: () => Promise<boolean>) => {
     if (pending.current) return false;
     pending.current = true;
-    setPendingLabel(label);
-    setLocalError("");
+    setBusy(label);
+    setError("");
     try {
       return await action();
     } catch {
-      setLocalError("That didn’t go through. Please try again.");
+      setError("That didn’t go through. Please try again.");
       return false;
     } finally {
       pending.current = false;
-      setPendingLabel("");
-    }
-  };
-  const invite = async (targetCode: string) => {
-    const ok = await run(
-      () => props.onSendFriendInvite(targetCode, name.trim() || "You"),
-      "Sending invitation…",
-    );
-    if (ok) {
-      remember(targetCode);
-      setFriendCode("");
-      toast.success("Invitation sent.");
-    }
-  };
-  const copy = async (
-    value: string,
-    label: string,
-    message: string,
-  ): Promise<boolean> => {
-    try {
-      await navigator.clipboard.writeText(value);
-      toast.success(message);
-      setManualCopy(null);
-      setLocalError("");
-      return true;
-    } catch {
-      setLocalError(`Couldn’t copy automatically. Select and copy below.`);
-      setManualCopy({ label, value });
-      return false;
+      setBusy("");
     }
   };
   const leave = async () => {
     if (!room) {
-      // Back also cancels a create/join whose acknowledgement is still in flight.
       void props.onLeaveRoom();
       props.onBack?.();
-    } else if (await run(props.onLeaveRoom, "Leaving room…")) props.onBack?.();
+    } else if (await run("Leaving room…", props.onLeaveRoom)) props.onBack?.();
   };
-  const reconnectingPlayers =
-    room?.players.filter((player) => !player.connected && !player.isBot)
-      .length ?? 0;
-  const roomControls = room && (
-    <div className="room-start-actions">
-      <>
-        <p className="muted">
-          {!connected
-            ? "Reconnecting to your room…"
-            : isHost
-              ? room.players.length < 2
-                ? "Share your code or add a bot to start."
-                : reconnectingPlayers > 0
-                  ? `${reconnectingPlayers} ${reconnectingPlayers === 1 ? "player is" : "players are"} reconnecting. You can wait or deal.`
-                  : "Everyone here? Your table is ready to deal."
-              : "Your host will deal when everyone is here."}
-        </p>
-        {isHost ? (
-          <button
-            className="button primary wide"
-            disabled={busy || !connected || room.players.length < 2}
-            onClick={() => void run(props.onStartGame, "Dealing cards…")}
-          >
-            {busy
-              ? pendingLabel
-              : room.players.length < 2
-                ? "Waiting for another player"
-                : "Deal everyone in"}
-            <ArrowRight size={19} />
-          </button>
-        ) : (
-          <div className="waiting-host" role="status">
-            <span
-              className={`presence-dot ${connected ? "online" : "offline"}`}
-            />
-            {connected
-              ? "Waiting for the host to deal"
-              : "Reconnecting to your room…"}
-          </div>
-        )}
-      </>
-    </div>
-  );
+  const copy = async (label: string, value: string) => {
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopied(label);
+      setManualCopy(null);
+      toast.success(`${label} copied.`);
+    } catch {
+      setManualCopy({ label, value });
+    }
+  };
   return (
     <SetupShell
-      subtitle="Friends’ table"
+      className="focused-room"
+      subtitle={
+        room ? "Your room" : panel === "join" ? "Join a room" : "Create a room"
+      }
       controls={props.controls}
       footer={
         room ? (
-          roomControls
-        ) : (
           <>
-            <p className="setup-hint">
+            <p className="muted" role="status">
               {!connected
-                ? "Room actions will be available when the connection returns."
-                : !name.trim()
-                  ? "Enter your name above to continue."
-                  : panel === "join" && !isRoomCode(code)
-                    ? "Paste an invitation link or enter a 6-character room code."
-                    : "Your room is private. Share the code with the people you want at your table."}
+                ? "Reconnecting to your room…"
+                : isHost
+                  ? room.players.length < 2
+                    ? "Share your code or add a bot to start."
+                    : room.players.some((p) => !p.isBot && !p.connected)
+                      ? "Someone is reconnecting. You can wait or deal."
+                      : "Everyone here? Deal when you’re ready."
+                  : "Your host will deal when everyone is here."}
             </p>
-            <button
-              type="submit"
-              form={formId}
-              className="button primary wide"
-              disabled={
-                busy ||
-                !connected ||
-                !name.trim() ||
-                (panel === "join" && !isRoomCode(code))
-              }
-              aria-busy={busy}
-            >
-              {busy
-                ? pendingLabel
-                : panel === "create"
-                  ? "Open a table"
-                  : "Join the table"}
-              <ArrowRight size={18} />
-            </button>
+            {isHost ? (
+              <button
+                className="button primary wide"
+                disabled={
+                  !!busy ||
+                  props.savingRules ||
+                  !connected ||
+                  room.players.length < 2
+                }
+                onClick={() => void run("Dealing cards…", props.onStartGame)}
+              >
+                {busy ||
+                  (room.players.length < 2
+                    ? "Waiting for another player"
+                    : "Deal everyone in")}
+                <ArrowRight size={19} />
+              </button>
+            ) : (
+              <p className="waiting-host" role="status">
+                Waiting for the host to deal
+              </p>
+            )}
           </>
+        ) : (
+          <button
+            type="submit"
+            form={formId}
+            className="button primary wide"
+            disabled={
+              !!busy || !connected || (panel === "join" && !isRoomCode(code))
+            }
+            aria-busy={!!busy}
+          >
+            {busy || (panel === "join" ? "Join the room" : "Create room")}
+            <ArrowRight size={20} />
+          </button>
         )
       }
     >
       <SetupIntro
-        title={room ? "Your table is open." : "Bring your people."}
+        title={
+          room
+            ? "Your table is open."
+            : panel === "join"
+              ? "Join your people."
+              : "A table for your people."
+        }
         description={
           room
-            ? "A little rivalry is better together."
-            : "Same game. Different places. Get everyone around one table."
+            ? "Make room for one more."
+            : panel === "join"
+              ? "Enter the room code. Take your seat."
+              : "Create a private room, then invite your crew."
         }
         onBack={() => void leave()}
         trailing={
           <span
-            role="status"
             className={`connection-state ${connected ? "online" : "offline"}`}
+            role="status"
           >
             <i className={`presence-dot ${connected ? "online" : "offline"}`} />
-            {connected ? "Connected" : error ? "Offline" : "Connecting…"}
+            {connected ? "Connected" : "Connecting…"}
           </span>
         }
       />
-      {(error || localError) && (
-        <div className="error-message connection-recovery" role="alert">
-          <p>{localError || error}</p>
-        </div>
+      {(error || props.error) && (
+        <p className="error-message" role="alert">
+          {error || props.error}
+        </p>
       )}
       {!connected && !room && props.onPlayBots && (
         <div className="room-connection-note" role="status">
-          <WifiOff size={20} aria-hidden="true" />
+          <WifiOff size={20} />
           <p>Connecting to rooms. You can play with bots while we reconnect.</p>
-          <button
-            type="button"
-            className="text-button"
-            onClick={props.onPlayBots}
-          >
-            Play with bots <ArrowRight size={16} />
+          <button className="text-button" onClick={props.onPlayBots}>
+            Play with bots
+            <ArrowRight size={16} />
           </button>
         </div>
+      )}
+      {!room && (
+        <form
+          id={formId}
+          className="room-form focused-room-form"
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (!connected || (panel === "join" && !isRoomCode(code))) return;
+            if (panel === "join")
+              try {
+                localStorage.setItem("uno.online.roomCode", code);
+              } catch {}
+            void run(
+              panel === "join" ? "Joining room…" : "Creating room…",
+              () =>
+                panel === "join"
+                  ? props.onJoinRoom(code, getPlayerName())
+                  : props.onCreateRoom(getPlayerName()),
+            );
+          }}
+        >
+          {panel === "join" && (
+            <>
+              <label className="field-label" htmlFor="room-code">
+                Room code
+              </label>
+              <input
+                id="room-code"
+                className="room-code-input"
+                value={code}
+                autoFocus
+                placeholder="Code or invitation link"
+                autoComplete="off"
+                autoCapitalize="characters"
+                aria-describedby="room-code-help"
+                aria-invalid={code.length > 0 && !isRoomCode(code)}
+                onChange={(e) => setCode(parseRoomCode(e.target.value))}
+                required
+              />
+              <p id="room-code-help" className="muted">
+                {code && !isRoomCode(code)
+                  ? "Use the 6-character code or paste the invitation link."
+                  : "Your friend can find it inside their room."}
+              </p>
+            </>
+          )}
+          <p className="room-joining-as muted">
+            Taking a seat as <strong>{getPlayerName()}</strong>
+          </p>
+        </form>
       )}
       {manualCopy && (
         <div
@@ -365,99 +273,20 @@ export default function OnlineLobby(props: Props) {
           role="region"
           aria-label={`Manual copy ${manualCopy.label}`}
         >
-          <div className="manual-copy-header">
-            <span className="manual-copy-hint">
-              Select and copy your {manualCopy.label.toLowerCase()}:
-            </span>
-            <button
-              type="button"
-              className="icon-button"
-              aria-label="Close manual copy input"
-              onClick={() => setManualCopy(null)}
-            >
-              <X size={15} />
-            </button>
-          </div>
+          <label className="field-label" htmlFor="manual-room-copy">
+            Select and copy {manualCopy.label.toLowerCase()}
+          </label>
           <input
-            type="text"
+            id="manual-room-copy"
+            autoFocus
             readOnly
             value={manualCopy.value}
-            aria-label={manualCopy.label}
-            autoFocus
             onFocus={(e) => e.target.select()}
-            className="manual-copy-input"
           />
+          <button className="text-button" onClick={() => setManualCopy(null)}>
+            Close
+          </button>
         </div>
-      )}
-      {!room && (
-        <>
-          <SegmentedToggle
-            value={panel}
-            options={[
-              { value: "create", label: "Create a room" },
-              { value: "join", label: "Join a room" },
-            ]}
-            onChange={setPanel}
-          />
-          <form
-            id={formId}
-            className="room-form"
-            aria-busy={busy}
-            onSubmit={(e) => {
-              e.preventDefault();
-              if (
-                !connected ||
-                !name.trim() ||
-                (panel === "join" && !isRoomCode(code))
-              )
-                return;
-              void run(
-                () =>
-                  panel === "create"
-                    ? props.onCreateRoom(name.trim())
-                    : props.onJoinRoom(code, name.trim()),
-                panel === "create" ? "Opening room…" : "Joining room…",
-              );
-            }}
-          >
-            <label className="field-label" htmlFor="online-name">
-              Your name
-            </label>
-            <input
-              id="online-name"
-              value={name}
-              maxLength={18}
-              autoComplete="nickname"
-              onBlur={() => setName(savePlayerName(name))}
-              onChange={(e) => setName(e.target.value)}
-              required
-            />
-            {panel === "join" && (
-              <>
-                <label className="field-label" htmlFor="room-code">
-                  Room code
-                </label>
-                <input
-                  id="room-code"
-                  className="room-code-input"
-                  aria-describedby="room-code-help"
-                  aria-invalid={code.length > 0 && !isRoomCode(code)}
-                  value={code}
-                  placeholder="6-letter code or invitation link"
-                  autoComplete="off"
-                  autoCapitalize="characters"
-                  onChange={(e) => setCode(parseRoomCode(e.target.value))}
-                  required
-                />
-                <p id="room-code-help" className="muted">
-                  {code && !isRoomCode(code)
-                    ? "Use the 6-character room code, or paste the full invitation link."
-                    : "Room codes have 6 characters. Friend codes are in Friends & invitations."}
-                </p>
-              </>
-            )}
-          </form>
-        </>
       )}
       {room && (
         <>
@@ -468,39 +297,31 @@ export default function OnlineLobby(props: Props) {
             </div>
             <div className="room-share-actions">
               <button
-                className="button secondary small"
-                onClick={async () => {
-                  const ok = await copy(
-                    room.roomId,
-                    "Room code",
-                    "Room code copied.",
-                  );
-                  if (ok) {
-                    setCopiedCode(true);
-                    setTimeout(() => setCopiedCode(false), 2000);
-                  }
-                }}
+                className="icon-button"
+                aria-label="Copy room code"
+                onClick={() => void copy("Room code", room.roomId)}
               >
-                {copiedCode ? <Check size={16} /> : <Copy size={16} />}
-                {copiedCode ? "Copied!" : "Copy code"}
+                {copied === "Room code" ? (
+                  <Check size={19} />
+                ) : (
+                  <Copy size={19} />
+                )}
               </button>
               <button
-                className="button secondary small"
+                className="icon-button"
                 aria-label="Copy invitation link"
-                onClick={async () => {
-                  const ok = await copy(
-                    `${window.location.origin}/?room=${room.roomId}`,
+                onClick={() =>
+                  void copy(
                     "Room link",
-                    "Room link copied.",
-                  );
-                  if (ok) {
-                    setCopiedLink(true);
-                    setTimeout(() => setCopiedLink(false), 2000);
-                  }
-                }}
+                    `${window.location.origin}/?room=${room.roomId}`,
+                  )
+                }
               >
-                {copiedLink ? <Check size={18} /> : <Link size={18} />}
-                {copiedLink ? "Copied link!" : "Copy link"}
+                {copied === "Room link" ? (
+                  <Check size={19} />
+                ) : (
+                  <Link size={19} />
+                )}
               </button>
             </div>
           </div>
@@ -508,250 +329,142 @@ export default function OnlineLobby(props: Props) {
             <h2>At the table</h2>
             <CountBadge current={room.players.length} total={6} />
           </div>
+          <div className="room-seat-actions">
+            {isHost && (
+              <button
+                className="button secondary"
+                disabled={!!busy || !connected || room.players.length >= 6}
+                onClick={() => void run("Adding bot…", props.onAddBotSeat)}
+              >
+                <Plus size={18} />
+                Add a bot
+              </button>
+            )}
+            <button
+              className="button secondary"
+              disabled={!connected || room.players.length >= 6}
+              onClick={() => setInviteOpen(true)}
+            >
+              <Users size={18} />
+              Invite friends
+            </button>
+          </div>
           <div
             className="seat-list room-seat-list"
             role="list"
             aria-label="Players at this table"
           >
-            {room.players.map((p) => (
-              <div className="seat-row" role="listitem" key={p.playerId}>
-                <PlayerAvatar
-                  seed={p.playerId}
-                  avatarId={p.avatarId}
-                  isBot={p.isBot}
-                />
-                <span className="lobby-seat-name">
-                  <strong>
-                    {p.name}
-                    {p.playerId === playerId && p.name.toLowerCase() !== "you"
-                      ? " (you)"
-                      : ""}
-                  </strong>
-                  <small>
-                    {p.isBot
-                      ? "Bot · ready to play"
-                      : !p.connected
-                        ? "Reconnecting…"
-                        : p.playerId === room.hostPlayerId
-                          ? "Host"
-                          : "At the table"}
-                  </small>
-                </span>
-                {isHost && p.playerId !== playerId ? (
-                  <button
-                    className="icon-button"
-                    aria-label={`Remove ${p.name}`}
-                    disabled={busy || !connected}
-                    onClick={() =>
-                      void run(
-                        () => props.onKickPlayer(p.playerId),
-                        "Removing player…",
-                      )
-                    }
-                  >
-                    <X size={17} />
-                  </button>
-                ) : (
-                  <span
-                    role="img"
-                    aria-label={
-                      p.connected || p.isBot ? "At the table" : "Reconnecting"
-                    }
-                    className="muted"
-                  >
-                    {p.connected || p.isBot ? (
-                      <Check size={17} aria-hidden="true" />
-                    ) : (
-                      <WifiOff size={17} aria-hidden="true" />
-                    )}
+            {room.players.map((player) => {
+              const isMe = player.playerId === playerId;
+              const code = player.friendCode;
+              const accepted = social.friends.some(
+                (friend) => friend.friendCode === code,
+              );
+              const requested = social.outgoingRequests.some(
+                (request) => request.to.friendCode === code,
+              );
+              const incoming = social.incomingRequests.some(
+                (request) => request.from.friendCode === code,
+              );
+              return (
+                <div className="seat-row" role="listitem" key={player.playerId}>
+                  <PlayerAvatar
+                    seed={player.playerId}
+                    avatarId={player.avatarId}
+                    isBot={player.isBot}
+                  />
+                  <span className="lobby-seat-name">
+                    <strong>
+                      {player.name}
+                      {isMe && player.name.toLowerCase() !== "you"
+                        ? " (you)"
+                        : ""}
+                    </strong>
+                    <small>
+                      {player.isBot
+                        ? "Bot"
+                        : !player.connected
+                          ? "Reconnecting…"
+                          : player.playerId === room.hostPlayerId
+                            ? "Host"
+                            : "Ready"}
+                    </small>
                   </span>
-                )}
-              </div>
-            ))}
+                  {!isMe && !player.isBot && code && (
+                    <button
+                      className="icon-button room-add-friend"
+                      aria-label={
+                        accepted
+                          ? `${player.name} is your friend`
+                          : requested
+                            ? `Friend request sent to ${player.name}`
+                            : incoming
+                              ? `Review ${player.name}'s friend request`
+                              : `Add ${player.name} as a friend`
+                      }
+                      disabled={!!busy || !connected || accepted || requested}
+                      onClick={() => {
+                        if (incoming) props.onOpenFriends();
+                        else
+                          void run("Sending request…", async () => {
+                            const ok = await props.onRequestFriend(code);
+                            if (ok) toast.success("Friend request sent.");
+                            return ok;
+                          });
+                      }}
+                    >
+                      {accepted ? <Check size={18} /> : <UserPlus size={18} />}
+                    </button>
+                  )}
+                  {isHost && !isMe && (
+                    <button
+                      className="icon-button"
+                      aria-label={`Remove ${player.name}`}
+                      disabled={!!busy || !connected}
+                      onClick={() =>
+                        void run("Removing player…", () =>
+                          props.onKickPlayer(player.playerId),
+                        )
+                      }
+                    >
+                      <X size={17} />
+                    </button>
+                  )}
+                  {!player.connected && !player.isBot && (
+                    <WifiOff size={17} aria-label="Reconnecting" />
+                  )}
+                </div>
+              );
+            })}
           </div>
-          {isHost && room.players.length < 6 && (
-            <button
-              className="button secondary"
-              disabled={busy || !connected}
-              onClick={() => void run(props.onAddBotSeat, "Adding bot…")}
-            >
-              <Plus size={17} />
-              Add a bot
-            </button>
-          )}
+          <button
+            className="room-rules-link text-button"
+            onClick={props.onOpenRules}
+          >
+            <SlidersHorizontal size={17} />
+            <span>
+              {getRuleSetLabel(publishedRules)} ·{" "}
+              {publishedRules.startingHandSize ?? 7} cards each
+            </span>
+            <ArrowRight size={16} />
+          </button>
         </>
       )}
-      <AvatarPicker />
-      {room && (
-        <TableScoreCard
-          score={room.tableScore}
-          players={room.players.map((player) => ({
-            id: player.playerId,
-            name: player.name,
-            avatarId: player.avatarId,
-            isBot: player.isBot,
-          }))}
-          localPlayerId={props.playerId}
-        />
-      )}
-      {room && isHost && (
-        <TableRules
-          rules={props.rules}
-          onChange={props.onRulesChange}
-          onOpenRules={props.onOpenRules}
-        />
-      )}
-      {room && !isHost && (
-        <section
-          className="setup-rules room-rules-summary"
-          aria-label="Table rules for this room"
-        >
-          <div className="section-heading">
-            <h2>Table rules</h2>
-            <button
-              type="button"
-              className="text-button"
-              onClick={() => setHelp(true)}
-            >
-              How to play
-            </button>
-          </div>
-          <p className="muted">Chosen by host</p>
-          <RulesSummary
-            rules={room.rules ?? {}}
-            includeBots={room.players.some((player) => player.isBot)}
-          />
-        </section>
-      )}
-      {help && (
-        <HowToPlayModal
-          open
-          rules={room ? (room.rules ?? {}) : props.rules}
-          inGame
-          onClose={() => setHelp(false)}
-        />
-      )}
-
-      <details
-        className="lobby-friends setup-disclosure"
-        key={outgoingInvites.length ? "invited" : "friends"}
-        open={outgoingInvites.length ? true : undefined}
-      >
-        <summary>Friends & invitations</summary>
-        <form
-          className="inline-form"
-          onSubmit={(e) => {
-            e.preventDefault();
-            void invite(friendCode);
+      {inviteOpen && room && (
+        <FriendInvitePicker
+          friends={social.friends}
+          seatedCodes={room.players.flatMap((player) =>
+            player.friendCode ? [player.friendCode] : [],
+          )}
+          invitedCodes={props.invitedCodes}
+          connected={connected}
+          onInvite={props.onInviteFriend}
+          onClose={() => setInviteOpen(false)}
+          onOpenFriends={() => {
+            setInviteOpen(false);
+            props.onOpenFriends();
           }}
-        >
-          <label className="sr-only" htmlFor="lobby-friend-code">
-            Friend code
-          </label>
-          <input
-            id="lobby-friend-code"
-            value={friendCode}
-            placeholder="Their friend code"
-            maxLength={8}
-            autoCapitalize="characters"
-            onChange={(e) => setFriendCode(normalize(e.target.value))}
-          />
-          <button
-            className="button secondary"
-            disabled={busy || !connected || friendCode.length < 4}
-          >
-            Invite
-            <ArrowRight size={17} />
-          </button>
-        </form>
-        {outgoingInvites.map((i) => (
-          <p key={i.inviteId} className="muted">
-            Invitation sent to {i.targetName ?? i.targetFriendCode}.
-          </p>
-        ))}
-        {friends.length > 0 && (
-          <div className="saved-friends">
-            {friends.slice(0, 4).map((f) => (
-              <div className="saved-friend" key={f.friendCode}>
-                <span className="avatar">{f.name[0]}</span>
-                <span>
-                  <strong>{f.name}</strong>
-                  <small>{presence[f.friendCode] ?? "offline"}</small>
-                </span>
-                <button
-                  className="icon-button"
-                  aria-label={`Invite ${f.name}`}
-                  disabled={busy || !connected}
-                  onClick={() => void invite(f.friendCode)}
-                >
-                  <Plus size={18} />
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-        <div className="your-code">
-          <span>Your friend code</span>
-          <button
-            className="text-button"
-            disabled={!props.friendCode}
-            onClick={async () => {
-              if (!props.friendCode) return;
-              const ok = await copy(
-                props.friendCode,
-                "Friend code",
-                "Friend code copied.",
-              );
-              if (ok) {
-                setCopiedFriendCode(true);
-                setTimeout(() => setCopiedFriendCode(false), 2000);
-              }
-            }}
-          >
-            {props.friendCode || "Connecting…"}
-            {copiedFriendCode ? <Check size={14} /> : <Copy size={14} />}
-          </button>
-        </div>
-      </details>
-      {incomingInvites.length > 0 && (
-        <section>
-          <h2>You’re invited.</h2>
-          {incomingInvites.map((inv) => (
-            <div className="invite-row" key={inv.inviteId}>
-              <div>
-                <strong>{inv.fromName}</strong>
-                <p>Has a seat for you.</p>
-              </div>
-              <button
-                className="icon-button"
-                disabled={busy}
-                aria-label={`Decline invite from ${inv.fromName}`}
-                onClick={() =>
-                  void run(() => props.onDeclineFriendInvite(inv.inviteId))
-                }
-              >
-                <X size={17} />
-              </button>
-              <button
-                className="button primary small"
-                disabled={busy || !connected}
-                onClick={async () => {
-                  if (
-                    await run(() =>
-                      props.onAcceptFriendInvite(
-                        inv.inviteId,
-                        name.trim() || "You",
-                      ),
-                    )
-                  )
-                    remember(inv.fromFriendCode, inv.fromName);
-                }}
-              >
-                Join
-              </button>
-            </div>
-          ))}
-        </section>
+        />
       )}
     </SetupShell>
   );

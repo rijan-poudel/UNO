@@ -1,6 +1,8 @@
 // Original illustrated portrait sheet shared by seats, setup and round results.
 import type { CSSProperties } from "react";
 import { UserRound, Smile, Sparkles } from "lucide-react";
+import CustomAvatar from "./CustomAvatar";
+import { parseCustomAvatar } from "../lib/avatarCustomization";
 import { isAvatarId } from "../lib/playerAvatars";
 import type { PlayerExpression } from "../lib/playerExpression";
 import styles from "./PlayerAvatar.module.css";
@@ -23,8 +25,11 @@ export default function PlayerAvatar({
     : isBot
       ? `portrait-${hash % 6}`
       : "initials";
+  const custom = parseCustomAvatar(chosen);
   const index =
-    chosen === "initials" ? null : Number(chosen.slice("portrait-".length));
+    chosen === "initials" || custom
+      ? null
+      : Number(chosen.slice("portrait-".length));
   const cell = index === null ? 0 : index % 6;
   return (
     <span
@@ -43,7 +48,8 @@ export default function PlayerAvatar({
         } as CSSProperties
       }
     >
-      {index === null && <UserRound size="58%" strokeWidth={2} />}
+      {custom && <CustomAvatar config={custom} />}
+      {index === null && !custom && <UserRound size="58%" strokeWidth={2} />}
       {(expression === "uno" ||
         expression === "surprised" ||
         expression === "celebrate" ||

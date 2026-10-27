@@ -42,6 +42,7 @@ export interface RoomSnapshot {
         Partial<Omit<PendingColorChoice, "playerId">>)
     | null;
   rules?: Partial<GameRules>;
+  profileId?: string;
 }
 
 export interface FriendInvite {
@@ -53,8 +54,29 @@ export interface FriendInvite {
   createdAt: number;
 }
 
+export interface FriendProfile {
+  friendCode: string;
+  name: string;
+  avatarId?: string;
+  status: FriendPresenceState;
+}
+
+export interface FriendRequest {
+  requestId: string;
+  from: FriendProfile;
+  to: FriendProfile;
+  createdAt: number;
+}
+
+export interface SocialSnapshot {
+  friends: FriendProfile[];
+  incomingRequests: FriendRequest[];
+  outgoingRequests: FriendRequest[];
+}
+
 export type MultiplayerAction =
   | { type: "resumeControl" }
+  | { type: "chooseRouletteColor"; color: CardColor }
   | { type: "prepareWild"; cardId: string }
   | { type: "cancelWildChoice" }
   | {
@@ -63,6 +85,7 @@ export type MultiplayerAction =
       chosenColor?: CardColor;
       secondCardId?: string;
       declareUno?: boolean;
+      targetPlayerId?: string;
     }
   | { type: "draw" }
   | { type: "pass" }
@@ -73,11 +96,13 @@ export interface CreateRoomPayload {
   playerName: string;
   deviceId: string;
   rules?: Partial<GameRules>;
+  profileId?: string;
 }
 
 export interface UpdateRulesPayload {
   roomId: string;
   rules: Partial<GameRules>;
+  profileId?: string;
 }
 
 export interface PresencePayload {
@@ -95,6 +120,7 @@ export interface JoinRoomPayload {
 export interface StartRoomPayload {
   roomId: string;
   rules?: Partial<GameRules>;
+  profileId?: string;
 }
 
 export interface KickPlayerPayload {
@@ -141,15 +167,7 @@ export interface DismissFriendInvitePayload {
   inviteId: string;
 }
 
-export interface FriendStatusPayload {
-  friendCodes: string[];
-}
-
 export type FriendPresenceState = "offline" | "online" | "playing";
-
-export interface FriendStatusResponse {
-  statuses: Record<string, FriendPresenceState>;
-}
 
 export interface AckSuccess<T> {
   ok: true;

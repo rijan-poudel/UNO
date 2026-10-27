@@ -10,7 +10,9 @@ export function resolvePlayerName(
 // Profile name is shared by setup, quick play, and online rooms.
 const PLAYER_NAME_KEY = 'uno.online.playerName';
 const PLAYER_NAME_EVENT = 'uno:player-name-updated';
+let fallbackPlayerName: string | null = null;
 export function getPlayerName(fallback = 'You'): string {
+  if (fallbackPlayerName !== null) return fallbackPlayerName;
   try {
     return (
       localStorage.getItem(PLAYER_NAME_KEY)?.trim().slice(0, 18) || fallback
@@ -23,15 +25,27 @@ export function savePlayerName(value: string): string {
   const name = value.trim().slice(0, 18) || 'You';
   try {
     localStorage.setItem(PLAYER_NAME_KEY, name);
-    window.dispatchEvent(new Event(PLAYER_NAME_EVENT));
+    fallbackPlayerName = null;
   } catch {
-    /* Storage failure must not prevent starting a game. */
+    fallbackPlayerName = name;
   }
+  if (typeof window !== 'undefined')
+    window.dispatchEvent(new Event(PLAYER_NAME_EVENT));
   return name;
 }
 export function subscribePlayerName(onChange: () => void): () => void {
   window.addEventListener(PLAYER_NAME_EVENT, onChange);
-  return () => window.removeEventListener(PLAYER_NAME_EVENT, onChange);
+  const onStorage = (event: StorageEvent) => {
+    if (event.key === PLAYER_NAME_KEY || event.key === null) {
+      fallbackPlayerName = null;
+      onChange();
+    }
+  };
+  window.addEventListener('storage', onStorage);
+  return () => {
+    window.removeEventListener(PLAYER_NAME_EVENT, onChange);
+    window.removeEventListener('storage', onStorage);
+  };
 }
 
 // Shared saved crew for quick play and the setup editor.

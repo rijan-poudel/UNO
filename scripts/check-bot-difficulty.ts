@@ -3,7 +3,8 @@ import assert from 'node:assert/strict';
 import { getBotMove, BOT_DIFFICULTY_OPTIONS } from '../lib/botSupport';
 import { initializeGame } from '../lib/gameSetup';
 import { validateGameRules } from '../lib/validateGameRules';
-import { RULE_PRESETS, matchesPreset } from '../lib/rulePresets';
+import { matchesPreset } from '../lib/rulePresets';
+import { RULE_SCENARIOS as RULE_PRESETS } from './ruleScenarios';
 import { toGameView, toPresentationGame } from '../lib/gameView';
 import { parseSavedRound } from '../lib/savedRound';
 import { canPlayCard } from '../lib/gameRules';
@@ -71,8 +72,8 @@ assert.deepEqual(getBotMove(situation(hand, 'casual'), 0), {
 });
 assert.deepEqual(getBotMove(situation(hand, 'standard'), 0), {
   action: 'play',
-  cardId: 'four',
-  chosenColor: 'red',
+  cardId: 'high',
+  chosenColor: undefined,
 });
 assert.deepEqual(
   getBotMove(situation(hand), 0),
@@ -80,8 +81,11 @@ assert.deepEqual(
   'Tactical saves a wild when a normal card works',
 );
 assert.deepEqual(
-  getBotMove(situation(hand, 'tactical', 1), 0),
-  { action: 'play', cardId: 'four', chosenColor: 'red' },
+  getBotMove(
+    situation([...hand, card('stop', 'red', 'skip')], 'tactical', 1),
+    0,
+  ),
+  { action: 'play', cardId: 'stop', chosenColor: undefined },
   'An imminent opponent changes the tactical decision',
 );
 

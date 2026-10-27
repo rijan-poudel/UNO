@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-25T17:24:08Z",
+  "generatedAt": "2026-10-27T02:56:00.972201Z",
   "title": "Design System: UNO \u2014 Color play",
   "extensions": {
     "colorMeta": {
@@ -90,7 +90,7 @@
       },
       "stage": {
         "role": "primary",
-        "displayName": "Stage",
+        "displayName": "Stage and settings header blue",
         "tonalRamp": [
           "oklch(15% 0.1314 260.47)",
           "oklch(26% 0.1314 260.47)",
@@ -118,7 +118,7 @@
       },
       "stack-stage": {
         "role": "primary",
-        "displayName": "Stack Stage",
+        "displayName": "Custom stacking ground",
         "tonalRamp": [
           "oklch(15% 0.1115 259.77)",
           "oklch(26% 0.1115 259.77)",
@@ -132,7 +132,7 @@
       },
       "stack-stage-light": {
         "role": "primary",
-        "displayName": "Stack Stage Light",
+        "displayName": "Custom stacking lift",
         "tonalRamp": [
           "oklch(15% 0.1300 256.60)",
           "oklch(26% 0.1300 256.60)",
@@ -146,7 +146,7 @@
       },
       "wild-stage": {
         "role": "primary",
-        "displayName": "Wild Stage",
+        "displayName": "Custom wild-rule ground",
         "tonalRamp": [
           "oklch(15% 0.0672 299.64)",
           "oklch(26% 0.0672 299.64)",
@@ -160,7 +160,7 @@
       },
       "wild-stage-light": {
         "role": "primary",
-        "displayName": "Wild Stage Light",
+        "displayName": "Custom wild-rule lift",
         "tonalRamp": [
           "oklch(15% 0.0889 310.49)",
           "oklch(26% 0.0889 310.49)",
@@ -316,42 +316,42 @@
         "role": "neutral",
         "displayName": "Midnight Surface",
         "tonalRamp": [
-          "oklch(15% 0.0166 285.25)",
-          "oklch(26% 0.0166 285.25)",
-          "oklch(37% 0.0166 285.25)",
-          "oklch(49% 0.0166 285.25)",
-          "oklch(60% 0.0166 285.25)",
-          "oklch(72% 0.0166 285.25)",
-          "oklch(84% 0.0166 285.25)",
-          "oklch(95% 0.0166 285.25)"
+          "oklch(15% 0.0900 256.93)",
+          "oklch(26% 0.0900 256.93)",
+          "oklch(37% 0.0900 256.93)",
+          "oklch(49% 0.0900 256.93)",
+          "oklch(60% 0.0900 256.93)",
+          "oklch(72% 0.0900 256.93)",
+          "oklch(84% 0.0900 256.93)",
+          "oklch(95% 0.0900 256.93)"
         ]
       },
       "midnight-muted": {
         "role": "neutral",
         "displayName": "Midnight Muted",
         "tonalRamp": [
-          "oklch(15% 0.0158 90.26)",
-          "oklch(26% 0.0158 90.26)",
-          "oklch(37% 0.0158 90.26)",
-          "oklch(49% 0.0158 90.26)",
-          "oklch(60% 0.0158 90.26)",
-          "oklch(72% 0.0158 90.26)",
-          "oklch(84% 0.0158 90.26)",
-          "oklch(95% 0.0158 90.26)"
+          "oklch(15% 0.0397 256.59)",
+          "oklch(26% 0.0397 256.59)",
+          "oklch(37% 0.0397 256.59)",
+          "oklch(49% 0.0397 256.59)",
+          "oklch(60% 0.0397 256.59)",
+          "oklch(72% 0.0397 256.59)",
+          "oklch(84% 0.0397 256.59)",
+          "oklch(95% 0.0397 256.59)"
         ]
       },
       "midnight-line": {
         "role": "neutral",
         "displayName": "Midnight Line",
         "tonalRamp": [
-          "oklch(15% 0.0145 285.81)",
-          "oklch(26% 0.0145 285.81)",
-          "oklch(37% 0.0145 285.81)",
-          "oklch(49% 0.0145 285.81)",
-          "oklch(60% 0.0145 285.81)",
-          "oklch(72% 0.0145 285.81)",
-          "oklch(84% 0.0145 285.81)",
-          "oklch(95% 0.0145 285.81)"
+          "oklch(15% 0.0727 257.31)",
+          "oklch(26% 0.0727 257.31)",
+          "oklch(37% 0.0727 257.31)",
+          "oklch(49% 0.0727 257.31)",
+          "oklch(60% 0.0727 257.31)",
+          "oklch(72% 0.0727 257.31)",
+          "oklch(84% 0.0727 257.31)",
+          "oklch(95% 0.0727 257.31)"
         ]
       },
       "midnight-accent-red": {
@@ -661,6 +661,106 @@
           "oklch(84% 0.1817 99.72)",
           "oklch(95% 0.1817 99.72)"
         ]
+      },
+      "no-mercy-stage": {
+        "role": "primary",
+        "displayName": "No Mercy charcoal",
+        "tonalRamp": [
+          "oklch(15% 0.0180 335.58)",
+          "oklch(26% 0.0180 335.58)",
+          "oklch(37% 0.0180 335.58)",
+          "oklch(49% 0.0180 335.58)",
+          "oklch(60% 0.0180 335.58)",
+          "oklch(72% 0.0180 335.58)",
+          "oklch(84% 0.0180 335.58)",
+          "oklch(95% 0.0180 335.58)"
+        ]
+      },
+      "no-mercy-stage-light": {
+        "role": "primary",
+        "displayName": "No Mercy crimson lift",
+        "tonalRamp": [
+          "oklch(15% 0.0457 354.66)",
+          "oklch(26% 0.0457 354.66)",
+          "oklch(37% 0.0457 354.66)",
+          "oklch(49% 0.0457 354.66)",
+          "oklch(60% 0.0457 354.66)",
+          "oklch(72% 0.0457 354.66)",
+          "oklch(84% 0.0457 354.66)",
+          "oklch(95% 0.0457 354.66)"
+        ]
+      },
+      "all-wild-stage": {
+        "role": "primary",
+        "displayName": "All Wild plum",
+        "tonalRamp": [
+          "oklch(15% 0.0694 301.37)",
+          "oklch(26% 0.0694 301.37)",
+          "oklch(37% 0.0694 301.37)",
+          "oklch(49% 0.0694 301.37)",
+          "oklch(60% 0.0694 301.37)",
+          "oklch(72% 0.0694 301.37)",
+          "oklch(84% 0.0694 301.37)",
+          "oklch(95% 0.0694 301.37)"
+        ]
+      },
+      "all-wild-stage-light": {
+        "role": "primary",
+        "displayName": "All Wild plum lift",
+        "tonalRamp": [
+          "oklch(15% 0.1153 306.72)",
+          "oklch(26% 0.1153 306.72)",
+          "oklch(37% 0.1153 306.72)",
+          "oklch(49% 0.1153 306.72)",
+          "oklch(60% 0.1153 306.72)",
+          "oklch(72% 0.1153 306.72)",
+          "oklch(84% 0.1153 306.72)",
+          "oklch(95% 0.1153 306.72)"
+        ]
+      },
+      "portrait-selected": {
+        "role": "neutral",
+        "displayName": "Portrait and profile selection",
+        "tonalRamp": [
+          "oklch(15% 0.0219 263.19)",
+          "oklch(26% 0.0219 263.19)",
+          "oklch(37% 0.0219 263.19)",
+          "oklch(49% 0.0219 263.19)",
+          "oklch(60% 0.0219 263.19)",
+          "oklch(72% 0.0219 263.19)",
+          "oklch(84% 0.0219 263.19)",
+          "oklch(95% 0.0219 263.19)"
+        ]
+      },
+      "draw-label-surface": {
+        "role": "neutral",
+        "displayName": "Draw label ink",
+        "tonalRamp": [
+          "oklch(15% 0.0446 262.33)",
+          "oklch(26% 0.0446 262.33)",
+          "oklch(37% 0.0446 262.33)",
+          "oklch(49% 0.0446 262.33)",
+          "oklch(60% 0.0446 262.33)",
+          "oklch(72% 0.0446 262.33)",
+          "oklch(84% 0.0446 262.33)",
+          "oklch(95% 0.0446 262.33)"
+        ],
+        "purpose": "Pile-status overlay only; frontmatter preserves the source rgba alpha."
+      },
+      "forced-draw-label-surface": {
+        "role": "neutral",
+        "displayName": "Forced draw label ink",
+        "tonalRamp": [
+          "oklch(15% 0.0301 82.74)",
+          "oklch(26% 0.0301 82.74)",
+          "oklch(37% 0.0301 82.74)",
+          "oklch(49% 0.0301 82.74)",
+          "oklch(60% 0.0301 82.74)",
+          "oklch(72% 0.0301 82.74)",
+          "oklch(84% 0.0301 82.74)",
+          "oklch(95% 0.0301 82.74)"
+        ],
+        "purpose": "Pile-status overlay only; frontmatter preserves the source rgba alpha."
       }
     },
     "typographyMeta": {
@@ -739,6 +839,22 @@
       "card-index": {
         "displayName": "Card Index",
         "purpose": "Native deck scale."
+      },
+      "account-section": {
+        "displayName": "Account section",
+        "purpose": "Settings overview choices and Friends section headings."
+      },
+      "preference-label": {
+        "displayName": "Preference label",
+        "purpose": "Disclosure summaries and ordinary preference labels."
+      },
+      "settings-title": {
+        "displayName": "Settings title",
+        "purpose": "Blue task headers use the shipped 26px Outfit role, including phones."
+      },
+      "settings-title-short": {
+        "displayName": "Short-height settings title",
+        "purpose": "Settings headers at viewport heights of 500px or less."
       }
     },
     "shadows": [
@@ -781,6 +897,11 @@
         "name": "dialog",
         "value": "0 20px 60px #061e4c66",
         "purpose": "Light native dialog ambient depth."
+      },
+      {
+        "name": "account-floating",
+        "value": "var(--ui-shadow)",
+        "purpose": "Theme-aware avatar popovers and incoming invitation notices; shared source value 0 16px 48px #00000045."
       }
     ],
     "motion": [
@@ -823,6 +944,16 @@
         "name": "thinking",
         "value": "1000ms ease-in-out infinite alternate",
         "purpose": "Actual waiting dots only; no travel in reduced motion."
+      },
+      {
+        "name": "account-reveal",
+        "value": "160ms cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Native avatar popover reveal and disclosure-chevron transition; OS or saved reduced motion suppresses travel."
+      },
+      {
+        "name": "invitation-reveal",
+        "value": "180ms cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Incoming room invitation reveal; OS or saved reduced motion suppresses travel."
       }
     ],
     "breakpoints": [
@@ -882,6 +1013,16 @@
         "name": "setup-short-height",
         "value": "(max-height: 540px)",
         "context": "@media; app/club.css, after narrow-width overrides"
+      },
+      {
+        "name": "account-phone",
+        "value": "(max-width: 640px)",
+        "context": "app/settings.css; 12px dialog inset, shared 20px gutters, 72px-minimum header, 76px overview rows and four portrait columns."
+      },
+      {
+        "name": "account-short",
+        "value": "(max-height: 500px)",
+        "context": "app/settings.css; 8px viewport inset, 52px-minimum header with 24px title, compact heading/footer and seven portrait columns retain scrolling body and fixed decisions."
       }
     ],
     "arenaLayout": {
@@ -1006,43 +1147,58 @@
       "css": ".ds-field{display:grid;gap:8px;font-family:var(--font-body,Outfit),sans-serif;color:var(--ui-text,#17345f);font-size:14px;font-weight:750}.ds-field input{min-height:50px;padding:12px 15px;border:2px solid var(--ui-line,#ccd3da);border-radius:6px;background:var(--ui-surface,#fffcf4);color:var(--ui-text,#17345f);font:inherit;font-weight:400;transition:border-color 150ms}.ds-field input::placeholder{color:var(--ui-muted,#58687a)}.ds-field input:focus{border-color:var(--ui-text,#17345f)}.ds-field input:focus-visible{outline:3px solid var(--ui-accent-blue,#1254b5);outline-offset:4px}.ds-field input[aria-invalid=\"true\"]{border-color:var(--ui-accent-red,#c50730)}"
     },
     {
-      "name": "Settings navigation",
+      "name": "Settings overview",
       "kind": "nav",
-      "refersTo": "settings-navigation",
-      "description": "Outlined tabs with an explicit selected state.",
-      "html": "<div class=\"ds-tabs\" role=\"tablist\" aria-label=\"Preferences\"><button role=\"tab\" aria-selected=\"true\">Controls</button><button role=\"tab\" aria-selected=\"false\">Sound</button><button role=\"tab\" aria-selected=\"false\">Appearance</button></div>",
-      "css": ".ds-tabs{display:flex;border:2px solid var(--club-ink,#17345f);border-radius:6px;overflow:hidden}.ds-tabs button{flex:1;min-height:48px;padding:9px 6px;border:0;background:transparent;color:var(--ui-text,#17345f);font-family:var(--font-body,Outfit),sans-serif;font-size:14px;cursor:pointer}.ds-tabs button[aria-selected=\"true\"]{background:var(--club-ink,#17345f);color:var(--club-paper,#fff7e7)}.ds-tabs button:hover:not([aria-selected=\"true\"]){background:#ffd45a20}.ds-tabs button:focus-visible{outline:3px solid #1254b5;outline-offset:-4px}.ds-tabs button:active{transform:scale(.97)}"
+      "refersTo": "settings-sheet",
+      "description": "Content-sized warm-white native sheet offers four task rows, then one active task with All settings and pinned Done.",
+      "html": "<section class=\"ds-settings\" aria-label=\"Settings\"><h2>Settings</h2><nav class=\"ds-settings-choices\" aria-label=\"Settings sections\"><button type=\"button\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"8\" r=\"4\"/><path d=\"M4 21v-2a8 8 0 0 1 16 0v2\"/></svg><span><strong>Profile</strong><small>Your name and avatar</small></span><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"m9 18 6-6-6-6\"/></svg></button><button type=\"button\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2m20 0v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75\"/><circle cx=\"9\" cy=\"7\" r=\"4\"/></svg><span><strong>Friends</strong><small>Your people and invitations</small></span><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"m9 18 6-6-6-6\"/></svg></button><button type=\"button\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M21 4H14M10 4H3M21 12H12M8 12H3M21 20H16M12 20H3M14 1v6M8 9v6M16 17v6\"/></svg><span><strong>Game rules</strong><small>Game profiles and house rules</small></span><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"m9 18 6-6-6-6\"/></svg></button><button type=\"button\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M2 10v4m4-7v10m4-14v18m4-12v6m4-11v14m4-8v2\"/></svg><span><strong>Audio</strong><small>Sounds, music and voice</small></span><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"m9 18 6-6-6-6\"/></svg></button></nav><footer><button class=\"ds-settings-done\" type=\"button\">Done</button></footer></section>",
+      "css": ".ds-settings{--ui-surface:#fffcf4;--ui-text:var(--club-ink,#17345f);--ui-muted:#58687a;--ui-line:#ccd3da;--ui-accent-blue:#1254b5;display:flex;flex-direction:column;width:min(620px,calc(100vw - 32px));height:fit-content;max-height:min(800px,calc(100dvh - 40px));border-radius:24px;background:var(--ui-surface);color:var(--ui-text);font-family:var(--font-body,Outfit),sans-serif;box-shadow:0 20px 60px #061e4c66}.ds-settings h2{flex:none;margin:0;padding:24px 32px 16px;font-size:28px;line-height:1.1;font-weight:750}.ds-settings-choices{display:grid;min-height:0;overflow:auto;padding:12px 32px 24px}.ds-settings-choices button{display:flex;align-items:center;gap:16px;min-height:88px;padding:16px 0;border:0;border-bottom:1px solid var(--ui-line);background:transparent;color:inherit;font:inherit;text-align:left;cursor:pointer}.ds-settings-choices button:last-child{border-bottom:0}.ds-settings-choices button>span{flex:1}.ds-settings-choices svg{flex:none}.ds-settings-choices strong{display:block;font-size:18px;font-weight:650}.ds-settings-choices small{display:block;margin-top:4px;font-size:14px;color:var(--ui-muted)}.ds-settings footer{display:flex;justify-content:flex-end;flex:none;padding:16px 32px 24px}.ds-settings-done{min-width:112px;min-height:44px;padding:10px 15px;border:0;border-radius:12px;background:var(--club-yellow,#ffd45a);color:var(--ui-text);font:750 14px var(--font-body,Outfit),sans-serif;box-shadow:inset 0 -3px 0 #bf8a28,0 4px 10px #061e4c20;cursor:pointer}.ds-settings button:focus-visible{outline:3px solid var(--ui-accent-blue);outline-offset:3px}.ds-settings-done:active{transform:scale(.97)}@media(hover:hover){.ds-settings-choices button:hover{color:var(--ui-accent-blue)}.ds-settings-done:hover{background:#ffdc36}}@media(max-width:640px){.ds-settings{width:calc(100vw - 24px);max-height:calc(100dvh - 24px);border-radius:20px}.ds-settings h2{padding:20px 24px 12px}.ds-settings-choices{padding:12px 24px 20px}.ds-settings-choices button{min-height:80px}.ds-settings footer{padding:12px 24px 20px}}@media(max-height:500px){.ds-settings{max-height:calc(100dvh - 16px)}.ds-settings h2{padding-block:12px;font-size:24px}.ds-settings-choices{padding-block:8px}.ds-settings footer{padding-block:8px 12px}}"
     },
     {
-      "name": "Home preset selector",
+      "name": "Game profile row",
       "kind": "chip",
-      "refersTo": "preset-selected",
-      "description": "Only engine-supported presets; selected segment is cream.",
-      "html": "<div class=\"ds-presets\" role=\"group\" aria-label=\"Choose your game\"><button aria-pressed=\"true\">Classic</button><button aria-pressed=\"false\">Stack party</button><button aria-pressed=\"false\">Wild table</button></div>",
-      "css": ".ds-presets{display:flex;gap:4px;padding:4px;border-radius:12px;background:#061e4c55}.ds-presets button{flex:1;min-height:44px;padding:8px;border:0;border-radius:9px;background:transparent;color:#dce9ff;font-family:var(--font-body,Outfit),sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:background-color 160ms,color 160ms}.ds-presets button[aria-pressed=\"true\"]{background:var(--club-paper,#fff7e7);color:var(--club-ink,#17345f);box-shadow:0 3px 8px #061c4540}.ds-presets button:hover:not([aria-pressed=\"true\"]){background:#ffffff14}.ds-presets button:focus-visible{outline:3px solid #ffd45a;outline-offset:4px}.ds-presets button:active{transform:scale(.97)}@media(prefers-reduced-motion:reduce){.ds-presets button{transition:none}}"
+      "refersTo": "rule-profile-select",
+      "description": "Fixed originals and named custom copies share a flat row; the active check and favorite star express independent states.",
+      "html": "<div class=\"ds-profile-row\"><button class=\"ds-profile-select\" aria-pressed=\"true\"><span class=\"ds-profile-check\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"m20 6-11 11-5-5\"/></svg></span><span><strong>Classic UNO</strong><small>Standard 108-card deck, matching color or number, single draws.</small></span></button><div class=\"ds-profile-actions\"><button aria-label=\"Unpin Classic UNO\" aria-pressed=\"true\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"currentColor\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"m12 3 2.8 5.7 6.3.9-4.5 4.4 1.1 6.2L12 17.3l-5.7 2.9 1.1-6.2L2.9 9.6l6.3-.9z\"/></svg></button><button aria-label=\"Copy Classic UNO\"><svg width=\"17\" height=\"17\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><rect x=\"9\" y=\"9\" width=\"13\" height=\"13\" rx=\"2\"/><path d=\"M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1\"/></svg></button></div></div>",
+      "css": ".ds-profile-row{display:flex;align-items:center;gap:8px;padding-block:14px;border-bottom:1px solid var(--ui-line,#ccd3da);color:var(--club-ink,#17345f);font-family:var(--font-body,Outfit),sans-serif}.ds-profile-select{display:flex;align-items:center;gap:12px;flex:1;min-width:0;padding:4px 0;border:0;background:transparent;color:inherit;text-align:left;font:inherit;cursor:pointer}.ds-profile-select strong{display:block;font-size:16px;overflow-wrap:anywhere}.ds-profile-select small{display:block;margin-top:4px;color:var(--ui-muted,#58687a);font-size:13px;line-height:1.5}.ds-profile-check{display:grid;place-items:center;flex:none;width:24px;height:24px;border:1px solid var(--ui-accent-blue,#1254b5);border-radius:50%;background:var(--ui-accent-blue,#1254b5);color:var(--ui-surface,#fffcf4)}.ds-profile-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;max-width:88px;flex:none}.ds-profile-actions button{display:grid;place-items:center;width:40px;height:40px;min-width:44px;min-height:44px;border:0;border-radius:12px;background:transparent;color:inherit;cursor:pointer}.ds-profile-actions [aria-pressed=\"true\"]{color:var(--ui-accent-blue,#1254b5)}.ds-profile-row button:focus-visible{outline:3px solid var(--ui-accent-blue,#1254b5);outline-offset:3px}.ds-profile-actions button:hover{background:var(--ui-bg,#fff7e7)}.ds-profile-row button:active{transform:scale(.97)}@media(prefers-reduced-motion:reduce){.ds-profile-row button:active{transform:none}}"
     },
     {
-      "name": "Native dialog surface",
+      "name": "Custom profile draft",
       "kind": "card",
-      "refersTo": "dialog",
-      "description": "Light scope remains readable across saved appearances; runtime uses native Modal.",
-      "html": "<section class=\"ds-dialog\" aria-label=\"Your table\"><h2>Your table.</h2><p>Choose how to continue.</p><button class=\"ds-close\">Close</button></section>",
-      "css": ".ds-dialog{display:grid;gap:20px;padding:28px;border:0;border-radius:20px;background:#fffcf4;color:#17345f;box-shadow:0 20px 60px #061e4c66;font-family:var(--font-body,Outfit),sans-serif;font-size:15px;line-height:1.5}.ds-dialog h2{margin:0;font-family:inherit;font-size:28px;font-weight:750;line-height:1.1;letter-spacing:-.01em}.ds-dialog p{margin:0}.ds-close{min-height:44px;padding:10px 15px;border:1px solid #ccd3da;border-radius:12px;background:transparent;color:inherit;font:inherit;cursor:pointer}.ds-close:hover{background:#ffd45a20}.ds-close:focus-visible{outline:3px solid #1254b5;outline-offset:4px}.ds-close:active{transform:scale(.97)}"
+      "refersTo": "settings-sheet",
+      "description": "A separate native task sheet isolates the named custom draft; only its content scrolls while Save and use / Cancel stay visible.",
+      "html": "<section class=\"ds-editor\" aria-label=\"Custom profile\"><header><h2>Custom profile</h2><button class=\"ds-editor-close\" aria-label=\"Close custom profile\">Close</button></header><form><div class=\"ds-editor-body\"><label>Profile name<input value=\"Classic custom\" maxlength=\"30\" required /></label><p>Based on Classic UNO. The original stays unchanged.</p><details><summary>Drawing</summary><p>Supported house-rule controls appear in these groups.</p></details></div><footer><button class=\"ds-editor-save\" type=\"submit\">Save and use</button><button class=\"ds-editor-cancel\" type=\"button\">Cancel</button></footer></form></section>",
+      "css": ".ds-editor{display:flex;flex-direction:column;width:min(620px,calc(100vw - 32px));height:fit-content;max-height:min(800px,calc(100dvh - 40px));border-radius:24px;background:var(--ui-surface,#fffcf4);color:var(--ui-text,#17345f);box-shadow:0 20px 60px #061e4c66;font:15px/1.5 var(--font-body,Outfit),sans-serif}.ds-editor header{display:flex;align-items:center;justify-content:space-between;gap:16px;flex:none;padding:24px 32px 16px}.ds-editor h2{margin:0;font-size:28px;font-weight:750;line-height:1.1;letter-spacing:-.01em}.ds-editor form{display:flex;flex:1 1 auto;min-height:0;flex-direction:column}.ds-editor-body{flex:1 1 auto;min-height:0;overflow:auto;overscroll-behavior:contain;scrollbar-gutter:stable;padding:12px 32px 24px}.ds-editor-body label{display:grid;gap:8px;font-size:14px;font-weight:750}.ds-editor-body input{min-width:0;min-height:50px;padding:12px 15px;border:2px solid var(--ui-line,#ccd3da);border-radius:6px;background:var(--ui-surface,#fffcf4);color:inherit;font:400 15px var(--font-body,Outfit),sans-serif}.ds-editor-body p{color:var(--ui-muted,#58687a)}.ds-editor details{border-bottom:1px solid var(--ui-line,#ccd3da)}.ds-editor summary{min-height:44px;padding:12px 0;font-size:14px;font-weight:600;cursor:pointer}.ds-editor footer{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:12px;flex:none;padding:16px 32px 24px}.ds-editor button{min-height:44px;min-width:44px;padding:10px 15px;border:1px solid var(--ui-line,#ccd3da);border-radius:12px;background:transparent;color:inherit;font:750 14px var(--font-body,Outfit),sans-serif;cursor:pointer}.ds-editor .ds-editor-save{background:var(--club-yellow,#ffd45a);border:0;box-shadow:inset 0 -3px 0 #bf8a28,0 4px 10px #061e4c20}.ds-editor .ds-editor-close{border:0;padding:8px}.ds-editor :focus-visible{outline:3px solid var(--ui-accent-blue,#1254b5);outline-offset:3px}.ds-editor input:focus{border-color:var(--ui-text,#17345f)}.ds-editor button:hover{background:var(--ui-bg,#fff7e7)}.ds-editor .ds-editor-save:hover{background:#ffdc36}.ds-editor button:active{transform:scale(.97)}@media(max-width:640px){.ds-editor{width:calc(100vw - 24px);max-height:calc(100dvh - 24px);border-radius:20px}.ds-editor header{padding:20px 24px 12px}.ds-editor-body{padding:12px 24px 20px}.ds-editor footer{padding:12px 24px 20px}}@media(max-height:500px){.ds-editor{max-height:calc(100dvh - 16px)}.ds-editor header{padding-block:12px}.ds-editor h2{font-size:24px}.ds-editor-body{padding-block:8px}.ds-editor footer{padding-block:8px 12px}}@media(prefers-reduced-motion:reduce){.ds-editor button:active{transform:none}}"
     },
     {
       "name": "Local turn cue",
       "kind": "custom",
       "refersTo": "cue-local",
       "description": "Static component sample; runtime number/ring come only from the authoritative deadline.",
-      "html": "<div class=\"ds-cue\"><span class=\"ds-clock\" role=\"timer\" aria-label=\"30 seconds remaining\">30</span><span><strong>Your turn</strong><small>Match green or 7</small></span></div>",
-      "css": ".ds-cue{display:flex;align-items:center;gap:12px;min-height:64px;padding:10px 20px 10px 12px;border-radius:18px;background:var(--club-yellow,#ffd45a);color:#38290c;box-shadow:inset 0 -3px 0 #bf8a2860,0 8px 16px #061e4c35;font-family:var(--font-body,Outfit),sans-serif;pointer-events:none}.ds-clock{display:grid;place-items:center;width:44px;height:44px;border:3px solid currentColor;border-radius:50%;font-size:16px;font-variant-numeric:tabular-nums}.ds-cue strong{display:block;font-size:18px;font-weight:750;line-height:1.1}.ds-cue small{display:block;margin-top:3px;color:#5a410f;font-size:12px;line-height:1.2}"
+      "html": "<div class=\"ds-cue\"><span class=\"ds-clock\" role=\"timer\" aria-label=\"30 seconds remaining\">30</span><span><strong>Your turn</strong><small class=\"ds-cue-accessible\">Match green or 7</small></span></div>",
+      "css": ".ds-cue{display:flex;align-items:center;gap:12px;min-height:64px;padding:10px 20px 10px 12px;border-radius:18px;background:var(--club-yellow,#ffd45a);color:#38290c;box-shadow:inset 0 -3px 0 #bf8a2860,0 8px 16px #061e4c35;font-family:var(--font-body,Outfit),sans-serif;pointer-events:none}.ds-clock{display:grid;place-items:center;width:44px;height:44px;border:3px solid currentColor;border-radius:50%;font-size:16px;font-variant-numeric:tabular-nums}.ds-cue strong{display:block;font-size:18px;font-weight:750;line-height:1.1}.ds-cue small{display:block;margin-top:3px;color:#5a410f;font-size:12px;line-height:1.2} .ds-cue-accessible{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}"
+    },
+    {
+      "name": "Avatar account popover",
+      "kind": "nav",
+      "refersTo": "account-menu-row",
+      "description": "Native auto popover offers three explicit account destinations with the saved identity above.",
+      "html": "<div class=\"ds-profile-popover\"><strong class=\"ds-profile-identity\">Your profile</strong><nav aria-label=\"Your account\"><button>Edit profile</button><button>Friends</button><button>Game settings</button></nav></div>",
+      "css": ".ds-profile-popover{width:min(288px,calc(100vw - 32px));padding:8px;border:0;border-radius:16px;background:var(--ui-surface,#fffcf4);color:var(--ui-text,#17345f);box-shadow:var(--ui-shadow,0 16px 48px #00000045);font-family:var(--font-body,Outfit),sans-serif}.ds-profile-identity{display:block;padding:12px;border-bottom:1px solid var(--ui-line,#ccd3da)}.ds-profile-popover nav{display:grid;gap:2px;padding-top:8px}.ds-profile-popover button{display:flex;align-items:center;gap:12px;min-height:48px;padding:12px;border:0;border-radius:8px;background:transparent;color:inherit;font-family:inherit;font-size:15px;text-align:left;cursor:pointer}.ds-profile-popover button:hover{background:var(--ui-bg,#fff7e7)}.ds-profile-popover button:focus-visible{outline:3px solid var(--ui-accent-blue,#1254b5);outline-offset:3px}"
+    },
+    {
+      "name": "Incoming invitation",
+      "kind": "card",
+      "description": "An actionable notice stays above the current screen, including open native dialogs.",
+      "html": "<section class=\"ds-invitation\" aria-label=\"Room invitation\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2m20 0v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75\"/><circle cx=\"9\" cy=\"7\" r=\"4\"/></svg><div><strong>A friend saved you a seat</strong><p>Join their room?</p></div><div class=\"ds-invitation-actions\"><button>Decline</button><button class=\"ds-invitation-accept\">Accept</button></div></section>",
+      "css": ".ds-invitation{display:grid;grid-template-columns:24px minmax(0,1fr);gap:12px;width:min(380px,calc(100vw - 32px));padding:24px 44px 24px 24px;border-radius:16px;background:var(--ui-surface,#fffcf4);color:var(--ui-text,#17345f);box-shadow:var(--ui-shadow,0 16px 48px #00000045);font-family:var(--font-body,Outfit),sans-serif}.ds-invitation strong{display:block;font-size:16px;overflow-wrap:anywhere}.ds-invitation p{margin:4px 0 0;color:var(--ui-muted,#58687a);font-size:14px}.ds-invitation-actions{grid-column:1/-1;display:flex;gap:8px;padding-top:4px}.ds-invitation-actions button{flex:1;min-height:44px;padding:10px 15px;border:1px solid var(--ui-line,#ccd3da);border-radius:12px;background:transparent;color:var(--ui-text,#17345f);font:750 14px var(--font-body,Outfit),sans-serif;cursor:pointer}.ds-invitation-actions .ds-invitation-accept{border-color:transparent;background:var(--club-yellow,#ffd45a);color:var(--club-ink,#17345f);box-shadow:inset 0 -3px 0 #bf8a28,0 4px 10px #061e4c20}.ds-invitation-actions button:hover{background:var(--ui-bg,#fff7e7)}.ds-invitation-actions .ds-invitation-accept:hover{background:#ffdc36}.ds-invitation-actions button:focus-visible{outline:3px solid var(--ui-accent-blue,#1254b5);outline-offset:3px}.ds-invitation-actions button:active{transform:scale(.97)}"
     }
   ],
   "narrative": {
     "northStar": "Color play",
     "overview": "A welcoming shared card table combines a rich blue field, warm cream foreground, vivid native UNO cards and expressive illustrated human portraits. Outfit keeps the interface friendly and direct; Barlow Condensed gives the deck, wordmark and selected game actions their familiar energy. Soft contact shadows and inset press edges make cards and controls feel physical.\n\nThis records the shipped October 24 composite: Classic supplies the blue field and card prominence, Color court supplies the portraits, and After-hours supplies amber turn and action emphasis. The approved direction is `.impeccable/review/experience-reset/contract.md` (FORM seed `2fba311c`); its three references are `reset-classic.png`, `reset-color-court.png` and `reset-after-hours.png` under `.impeccable/mocks/decision/`. No catalog quality-bar world was selected. Earlier Comic-card showdown, giant-cast/painted-menu, violet-corner, illustrated-room and poker-table instructions are historical and superseded. Their assets and provenance remain recoverable; they are not current surface guidance.",
     "keyCharacteristics": [
-      "Quiet blue or plum preset fields keep attention on live cards and people.",
+      "Quiet blue, charcoal/crimson or plum edition fields keep attention on live cards and people.",
       "Human portraits, opaque nameplates and exact hand counts make the table social and readable.",
       "Outfit UI and Barlow Condensed deck lettering share one friendly voice.",
       "Amber pressed actions and a compact real countdown explain the current decision.",
@@ -1071,23 +1227,34 @@
       },
       {
         "name": "The Reachable Decision Rule",
-        "body": "In setup, room and help flows, scroll the content body while keeping the primary decision or lesson navigation visible. Short-height adjustments preserve target size and readable content instead of shrinking the entire panel.",
+        "body": "In setup, room, account and help flows, scroll the content body while keeping the primary decision or lesson navigation visible. Short-height adjustments preserve target size and readable content instead of shrinking the entire panel.",
+        "section": "layout"
+      },
+      {
+        "name": "The One Open Task Rule",
+        "body": "Keep optional identity, progress and social controls behind the avatar. Show the four-choice settings overview or one selected task; mount optional progress and pickers when opened. Ready-made profile portraits remain immediately visible. The current task keeps its heading and decision reachable; custom-profile drafts use their own native dialog and explicit save/cancel boundary.",
         "section": "layout"
       },
       {
         "name": "The Contact Rule",
         "body": "Use inset press depth for actions and stock/contact depth for cards. Preserve readable resting geometry and keyboard focus; sound and animation never determine turn timing.",
         "section": "elevation & depth"
+      },
+      {
+        "name": "The Distinct State Rule",
+        "body": "The active check identifies the selected profile; the star identifies a home favorite. Saving a custom draft is the explicit boundary before its rules become active.",
+        "section": "components"
       }
     ],
     "dos": [
-      "**Do** use the quiet preset field, warm cream, human portraits and vivid native deck as one shared identity.",
+      "**Do** use the quiet edition field, warm cream, human portraits and vivid native deck as one shared identity.",
       "**Do** keep Outfit ordinary headings and the separate Barlow Condensed brand/deck roles.",
-      "**Do** retain saved supporting appearances and the explicit light native-dialog scope.",
+      "**Do** retain saved appearances on other dialogs, the avatar popover and invitation notices, while keeping Settings warm-white with navy text.",
       "**Do** keep exact hand counts, inline compact status, a real turn clock and written action/color cues.",
       "**Do** preserve the quarter-cropped curved held hand, readable overlap, independent overflow, direct legal play and visible keyboard focus.",
       "**Do** keep compact cues, inspection and actions clear of identities and piles, and confine game dialogs to the reported usable panel.",
-      "**Do** keep setup decisions and help navigation outside the scrolling content body, and distinguish actual table rules from practice examples.",
+      "**Do** keep setup, account and help decisions outside the scrolling content body, and distinguish actual table rules from practice examples.",
+      "**Do** show the four-choice settings overview or one task, keep ready-made portraits visible, and expose rule controls only inside a named custom-profile draft.",
       "**Do** use soft contact depth and the intentional inset amber pressed-control lip.",
       "**Do** keep original artwork and exact provenance, even when earlier artwork is superseded.",
       "**Do** verify six-seat landscape phones, large hands and reduced motion when extending the interface."
@@ -1098,7 +1265,9 @@
       "**Don't** add another font family, glyph icons, mixed display systems or a parallel component library.",
       "**Don't** replace the live deadline with a decorative countdown or reset it after a draw or metadata update.",
       "**Don't** add blocking splashes or let audio, reactions or motion gate game turns.",
-      "**Don't** label No Mercy, Flip or Flex playable before their actual decks/actions exist."
+      "**Don't** repeat identity editors in joining or room setup, or add routine hand coaching.",
+      "**Don't** offer Stack party or Wild table as built-in choices; use named custom profiles for house rules.",
+      "**Don't** label Flip or Flex playable before their actual decks/actions exist, or describe the three originals as editable house-rule presets."
     ]
   }
 }

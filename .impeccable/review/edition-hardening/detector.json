@@ -1,0 +1,68 @@
+[
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/settings.css",
+    "line": 25,
+    "snippet": "border-radius: 24px is outside the DESIGN.md rounded scale",
+    "ignoreValue": "24px"
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/settings.css",
+    "line": 139,
+    "snippet": "border-radius: 999px is outside the DESIGN.md rounded scale",
+    "ignoreValue": "999px"
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/settings.css",
+    "line": 248,
+    "snippet": "Undocumented color #e8f0ff is outside DESIGN.md colors",
+    "ignoreValue": "#e8f0ff"
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/arena.css",
+    "line": 157,
+    "snippet": "Undocumented color rgba(14, 25, 46, 0.9) is outside DESIGN.md colors",
+    "ignoreValue": "rgba(14, 25, 46, 0.9)"
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/app/arena.css",
+    "line": 172,
+    "snippet": "Undocumented color rgba(28, 20, 5, 0.95) is outside DESIGN.md colors",
+    "ignoreValue": "rgba(28, 20, 5, 0.95)"
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/components/UnoCard.module.css",
+    "line": 206,
+    "snippet": "border-radius: 4px is outside the DESIGN.md rounded scale",
+    "ignoreValue": "4px"
+  }
+]

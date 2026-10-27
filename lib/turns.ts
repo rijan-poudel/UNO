@@ -18,8 +18,23 @@ import type { GameState } from '../types/game';
 export function getNextPlayerIndex(state: GameState, steps = 1): number {
   const { players, currentPlayerIndex, direction } = state;
   const n = players.length;
-  // The modulo is applied twice-over to handle negative results from direction === -1.
-  return (((currentPlayerIndex + direction * steps) % n) + n) % n;
+  if (steps === 0) return currentPlayerIndex;
+
+  if (!players.some((p) => p.eliminated)) {
+    return (((currentPlayerIndex + direction * steps) % n) + n) % n;
+  }
+
+  const activeCount = players.filter((p) => !p.eliminated).length;
+  if (activeCount === 0) return currentPlayerIndex;
+
+  let current = currentPlayerIndex;
+  let remainingSteps = Math.abs(steps);
+  const stepDirection = direction * Math.sign(steps);
+  while (remainingSteps > 0) {
+    current = (((current + stepDirection) % n) + n) % n;
+    if (!players[current].eliminated) remainingSteps--;
+  }
+  return current;
 }
 
 /**
@@ -36,12 +51,4 @@ export function advanceTurn(state: GameState, steps = 1): GameState {
     turnCount: state.turnCount + 1,
     drawnThisTurn: false,
   };
-}
-
-/**
- * Returns the Player object for whoever acts next (after the current turn).
- * Useful for UI hints like "Next: Bob" without committing to state mutation.
- */
-export function peekNextPlayer(state: GameState, steps = 1) {
-  return state.players[getNextPlayerIndex(state, steps)];
 }

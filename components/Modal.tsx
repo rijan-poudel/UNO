@@ -1,7 +1,7 @@
 // Native modal: focus containment, Escape, and focus return are browser-owned.
 "use client";
 import { useEffect, useId, useRef, type ReactNode } from "react";
-import { X } from "lucide-react";
+import { X, ArrowLeft } from "lucide-react";
 
 export default function Modal({
   open = true,
@@ -9,12 +9,14 @@ export default function Modal({
   children,
   onClose,
   className = "",
+  onBack,
 }: {
   open?: boolean;
   title: string;
   children: ReactNode;
   onClose?: () => void;
   className?: string;
+  onBack?: () => void;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
   const id = useId();
@@ -28,7 +30,8 @@ export default function Modal({
       if (dialog.open) dialog.close();
       if (open && opener instanceof HTMLElement) {
         queueMicrotask(() => {
-          if (opener.isConnected && !document.querySelector("dialog[open]"))
+          const remaining = document.querySelector("dialog[open]");
+          if (opener.isConnected && (!remaining || remaining.contains(opener)))
             opener.focus({ preventScroll: true });
         });
       }
@@ -39,16 +42,12 @@ export default function Modal({
       ref={ref}
       className={`modal ${className}`}
       aria-labelledby={id}
-      {...({ closedby: "any" } as Record<string, string>)}
+      {...({ closedby: onClose ? "any" : "none" } as Record<string, string>)}
       onCancel={(e) => {
         e.preventDefault();
         onClose?.();
       }}
       onClick={(e) => {
-        if (e.target === e.currentTarget) {
-          onClose?.();
-          return;
-        }
         const dialog = ref.current;
         if (dialog && e.target === dialog) {
           const rect = dialog.getBoundingClientRect();
@@ -63,7 +62,19 @@ export default function Modal({
     >
       <div className="modal-content">
         <div className="modal-heading">
-          <h2 id={id}>{title}</h2>
+          <div className="modal-title-group">
+            {onBack && (
+              <button
+                type="button"
+                className="icon-button modal-back-btn"
+                aria-label="All settings"
+                onClick={onBack}
+              >
+                <ArrowLeft size={20} />
+              </button>
+            )}
+            <h2 id={id}>{title}</h2>
+          </div>
           {onClose && (
             <button
               type="button"

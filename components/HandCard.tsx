@@ -7,6 +7,7 @@ import {
   type PointerEvent,
 } from "react";
 import { getHandFan } from "../lib/handLayout";
+import { getCardLabel } from "../types/card";
 import type { Card } from "../types/card";
 import UnoCard from "./UnoCard";
 import {
@@ -286,7 +287,7 @@ export default function HandCard({
         tabIndex={tabIndex}
         disabled={disabled}
         cornerHint={playHint?.badge}
-        ariaLabel={`${playable ? "Play" : "Inspect"} ${card.color === "wild" ? "" : card.color + " "}${({ skip: "skip", reverse: "reverse", draw2: "draw two", wild4: "wild draw four", wild: "wild", shuffle: "shuffle hands", discardAll: "discard all" } as Record<string, string>)[card.value] ?? card.value}${playable ? "" : ", not playable now"}${playHint ? `. ${playHint.description}` : ""}`}
+        ariaLabel={`${playable ? "Play" : "Inspect"} ${getCardLabel(card).toLowerCase()}${playable ? "" : ", not playable now"}${playHint ? `. ${playHint.description}` : ""}`}
         onClick={() => {
           if (disabled) return;
           if (suppressClick.current) {

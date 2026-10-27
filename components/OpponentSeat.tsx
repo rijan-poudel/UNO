@@ -26,16 +26,18 @@ export default function OpponentSeat({
 }) {
   const SeatLabel = canCatch ? "button" : "div";
   const count = player.hand.length;
-  const status = canCatch
-    ? "Catch!"
-    : offline
-      ? "Offline"
-      : player.saidUno && count === 1
-        ? "UNO!"
-        : null;
+  const status = player.eliminated
+    ? "Out"
+    : canCatch
+      ? "Catch!"
+      : offline
+        ? "Offline"
+        : player.saidUno && count === 1
+          ? "UNO!"
+          : null;
   return (
     <div
-      className={`${styles.seat} opponent ${position} ${active ? "active-seat" : ""} ${count === 1 ? "last-card-seat" : ""}`}
+      className={`${styles.seat} ${player.eliminated ? "eliminated-seat" : ""} opponent ${position} ${active ? "active-seat" : ""} ${count === 1 ? "last-card-seat" : ""}`}
       data-seat={player.id}
     >
       <div className="opponent-hand" aria-hidden="true">

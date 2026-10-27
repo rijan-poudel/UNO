@@ -1,5 +1,41 @@
 # Product
 
+## October 27 — Settings should carry the homepage
+
+The owner explicitly rejects settings spacing, cramped selects, repeated explanatory copy and the lack of the homepage’s color/simplicity. Refine the full settings flow in the established blue/cream/amber world: blue task headers, integrated back navigation, consistent gutters and native select sizing, shorter game/profile text, native card previews and clear selected rows. Treat Settings as a primary product surface. This supersedes the all-cream settings-header prescription; keep one task, ready-made portraits, existing rule behavior and fixed decisions.
+
+## October 27 — Three editions and home favorites
+
+The owner restores three original editions: Classic UNO, UNO Show ’Em No Mercy and UNO All Wild. Preserve the approved blue homepage, native card fan, Play/Create/Join controls and a compact row of up to three pinned profiles. Other profiles live in Settings → Game rules, with one active checkmark independent of favorites. The three originals are fixed; changing rules requires a named custom copy. Copy/edit is one focused draft view, with Save and use or Cancel; edits never change the active game before saving. Ready-made avatars only, no Appearance section. Classic retains blue, No Mercy uses charcoal/crimson, All Wild uses plum; each game board follows its selected edition. This supersedes the single built-in Classic restriction and the older stacking presets.
+
+Implement real edition decks and transitions. Color Roulette is the receiving player's choice; 7/0 hand transfers, two-survivor Reverse +4, skipped knocked-out seats and recyclable knocked-out hands must work locally, online and after recovery. Original IDs are canonicalized by the server. Custom rules expose supported choices only. Keep the existing 30-second turn policy and per-round win tally; do not claim tournament scoring or bluff/challenge play.
+
+## October 26 — Settings redo and ready-made avatars
+
+The owner rejects the settings design, removes Appearance and the “Saved on this device” slogan, and defers custom avatar creation. Replace the sidebar account layout with a compact warm-white task sheet: four clear choices (Profile, Friends, Game rules, Audio), direct task views, All settings back navigation and a reachable Done action. Profile exposes ready-made portraits immediately and a single name field; portrait changes apply on tap, names on blur/Enter/close. Keep optional progress collapsed. Audio uses one Music switch rather than separate lobby/table choices. No custom creator, feature selectors or color editor is offered. Preserve old saved-round recipes only for compatibility. This correction supersedes the earlier custom-avatar builder, Appearance controls and sidebar/mobile-selector layout.
+
+## October 26 — Remove the old flow
+
+The owner asks to continue removing unnecessary settings and code left by the previous version. Keep one avatar-based account entry, preserve working custom rules and friendships, and delete superseded controls and unreachable implementations rather than maintaining parallel versions. The in-game Menu contains immediate table actions; account settings stay behind the avatar.
+
+## October 26 — Quiet play and custom rule profiles
+
+Discard All immediately plays every matching-color card in one action, including an atomic UNO declaration when one card remains. Remove unsolicited hand labels, browse/tap/drag coaching and recurring move tips; deliberate card inspection and accessible state remain.
+
+Classic is the sole built-in rules preset: standard deck, seven-card hands, no stacking, pairs or jump-ins. It enforces playing only the newly drawn card after a voluntary draw and blocks Wild Draw Four while holding the active color. Stack party and Wild table are no longer offered as built-in modes. House rules belong in explicitly named device-local custom profiles under Game rules, with Classic available as a fixed reset. Bot difficulty and room capacity do not change game identity. Timed rounds remain the existing product policy; this game does not claim to implement official tournament scoring or a bluff/challenge system. This supersedes the earlier stacking default.
+
+## October 26 — One task at a time
+
+The owner rejects profile editing, milestones and friend management mixed into joining and home. Home concentrates on Play/Create/Join. Joining uses only a room code or invitation link and the saved profile. One top-right avatar opens a small menu for Profile, Friends and Game settings. The expanded account dialog uses a desktop sidebar and one mobile section picker, with only the selected section mounted. Avatar editing, progress and optional pickers mount when opened.
+
+Friendship requires explicit mutual acceptance, independently of joining a room. A room player can request another human as a friend from their roster row. Requests live in Friends; accepted friends alone appear in the room invite picker beside Add a bot. Incoming room invitations appear on any screen as actionable popups with Accept/Decline and a short audio cue respecting master mute, invitation-sound preferences and effects volume. Accepting while already playing explicitly offers to leave and join. Friend relationships and pending requests belong to the browser's existing device identity and persist on the socket server; this is not an account system.
+
+## October 26 — Less is more
+
+The owner likes the current home palette and asks for a quieter interface. Home ends after the main play and Create/Join choices; bot setup and help belong in Settings → Game. Progress, milestones and friend codes are optional disclosures in Settings → Profile. Remove decorative footer slogans and repeated avatar editors from setup and rooms. These choices supersede earlier requests to expose collection details on Home.
+
+Settings opens on Profile from the shared header, uses the same blue/cream/amber world and clearly labeled Profile, Game, Sound and Theme navigation. Detailed rule groups expand on demand. Avatar appearance is explicitly customizable: face, skin, hair style/color, eyes, brows, smile, facial hair, glasses, clothing and background. Preserve existing portraits and the neutral default. Changes remain device-local and propagate to local/online seats. Snapchat/Bitmoji import is a possible later feature, with no placeholder integration in the current UI.
+
 ## October 24 — Color play experience replacement (current authority)
 
 The owner rejects the congested character/card title screen and sparse game board, then explicitly approves combining the three new previews and delegates continuation: Classic supplies the blue arena and vivid cards, Color court supplies illustrated human portraits, After-hours supplies amber turn cues and action feedback. The new title screen has one primary Play action with smaller Create/Join controls; no giant cast or painted card buttons. Shared components serve every mode, with supported presets changing mood: Classic blue, Stack party deeper blue, Wild table plum. No Mercy remains future work until its engine exists. This supersedes earlier comic-world and no-visible-turn-HUD guidance.

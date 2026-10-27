@@ -4,6 +4,7 @@ import { randomBytes } from 'node:crypto';
 import { io, type Socket } from 'socket.io-client';
 import type { Ack, GameView, RoomSnapshot } from '../types/multiplayer';
 import { toPresentationGame } from '../lib/gameView';
+import { canPlayCard } from '../lib/gameRules';
 import { getBotMove } from '../lib/botSupport';
 import type { GameState } from '../types/game';
 
@@ -56,7 +57,12 @@ async function openWildTable(host: Socket, guest: Socket, guestDevice: string) {
       rules: { allowStartingActionCard: false, mustDeclareUno: false },
     });
     if (
-      started.room.game?.players[0].hand?.some((card) => card.color === 'wild')
+      started.room.game &&
+      started.room.game.players[0].hand?.some(
+        (card) =>
+          card.color === 'wild' &&
+          canPlayCard(card, toPresentationGame(started.room.game)!, 0),
+      )
     ) {
       return { created, joined, started };
     }
@@ -161,7 +167,9 @@ async function main() {
       'Table editing cannot interrupt an active round',
     );
     const wild = unchanged.room.game?.players[0].hand?.find(
-      (card) => card.color === 'wild',
+      (card) =>
+        card.color === 'wild' &&
+        canPlayCard(card, toPresentationGame(unchanged.room.game)!, 0),
     );
     assert.ok(wild);
     const prepared = await request(host, 'game:action', {

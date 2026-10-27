@@ -22,7 +22,6 @@ export default function CardPlayDialog({
   onPlay: (lead: Card, options: PlayOptions) => void;
   onClose: () => void;
 }) {
-  const discardAll = card.value === "discardAll";
   const canPlayAlone = choices.some((choice) => !choice.secondCardId);
   // Physical duplicate copies produce the same visible move and next color.
   const distinctChoices = choices.filter(
@@ -36,29 +35,21 @@ export default function CardPlayDialog({
   );
   return (
     <Modal
-      title={
-        discardAll
-          ? `Clear your ${card.color} cards?`
-          : `Play your ${card.value}s?`
-      }
+      title={`Play your ${card.value}s?`}
       onClose={onClose}
       className="card-play-dialog"
     >
       <p className="muted">
-        {discardAll
-          ? "Discard All plays this card and every other card of its color together."
-          : canPlayAlone
-            ? "This table allows two matching numbers in one turn. Choose one card or a pair; the second card sets the next color."
-            : "These matching numbers can play together. The card that matches the pile goes first; the second card sets the next color."}
+        {canPlayAlone
+          ? "This table allows two matching numbers in one turn. Choose one card or a pair; the second card sets the next color."
+          : "These matching numbers can play together. The card that matches the pile goes first; the second card sets the next color."}
       </p>
       <div className="card-play-options">
         {distinctChoices.map((choice) => {
           const callUno = mustDeclareUno && !saidUno && choice.remaining === 1;
-          const label = discardAll
-            ? `Discard ${choice.cards.length} ${card.color} cards`
-            : choice.secondCardId
-              ? "Play both"
-              : `Play just ${card.color} ${card.value}`;
+          const label = choice.secondCardId
+            ? "Play both"
+            : `Play just ${card.color} ${card.value}`;
           return (
             <button
               type="button"
@@ -72,10 +63,9 @@ export default function CardPlayDialog({
               }
             >
               <span className="card-play-preview" aria-hidden="true">
-                {choice.cards.slice(0, 6).map((entry) => (
+                {choice.cards.map((entry) => (
                   <UnoCard key={entry.id} card={entry} sizeMultiplier={0.5} />
                 ))}
-                {choice.cards.length > 6 && <b>+{choice.cards.length - 6}</b>}
               </span>
               <span className="card-play-copy">
                 <strong>

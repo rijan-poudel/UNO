@@ -6,6 +6,7 @@ import { defaultAudioSettings, AUDIO_SETTINGS_KEY } from '../lib/audioSettings';
 let now = 0;
 let muted = false;
 let enabled = true;
+let notificationsEnabled = true;
 let volume = 0.65;
 let sources = 0;
 let audible = 0;
@@ -83,6 +84,7 @@ Object.defineProperty(globalThis, 'window', {
               ...defaultAudioSettings,
               muted,
               chimesEnabled: enabled,
+              notificationsEnabled,
               sfxVolume: volume,
             })
           : null,
@@ -186,6 +188,23 @@ async function main() {
     'reverse combines paper contact with its bounded three-note direction cue',
   );
   const beforeColdDraw = audible;
+  enabled = false;
+  playTableChime('notification');
+  assert.equal(
+    audible,
+    beforeColdDraw + 2,
+    'Invitations use one short two-note cue',
+  );
+  enabled = true;
+  notificationsEnabled = false;
+  playTableChime('notification');
+  assert.equal(
+    audible,
+    beforeColdDraw + 2,
+    'Invitation sounds can be disabled independently',
+  );
+  notificationsEnabled = true;
+  const beforeNotificationDraw = audible;
   Context.instance.state = 'suspended';
   primeTableAudioFromUserGesture();
   playTableChime('draw');
@@ -193,7 +212,7 @@ async function main() {
   await flush();
   assert.equal(
     audible,
-    beforeColdDraw + 1,
+    beforeNotificationDraw + 1,
     'first draw survives cold-context gesture unlock',
   );
   const stoppedBeforeMute = stopped;
@@ -261,6 +280,40 @@ async function main() {
     3,
     'Music controls immediately notify the player',
   );
+  let spoken = 0;
+  Object.defineProperty(globalThis, 'Audio', {
+    configurable: true,
+    value: class {
+      currentTime = 0;
+      volume = 1;
+      onplaying: (() => void) | null = null;
+      pause() {}
+      play() {
+        spoken++;
+        this.onplaying?.();
+        return Promise.resolve();
+      }
+    },
+  });
+  Object.assign(window, { setTimeout, clearTimeout });
+  const { playVoiceStem, stopBoardVoiceover } =
+    await import('../lib/voiceAnnouncer');
+  const voiceOptions = {
+    audience: { type: 'room' as const },
+    localPlayerId: null,
+    channel: 'check:voice',
+    minGapMs: 0,
+  };
+  setAudioSettings({ muted: false, voiceInGame: false });
+  playVoiceStem('skip', voiceOptions);
+  assert.equal(spoken, 0, 'Disabled announcer stays silent');
+  setAudioSettings({ voiceInGame: true });
+  playVoiceStem('skip', voiceOptions);
+  assert.equal(spoken, 1, 'Enabled in-game announcer still plays');
+  setAudioSettings({ muted: true });
+  playVoiceStem('reverse', voiceOptions);
+  assert.equal(spoken, 1, 'Master mute blocks the announcer');
+  stopBoardVoiceover();
   assert.ok(sources > 0);
   console.log(
     `Audio checks passed: unlock race, offline fallback, mute, hidden tab, expiry, no backlog. Blocked storage and prompt sample onset passed. Card sample peak ${peak.toFixed(2)}, RMS ${rms.toFixed(3)}.`,

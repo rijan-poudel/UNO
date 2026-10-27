@@ -31,6 +31,26 @@
     var(--stage, #123d86) 80%
   );
 }
+.game-page.mood-classic {
+  --stage: #123d86;
+  --stage-light: #1d56a3;
+}
+.game-page.mood-no-mercy {
+  --stage: #140c12;
+  --stage-light: #2c121d;
+}
+.game-page.mood-all-wild {
+  --stage: #26163b;
+  --stage-light: #482366;
+}
+.game-page.mood-stack {
+  --stage: #143975;
+  --stage-light: #2259a1;
+}
+.game-page.mood-wild {
+  --stage: #302247;
+  --stage-light: #523466;
+}
 .game-page :focus-visible {
   outline: 3px solid #ffe329;
   outline-offset: 4px;
@@ -1471,91 +1491,6 @@
 }
 
 /* ── Contextual Action Teaching Hints ── */
-.action-hint-banner {
-  position: absolute;
-  z-index: 90;
-  bottom: calc(100% + 48px);
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 2px 4px 2px 12px;
-  border-radius: 999px;
-  background: #0e2038;
-  border: 1px solid #2e4d7a;
-  color: #fff7e7;
-  box-shadow: 0 4px 14px #02081470;
-  font-size: 12px;
-  line-height: 1.25;
-  max-width: min(580px, calc(100vw - 32px));
-  pointer-events: auto;
-  animation: hint-fade-in 180ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-@keyframes hint-fade-in {
-  from {
-    opacity: 0;
-    transform: translate(-50%, 6px);
-  }
-  to {
-    opacity: 1;
-    transform: translate(-50%, 0);
-  }
-}
-.action-hint-banner strong {
-  color: #ffd45a;
-  font-weight: 700;
-}
-.action-hint-icon {
-  color: #ffd45a;
-  flex-shrink: 0;
-}
-.action-hint-text {
-  min-width: 0;
-  text-wrap: pretty;
-}
-.action-hint-dismiss {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  padding: 0;
-  border: 0;
-  border-radius: 999px;
-  background: transparent;
-  color: #fff7e7;
-  cursor: pointer;
-  flex-shrink: 0;
-  transition: background 140ms ease;
-}
-@media (hover: hover) and (pointer: fine) {
-  .action-hint-dismiss:hover {
-    background: #ffffff1f;
-  }
-}
-@media (max-height: 460px) and (min-width: 541px) {
-  .action-hint-banner {
-    bottom: calc(100% + 40px);
-    padding: 0 2px 0 10px;
-    font-size: 11px;
-    gap: 6px;
-    max-width: min(500px, calc(100vw - 24px));
-  }
-}
-@media (max-height: 360px) and (min-width: 541px) {
-  .action-hint-banner {
-    bottom: calc(100% + 34px);
-    padding: 0 2px 0 8px;
-    font-size: 10px;
-    max-width: min(440px, calc(100vw - 20px));
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .action-hint-banner {
-    animation: none;
-  }
-}
 
 /* ── Fallback Manual Copy Input ── */
 .manual-copy-box {
@@ -1732,24 +1667,6 @@
   font-size: 12px;
   white-space: nowrap;
 }
-.game-profile-trigger {
-  display: inline-flex;
-  padding: 0;
-  border: 0;
-  border-radius: 50%;
-  background: transparent;
-  cursor: pointer;
-  min-width: 44px;
-  min-height: 44px;
-  align-items: center;
-  justify-content: center;
-}
-.game-profile-trigger:hover {
-  filter: brightness(1.1);
-}
-.game-profile-trigger:active {
-  transform: scale(0.96);
-}
 .card-play-dialog {
   width: min(540px, calc(100vw - 32px));
 }
@@ -1814,10 +1731,6 @@
   .card-play-option {
     gap: 8px;
     padding: 10px;
-  }
-  .game-profile-trigger .player-avatar {
-    width: 34px;
-    height: 34px;
   }
   .card-play-dialog {
     max-height: calc(100dvh - 24px);
@@ -2038,41 +1951,6 @@
   min-height: var(--toolbar-height);
   padding-inline: 20px;
 }
-.centered-board .hand-caption {
-  grid-area: 1 / 1;
-  display: grid;
-  gap: 3px;
-  color: #fff7e7;
-}
-.centered-board .hand-caption strong {
-  font-size: 14px;
-  font-weight: 650;
-}
-.centered-board .hand-caption strong span {
-  margin-left: 6px;
-  font-variant-numeric: tabular-nums;
-  color: #ffd45a;
-}
-.centered-board .hand-caption small {
-  font-size: 12px;
-  color: #cfe0fa;
-}
-.centered-board .hand-toolbar .action-hint-banner {
-  grid-area: 1 / 1;
-  position: static;
-  transform: none;
-  width: auto;
-  min-width: 0;
-  max-width: 300px;
-  margin: 0;
-  padding: 4px 0;
-  background: transparent;
-  border: 0;
-  box-shadow: none;
-}
-.centered-board .hand-toolbar:has(.action-hint-banner) .hand-caption {
-  visibility: hidden;
-}
 .centered-board .turn-cue,
 .centered-board .move-dock {
   grid-area: 1 / 2;
@@ -2207,12 +2085,6 @@
   }
 }
 @container board (max-width: 1000px) {
-  .centered-board .hand-caption {
-    display: none;
-  }
-  .centered-board .hand-toolbar .action-hint-banner {
-    display: none;
-  }
   .centered-board .game-main {
     --seat-width: 112px;
     --seat-avatar: 28px;
@@ -2259,10 +2131,6 @@
     grid-template-columns: minmax(0, 1fr) var(--pile-lane-width) minmax(0, 1fr);
     column-gap: 8px;
     padding: 0 4px 6px;
-  }
-  .centered-board .hand-caption,
-  .centered-board .hand-toolbar .action-hint-banner {
-    display: none;
   }
   .centered-board .turn-cue,
   .centered-board .move-dock {
@@ -2444,4 +2312,37 @@
 .centered-board.needs-landscape
   > :is(.game-header, .game-main, .reconnect-banner, .game-error) {
   display: none;
+}
+
+.target-player-options {
+  display: grid;
+  gap: 12px;
+}
+.target-player-options .button {
+  justify-content: flex-start;
+  text-align: left;
+  gap: 12px;
+  min-height: 64px;
+}
+.target-player-options .player-avatar {
+  width: 40px;
+  height: 40px;
+  flex: none;
+}
+.target-player-options small {
+  display: block;
+  color: var(--ui-muted);
+  font-size: 14px;
+}
+.eliminated-seat .opponent-hand {
+  visibility: hidden;
+}
+.eliminated-seat .opponent-label {
+  opacity: 0.65;
+}
+.mercy-watch-note {
+  color: var(--club-paper);
+  font-size: 16px;
+  padding: 32px;
+  text-align: center;
 }

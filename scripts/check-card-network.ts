@@ -1,5 +1,9 @@
 // Real server verification for multi-card moves, UNO and chosen portraits.
 import assert from 'node:assert/strict';
+import {
+  customAvatarId,
+  DEFAULT_CUSTOM_AVATAR,
+} from '../lib/avatarCustomization';
 import { randomBytes } from 'node:crypto';
 import { io, type Socket } from 'socket.io-client';
 import { canPlayCard, getCardPlayChoices } from '../lib/gameRules';
@@ -38,9 +42,10 @@ async function main() {
   try {
     const host = await connect('portrait-3');
     const guest = await connect('initials');
+    const hostDevice = randomBytes(12).toString('hex');
     const created = await request(host, 'room:create', {
       playerName: 'Portrait host',
-      deviceId: randomBytes(12).toString('hex'),
+      deviceId: hostDevice,
     });
     const roomId = created.room.roomId;
     const hostId = created.playerId;
@@ -69,8 +74,13 @@ async function main() {
       })
     ).room;
     const initial = room.game;
+    const customPortrait = customAvatarId({
+      ...DEFAULT_CUSTOM_AVATAR,
+      hair: 4,
+      skin: '#8a563e',
+    });
     const avatarAck = (await host.timeout(5000).emitWithAck('profile:avatar', {
-      avatarId: 'portrait-11',
+      avatarId: customPortrait,
     })) as Ack<unknown>;
     assert.equal(avatarAck.ok, true);
     room = (
@@ -81,16 +91,42 @@ async function main() {
     ).room;
     assert.equal(
       room.players.find((p) => p.playerId === hostId)?.avatarId,
-      'portrait-11',
+      customPortrait,
     );
     assert.equal(
       room.game?.players.find((p) => p.id === hostId)?.avatarId,
-      'portrait-11',
+      customPortrait,
     );
     assert.equal(
       room.game?.turnDeadlineAt,
       initial?.turnDeadlineAt,
       'Avatar updates preserve the live clock',
+    );
+    assert.equal(room.game?.turnCount, initial?.turnCount);
+    assert.deepEqual(room.game?.discardPile, initial?.discardPile);
+    await request(host, 'presence:update', {
+      playerName: 'New host name',
+      deviceId: hostDevice,
+      friendCode: randomBytes(4).toString('hex').toUpperCase(),
+    });
+    room = (
+      await request(guest, 'game:action', {
+        roomId,
+        action: { type: 'resumeControl' },
+      })
+    ).room;
+    assert.equal(
+      room.players.find((p) => p.playerId === hostId)?.name,
+      'New host name',
+    );
+    assert.equal(
+      room.game?.players.find((p) => p.id === hostId)?.name,
+      'New host name',
+    );
+    assert.equal(
+      room.game?.turnDeadlineAt,
+      initial?.turnDeadlineAt,
+      'Profile name updates preserve the live clock',
     );
     assert.equal(room.game?.turnCount, initial?.turnCount);
     assert.deepEqual(room.game?.discardPile, initial?.discardPile);

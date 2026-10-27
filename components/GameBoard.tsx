@@ -9,6 +9,7 @@ import {
   useState,
   useSyncExternalStore,
   type CSSProperties,
+  type ReactNode,
 } from "react";
 import {
   ArrowLeft,
@@ -21,14 +22,12 @@ import {
   Smartphone,
   RotateCw,
   Layers,
-  Settings,
   Trophy,
   Volume2,
   VolumeX,
   X,
   AlertCircle,
   Clock,
-  Zap,
 } from "lucide-react";
 import { toast } from "sonner";
 import type { useUnoGame } from "../hooks/useUnoGame";
@@ -37,8 +36,6 @@ import type { Card } from "../types/card";
 import type { GameState } from "../types/game";
 import {
   canDeclareUno,
-  canJumpInPlay,
-  canPlayCard,
   getCardPlayChoices,
   getCardPlayHint,
   getCardPlayBlockReason,
@@ -78,10 +75,10 @@ import { UnoWordmark } from "./ui/PageChrome";
 export type GameApi =
   ReturnType<typeof useUnoGame> | ReturnType<typeof useUnoOnlineGame>;
 interface Props {
+  profileMenu: ReactNode;
   gameApi: GameApi;
   onReset: () => void;
   onDealAgain: () => boolean | Promise<boolean>;
-  onOpenSettings: (tab?: "profile" | "controls" | "audio") => void;
 }
 // Reveal in the hand’s horizontal scrollport without scrolling the document.
 function revealHandCard(scroller: HTMLElement, card: HTMLElement) {
@@ -100,6 +97,15 @@ const VALUES: Record<string, string> = {
   skip: "Skip",
   reverse: "Reverse",
   draw2: "+2",
+  draw4: "+4",
+  skipEveryone: "Skip everyone",
+  wildReverseDraw4: "Wild reverse +4",
+  wildDraw6: "Wild +6",
+  wildDraw10: "Wild +10",
+  wildColorRoulette: "Color roulette",
+  wildSkip2: "Skip two",
+  wildTargetDraw2: "Targeted +2",
+  wildForcedSwap: "Forced swap",
   wild: "Wild",
   wild4: "+4",
   shuffle: "Shuffle hands",
@@ -121,13 +127,15 @@ function describeAction(game: GameState) {
     return `${name(a.playerId)} drew ${a.count} ${a.count === 1 ? "card" : "cards"}`;
   if (a.type === "pass") return `${name(a.playerId)} passed`;
   if (a.type === "declareUno") return `${name(a.playerId)} called UNO!`;
+  if (a.type === "mercyElimination")
+    return `${name(a.playerId)} was knocked out by the Mercy Rule (25+ cards)!`;
   return `${name(a.callerId)} called out ${name(a.targetId)} · +${a.penalty} cards`;
 }
 export default function GameBoard({
   gameApi: api,
   onReset,
   onDealAgain,
-  onOpenSettings,
+  profileMenu,
 }: Props) {
   const {
     game,
@@ -141,6 +149,10 @@ export default function GameBoard({
   } = api;
   const phonePortrait = usePhonePortrait();
   const root = useRef<HTMLDivElement>(null);
+  const [targetChoice, setTargetChoice] = useState<{
+    cardId: string;
+    turnCount: number;
+  } | null>(null);
   const [exit, setExit] = useState(false);
   const [menu, setMenu] = useState(false);
   const [help, setHelp] = useState(false);
@@ -150,30 +162,6 @@ export default function GameBoard({
   const [manualRoomCode, setManualRoomCode] = useState(false);
   const [startingRematch, setStartingRematch] = useState(false);
   const [returningToLobby, setReturningToLobby] = useState(false);
-  const [dismissedTips, setDismissedTips] = useState<Record<string, boolean>>(
-    () => {
-      try {
-        return {
-          jumpIn: localStorage.getItem("uno.dismissed_tip.jumpIn") === "true",
-          stacking:
-            localStorage.getItem("uno.dismissed_tip.stacking") === "true",
-          catchUno:
-            localStorage.getItem("uno.dismissed_tip.catchUno") === "true",
-        };
-      } catch {
-        return { jumpIn: false, stacking: false, catchUno: false };
-      }
-    },
-  );
-  const dismissTip = useCallback(
-    (tipKey: "jumpIn" | "stacking" | "catchUno") => {
-      setDismissedTips((prev) => ({ ...prev, [tipKey]: true }));
-      try {
-        localStorage.setItem(`uno.dismissed_tip.${tipKey}`, "true");
-      } catch {}
-    },
-    [],
-  );
   const [draggingCard, setDraggingCard] = useState<"lifting" | "ready" | null>(
     null,
   );
@@ -420,21 +408,32 @@ export default function GameBoard({
               : "No match? Take a card."
         : `${currentPlayer.name}’s turn`;
   const commitCard = (card: Card, options: PlayOptions = {}) => {
+    if (
+      !options.targetPlayerId &&
+      ((game.rules.sevenZero && card.value === "7") ||
+        card.value === "wildForcedSwap" ||
+        card.value === "wildTargetDraw2")
+    ) {
+      setPlayChoice(null);
+      setTargetChoice({ cardId: card.id, turnCount: game.turnCount });
+      return;
+    }
+    setTargetChoice(null);
     setPlayChoice(null);
     setInspectedId(null);
     primeTableAudioFromUserGesture();
-    if (!isLocalTurn && canJumpInPlay(card, game)) {
-      dismissTip("jumpIn");
-    }
-    if (isLocalTurn && game.pendingDraw > 0) {
-      dismissTip("stacking");
-    }
     act(() => api.selectCard(card, options));
   };
   const select = (card: Card, element: HTMLElement) => {
     // Capture before a choice moves focus or a released drag ghost is removed.
     rememberOrigin(card.id, element);
     const choices = getCardPlayChoices(game, localPlayerIndex, card);
+    if (card.value === "discardAll" && choices.length) {
+      commitCard(card, {
+        declareUno: game.rules.mustDeclareUno && choices[0].remaining === 1,
+      });
+      return;
+    }
     if (choices.length > 1 || choices[0]?.cards.length > 1) {
       setPlayChoice({
         cardId: card.id,
@@ -473,57 +472,6 @@ export default function GameBoard({
       ? localPlayer.hand.at(-1)
       : null;
 
-  const canJumpInNow =
-    !isLocalTurn &&
-    !winner &&
-    !pendingWild &&
-    game.rules.allowJumpIn &&
-    cards.some((c) => canJumpInPlay(c, game));
-  const canStackNow =
-    isLocalTurn &&
-    !winner &&
-    !pendingWild &&
-    game.pendingDraw > 0 &&
-    cards.some((c) => canPlayCard(c, game, localPlayerIndex));
-  const catchableOpponent = opponents.find(
-    ({ player }) =>
-      (!online || isLocalTurn) &&
-      !winner &&
-      !pendingWild &&
-      !pendingAction &&
-      (!online || online.connected) &&
-      !player.saidUno &&
-      player.hand.length === 1 &&
-      game.rules.mustDeclareUno,
-  );
-
-  const activeTip = (() => {
-    if (canJumpInNow && !dismissedTips.jumpIn) {
-      return {
-        key: "jumpIn" as const,
-        icon: Zap,
-        title: "Jump-in",
-        message: "Exact color and value? Tap the match to play out of turn.",
-      };
-    }
-    if (canStackNow && !dismissedTips.stacking) {
-      return {
-        key: "stacking" as const,
-        icon: Layers,
-        title: "Stacking",
-        message: "Play a matching draw card to pass the penalty along.",
-      };
-    }
-    if (catchableOpponent && !dismissedTips.catchUno) {
-      return {
-        key: "catchUno" as const,
-        icon: AlertCircle,
-        title: "Missed UNO",
-        message: `Tap ${catchableOpponent.player.name}’s “Catch!” badge to give them +2 cards.`,
-      };
-    }
-    return null;
-  })();
   const blockedReason = selectedCard
     ? getCardPlayBlockReason(game, localPlayerIndex, selectedCard)
     : undefined;
@@ -541,7 +489,7 @@ export default function GameBoard({
                 ? "Ready to play. You can also drag it onto the table."
                 : "Exact match. Play now to jump in."
               : !isLocalTurn
-                ? "Browse your hand while they play."
+                ? ""
                 : drawnThisTurn
                   ? playable.length
                     ? drawnCard
@@ -555,7 +503,7 @@ export default function GameBoard({
                         ? "Stack a matching draw card, or take the penalty."
                         : `Draw ${game.pendingDraw} to take the penalty.`
                       : playable.length
-                        ? "Tap a match, or flick it onto the table."
+                        ? ""
                         : "No matching card. Draw to keep the round moving.";
   return (
     <div
@@ -604,18 +552,7 @@ export default function GameBoard({
           <UnoWordmark compact />
         </button>
         <div className="header-actions">
-          <button
-            className="game-profile-trigger"
-            aria-label="Choose your avatar"
-            title="Choose your avatar"
-            onClick={() => onOpenSettings("profile")}
-          >
-            <PlayerAvatar
-              seed={localPlayer.id}
-              avatarId={localPlayer.avatarId}
-              expression={getPlayerExpression(game, localPlayer.id)}
-            />
-          </button>
+          {profileMenu}
           <button
             className="icon-button game-menu-trigger"
             aria-label="Game menu"
@@ -664,6 +601,8 @@ export default function GameBoard({
                   ?.connected === false
               }
               canCatch={
+                !localPlayer.eliminated &&
+                !player.eliminated &&
                 (!online || isLocalTurn) &&
                 !winner &&
                 !pendingWild &&
@@ -674,7 +613,6 @@ export default function GameBoard({
                 game.rules.mustDeclareUno
               }
               onCatch={() => {
-                dismissTip("catchUno");
                 act(() => api.callOut(localPlayerIndex, index));
               }}
             />
@@ -765,15 +703,17 @@ export default function GameBoard({
                 </div>
               </div>
               <span className="sr-only">Last played</span>
-              {top?.color === "wild" && (
-                <span
-                  className="wild-color"
-                  aria-label={`Chosen color: ${activeColor}`}
-                >
-                  <i aria-hidden="true" />
-                  {activeColor}
-                </span>
-              )}
+              {game.rules.gameMode !== "all_wild" &&
+                !game.pendingRoulette &&
+                top?.color === "wild" && (
+                  <span
+                    className="wild-color"
+                    aria-label={`Chosen color: ${activeColor}`}
+                  >
+                    <i aria-hidden="true" />
+                    {activeColor}
+                  </span>
+                )}
             </div>
           </div>
           <div className="sr-only" role="status">
@@ -788,7 +728,11 @@ export default function GameBoard({
             )}
           <div className="sr-only">
             <h1 aria-live="polite">{turnTitle}</h1>
-            <span>Active color: {activeColor}</span>
+            <span>
+              {game.rules.gameMode === "all_wild"
+                ? "Every card is playable without matching a color"
+                : `Active color: ${activeColor}`}
+            </span>
           </div>
         </section>
         <section
@@ -799,40 +743,6 @@ export default function GameBoard({
         >
           {canSayUno && <span className="sr-only">You can call UNO.</span>}
           <div className="hand-toolbar">
-            <div className="hand-caption">
-              <strong>
-                Your hand <span>{cards.length}</span>
-              </strong>
-              <small>
-                {handNavigation.edges.before || handNavigation.edges.after
-                  ? "Scroll to see every card"
-                  : "Tap a match to play"}
-              </small>
-            </div>
-            {activeTip && (
-              <div
-                className="action-hint-banner"
-                role="status"
-                aria-live="polite"
-              >
-                <activeTip.icon
-                  size={15}
-                  className="action-hint-icon"
-                  aria-hidden="true"
-                />
-                <span className="action-hint-text">
-                  <strong>{activeTip.title}:</strong> {activeTip.message}
-                </span>
-                <button
-                  type="button"
-                  className="action-hint-dismiss"
-                  aria-label={`Dismiss ${activeTip.title} hint`}
-                  onClick={() => dismissTip(activeTip.key)}
-                >
-                  <X size={13} aria-hidden="true" />
-                </button>
-              </div>
-            )}
             {(isLocalTurn ||
               canPlaySelected ||
               canSayUno ||
@@ -902,7 +812,7 @@ export default function GameBoard({
             />
             <div className="move-dock">
               <div
-                className={`move-hint ${previewHint || selectedCard || drawnThisTurn || (online && !online.connected) ? "" : "sr-only"}`}
+                className={`move-hint ${selectedCard || (online && !online.connected) ? "" : "sr-only"}`}
                 role="status"
               >
                 {selectedCard && !previewHint && (
@@ -968,6 +878,11 @@ export default function GameBoard({
                 { "--hand-overlap": `${handFit.overlap}px` } as CSSProperties
               }
             >
+              {localPlayer.eliminated && (
+                <p className="mercy-watch-note" role="status">
+                  Out by the Mercy Rule. Stay to watch this round.
+                </p>
+              )}
               {cards.map((card, i) => {
                 // Request locks block interaction without making the whole hand
                 // briefly lose/reacquire its legal-card lift and color.
@@ -1044,13 +959,61 @@ export default function GameBoard({
           playerName={localPlayer.name}
           hand={cards.filter((card) => card.id !== pendingWild.id)}
           onSelect={(color) => act(() => api.confirmWildColor(color))}
-          onCancel={() => {
-            pendingRef.current = false;
-            setPendingAction(false);
-            api.cancelWild();
-          }}
+          roulette={!!game.pendingRoulette}
+          onCancel={
+            game.pendingRoulette
+              ? undefined
+              : () => {
+                  pendingRef.current = false;
+                  setPendingAction(false);
+                  api.cancelWild();
+                }
+          }
         />
       )}
+      {targetChoice &&
+        targetChoice.turnCount === game.turnCount &&
+        isLocalTurn &&
+        !winner && (
+          <Modal
+            title={
+              cards.find((card) => card.id === targetChoice.cardId)?.value ===
+              "wildTargetDraw2"
+                ? "Who draws two?"
+                : "Swap hands with…"
+            }
+            onClose={() => setTargetChoice(null)}
+            className="friend-picker-modal"
+          >
+            <div className="target-player-options">
+              {opponents
+                .filter(({ player }) => !player.eliminated)
+                .map(({ player }) => (
+                  <button
+                    type="button"
+                    key={player.id}
+                    className="button secondary"
+                    onClick={() => {
+                      const card = cards.find(
+                        (entry) => entry.id === targetChoice.cardId,
+                      );
+                      if (card) commitCard(card, { targetPlayerId: player.id });
+                    }}
+                  >
+                    <PlayerAvatar
+                      seed={player.id}
+                      avatarId={player.avatarId}
+                      isBot={player.isBot}
+                    />
+                    <span>
+                      {player.name}
+                      <small>{player.hand.length} cards</small>
+                    </span>
+                  </button>
+                ))}
+            </div>
+          </Modal>
+        )}
       {exit && (
         <ChoiceDialog
           title="Leave the table?"
@@ -1215,16 +1178,6 @@ export default function GameBoard({
             >
               <HelpCircle />
               <span>How to play</span>
-              <ArrowRight size={17} />
-            </button>
-            <button
-              onClick={() => {
-                setMenu(false);
-                onOpenSettings();
-              }}
-            >
-              <Settings />
-              <span>Settings & house rules</span>
               <ArrowRight size={17} />
             </button>
             <button

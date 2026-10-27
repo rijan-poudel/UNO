@@ -1,7 +1,9 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import {
   useEffect,
+  useRef,
   useState,
   useSyncExternalStore,
   type ReactNode,
@@ -15,11 +17,28 @@ import GameBoard from "../components/GameBoard";
 import GameSetup from "../components/GameSetup";
 import HomeScreen from "../components/home/HomeScreen";
 import OnlineLobby from "../components/OnlineLobby";
-import NotificationPanel from "../components/NotificationPanel";
-import SettingsModal from "../components/SettingsModal";
+import AppHeader from "../components/AppHeader";
+import ProfileMenu from "../components/ProfileMenu";
+import InvitationNotifications from "../components/InvitationNotifications";
+import ChoiceDialog from "../components/ChoiceDialog";
+import type { SettingsSection } from "../components/SettingsModal";
+const SettingsModal = dynamic(() => import("../components/SettingsModal"), {
+  loading: () => null,
+});
+const FriendsPanel = dynamic(() => import("../components/FriendsPanel"), {
+  loading: () => (
+    <p className="muted" role="status">
+      Opening friends…
+    </p>
+  ),
+});
 import { UnoWordmark } from "../components/ui/PageChrome";
-import { getSavedPlayerNames } from "../lib/playerNames";
+import { getPlayerName, getSavedPlayerNames } from "../lib/playerNames";
 import { toast } from "sonner";
+import {
+  getReducedMotionSetting,
+  subscribeDisplaySettings,
+} from "../lib/displaySettings";
 
 import {
   DEFAULT_TABLE_RULES,
@@ -31,16 +50,7 @@ import {
 const subscribeToClient = () => () => {};
 const PREFERRED_THEME_KEY = "uno.preferred.theme";
 
-const ONLINE_PLAYER_NAME_KEY = "uno.online.playerName";
-
 type ThemeName = "paper" | "midnight" | "forest" | "sunset";
-
-const THEMES: Record<ThemeName, { label: string }> = {
-  paper: { label: "Daylight" },
-  midnight: { label: "After hours" },
-  forest: { label: "Club green" },
-  sunset: { label: "Clay" },
-};
 
 function getInitialRules(): GameRules {
   if (typeof window === "undefined") return { ...DEFAULT_TABLE_RULES };
@@ -77,29 +87,34 @@ export default function Home() {
       ? "online"
       : "computer",
   );
-  const [view, setView] = useState<"home" | "computer" | "friends">(() =>
+  const [view, setView] = useState<"home" | "computer" | "room">(() =>
     typeof window !== "undefined" &&
     new URLSearchParams(window.location.search).has("room")
-      ? "friends"
+      ? "room"
       : "home",
   );
-  const [panel, setPanel] = useState<"create" | "join">("create");
-  const [theme, setTheme] = useState<ThemeName>(getInitialTheme);
-  const [showS, setShowS] = useState(false);
-  const [settingsTab, setSettingsTab] = useState<
-    "profile" | "controls" | "audio"
-  >("controls");
+  const [panel, setPanel] = useState<"create" | "join">(() =>
+    typeof window !== "undefined" &&
+    new URLSearchParams(window.location.search).has("room")
+      ? "join"
+      : "create",
+  );
+  const [theme] = useState<ThemeName>(getInitialTheme);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [settingsTab, setSettingsTab] = useState<SettingsSection>("profile");
+  const [inviteToJoin, setInviteToJoin] = useState<string | null>(null);
+  const joiningInvite = useRef(false);
   const [rules, setRules] = useState<Partial<GameRules>>(getInitialRules);
+  const [savingRules, setSavingRules] = useState(false);
   // On client this is always true; on server it's false (SSR guard)
   const mounted = useSyncExternalStore(
     subscribeToClient,
     () => true,
     () => false,
   );
-  const { playMusic, setMusicContext } = useAudioManager();
 
   const phonePortrait = usePhonePortrait();
-  const local = useUnoGame(phonePortrait);
+  const local = useUnoGame(phonePortrait || mode === "online");
   const online = useUnoOnlineGame();
   const api = mode === "computer" ? local : online;
 
@@ -107,13 +122,23 @@ export default function Home() {
     if (!online.room || view !== "home") return;
     const timer = setTimeout(() => {
       setMode("online");
-      setView("friends");
+      setView("room");
     }, 0);
     return () => clearTimeout(timer);
   }, [online.room, view]);
 
   // Derive gameContext directly from api.game to avoid setState-in-effect
   const gameContext = api.game !== null ? "game" : "lobby";
+  useAudioManager(gameContext);
+  useEffect(() => {
+    const sync = () => {
+      document.documentElement.dataset.reducedMotion = String(
+        getReducedMotionSetting(),
+      );
+    };
+    sync();
+    return subscribeDisplaySettings(sync);
+  }, []);
 
   useEffect(() => {
     if (mounted) {
@@ -132,100 +157,137 @@ export default function Home() {
     document.documentElement.dataset.theme = theme;
   }, [theme, mounted]);
 
-  useEffect(() => {
-    setMusicContext(gameContext);
-    playMusic(gameContext);
-  }, [gameContext, setMusicContext, playMusic]);
-
-  useEffect(() => {
-    const startMusic = () => {
-      setMusicContext(gameContext);
-      playMusic(gameContext);
-    };
-    window.addEventListener("pointerdown", startMusic, { once: true });
-    return () => window.removeEventListener("pointerdown", startMusic);
-  }, [gameContext, setMusicContext, playMusic]);
-
-  const selectTheme = (themeName: string) => {
-    if (
-      themeName === "paper" ||
-      themeName === "midnight" ||
-      themeName === "forest" ||
-      themeName === "sunset"
-    ) {
-      setTheme(themeName);
-    }
-  };
-
-  const copyCode = async () => {
-    if (!online.friendCode) return;
-    try {
-      await navigator.clipboard.writeText(online.friendCode);
-      toast.success("Friend code copied.");
-    } catch {
-      toast.error("Could not copy friend code.");
-    }
-  };
-
-  const label = THEMES[theme].label;
   const editingRoom =
     mode === "online" &&
     !!online.room &&
     !online.room.started &&
     online.room.hostPlayerId === online.playerId;
   const lobbyRules = online.room?.rules ?? rules;
-  const changeRules = (newRules: Partial<GameRules>) => {
-    setRules(newRules);
-    if (editingRoom) void online.updateRoomRules(newRules);
-  };
-
-  const openSettingsAt = (tab: "profile" | "controls" | "audio") => {
-    setSettingsTab(tab);
-    setShowS(true);
-  };
-
-  const settingsModal = (
-    <SettingsModal
-      key={`settings-${settingsTab}-${showS ? "open" : "closed"}`}
-      open={showS}
-      initialTab={settingsTab}
-      themeLabel={label}
-      onSelectTheme={selectTheme}
-      rules={editingRoom ? lobbyRules : rules}
-      editingRoom={editingRoom}
-      friendCode={online.friendCode}
-      onCopyFriendCode={() => {
-        void copyCode();
-      }}
-      onChange={changeRules}
-      onClose={() => setShowS(false)}
-    />
-  );
-
-  const topBar = (
-    <NotificationPanel
-      themeLabel={label}
-      onSelectTheme={selectTheme}
-      onOpenProfileSettings={() => openSettingsAt("profile")}
-      onOpenControlsSettings={() => openSettingsAt("controls")}
-      onOpenAudioSettings={() => openSettingsAt("audio")}
-      incomingInviteCount={online.incomingInvites.length}
-      incomingInvites={online.incomingInvites}
-      onAcceptFriendInvite={async (id) => {
-        let name = "You";
-        try {
-          name = localStorage.getItem(ONLINE_PLAYER_NAME_KEY)?.trim() || name;
-        } catch {}
-        const joined = await online.acceptFriendInvite(id, name);
-        if (joined) {
-          setMode("online");
-          setView("friends");
+  const changeRules = async (newRules: Partial<GameRules>) => {
+    if (savingRules) return;
+    if (editingRoom) {
+      setSavingRules(true);
+      try {
+        if (!(await online.updateRoomRules(newRules))) {
+          toast.error(
+            "Couldn’t save the room rules. Check your connection and try again.",
+          );
+          return false;
         }
-        return joined;
-      }}
-      onDeclineFriendInvite={online.declineFriendInvite}
+      } finally {
+        setSavingRules(false);
+      }
+    }
+    setRules(newRules);
+    return true;
+  };
+
+  const openSettingsAt = (tab: SettingsSection) => {
+    setSettingsTab(tab);
+    setSettingsOpen(true);
+  };
+
+  const joinFromInvite = async (id: string) => {
+    if (joiningInvite.current) return false;
+    joiningInvite.current = true;
+    try {
+      const invite = online.incomingInvites.find(
+        (item) => item.inviteId === id,
+      );
+      if (!invite) return false;
+      if (online.room && online.room.roomId !== invite.roomId)
+        await online.leaveRoom();
+      const joined = await online.acceptFriendInvite(id, getPlayerName());
+      if (joined) {
+        if (local.game) local.resetGame();
+        setMode("online");
+        setView("room");
+        setSettingsOpen(false);
+      } else toast.error("Couldn’t join that invitation. It may have expired.");
+      return joined;
+    } finally {
+      joiningInvite.current = false;
+    }
+  };
+  const acceptInvitation = async (id: string) => {
+    const invite = online.incomingInvites.find((item) => item.inviteId === id);
+    if (api.game || (online.room && online.room.roomId !== invite?.roomId)) {
+      setInviteToJoin(id);
+      return true;
+    }
+    return joinFromInvite(id);
+  };
+  const sendRoomInvite = async (code: string) => {
+    if (!online.room && !(await online.createRoom(getPlayerName(), rules)))
+      return false;
+    const ok = await online.sendFriendInvite(code, getPlayerName());
+    if (ok) {
+      setMode("online");
+      setView("room");
+      setSettingsOpen(false);
+    }
+    return ok;
+  };
+  const profileMenuProps = {
+    onOpenProfile: () => openSettingsAt("profile"),
+    onOpenFriends: () => openSettingsAt("friends"),
+    onOpenSettings: () => openSettingsAt("overview"),
+    notificationCount:
+      online.incomingInvites.length + online.social.incomingRequests.length,
+  };
+
+  const settingsModal = settingsOpen ? (
+    <SettingsModal
+      key={settingsTab}
+      open
+      initialTab={settingsTab}
+      rules={
+        api.game?.rules ??
+        (online.room && mode === "online" ? lobbyRules : rules)
+      }
+      editingRoom={editingRoom}
+      readOnlyRules={
+        !!api.game || (mode === "online" && !!online.room && !editingRoom)
+      }
+      savingRules={savingRules}
+      friendNotificationCount={
+        online.incomingInvites.length + online.social.incomingRequests.length
+      }
+      friendsContent={
+        <FriendsPanel
+          social={online.social}
+          friendCode={online.friendCode}
+          connected={online.connected}
+          incomingInvites={online.incomingInvites}
+          canInvite={!api.game && !online.room?.started}
+          seatedCodes={
+            online.room?.players.flatMap((player) =>
+              player.friendCode ? [player.friendCode] : [],
+            ) ?? []
+          }
+          onRequest={online.sendFriendRequest}
+          onRespond={online.respondToFriendRequest}
+          onRemove={online.removeFriend}
+          onInvite={sendRoomInvite}
+          onAcceptInvite={acceptInvitation}
+          onDeclineInvite={online.declineFriendInvite}
+        />
+      }
+      onSetUpBots={
+        !api.game && !online.room
+          ? () => {
+              setSettingsOpen(false);
+              setMode("computer");
+              setView("computer");
+            }
+          : undefined
+      }
+      onChange={changeRules}
+      onClose={() => setSettingsOpen(false)}
     />
-  );
+  ) : null;
+
+  const topBar = <AppHeader {...profileMenuProps} />;
 
   let content: ReactNode = (
     <main className="loading-screen">
@@ -241,6 +303,7 @@ export default function Home() {
       <>
         <GameBoard
           gameApi={api}
+          profileMenu={<ProfileMenu {...profileMenuProps} />}
           onReset={() => {
             api.resetGame();
             setMode("computer");
@@ -252,9 +315,7 @@ export default function Home() {
             }
             return online.startOnlineGame(currentGame.rules);
           }}
-          onOpenSettings={(tab) => openSettingsAt(tab ?? "controls")}
         />
-        {settingsModal}
       </>
     );
   } else if (mounted && view === "home") {
@@ -273,37 +334,13 @@ export default function Home() {
             setMode("computer");
           }}
           rules={rules}
-          onRulesChange={setRules}
-          themeLabel={label}
-          onSelectTheme={selectTheme}
-          onOpenControlsSettings={() => openSettingsAt("controls")}
-          onOpenAudioSettings={() => openSettingsAt("audio")}
-          onOpenProfileSettings={() => openSettingsAt("profile")}
-          onComputer={() => {
-            if (online.room) void online.leaveRoom();
-            setMode("computer");
-            setView("computer");
-          }}
-          onFriends={() => {
+          onRulesChange={changeRules}
+          controls={topBar}
+          onCreateRoom={() => {
             setMode("online");
             setPanel("create");
-            setView("friends");
+            setView("room");
           }}
-          incomingInvites={online.incomingInvites}
-          onAcceptFriendInvite={async (id) => {
-            let name = "You";
-            try {
-              name =
-                localStorage.getItem(ONLINE_PLAYER_NAME_KEY)?.trim() || name;
-            } catch {}
-            const joined = await online.acceptFriendInvite(id, name);
-            if (joined) {
-              setMode("online");
-              setView("friends");
-            }
-            return joined;
-          }}
-          onDeclineFriendInvite={online.declineFriendInvite}
           onQuickPlay={() => {
             if (online.room) void online.leaveRoom();
             const names = getSavedPlayerNames();
@@ -317,10 +354,9 @@ export default function Home() {
           onJoin={() => {
             setMode("online");
             setPanel("join");
-            setView("friends");
+            setView("room");
           }}
         />
-        {settingsModal}
       </>
     );
   } else if (mounted && view === "computer") {
@@ -338,15 +374,14 @@ export default function Home() {
             local.startGame(names, rules, botFlags);
           }}
         />
-        {settingsModal}
       </>
     );
   } else if (mounted) {
     content = (
       <>
         <OnlineLobby
+          savingRules={savingRules}
           rules={lobbyRules}
-          onRulesChange={changeRules}
           onOpenRules={() => openSettingsAt("controls")}
           onPlayBots={() => {
             setMode("computer");
@@ -358,16 +393,16 @@ export default function Home() {
           connected={online.connected}
           room={online.room}
           playerId={online.playerId}
-          friendCode={online.friendCode}
-          incomingInvites={online.incomingInvites}
-          outgoingInvites={online.outgoingInvites}
+          social={online.social}
+          invitedCodes={online.outgoingInvites.map(
+            (invite) => invite.targetFriendCode,
+          )}
+          onRequestFriend={online.sendFriendRequest}
+          onInviteFriend={sendRoomInvite}
+          onOpenFriends={() => openSettingsAt("friends")}
           error={online.error}
-          onSyncPresence={online.syncPresence}
           onCreateRoom={(name) => online.createRoom(name, rules)}
           onJoinRoom={online.joinRoom}
-          onSendFriendInvite={online.sendFriendInvite}
-          onAcceptFriendInvite={online.acceptFriendInvite}
-          onDeclineFriendInvite={online.declineFriendInvite}
           onLeaveRoom={online.leaveRoom}
           onStartGame={() => {
             setMode("online");
@@ -375,12 +410,45 @@ export default function Home() {
           }}
           onAddBotSeat={online.addBotToRoom}
           onKickPlayer={online.kickPlayer}
-          onCheckFriendOnline={online.checkFriendOnline}
         />
-        {settingsModal}
       </>
     );
   }
 
-  return <>{content}</>;
+  return (
+    <>
+      {content}
+      {settingsModal}
+      <InvitationNotifications
+        invites={online.incomingInvites}
+        requests={online.social.incomingRequests}
+        connected={online.connected}
+        onAccept={acceptInvitation}
+        onDecline={online.declineFriendInvite}
+        onOpenFriends={() => openSettingsAt("friends")}
+      />
+      {inviteToJoin && (
+        <ChoiceDialog
+          title="Join the other table?"
+          description="You’ll leave your current table to accept this invitation."
+          actions={[
+            {
+              label: "Stay here",
+              variant: "secondary",
+              onClick: () => setInviteToJoin(null),
+            },
+            {
+              label: "Leave and join",
+              variant: "primary",
+              onClick: () => {
+                const id = inviteToJoin;
+                setInviteToJoin(null);
+                void joinFromInvite(id);
+              },
+            },
+          ]}
+        />
+      )}
+    </>
+  );
 }

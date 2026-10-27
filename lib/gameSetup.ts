@@ -10,6 +10,8 @@ import { isActionCard, isWildCard, STANDARD_COLORS } from '../types/card';
 import { validateGameRules } from './validateGameRules';
 import {
   createStandardUnoDeck,
+  createNoMercyDeck,
+  createAllWildDeck,
   shuffleDeck,
   dealCards,
   resetCardIdCounter,
@@ -104,19 +106,20 @@ export function initializeGame(
   }));
 
   // ── 4. Create and shuffle deck ────────────────────────────────────────────
-  let deck = createStandardUnoDeck().filter((card) => {
-    if (card.value === 'discardAll' && !mergedRules.allowDiscardAll)
-      return false;
-    if (card.value === 'shuffle' && !mergedRules.allowShuffleCard) return false;
-    return true;
-  });
-  // Reserve all wild/action candidates so the opener can always be a number.
+  let deck = createGameDeck(mergedRules);
+
+  // Reserve opening candidate(s) so dealing doesn't starve the deck.
   const openingReserve =
-    deck.filter(
-      (card) =>
-        isWildCard(card) ||
-        (!mergedRules.allowStartingActionCard && isActionCard(card)),
-    ).length + 1;
+    mergedRules.gameMode === 'all_wild'
+      ? 1
+      : deck.filter(
+          (card) =>
+            isWildCard(card) ||
+            ((mergedRules.gameMode === 'no_mercy' ||
+              !mergedRules.allowStartingActionCard) &&
+              isActionCard(card)),
+        ).length + 1;
+
   if (
     playerNames.length * mergedRules.startingHandSize >
     deck.length - openingReserve
@@ -138,33 +141,51 @@ export function initializeGame(
   }
 
   // ── 6. Flip starting card ─────────────────────────────────────────────────
-  const {
-    card: startCard,
-    deck: deckAfterStart,
-    rejected,
-  } = drawStartingCard(deck, mergedRules.allowStartingActionCard);
-
-  // Rejected cards go back to the bottom of the draw pile so nothing is lost.
-  deck = [...rejected, ...deckAfterStart];
+  let startCard: Card;
+  if (mergedRules.gameMode === 'all_wild') {
+    // In All Wild, top card begins discard pile; its special action is ignored.
+    startCard = deck[deck.length - 1];
+    deck = deck.slice(0, -1);
+  } else {
+    const {
+      card,
+      deck: deckAfterStart,
+      rejected,
+    } = drawStartingCard(
+      deck,
+      mergedRules.gameMode === 'no_mercy'
+        ? false
+        : mergedRules.allowStartingActionCard,
+    );
+    startCard = card;
+    // Rejected cards go back to the bottom of the draw pile so nothing is lost.
+    deck = [...rejected, ...deckAfterStart];
+  }
 
   // ── 7. Derive initial active color ────────────────────────────────────────
-  const activeColor = getInitialActiveColor(startCard);
+  const activeColor =
+    mergedRules.gameMode === 'all_wild'
+      ? null
+      : getInitialActiveColor(startCard);
 
   // ── 8. Assemble initial state ─────────────────────────────────────────────
+  const isActionStart =
+    mergedRules.gameMode !== 'all_wild' && startCard.value !== '0';
   const state: GameState = {
     players,
     currentPlayerIndex:
-      startCard.value === 'skip'
+      isActionStart && startCard.value === 'skip'
         ? 1
-        : startCard.value === 'reverse'
+        : isActionStart && startCard.value === 'reverse'
           ? players.length - 1
           : 0,
-    direction: startCard.value === 'reverse' ? -1 : 1,
+    direction: isActionStart && startCard.value === 'reverse' ? -1 : 1,
     drawPile: deck,
     discardPile: [startCard],
     activeColor,
-    pendingDraw: startCard.value === 'draw2' ? 2 : 0,
-    pendingDrawType: startCard.value === 'draw2' ? 'draw2' : null,
+    pendingDraw: isActionStart && startCard.value === 'draw2' ? 2 : 0,
+    pendingDrawType:
+      isActionStart && startCard.value === 'draw2' ? 'draw2' : null,
     drawnThisTurn: false,
     winnerId: null,
     rules: mergedRules,
@@ -173,4 +194,25 @@ export function initializeGame(
   };
 
   return state;
+}
+
+/** One deck definition shared by fresh deals and saved-round validation. */
+export function createGameDeck(rules: GameRules): Card[] {
+  let deck =
+    rules.gameMode === 'no_mercy'
+      ? createNoMercyDeck()
+      : rules.gameMode === 'all_wild'
+        ? createAllWildDeck()
+        : createStandardUnoDeck();
+  if (rules.gameMode === 'no_mercy' && rules.allowShuffleCard) {
+    deck = [
+      ...deck,
+      ...createStandardUnoDeck().filter((card) => card.value === 'shuffle'),
+    ];
+  }
+  return deck.filter(
+    (card) =>
+      (card.value !== 'discardAll' || rules.allowDiscardAll) &&
+      (card.value !== 'shuffle' || rules.allowShuffleCard),
+  );
 }

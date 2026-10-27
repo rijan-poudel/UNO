@@ -1,13 +1,16 @@
 // One native challenge selector for bot setup, room hosts and preferences.
 "use client";
 import { useId } from "react";
+import SettingSelect from "./ui/SettingSelect";
 import type { GameRules } from "../types/rules";
 import { BOT_DIFFICULTY_OPTIONS } from "../lib/botSupport";
 
 export default function BotDifficultyControl({
   rules,
   onChange,
+  compact = false,
 }: {
+  compact?: boolean;
   rules: Partial<GameRules>;
   onChange: (rules: Partial<GameRules>) => void;
 }) {
@@ -20,9 +23,11 @@ export default function BotDifficultyControl({
     <label className="preference-row">
       <span>
         <strong>Bot challenge</strong>
-        <small id={descriptionId}>{current.description}</small>
+        <small id={descriptionId} className={compact ? "sr-only" : undefined}>
+          {current.description}
+        </small>
       </span>
-      <select
+      <SettingSelect
         className="bot-challenge-select"
         aria-label="Bot challenge"
         aria-describedby={descriptionId}
@@ -39,7 +44,7 @@ export default function BotDifficultyControl({
             {option.label}
           </option>
         ))}
-      </select>
+      </SettingSelect>
     </label>
   );
 }

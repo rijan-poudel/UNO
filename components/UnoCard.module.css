@@ -161,3 +161,61 @@
   pointer-events: none;
   white-space: nowrap;
 }
+
+/* Composite edition symbols stay readable at hand and corner scales. */
+.face
+  :global(.card-value)
+  :is(
+    :global(.card-skip-two),
+    :global(.card-reverse-draw4),
+    :global(.card-target-draw2)
+  ) {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 1.15em;
+  height: 1.15em;
+}
+.face
+  :global(.card-value)
+  :is(
+    :global(.card-skip-two),
+    :global(.card-reverse-draw4),
+    :global(.card-target-draw2)
+  )
+  > svg {
+  width: 100%;
+  height: 100%;
+}
+.face
+  :global(.card-value)
+  :is(
+    :global(.card-skip-two),
+    :global(.card-reverse-draw4),
+    :global(.card-target-draw2)
+  )
+  > small {
+  position: absolute;
+  right: -0.25em;
+  bottom: -0.15em;
+  padding: 0 0.1em;
+  font-size: 0.52em;
+  font-family: var(--font-card), sans-serif;
+  line-height: 1;
+  background: #fff;
+  border-radius: 4px;
+}
+.face
+  :global(.card-index)
+  :is(
+    :global(.card-skip-two),
+    :global(.card-reverse-draw4),
+    :global(.card-target-draw2)
+  ) {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.08em;
+}
+.face :global(.card-index) small {
+  font-size: 0.7em;
+}

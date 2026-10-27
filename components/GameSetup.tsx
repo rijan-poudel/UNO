@@ -2,10 +2,9 @@
 "use client";
 import { useEffect, useState, type ReactNode } from "react";
 import { ArrowRight, Minus, Plus } from "lucide-react";
+import { getRuleSetLabel } from "../lib/customRuleProfiles";
 import type { GameRules } from "../types/rules";
-import { RULE_PRESETS, matchesPreset } from "../lib/rulePresets";
 import PlayerAvatar from "./PlayerAvatar";
-import AvatarPicker from "./AvatarPicker";
 import SetupShell from "./SetupShell";
 import { SetupIntro } from "./ui/PageChrome";
 import {
@@ -15,7 +14,6 @@ import {
   savePlayerName,
   subscribePlayerName,
 } from "../lib/playerNames";
-import TableRules from "./TableRules";
 import BotDifficultyControl from "./BotDifficultyControl";
 import { getBotDifficultyLabel } from "../lib/botSupport";
 export default function GameSetup({
@@ -36,7 +34,7 @@ export default function GameSetup({
   onOpenRules: () => void;
 }) {
   const [names, setNames] = useState(getSavedPlayerNames);
-  const preset = RULE_PRESETS.find((item) => matchesPreset(rules, item.rules));
+
   useEffect(
     () =>
       subscribePlayerName(() => {
@@ -59,7 +57,7 @@ export default function GameSetup({
       footer={
         <>
           <p className="muted">
-            {preset?.label ?? "Custom rules"} ·{" "}
+            {getRuleSetLabel(rules)} ·{" "}
             {getBotDifficultyLabel(rules.botDifficulty)} bots ·{" "}
             {startingHandSize} cards each. First to an empty hand wins.
           </p>
@@ -111,25 +109,6 @@ export default function GameSetup({
           </button>
         </div>
       </div>
-      <div className="setup-name-field">
-        <label className="field-label" htmlFor="local-player-name">
-          Your name
-        </label>
-        <input
-          id="local-player-name"
-          value={names[0]}
-          maxLength={18}
-          autoComplete="nickname"
-          onBlur={() => {
-            const name = savePlayerName(names[0]);
-            setNames((current) => [name, ...current.slice(1)]);
-          }}
-          onChange={(e) =>
-            setNames((n) => n.map((v, i) => (i === 0 ? e.target.value : v)))
-          }
-        />
-      </div>
-      <AvatarPicker />
       <div className="crew-line" aria-label="Your bot opponents">
         {names.slice(1).map((name, i) => (
           <div key={i}>
@@ -160,17 +139,9 @@ export default function GameSetup({
           ))}
         </div>
       </details>
-      <details className="setup-disclosure bot-rule-disclosure">
-        <summary>
-          Table rules <span>{preset?.label ?? "Custom rules"}</span>
-        </summary>
-        <TableRules
-          showBotChallenge={false}
-          rules={rules}
-          onChange={onRulesChange}
-          onOpenRules={onOpenRules}
-        />
-      </details>
+      <button className="text-button" onClick={onOpenRules}>
+        Game rules · {getRuleSetLabel(rules)}
+      </button>
     </SetupShell>
   );
 }

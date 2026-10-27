@@ -1,26 +1,13 @@
 // Device-local recovery for unfinished bot rounds. Storage never gates play.
 import type { Card } from '../types/card';
-import { ACTION_VALUES, NUMBER_VALUES, STANDARD_COLORS } from '../types/card';
+import { STANDARD_COLORS } from '../types/card';
+import { createGameDeck } from './gameSetup';
 import type { GameState } from '../types/game';
 import { validateGameRules } from './validateGameRules';
 import { withTurnDeadline } from './turnFlow';
 import { parseTableScore } from './tableScore';
 
 export const SAVED_ROUND_KEY = 'uno.localRound.v1';
-
-function isCard(card: Card): boolean {
-  return (
-    !!card &&
-    typeof card.id === 'string' &&
-    card.id.length > 0 &&
-    card.id.length <= 100 &&
-    (card.color === 'wild'
-      ? ['wild', 'wild4', 'shuffle'].includes(card.value)
-      : STANDARD_COLORS.includes(card.color) &&
-        [...NUMBER_VALUES, ...ACTION_VALUES].includes(card.value) &&
-        !['wild', 'wild4', 'shuffle'].includes(card.value))
-  );
-}
 
 export function parseSavedRound(raw: string | null): GameState | null {
   if (!raw || raw.length > 64_000) return null;
@@ -37,7 +24,9 @@ export function parseSavedRound(raw: string | null): GameState | null {
       game.currentPlayerIndex < 0 ||
       game.currentPlayerIndex >= game.players.length ||
       ![1, -1].includes(game.direction) ||
-      !STANDARD_COLORS.includes(game.activeColor) ||
+      !(
+        game.activeColor === null || STANDARD_COLORS.includes(game.activeColor)
+      ) ||
       !Number.isSafeInteger(game.turnCount) ||
       game.turnCount < 0 ||
       !Number.isSafeInteger(game.pendingDraw) ||
@@ -69,7 +58,9 @@ export function parseSavedRound(raw: string | null): GameState | null {
           typeof player.isBot !== 'boolean' ||
           typeof player.saidUno !== 'boolean' ||
           !Array.isArray(player.hand) ||
-          player.hand.length === 0,
+          (player.hand.length === 0 && player.eliminated !== true) ||
+          (player.eliminated !== undefined &&
+            typeof player.eliminated !== 'boolean'),
       )
     )
       return null;
@@ -78,34 +69,49 @@ export function parseSavedRound(raw: string | null): GameState | null {
       ...game.drawPile,
       ...game.discardPile,
       ...players.flatMap((player) => player.hand),
+      ...(game.outOfPlayPile ?? []),
     ];
-    const expectedSize =
-      108 + (rules.allowDiscardAll ? 8 : 0) + (rules.allowShuffleCard ? 4 : 0);
+    if (game.outOfPlayPile !== undefined && !Array.isArray(game.outOfPlayPile))
+      return null;
+    const deck = createGameDeck(rules);
+    const expected = new Map<string, number>();
+    for (const card of deck) {
+      const key = `${card.color}:${card.value}`;
+      expected.set(key, (expected.get(key) ?? 0) + 1);
+    }
     if (
-      cards.length !== expectedSize ||
-      !cards.every(isCard) ||
-      new Set(cards.map((card) => card.id)).size !== cards.length
+      cards.length !== deck.length ||
+      new Set(cards.map((card) => card?.id)).size !== cards.length
     )
       return null;
-    const counts = new Map<string, number>();
     for (const card of cards) {
+      if (
+        !card ||
+        typeof card.id !== 'string' ||
+        !card.id ||
+        card.id.length > 100
+      )
+        return null;
       const key = `${card.color}:${card.value}`;
-      const count = (counts.get(key) ?? 0) + 1;
-      const expected =
-        card.color === 'wild'
-          ? card.value === 'shuffle' && !rules.allowShuffleCard
-            ? 0
-            : 4
-          : card.value === 'discardAll' && !rules.allowDiscardAll
-            ? 0
-            : card.value === '0'
-              ? 1
-              : 2;
-      if (count > expected) return null;
-      counts.set(key, count);
+      const remaining = expected.get(key) ?? 0;
+      if (remaining <= 0) return null;
+      expected.set(key, remaining - 1);
     }
     const top: Card = game.discardPile.at(-1);
-    if (top.color !== 'wild' && top.color !== game.activeColor) return null;
+    if (
+      rules.gameMode !== 'all_wild' &&
+      (!STANDARD_COLORS.includes(game.activeColor) ||
+        (top.color !== 'wild' && top.color !== game.activeColor))
+    )
+      return null;
+    if (players[game.currentPlayerIndex].eliminated) return null;
+    if (
+      game.pendingRoulette &&
+      (game.pendingRoulette.playerId !== players[game.currentPlayerIndex].id ||
+        top.value !== 'wildColorRoulette' ||
+        game.pendingDraw !== 0)
+    )
+      return null;
 
     // Transient presentation and an expired wall clock must not replay on return.
     const roundId =
@@ -123,6 +129,10 @@ export function parseSavedRound(raw: string | null): GameState | null {
       players,
       rules,
       drawPile: game.drawPile,
+      ...(game.outOfPlayPile ? { outOfPlayPile: game.outOfPlayPile } : {}),
+      ...(game.pendingRoulette
+        ? { pendingRoulette: game.pendingRoulette }
+        : {}),
       discardPile: game.discardPile,
       currentPlayerIndex: game.currentPlayerIndex,
       direction: game.direction,

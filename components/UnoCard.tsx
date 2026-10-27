@@ -2,7 +2,17 @@
 "use client";
 
 import type { CSSProperties } from "react";
-import { Ban, Repeat2, Layers, Shuffle } from "lucide-react";
+import {
+  Ban,
+  Repeat2,
+  Layers,
+  Shuffle,
+  FastForward,
+  ArrowLeftRight,
+  Crosshair,
+  Disc,
+} from "lucide-react";
+import { getCardLabel } from "../types/card";
 import type { Card } from "../types/card";
 import styles from "./UnoCard.module.css";
 
@@ -18,18 +28,14 @@ interface UnoCardProps {
   tabIndex?: number;
   cornerHint?: string;
 }
-const LABELS: Record<string, string> = {
-  skip: "Skip",
-  reverse: "Reverse",
-  draw2: "Draw two",
-  wild: "Wild",
-  wild4: "Wild draw four",
-  shuffle: "Shuffle hands",
-  discardAll: "Discard all",
-};
 const SYMBOLS: Record<string, string> = {
   draw2: "+2",
+  draw4: "+4",
   wild4: "+4",
+  wildDraw6: "+6",
+  wildDraw10: "+10",
+  wildSkip2: "×2",
+  wildTargetDraw2: "+2",
   wild: "",
   shuffle: "",
   discardAll: "",
@@ -37,7 +43,31 @@ const SYMBOLS: Record<string, string> = {
 
 function CardSymbol({ value }: { value: string }) {
   if (value === "skip") return <Ban aria-hidden="true" />;
+  if (value === "skipEveryone") return <FastForward aria-hidden="true" />;
+  if (value === "wildSkip2")
+    return (
+      <span className="card-skip-two">
+        <Ban aria-hidden="true" />
+        <small>2</small>
+      </span>
+    );
   if (value === "reverse") return <Repeat2 aria-hidden="true" />;
+  if (value === "wildReverseDraw4")
+    return (
+      <span className="card-reverse-draw4">
+        <Repeat2 aria-hidden="true" />
+        <small>+4</small>
+      </span>
+    );
+  if (value === "wildTargetDraw2")
+    return (
+      <span className="card-target-draw2">
+        <Crosshair aria-hidden="true" />
+        <small>+2</small>
+      </span>
+    );
+  if (value === "wildForcedSwap") return <ArrowLeftRight aria-hidden="true" />;
+  if (value === "wildColorRoulette") return <Disc aria-hidden="true" />;
   if (value === "shuffle") return <Shuffle aria-hidden="true" />;
   if (value === "discardAll") return <Layers aria-hidden="true" />;
   if (value === "wild")
@@ -64,9 +94,7 @@ export default function UnoCard({
   tabIndex,
   cornerHint,
 }: UnoCardProps) {
-  const label = faceDown
-    ? "Face-down card"
-    : `${card.color === "wild" ? "" : `${card.color} `}${LABELS[card.value] ?? card.value}`;
+  const label = faceDown ? "Face-down card" : getCardLabel(card);
   const style = { "--card-scale": sizeMultiplier } as CSSProperties;
   const content = faceDown ? (
     <>

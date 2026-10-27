@@ -68,8 +68,8 @@ assert.deepEqual(timedOut.autoPlayPlayerIds, ['player_0']);
 assert.equal(JSON.stringify(clock), original, 'Timeouts never mutate input');
 assert.equal(
   expireTurn(drawn).players[0].hand.length,
-  drawn.players[0].hand.length - 1,
-  'An already drawn turn may still play its legal card',
+  drawn.players[0].hand.length,
+  'After drawing an unplayable card, the substitute passes instead of playing an older card',
 );
 assert.equal(
   clock.players[0].hand.length,
@@ -195,6 +195,7 @@ assert.equal(
 );
 const stack: GameState = {
   ...penalty,
+  rules: { ...penalty.rules, stackDraw2: true },
   players: penalty.players.map((player, index) =>
     index === 0
       ? {

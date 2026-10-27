@@ -11,6 +11,10 @@ import { playTableChime, type TableChime } from "../lib/tableChimes";
 import { recordRound } from "../lib/playerProgress";
 import { getAudioSettings } from "../lib/audioSettings";
 import {
+  isReducedMotion,
+  subscribeDisplaySettings,
+} from "../lib/displaySettings";
+import {
   getCardFlight,
   getDealDelay,
   getPlayedCards,
@@ -118,9 +122,7 @@ export function useGamePresentation(
       handCardPoses.current.clear();
       selectedOrigin.current = null;
     }
-    const reduced =
-      document.hidden ||
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const reduced = document.hidden || isReducedMotion();
     const findSeat = (id: string) =>
       Array.from(board.querySelectorAll<HTMLElement>("[data-seat]")).find(
         (el) => el.dataset.seat === id,
@@ -531,7 +533,7 @@ export function useGamePresentation(
       }
     };
     const onMotion = () => {
-      if (media.matches) interrupt();
+      if (isReducedMotion()) interrupt();
     };
     const onResize = () => {
       interrupt();
@@ -543,6 +545,7 @@ export function useGamePresentation(
     window.addEventListener("resize", onResize);
     document.addEventListener("visibilitychange", onVisibility);
     media.addEventListener("change", onMotion);
+    const unsubscribeDisplay = subscribeDisplaySettings(onMotion);
     const active = running.current;
     const activeGhosts = ghosts.current;
     const activeFlights = flights.current;
@@ -552,6 +555,7 @@ export function useGamePresentation(
       window.removeEventListener("resize", onResize);
       document.removeEventListener("visibilitychange", onVisibility);
       media.removeEventListener("change", onMotion);
+      unsubscribeDisplay();
       stopBoardVoiceover();
       active.forEach((animation) => animation.cancel());
       activeGhosts.forEach((element) => element.remove());

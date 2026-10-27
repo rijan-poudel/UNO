@@ -14,8 +14,6 @@ import type { GameState } from '../types/game';
 import { getAudioSettings } from './audioSettings';
 import { audioUrlsForStem, STEM_TO_AUDIOS } from './audiosRegistry';
 
-export type VoiceCategory = 'board' | 'outside';
-
 type VoiceAudience =
   { type: 'room' } | { type: 'players'; ids: readonly string[] };
 
@@ -63,47 +61,6 @@ function channelOk(channel: string, minGapMs: number): boolean {
   }
   lastChannelAt.set(channel, now);
   return true;
-}
-
-function categoryEnabled(category: VoiceCategory): boolean {
-  const s = getAudioSettings();
-  if (s.muted) return false;
-  if (category === 'board') return s.voiceInGame;
-  return false;
-}
-
-function tryPlayPath(path: string, volume: number, onFail: () => void): void {
-  if (typeof window === 'undefined' || typeof Audio === 'undefined') return;
-
-  const s = getAudioSettings();
-  const effectiveVolume = volume * (s.sfxVolume ?? 0.8);
-
-  let audio = audioCache[path];
-  if (!audio) {
-    audio = new Audio(path);
-    audio.preload = 'auto';
-    audioCache[path] = audio;
-  }
-
-  audio.volume = Math.min(1, Math.max(0, effectiveVolume));
-  audio.currentTime = 0;
-
-  const onErr = () => {
-    audio.removeEventListener('error', onErr);
-    onFail();
-  };
-  audio.addEventListener('error', onErr, { once: true });
-
-  const clearErr = () => audio.removeEventListener('error', onErr);
-  audio.addEventListener('playing', clearErr, { once: true });
-
-  const result = audio.play();
-  if (result && typeof result.then === 'function') {
-    void result.catch(() => {
-      clearErr();
-      onFail();
-    });
-  }
 }
 
 /** Warm the clips while the user is setting up, never on a card's critical path. */
@@ -180,7 +137,6 @@ export function stopBoardVoiceover(): void {
 export function playVoiceStem(
   stem: string,
   opts: {
-    category: VoiceCategory;
     audience: VoiceAudience;
     localPlayerId: string | null;
     channel: string;
@@ -190,7 +146,8 @@ export function playVoiceStem(
   },
 ): void {
   if (!stem) return;
-  if (!categoryEnabled(opts.category)) return;
+  const settings = getAudioSettings();
+  if (settings.muted || !settings.voiceInGame) return;
   if (!audienceAllows(opts.audience, opts.localPlayerId)) return;
 
   const p = opts.probability ?? 1;
@@ -205,13 +162,7 @@ export function playVoiceStem(
   const candidates = audioUrlsForStem(stem);
   if (!candidates.length) return;
 
-  if (opts.category === 'board') {
-    playBoardVoicePath(candidates, volume);
-    return;
-  }
-
-  const path = candidates[0]!;
-  tryPlayPath(path, volume, () => {});
+  playBoardVoicePath(candidates, volume);
 }
 
 // ── Semantic pools (stems ↔ your spoken lines) ───────────────────────────────
@@ -335,7 +286,6 @@ export function announceBoardFromTransition(
       const { card, chosenColor, discardAllCount, shuffledHands } = action;
       if (action.declaredUno) {
         playVoiceStem(pickStem(POOLS.unoDeclare, seed), {
-          category: 'board',
           audience: { type: 'room' },
           localPlayerId,
           channel: 'board:uno',
@@ -348,7 +298,6 @@ export function announceBoardFromTransition(
         const mapped = normalizeActionColor(chosenColor);
         if (mapped) {
           playVoiceStem(POOLS.wildShuffleByColor[mapped], {
-            category: 'board',
             audience: { type: 'room' },
             localPlayerId,
             channel: 'board:shuffle',
@@ -361,7 +310,6 @@ export function announceBoardFromTransition(
       if (discardAllCount && discardAllCount > 0) {
         const stem = pickStem(POOLS.discardAll, seed);
         playVoiceStem(stem, {
-          category: 'board',
           audience: { type: 'room' },
           localPlayerId,
           channel: 'board:discard_all',
@@ -372,7 +320,6 @@ export function announceBoardFromTransition(
       if (card.value === 'skip') {
         const stem = pickStem(POOLS.skip, seed);
         playVoiceStem(stem, {
-          category: 'board',
           audience: { type: 'room' },
           localPlayerId,
           channel: 'board:skip',
@@ -384,7 +331,6 @@ export function announceBoardFromTransition(
       if (card.value === 'reverse') {
         const stem = pickStem(POOLS.reverse, seed);
         playVoiceStem(stem, {
-          category: 'board',
           audience: { type: 'room' },
           localPlayerId,
           channel: 'board:reverse',
@@ -395,7 +341,6 @@ export function announceBoardFromTransition(
 
       if (card.value === 'draw2') {
         playVoiceStem(pickStem(POOLS.draw2, seed), {
-          category: 'board',
           audience: { type: 'room' },
           localPlayerId,
           channel: 'board:draw2',
@@ -411,7 +356,6 @@ export function announceBoardFromTransition(
           : (stemForPlusCount(4) ??
             pickStem(Object.values(POOLS.plusFourByColor), seed));
         playVoiceStem(stem, {
-          category: 'board',
           audience: { type: 'room' },
           localPlayerId,
           channel: 'board:wild4',
@@ -424,7 +368,6 @@ export function announceBoardFromTransition(
         const mapped = normalizeActionColor(chosenColor);
         if (mapped) {
           playVoiceStem(POOLS.colorChangeByColor[mapped], {
-            category: 'board',
             audience: { type: 'room' },
             localPlayerId,
             channel: 'board:wild',
@@ -438,7 +381,6 @@ export function announceBoardFromTransition(
         const mapped = normalizeActionColor(chosenColor);
         if (mapped) {
           playVoiceStem(POOLS.wildShuffleByColor[mapped], {
-            category: 'board',
             audience: { type: 'room' },
             localPlayerId,
             channel: 'board:shuffle_card',
@@ -461,7 +403,6 @@ export function announceBoardFromTransition(
         const forcedStem = resolveForcedDrawStem(forcedCount);
         if (forcedStem) {
           playVoiceStem(forcedStem, {
-            category: 'board',
             audience: { type: 'room' },
             localPlayerId,
             channel: `board:forced_draw_${forcedCount}`,
@@ -477,7 +418,6 @@ export function announceBoardFromTransition(
     case 'declareUno': {
       const stem = pickStem(POOLS.unoDeclare, seed);
       playVoiceStem(stem, {
-        category: 'board',
         audience: { type: 'room' },
         localPlayerId,
         channel: 'board:uno',
@@ -489,7 +429,6 @@ export function announceBoardFromTransition(
     case 'callOut': {
       const stem = pickStem(POOLS.unoDeclare, seed);
       playVoiceStem(stem, {
-        category: 'board',
         audience: { type: 'room' },
         localPlayerId,
         channel: 'board:uno_callout',
@@ -502,76 +441,4 @@ export function announceBoardFromTransition(
     default:
       break;
   }
-}
-
-export function announceBoardWinner(
-  winnerId: string,
-  localPlayerId: string | null,
-  _seed: number,
-): void {
-  void winnerId;
-  void localPlayerId;
-  void _seed;
-  stopBoardVoiceover();
-}
-
-/** Lobby / socket / menus — respects "voice outside game" setting. */
-export function announceOutside(
-  pool: readonly string[],
-  channel: string,
-  minGapMs: number,
-  seed?: number,
-  probability = 1,
-): void {
-  if (!categoryEnabled('outside')) return;
-  const stem = pickStem(pool, seed ?? Date.now());
-  if (!stem) return;
-  if (!channelOk(channel, minGapMs)) return;
-  if (probability < 1 && Math.random() > probability) return;
-
-  const volume = 0.88;
-  const candidates = audioUrlsForStem(stem);
-  let index = 0;
-  const tryNext = () => {
-    if (index >= candidates.length) return;
-    const path = candidates[index]!;
-    index += 1;
-    tryPlayPath(path, volume, tryNext);
-  };
-  tryNext();
-}
-
-// Outside-game voice clips were removed from the asset set.
-const UI_CONNECT = [] as const;
-const UI_DISCONNECT = [] as const;
-const UI_ROOM = [] as const;
-
-export function voiceUiConnected(): void {
-  announceOutside(
-    UI_CONNECT,
-    'ui:socket_connect',
-    14000,
-    hashSeed(['connect', Date.now()]),
-    0.55,
-  );
-}
-
-export function voiceUiDisconnected(): void {
-  announceOutside(
-    UI_DISCONNECT,
-    'ui:socket_disconnect',
-    14000,
-    hashSeed(['disconnect', Date.now()]),
-    0.4,
-  );
-}
-
-export function voiceUiRoomJoined(): void {
-  announceOutside(
-    UI_ROOM,
-    'ui:room_join',
-    10000,
-    hashSeed(['room', Date.now()]),
-    0.35,
-  );
 }

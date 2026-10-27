@@ -21,6 +21,7 @@ import { initializeGame } from '../lib/gameSetup';
 import {
   playCard as enginePlayCard,
   drawOneCard,
+  chooseRouletteColor,
   drawRequiredCards,
   passTurn,
   declareUno,
@@ -30,7 +31,11 @@ import {
 import { canPlayCard, getPlayableCards } from '../lib/gameRules';
 import { playBotStep } from '../lib/botSupport';
 import { usePlayerActivity } from './usePlayerActivity';
-import { resolvePlayerName } from '../lib/playerNames';
+import {
+  getPlayerName,
+  resolvePlayerName,
+  subscribePlayerName,
+} from '../lib/playerNames';
 import { getPlayerAvatar, subscribePlayerAvatar } from '../lib/playerAvatars';
 import { readSavedRound, saveRound, resumeRound } from '../lib/savedRound';
 import { recordTableWin, startTableRound } from '../lib/tableScore';
@@ -47,11 +52,17 @@ const BOT_ACTION_DELAY_MS = BOT_TURN_MS;
 const AUTO_PASS_AFTER_DRAW_MS = 650;
 const POST_ACTION_HANDOFF_DELAY_MS = 180;
 
-function withLocalAvatar(game: GameState): GameState {
+function withLocalProfile(game: GameState): GameState {
   return {
     ...game,
     players: game.players.map((player) =>
-      player.isBot ? player : { ...player, avatarId: getPlayerAvatar() },
+      player.isBot
+        ? player
+        : {
+            ...player,
+            name: getPlayerName(player.name),
+            avatarId: getPlayerAvatar(),
+          },
     ),
   };
 }
@@ -256,14 +267,21 @@ export function useUnoGame(paused = false) {
 
   // Ref to always access latest game state in async callbacks
   const gameRef = useRef<GameState | null>(game);
-  useEffect(
-    () =>
-      subscribePlayerAvatar(() => {
-        const live = gameRef.current;
-        if (live) dispatch({ type: 'CLOCK', game: withLocalAvatar(live) });
-      }),
-    [],
-  );
+  useEffect(() => {
+    const sync = () => {
+      const live = gameRef.current;
+      if (!live) return;
+      const next = withLocalProfile(live);
+      gameRef.current = next;
+      dispatch({ type: 'CLOCK', game: next });
+    };
+    const unsubscribeAvatar = subscribePlayerAvatar(sync);
+    const unsubscribeName = subscribePlayerName(sync);
+    return () => {
+      unsubscribeAvatar();
+      unsubscribeName();
+    };
+  }, []);
   const pausedRef = useRef(paused);
   const pendingWildRef = useRef(pendingWild);
   const pausedAt = useRef<number | null>(null);
@@ -311,7 +329,7 @@ export function useUnoGame(paused = false) {
   const startGame = useCallback(
     (playerNames: string[], rules: Partial<GameRules>, botFlags: boolean[]) => {
       const newGame = startTableRound(
-        withLocalAvatar(initializeGame(playerNames, rules, botFlags)),
+        withLocalProfile(initializeGame(playerNames, rules, botFlags)),
         localRoundId(),
       );
       const firstHuman = newGame.players.findIndex((p) => !p.isBot);
@@ -334,7 +352,7 @@ export function useUnoGame(paused = false) {
     dispatch({
       type: 'INIT',
       game: startTableRound(
-        withLocalAvatar(next),
+        withLocalProfile(next),
         localRoundId(),
         finished.tableScore,
       ),
@@ -352,7 +370,7 @@ export function useUnoGame(paused = false) {
     setSavedGame(null);
     dispatch({
       type: 'RESTORE',
-      game: withLocalAvatar(
+      game: withLocalProfile(
         saved.tableScore
           ? saved
           : startTableRound(saved, saved.roundId ?? localRoundId()),
@@ -366,7 +384,11 @@ export function useUnoGame(paused = false) {
   const selectCard = useCallback(
     (card: Card, options: PlayOptions = {}) => {
       if (!game || !canPlayCard(card, game, localPlayerIndex)) return;
-      if (card.color === 'wild') {
+      if (
+        card.color === 'wild' &&
+        game.rules.gameMode !== 'all_wild' &&
+        card.value !== 'wildColorRoulette'
+      ) {
         // Wild cards need a color choice first — open the picker
         dispatchHuman({ type: 'SELECT_WILD', card });
       } else {
@@ -391,7 +413,17 @@ export function useUnoGame(paused = false) {
 
   const confirmWildColor = useCallback(
     (color: CardColor) => {
-      if (!game || !pendingWild) return;
+      if (!game) return;
+      if (
+        game.pendingRoulette?.playerId === game.players[localPlayerIndex].id
+      ) {
+        dispatchHuman({
+          type: 'PLAY',
+          game: chooseRouletteColor(game, localPlayerIndex, color),
+        });
+        return;
+      }
+      if (!pendingWild) return;
       try {
         const next = enginePlayCard(
           game,
@@ -596,7 +628,15 @@ export function useUnoGame(paused = false) {
       : [],
   );
 
-  const canPass = drawnThisTurn && (game?.pendingDraw ?? 0) === 0;
+  const canPass =
+    drawnThisTurn &&
+    !game?.pendingRoulette &&
+    (game?.pendingDraw ?? 0) === 0 &&
+    !(
+      game?.rules.gameMode === 'no_mercy' &&
+      game.rules.drawUntilPlayable &&
+      playableCardIds.size > 0
+    );
   const hasPendingStackOption = !!(
     game &&
     localPlayer &&
@@ -639,7 +679,11 @@ export function useUnoGame(paused = false) {
   return {
     game,
     localPlayerIndex,
-    pendingWild,
+    pendingWild:
+      game &&
+      game.pendingRoulette?.playerId === game.players[localPlayerIndex]?.id
+        ? (game.discardPile.at(-1) ?? null)
+        : pendingWild,
     drawnThisTurn,
     botThinking,
     log,

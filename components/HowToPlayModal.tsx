@@ -118,7 +118,7 @@ const TRICK_ITEMS: TrickItem[] = [
   },
 ];
 
-export default function HowToPlayModal({
+function ClassicHowToPlayModal({
   open,
   onClose,
   onPracticeWithBots,
@@ -1112,6 +1112,95 @@ export default function HowToPlayModal({
           </button>
         )}
       </div>
+    </Modal>
+  );
+}
+
+export default function HowToPlayModal(props: HowToPlayModalProps) {
+  const mode = props.rules?.gameMode ?? "classic";
+  if (mode === "classic") return <ClassicHowToPlayModal {...props} />;
+  const mercy = mode === "no_mercy";
+  return (
+    <Modal
+      open={props.open}
+      title="How to play"
+      onClose={props.onClose}
+      className="friend-picker-modal"
+    >
+      <p>
+        {mercy
+          ? "Match a color, number or symbol. If you draw, keep going until you can play; play that card."
+          : "Every card is wild. Play any one card—no color matching or color choice needed. After a voluntary draw, play only the new card or pass."}
+      </p>
+      <ul className="edition-guide">
+        {mercy ? (
+          <>
+            <li>
+              <strong>Draw cards:</strong> stack an equal or higher value,
+              regardless of color. The first player who cannot respond takes the
+              whole total and loses a turn.
+            </li>
+            <li>
+              <strong>7 and 0:</strong> choose someone to swap with on a 7; a 0
+              passes everyone’s hand in the current direction.
+            </li>
+            <li>
+              <strong>Discard All:</strong> one tap clears the card’s whole
+              color. Skip Everyone gives you another turn.
+            </li>
+            <li>
+              <strong>Reverse +4:</strong> reverse and pass the penalty. With
+              two active players you take the penalty yourself, or stack it
+              back.
+            </li>
+            <li>
+              <strong>Color Roulette:</strong> the next player chooses a color,
+              reveals until it appears, takes all the revealed cards and loses a
+              turn.
+            </li>
+            <li>
+              <strong>Mercy:</strong> reach the table’s hand limit and you are
+              out. Win with an empty hand or as the last player standing.
+            </li>
+          </>
+        ) : (
+          <>
+            <li>
+              <strong>Skip / Skip Two:</strong> the next one or two players lose
+              their turns.
+            </li>
+            <li>
+              <strong>Draw Two / Four:</strong> the next player draws and loses
+              a turn.
+            </li>
+            <li>
+              <strong>Targeted Draw Two:</strong> choose anyone to draw two.
+              They keep their next turn.
+            </li>
+            <li>
+              <strong>Forced Swap:</strong> choose another player and exchange
+              hands.
+            </li>
+          </>
+        )}
+        <li>
+          <strong>UNO:</strong> call it when you have one card left. This table
+          uses the exact rules listed below.
+        </li>
+      </ul>
+      <RulesSummary rules={props.rules ?? {}} includeBots />
+      <a
+        className="settings-link"
+        href={
+          mercy
+            ? "https://service.mattel.com/instruction_sheets/HVW18-Eng.pdf"
+            : "https://service.mattel.com/instruction_sheets/HHL33-Eng.pdf"
+        }
+        target="_blank"
+        rel="noreferrer"
+      >
+        Mattel instruction sheet <ArrowRight size={16} />
+      </a>
     </Modal>
   );
 }

@@ -1,15 +1,16 @@
 // Preferences use the same controls and typography as the rest of the club.
 "use client";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
+import dynamic from "next/dynamic";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import {
   AudioLines,
-  Copy,
-  RotateCcw,
   SlidersHorizontal,
   User,
-  Palette,
-  Check,
+  Users,
+  BookOpen,
+  Bot,
+  ChevronDown,
+  ChevronRight,
 } from "lucide-react";
 import { getPlayerName, savePlayerName } from "../lib/playerNames";
 import type { GameRules } from "../types/rules";
@@ -26,20 +27,57 @@ import {
   playTableChime,
 } from "../lib/tableChimes";
 import Modal from "./Modal";
-import RulePresets from "./RulePresets";
+import SettingSelect from "./ui/SettingSelect";
+import RuleProfileManager from "./RuleProfileManager";
 import BotDifficultyControl from "./BotDifficultyControl";
 import AvatarPicker from "./AvatarPicker";
+import RulesSummary from "./RulesSummary";
+import PlayerProgress from "./PlayerProgress";
+const HowToPlayModal = dynamic(() => import("./HowToPlayModal"), {
+  loading: () => null,
+});
+export type SettingsSection =
+  "overview" | "profile" | "friends" | "controls" | "audio";
+const SECTIONS = [
+  {
+    id: "profile",
+    label: "Profile",
+    description: "Name & avatar",
+    Icon: User,
+  },
+  {
+    id: "friends",
+    label: "Friends",
+    description: "People & invitations",
+    Icon: Users,
+  },
+  {
+    id: "controls",
+    label: "Game rules",
+    description: "Modes & house rules",
+    Icon: SlidersHorizontal,
+  },
+  {
+    id: "audio",
+    label: "Audio",
+    description: "Music, effects & voice",
+    Icon: AudioLines,
+  },
+] as const;
 interface Props {
   open: boolean;
-  initialTab?: "profile" | "controls" | "audio";
+  initialTab?: SettingsSection;
+  friendsContent?: ReactNode;
+  friendNotificationCount?: number;
   rules: Partial<GameRules>;
   editingRoom?: boolean;
-  friendCode?: string;
-  themeLabel?: string;
-  onSelectTheme?: (theme: string) => void;
-  onCopyFriendCode?: () => void;
-  onChange: (rules: Partial<GameRules>) => void;
+  readOnlyRules?: boolean;
+  savingRules?: boolean;
+  onChange: (
+    rules: Partial<GameRules>,
+  ) => void | boolean | Promise<void | boolean>;
   onClose: () => void;
+  onSetUpBots?: () => void;
 }
 const RULES: Array<{
   key: keyof GameRules;
@@ -47,6 +85,13 @@ const RULES: Array<{
   label: string;
   description: string;
 }> = [
+  {
+    key: "sevenZero",
+    group: "Special cards & moves",
+    label: "Seven swap, zero pass",
+    description:
+      "Sevens swap with a chosen player; zeroes pass everyone’s hand.",
+  },
   {
     key: "allowDoublePlaySameNumber",
     group: "Special cards & moves",
@@ -167,26 +212,23 @@ export function Toggle({
 }
 export default function SettingsModal({
   open,
-  initialTab = "controls",
+  initialTab = "overview",
   rules,
-  friendCode,
-  themeLabel,
-  onSelectTheme,
-  onCopyFriendCode,
+  friendsContent,
+  friendNotificationCount = 0,
   onChange,
   onClose,
-  editingRoom = false,
+  readOnlyRules = false,
+  savingRules = false,
+  onSetUpBots,
 }: Props) {
-  const [tab, setTab] = useState<"profile" | "controls" | "audio" | "look">(
-    initialTab,
-  );
+  const [tab, setTab] = useState<SettingsSection>(initialTab);
+  const [progressOpen, setProgressOpen] = useState(false);
+  const [help, setHelp] = useState(false);
   const [audio, setAudio] = useState(getAudioSettings);
   const [music, setMusic] = useState(getMusicContextSettings);
   const [name, setName] = useState(getPlayerName);
   const [savedName, setSavedName] = useState(getPlayerName);
-  const [saved, setSaved] = useState(false);
-  const [copiedFriendCode, setCopiedFriendCode] = useState(false);
-  const [manualFriendCode, setManualFriendCode] = useState(false);
   const nameChanged = name.trim() !== savedName;
   useEffect(() => {
     const sync = () => {
@@ -208,94 +250,73 @@ export default function SettingsModal({
     const next = savePlayerName(name);
     setName(next);
     setSavedName(next);
-    setSaved(true);
+  };
+  const panel = useRef<HTMLDivElement>(null);
+  const previousTab = useRef(tab);
+  useEffect(() => {
+    if (previousTab.current === tab) return;
+    previousTab.current = tab;
+    panel.current?.focus({ preventScroll: true });
+  }, [tab]);
+  const close = () => {
+    if (nameChanged) saveName();
+    onClose();
   };
   return (
     <Modal
       open={open}
-      title="Make it your game."
-      onClose={onClose}
+      title={
+        tab === "overview"
+          ? "Settings"
+          : (SECTIONS.find((section) => section.id === tab)?.label ??
+            "Settings")
+      }
+      onClose={close}
+      onBack={
+        tab === "overview"
+          ? undefined
+          : () => {
+              if (nameChanged) saveName();
+              setTab("overview");
+            }
+      }
       className="settings-modal"
     >
       <div
-        className="settings-tabs"
-        role="tablist"
-        aria-label="Settings categories"
-        onKeyDown={(e) => {
-          const tabs = ["profile", "controls", "audio", "look"] as const;
-          const offset =
-            e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
-          if (offset || e.key === "Home" || e.key === "End") {
-            e.preventDefault();
-            const next =
-              e.key === "Home"
-                ? tabs[0]
-                : e.key === "End"
-                  ? tabs[3]
-                  : tabs[
-                      (tabs.indexOf(tab) + offset + tabs.length) % tabs.length
-                    ];
-            setTab(next);
-            document.getElementById(`settings-${next}`)?.focus();
-          }
-        }}
-      >
-        {[
-          { id: "profile", label: "Profile", Icon: User },
-          { id: "controls", label: "Rules", Icon: SlidersHorizontal },
-          { id: "audio", label: "Audio", Icon: AudioLines },
-          { id: "look", label: "Look", Icon: Palette },
-        ].map((t) => (
-          <button
-            id={`settings-${t.id}`}
-            role="tab"
-            tabIndex={tab === t.id ? 0 : -1}
-            aria-selected={tab === t.id}
-            aria-controls={`panel-${t.id}`}
-            key={t.id}
-            onClick={() => setTab(t.id as typeof tab)}
-          >
-            <t.Icon size={17} />
-            {t.label}
-          </button>
-        ))}
-      </div>
-      <div
         key={tab}
-        role="tabpanel"
+        ref={panel}
+        role="region"
         tabIndex={0}
         id={`panel-${tab}`}
-        aria-labelledby={`settings-${tab}`}
-        className="settings-panel"
+        aria-label={
+          tab === "overview"
+            ? "Settings"
+            : SECTIONS.find((section) => section.id === tab)?.label
+        }
+        className={`settings-panel settings-${tab}`}
       >
-        {tab === "look" && (
-          <div className="theme-options">
-            {[
-              { key: "paper", label: "Daylight" },
-              { key: "midnight", label: "After hours" },
-              { key: "forest", label: "Club green" },
-              { key: "sunset", label: "Clay" },
-            ].map((t) => (
-              <button
-                className="theme-option"
-                aria-pressed={themeLabel === t.label}
-                key={t.key}
-                onClick={() => onSelectTheme?.(t.key)}
-              >
-                <i data-swatch={t.key} />
-                {t.label}
-                {themeLabel === t.label && <Check size={17} />}
+        {tab === "overview" && (
+          <nav className="settings-choices" aria-label="Settings sections">
+            {SECTIONS.map((section) => (
+              <button key={section.id} onClick={() => setTab(section.id)}>
+                <section.Icon size={22} aria-hidden="true" />
+                <span>
+                  <strong>{section.label}</strong>
+                  <small>{section.description}</small>
+                </span>
+                {section.id === "friends" && friendNotificationCount > 0 && (
+                  <span className="count-badge">{friendNotificationCount}</span>
+                )}
+                <ChevronRight size={18} aria-hidden="true" />
               </button>
             ))}
-          </div>
+          </nav>
         )}
+        {tab === "friends" && friendsContent}
         {tab === "profile" && (
           <>
-            <AvatarPicker />
-            <p className="muted">
-              The name your friends will see at the table.
-            </p>
             <form
+              className="profile-name-form"
               onSubmit={(e) => {
                 e.preventDefault();
                 saveName();
@@ -309,154 +330,191 @@ export default function SettingsModal({
                 autoComplete="nickname"
                 value={name}
                 maxLength={18}
+                onBlur={saveName}
                 onChange={(e) => {
                   setName(e.target.value);
-                  setSaved(false);
                 }}
               />
-              <button
-                className="button primary"
-                style={{ marginTop: 16 }}
-                disabled={!nameChanged}
-              >
-                {saved ? "Name saved" : "Save name"}
-              </button>
             </form>
-            {friendCode && (
-              <div className="friend-code-block">
-                <span>Your friend code</span>
-                <button
-                  onClick={async () => {
-                    let ok = false;
-                    try {
-                      if (friendCode) {
-                        await navigator.clipboard.writeText(friendCode);
-                        toast.success("Friend code copied.");
-                        ok = true;
-                        onCopyFriendCode?.();
-                      }
-                    } catch {
-                      toast.error("Couldn’t copy friend code automatically.");
-                    }
-                    if (ok) {
-                      setCopiedFriendCode(true);
-                      setManualFriendCode(false);
-                      setTimeout(() => setCopiedFriendCode(false), 2000);
-                    } else {
-                      setManualFriendCode(true);
-                    }
-                  }}
-                  className="code-button"
-                  aria-label={`Copy friend code ${friendCode}`}
-                >
-                  {friendCode}
-                  {copiedFriendCode ? <Check size={17} /> : <Copy size={17} />}
-                </button>
-                {manualFriendCode && (
-                  <div
-                    className="manual-copy-box"
-                    role="region"
-                    aria-label="Manual copy friend code"
-                  >
-                    <span className="manual-copy-hint">
-                      Select and copy your friend code:
-                    </span>
-                    <input
-                      type="text"
-                      readOnly
-                      value={friendCode}
-                      aria-label="Friend code"
-                      autoFocus
-                      onFocus={(e) => e.target.select()}
-                      className="manual-copy-input"
-                    />
-                  </div>
-                )}
-                <p>Share it so friends can invite you to their table.</p>
-              </div>
-            )}
+            <AvatarPicker />
+            <details
+              className="settings-disclosure profile-history"
+              onToggle={(e) => setProgressOpen(e.currentTarget.open)}
+            >
+              <summary>
+                Your progress <ChevronDown size={16} aria-hidden="true" />
+              </summary>
+              {progressOpen && (
+                <>
+                  <PlayerProgress />
+                </>
+              )}
+            </details>
           </>
         )}
         {tab === "controls" && (
           <>
-            <p className="muted">
-              {editingRoom
-                ? "Changes are shared with everyone in this room before dealing."
-                : "Changes apply when you set up your next table. Rematches keep the current table’s rules."}
-            </p>
-            <RulePresets rules={rules} onChange={onChange} />
-            <label className="preference-row">
-              <span>
-                <strong>Starting hand</strong>
-                <small>Cards dealt to each player.</small>
-              </span>
-              <select
-                aria-label="Starting hand size"
-                value={rules.startingHandSize ?? defaultRules.startingHandSize}
-                onChange={(e) =>
-                  onChange({
-                    ...rules,
-                    startingHandSize: Number(e.target.value),
-                  })
-                }
+            {readOnlyRules && <p className="muted">Rules for this table.</p>}
+            {readOnlyRules ? (
+              <RulesSummary rules={rules} includeBots />
+            ) : (
+              <fieldset
+                className="settings-rule-controls"
+                disabled={savingRules}
+                aria-label="Table rules"
+                aria-busy={savingRules}
               >
-                {[5, 7, 9, 12].map((n) => (
-                  <option key={n} value={n}>
-                    {n} cards
-                  </option>
-                ))}
-              </select>
-            </label>
-            <BotDifficultyControl rules={rules} onChange={onChange} />
-            {[...new Set(RULES.map((rule) => rule.group))].map((group) => (
-              <fieldset className="settings-rule-group" key={group}>
-                <legend>{group}</legend>
-                {RULES.filter((rule) => rule.group === group).map((r) => (
-                  <Toggle
-                    key={r.key}
-                    label={r.label}
-                    description={
-                      r.key === "allowDoublePlayExactMatchOnly" &&
-                      !(
-                        rules.allowDoublePlaySameNumber ??
-                        defaultRules.allowDoublePlaySameNumber
-                      )
-                        ? "Enable matching-number play to change this option."
-                        : r.description
-                    }
-                    disabled={
-                      r.key === "allowDoublePlayExactMatchOnly" &&
-                      !(
-                        rules.allowDoublePlaySameNumber ??
-                        defaultRules.allowDoublePlaySameNumber
-                      )
-                    }
-                    checked={Boolean(rules[r.key] ?? defaultRules[r.key])}
-                    onChange={(v) => onChange({ ...rules, [r.key]: v })}
-                  />
-                ))}
+                <BotDifficultyControl
+                  compact
+                  rules={rules}
+                  onChange={onChange}
+                />
+                <RuleProfileManager rules={rules} onChange={onChange}>
+                  {(draft, changeDraft) => (
+                    <>
+                      <label className="preference-row">
+                        <span>
+                          <strong>Starting hand</strong>
+                        </span>
+                        <SettingSelect
+                          aria-label="Starting hand size"
+                          value={
+                            draft.startingHandSize ??
+                            defaultRules.startingHandSize
+                          }
+                          onChange={(e) =>
+                            changeDraft({
+                              ...draft,
+                              startingHandSize: Number(e.target.value),
+                            })
+                          }
+                        >
+                          {[5, 7, 9, 12].map((n) => (
+                            <option key={n} value={n}>
+                              {n} cards
+                            </option>
+                          ))}
+                        </SettingSelect>
+                      </label>
+                      <label className="preference-row">
+                        <span>
+                          <strong>Missed UNO</strong>
+                        </span>
+                        <SettingSelect
+                          aria-label="Missed UNO penalty"
+                          value={
+                            draft.missedUnoDrawPenalty ??
+                            defaultRules.missedUnoDrawPenalty
+                          }
+                          onChange={(e) =>
+                            changeDraft({
+                              ...draft,
+                              missedUnoDrawPenalty: Number(e.target.value),
+                            })
+                          }
+                        >
+                          {[2, 4, 6, 8].map((n) => (
+                            <option key={n} value={n}>
+                              {n} cards
+                            </option>
+                          ))}
+                        </SettingSelect>
+                      </label>
+                      {[...new Set(RULES.map((rule) => rule.group))].map(
+                        (group) => (
+                          <details
+                            className="settings-disclosure settings-rule-group"
+                            key={group}
+                          >
+                            <summary>
+                              {group}
+                              <ChevronDown size={16} aria-hidden="true" />
+                            </summary>
+                            <fieldset>
+                              <legend className="sr-only">{group}</legend>
+                              {RULES.filter(
+                                (rule) =>
+                                  rule.group === group &&
+                                  !(
+                                    draft.gameMode === "all_wild" &&
+                                    [
+                                      "allowDoublePlaySameNumber",
+                                      "allowDoublePlayExactMatchOnly",
+                                      "sevenZero",
+                                      "allowDiscardAll",
+                                      "allowShuffleCard",
+                                      "drawUntilPlayable",
+                                      "allowStartingActionCard",
+                                      "canFinishWithActionCard",
+                                    ].includes(rule.key)
+                                  ) &&
+                                  !(
+                                    draft.gameMode === "no_mercy" &&
+                                    rule.key === "allowStartingActionCard"
+                                  ),
+                              ).map((r) => (
+                                <Toggle
+                                  key={r.key}
+                                  label={
+                                    draft.gameMode === "no_mercy" &&
+                                    r.key === "stackWild4"
+                                      ? "Stack draw four and higher"
+                                      : r.label
+                                  }
+                                  description={
+                                    r.key === "allowDoublePlayExactMatchOnly" &&
+                                    !(
+                                      draft.allowDoublePlaySameNumber ??
+                                      defaultRules.allowDoublePlaySameNumber
+                                    )
+                                      ? "Enable matching-number play to change this option."
+                                      : draft.gameMode === "no_mercy" &&
+                                          r.key === "stackWild4"
+                                        ? "Respond with an equal or higher draw card, including +6 and +10."
+                                        : r.description
+                                  }
+                                  disabled={
+                                    r.key === "allowDoublePlayExactMatchOnly" &&
+                                    !(
+                                      draft.allowDoublePlaySameNumber ??
+                                      defaultRules.allowDoublePlaySameNumber
+                                    )
+                                  }
+                                  checked={Boolean(
+                                    draft[r.key] ?? defaultRules[r.key],
+                                  )}
+                                  onChange={(v) =>
+                                    changeDraft({ ...draft, [r.key]: v })
+                                  }
+                                />
+                              ))}
+                            </fieldset>
+                          </details>
+                        ),
+                      )}
+                    </>
+                  )}
+                </RuleProfileManager>
               </fieldset>
-            ))}
-            <button
-              className="text-button"
-              onClick={() =>
-                onChange({
-                  ...defaultRules,
-                  maxPlayers: 6,
-                  botDifficulty: rules.botDifficulty ?? "standard",
-                })
-              }
-            >
-              <RotateCcw size={16} />
-              Reset to classic rules
-            </button>
+            )}
+            <div className="settings-game-actions">
+              {onSetUpBots && (
+                <button className="settings-link" onClick={onSetUpBots}>
+                  <Bot size={18} aria-hidden="true" /> Bot seats
+                </button>
+              )}
+              <button
+                className="settings-link"
+                onClick={() => setHelp(true)}
+                aria-haspopup="dialog"
+              >
+                <BookOpen size={18} aria-hidden="true" /> How to play
+              </button>
+            </div>
           </>
         )}
         {tab === "audio" && (
           <>
-            <p className="muted">
-              Choose card sounds, voice and background music.
-            </p>
             <Toggle
               label="Mute everything"
               checked={audio.muted}
@@ -469,13 +527,18 @@ export default function SettingsModal({
             )}
             <Toggle
               label="Card sounds"
-              description="Soft, immediate feedback for plays and draws."
               checked={audio.chimesEnabled}
               onChange={(v) => updateAudio({ chimesEnabled: v })}
             />
             <Toggle
+              label="Invitation sounds"
+              description="A short cue for room invites and friend requests."
+              checked={audio.notificationsEnabled}
+              onChange={(v) => updateAudio({ notificationsEnabled: v })}
+            />
+            <Toggle
               label="Voice announcer"
-              description="Announce special cards. Never delays the next turn."
+              description="Announce special cards."
               checked={audio.voiceInGame}
               onChange={(v) => updateAudio({ voiceInGame: v })}
             />
@@ -518,17 +581,10 @@ export default function SettingsModal({
               </button>
             </div>
             <Toggle
-              label="Music in the lobby"
-              checked={music.lobbyEnabled}
+              label="Music"
+              checked={music.lobbyEnabled || music.gameEnabled}
               onChange={(v) => {
                 setMusicEnabledForContext("lobby", v);
-                setMusic(getMusicContextSettings());
-              }}
-            />
-            <Toggle
-              label="Music at the table"
-              checked={music.gameEnabled}
-              onChange={(v) => {
                 setMusicEnabledForContext("game", v);
                 setMusic(getMusicContextSettings());
               }}
@@ -557,17 +613,23 @@ export default function SettingsModal({
         )}
       </div>
       <div className="modal-footer">
-        <span className="muted" role="status">
-          {tab === "profile" && nameChanged
-            ? "Name not saved yet"
-            : editingRoom && tab === "controls"
-              ? "Rules for this room"
-              : "Saved on this device"}
-        </span>
-        <button className="button secondary small" onClick={onClose}>
+        {savingRules && (
+          <span className="muted" role="status">
+            Saving room rules…
+          </span>
+        )}
+        <button className="button primary small" onClick={close}>
           Done
         </button>
       </div>
+      {help && (
+        <HowToPlayModal
+          open
+          rules={rules}
+          onClose={() => setHelp(false)}
+          onPracticeWithBots={onSetUpBots}
+        />
+      )}
     </Modal>
   );
 }

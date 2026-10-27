@@ -7,10 +7,16 @@
 import type { Card, CardColor } from '../types/card';
 import type { GameState } from '../types/game';
 import type { GameRules } from '../types/rules';
-import { isWildCard, isActionCard, NUMBER_VALUES } from '../types/card';
+import {
+  isWildCard,
+  isActionCard,
+  NUMBER_VALUES,
+  getCardDrawPenalty,
+} from '../types/card';
+import { RULE_PRESETS, matchesPreset } from './rulePresets';
 
 export function canJumpInPlay(card: Card, state: GameState): boolean {
-  if (!state.rules.allowJumpIn) return false;
+  if (!state.rules.allowJumpIn || state.pendingRoulette) return false;
   if (state.pendingDraw > 0) return false;
 
   const topDiscard = state.discardPile[state.discardPile.length - 1];
@@ -40,9 +46,9 @@ export function canPlayCard(
   playerIndex: number,
 ): boolean {
   const player = state.players[playerIndex];
-  if (!player || state.winnerId) return false;
-  const { activeColor, pendingDraw, pendingDrawType, rules, discardPile } =
-    state;
+  if (!player || player.eliminated || state.winnerId || state.pendingRoulette)
+    return false;
+  const { activeColor, pendingDraw, rules, discardPile } = state;
   const topDiscard = discardPile[discardPile.length - 1];
   if (!topDiscard) return false;
   if (card.value === 'discardAll' && !rules.allowDiscardAll) return false;
@@ -58,13 +64,24 @@ export function canPlayCard(
     return false;
   if (playerIndex !== state.currentPlayerIndex)
     return canJumpInPlay(card, state);
-  if (pendingDraw > 0) {
-    return (
-      pendingDrawType !== null && isValidStackCard(card, pendingDrawType, rules)
-    );
+
+  if (state.drawnThisTurn && card.id !== player.hand.at(-1)?.id) return false;
+  if (rules.gameMode === 'all_wild') {
+    return pendingDraw > 0 ? isValidStackCard(card, state) : true;
   }
 
-  // Wild cards (wild / wild4) are always playable when there is no pending draw.
+  const classic = rules.gameMode === 'classic';
+  if (pendingDraw > 0) {
+    return isValidStackCard(card, state);
+  }
+
+  if (
+    classic &&
+    card.value === 'wild4' &&
+    player.hand.some((entry) => entry.color === activeColor)
+  )
+    return false;
+  // A regular Wild remains legal even while holding a matching color.
   if (isWildCard(card)) return true;
 
   // Same active color (may differ from top card's printed color after a wild play)
@@ -77,24 +94,42 @@ export function canPlayCard(
 }
 
 /**
- * Whether `card` qualifies as a legal stack response to an incoming `pendingDrawType`.
+ * Whether `card` qualifies as a legal stack response to an incoming pending draw.
  */
-function isValidStackCard(
-  card: Card,
-  pendingDrawType: 'draw2' | 'wild4',
-  rules: GameRules,
-): boolean {
+function isValidStackCard(card: Card, state: GameState): boolean {
+  const { rules, pendingDrawType, discardPile } = state;
+  const cardPenalty = getCardDrawPenalty(card.value);
+  if (cardPenalty === 0) return false;
+
+  if (rules.gameMode === 'no_mercy') {
+    const topDiscard = discardPile[discardPile.length - 1];
+    const incomingDrawPenalty = topDiscard
+      ? getCardDrawPenalty(topDiscard.value)
+      : pendingDrawType === 'wild4'
+        ? 4
+        : 2;
+    // In No Mercy, any draw card of equal or higher penalty stacks!
+    if (
+      incomingDrawPenalty === 2 &&
+      cardPenalty >= 4 &&
+      !rules.allowWild4OnDraw2
+    )
+      return false;
+    const enabled = cardPenalty === 2 ? rules.stackDraw2 : rules.stackWild4;
+    return enabled && cardPenalty >= incomingDrawPenalty;
+  }
+
   if (pendingDrawType === 'draw2') {
     // Player may play their own draw2 if stackDraw2 is enabled.
-    if (rules.stackDraw2 && card.value === 'draw2') return true;
+    if (rules.stackDraw2 && cardPenalty === 2) return true;
     // Player may also escape a draw2 with a wild4 if allowWild4OnDraw2 is enabled.
-    if (rules.allowWild4OnDraw2 && card.value === 'wild4') return true;
+    if (rules.allowWild4OnDraw2 && cardPenalty >= 4) return true;
     return false;
   }
 
   if (pendingDrawType === 'wild4') {
     // Player may play their own wild4 if stackWild4 is enabled.
-    if (rules.stackWild4 && card.value === 'wild4') return true;
+    if (rules.stackWild4 && cardPenalty >= 4) return true;
     return false;
   }
 
@@ -228,7 +263,12 @@ export function getCardPlayChoices(
     ? [{ cards: removed, remaining: player.hand.length - removed.length }]
     : [];
   const top = state.discardPile.at(-1);
-  if (playerIndex !== state.currentPlayerIndex || state.pendingDraw > 0 || !top)
+  if (
+    playerIndex !== state.currentPlayerIndex ||
+    state.drawnThisTurn ||
+    state.pendingDraw > 0 ||
+    !top
+  )
     return choices;
   for (const pair of getPlayableMultiCardCombos(
     player.hand,
@@ -287,6 +327,15 @@ export function getCardPlayBlockReason(
     return getPlayableCards(player.hand, state, playerIndex).length > 0
       ? 'Only draw cards can stack.'
       : `No stack. Draw ${state.pendingDraw}.`;
+  }
+  if (matchesPreset(state.rules, RULE_PRESETS[0].rules)) {
+    if (state.drawnThisTurn && card.id !== player.hand.at(-1)?.id)
+      return 'After drawing, only the card you just drew can be played.';
+    if (
+      card.value === 'wild4' &&
+      player.hand.some((entry) => entry.color === state.activeColor)
+    )
+      return 'Play your matching color before a Wild Draw Four.';
   }
   if (
     NUMBER_VALUES.includes(card.value) &&

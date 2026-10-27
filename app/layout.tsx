@@ -6,6 +6,7 @@ import "./table.css";
 import "./arena.css";
 import "./home.css";
 import "./club.css";
+import "./settings.css";
 
 const bodyFont = Outfit({
   variable: "--font-body",
@@ -45,6 +46,12 @@ export default function RootLayout({
         />
       </head>
       <body className={`${bodyFont.variable} ${cardFont.variable}`}>
+        <template
+          dangerouslySetInnerHTML={{
+            __html:
+              "<!-- focused-account-20261026. THESIS: One task per screen; optional account tools open from the avatar. OWN-WORLD: UNO Color play, Outfit, blue arena, native cards, theme-aware panels and amber actions. STORY: Join by code; accept friends separately; invite accepted friends with one tap. FIRST VIEWPORT: Play/Create/Join and an avatar; account sidebar with one mounted panel, mobile section picker, fixed Done. FORM: User-specified focused account extension; native popover reveal and non-blocking invitation notices. FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance -->",
+          }}
+        />
         <span hidden data-design-contract="color-play">
           UNO Color play: user-approved blue arena, Color court portraits, vivid
           native cards, amber turn cues, a calm title screen and shared

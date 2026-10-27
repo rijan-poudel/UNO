@@ -1,15 +1,12 @@
 // Background music is optional; immediate card feedback uses the shared Web Audio context.
 "use client";
-import { useCallback, useEffect } from "react";
+import { useEffect } from "react";
 import {
   getAudioSettings,
   isMusicEnabledForContext,
   type MusicContext,
 } from "../lib/audioSettings";
-import {
-  playTableChime,
-  primeTableAudioFromUserGesture,
-} from "../lib/tableChimes";
+import { primeTableAudioFromUserGesture } from "../lib/tableChimes";
 import { preloadBoardVoiceovers } from "../lib/voiceAnnouncer";
 let music: HTMLAudioElement | null = null;
 let activeContext: MusicContext = "lobby";
@@ -41,17 +38,17 @@ function applySettings() {
   syncMusic();
   preloadBoardVoiceovers();
 }
-export function primeMusicForFastStart(context: MusicContext = "lobby") {
-  activeContext = context;
-  primeTableAudioFromUserGesture();
-  syncMusic();
-}
-export function useAudioManager() {
+export function useAudioManager(context: MusicContext) {
+  useEffect(() => {
+    activeContext = context;
+    syncMusic();
+  }, [context]);
   useEffect(() => {
     users++;
     preloadBoardVoiceovers();
     if (users === 1) {
       window.addEventListener("uno:audio-settings", applySettings);
+      window.addEventListener("storage", applySettings);
       window.addEventListener("pointerdown", unlock, { passive: true });
       window.addEventListener("keydown", unlock);
       document.addEventListener("visibilitychange", syncMusic);
@@ -60,6 +57,7 @@ export function useAudioManager() {
       users--;
       if (users === 0) {
         window.removeEventListener("uno:audio-settings", applySettings);
+        window.removeEventListener("storage", applySettings);
         window.removeEventListener("pointerdown", unlock);
         window.removeEventListener("keydown", unlock);
         document.removeEventListener("visibilitychange", syncMusic);
@@ -67,24 +65,4 @@ export function useAudioManager() {
       }
     };
   }, []);
-  const setMusicContext = useCallback((context: MusicContext) => {
-    activeContext = context;
-    syncMusic();
-  }, []);
-  const playMusic = useCallback((context?: MusicContext) => {
-    if (context) activeContext = context;
-    syncMusic();
-  }, []);
-  const pauseMusic = useCallback(() => music?.pause(), []);
-  const playCardMixing = useCallback(() => playTableChime("shuffleMotion"), []);
-  const playCardThrowing = useCallback(() => playTableChime("cardPlay"), []);
-  const stopCardMixing = useCallback(() => {}, []);
-  return {
-    setMusicContext,
-    playMusic,
-    pauseMusic,
-    playCardMixing,
-    playCardThrowing,
-    stopCardMixing,
-  };
 }

@@ -1,14 +1,23 @@
 import { createServer } from 'node:http';
 import { randomBytes } from 'node:crypto';
+import { resolve } from 'node:path';
 import { Server } from 'socket.io';
+import { FriendStore } from './friendStore';
 import { initializeGame } from '../lib/gameSetup';
 import { isAvatarId } from '../lib/playerAvatars';
 import { validateGameRules } from '../lib/validateGameRules';
 import { toGameView, toPresentationGame } from '../lib/gameView';
 import { recordTableWin, startTableRound } from '../lib/tableScore';
-import { defaultRules, type GameRules } from '../types/rules';
+import {
+  defaultRules,
+  CLASSIC_RULES,
+  NO_MERCY_RULES,
+  ALL_WILD_RULES,
+  type GameRules,
+} from '../types/rules';
 import {
   playCard,
+  chooseRouletteColor,
   drawOneCard,
   drawRequiredCards,
   passTurn,
@@ -47,6 +56,7 @@ import type {
   UpdateRulesPayload,
   PendingColorChoice,
   ReturnToLobbyPayload,
+  SocialSnapshot,
 } from '../types/multiplayer';
 
 const PORT = Number(process.env.PORT ?? process.env.UNO_SOCKET_PORT ?? 3001);
@@ -93,6 +103,43 @@ interface ServerRoom {
   game: GameState | null;
   pendingColorChoice: PendingColorChoice | null;
   rules?: Partial<GameRules>;
+  profileId?: string;
+}
+
+function resolveImmutableRules(
+  rules?: Partial<GameRules>,
+  profileId?: string,
+): GameRules {
+  rules = validateGameRules(rules);
+  if (profileId === 'classic') {
+    return {
+      ...CLASSIC_RULES,
+      botDifficulty: rules?.botDifficulty ?? 'standard',
+      maxPlayers: rules?.maxPlayers ?? 10,
+    };
+  }
+  if (profileId === 'no_mercy') {
+    return {
+      ...NO_MERCY_RULES,
+      botDifficulty: rules?.botDifficulty ?? 'standard',
+      maxPlayers: Math.min(6, rules?.maxPlayers ?? 6),
+    };
+  }
+  if (profileId === 'all_wild') {
+    return {
+      ...ALL_WILD_RULES,
+      botDifficulty: rules?.botDifficulty ?? 'standard',
+      maxPlayers: rules?.maxPlayers ?? 10,
+    };
+  }
+  return validateGameRules({
+    ...(rules?.gameMode === 'no_mercy'
+      ? NO_MERCY_RULES
+      : rules?.gameMode === 'all_wild'
+        ? ALL_WILD_RULES
+        : defaultRules),
+    ...rules,
+  });
 }
 
 interface PresenceRecord {
@@ -121,6 +168,42 @@ const playerBySocket = new Map<string, { roomId: string; playerId: string }>();
 const presenceBySocket = new Map<string, PresenceRecord>();
 const presenceByFriendCode = new Map<string, PresenceRecord>();
 const pendingInvites = new Map<string, PendingInviteRecord>();
+const friends = new FriendStore(
+  process.env.UNO_SOCIAL_FILE ?? resolve('.data/friends.json'),
+);
+const lastSocialStatuses = new Map<string, FriendPresenceState>();
+
+function socialStatus(code: string): FriendPresenceState {
+  const presence = presenceByFriendCode.get(code);
+  if (!presence || !io.sockets.sockets.has(presence.socketId)) return 'offline';
+  return playerBySocket.has(presence.socketId) ? 'playing' : 'online';
+}
+function publishSocial(codes: string[]): void {
+  for (const code of new Set(codes)) {
+    const presence = presenceByFriendCode.get(code);
+    if (presence)
+      io.to(presence.socketId).emit(
+        'social:update',
+        friends.snapshot(code, socialStatus),
+      );
+  }
+}
+function requireFriendCode(socketId: string): string {
+  const presence = presenceBySocket.get(socketId);
+  if (!presence) throw new Error('Reconnect before updating friends.');
+  return presence.friendCode;
+}
+function updateSocialStatus(socketId: string): void {
+  const presence = presenceBySocket.get(socketId);
+  if (!presence) return;
+  const status = socialStatus(presence.friendCode);
+  if (lastSocialStatuses.get(presence.friendCode) === status) return;
+  lastSocialStatuses.set(presence.friendCode, status);
+  publishSocial([
+    presence.friendCode,
+    ...friends.friendCodes(presence.friendCode),
+  ]);
+}
 
 function makeRoomId(): string {
   const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -194,6 +277,7 @@ function toSnapshot(
         : { playerId: room.pendingColorChoice.playerId }
       : null,
     rules: room.rules ?? defaultRules,
+    profileId: room.profileId,
   };
 }
 
@@ -294,6 +378,7 @@ function createRoomForPlayer(
   playerName: string,
   deviceId: string,
   rules?: Partial<GameRules>,
+  profileId?: string,
 ): { room: ServerRoom; playerId: string } {
   let roomId = makeRoomId();
   while (rooms.has(roomId)) {
@@ -301,6 +386,7 @@ function createRoomForPlayer(
   }
 
   const playerId = makePlayerId(0);
+  const effectiveProfileId = profileId ?? (rules ? undefined : 'classic');
   const room: ServerRoom = {
     roomId,
     hostPlayerId: playerId,
@@ -319,7 +405,8 @@ function createRoomForPlayer(
     started: false,
     game: null,
     pendingColorChoice: null,
-    rules: rules ? validateGameRules(rules) : { ...defaultRules },
+    rules: resolveImmutableRules(rules, effectiveProfileId),
+    profileId: effectiveProfileId,
   };
 
   rooms.set(roomId, room);
@@ -443,6 +530,20 @@ function upsertPresence(socketId: string, payload: PresencePayload): string {
   if (!playerName || !deviceId || friendCode.length < 4) {
     throw new Error('Player name, device id and friend code are required.');
   }
+  const member = playerBySocket.get(socketId);
+  const actor = member
+    ? rooms.get(member.roomId)?.players.find((p) => p.socketId === socketId)
+    : undefined;
+  if (actor && actor.deviceId !== deviceId)
+    throw new Error('This profile belongs to a different device.');
+  const socketAvatar =
+    io.sockets.sockets.get(socketId)?.handshake.auth.avatarId;
+  friends.register({
+    friendCode,
+    deviceId,
+    name: playerName,
+    avatarId: isAvatarId(socketAvatar) ? socketAvatar : undefined,
+  });
 
   const existing = presenceByFriendCode.get(friendCode);
   if (
@@ -467,6 +568,15 @@ function upsertPresence(socketId: string, payload: PresencePayload): string {
   };
   presenceBySocket.set(socketId, record);
   presenceByFriendCode.set(friendCode, record);
+  lastSocialStatuses.set(friendCode, socialStatus(friendCode));
+  publishSocial([friendCode, ...friends.friendCodes(friendCode)]);
+  for (const invite of pendingInvites.values()) {
+    if (
+      invite.toFriendCode === friendCode &&
+      Date.now() - invite.createdAt < INVITE_TTL_MS
+    )
+      io.to(socketId).emit('friend:invite', invite);
+  }
   return friendCode;
 }
 
@@ -477,7 +587,9 @@ function removePresence(socketId: string): void {
   const existing = presenceByFriendCode.get(previous.friendCode);
   if (existing?.socketId === socketId) {
     presenceByFriendCode.delete(previous.friendCode);
+    lastSocialStatuses.delete(previous.friendCode);
   }
+  publishSocial(friends.friendCodes(previous.friendCode));
 }
 
 function removeInvite(inviteId: string, ioServer: Server): void {
@@ -528,6 +640,7 @@ function leaveRoomForSocket(socketId: string, ioServer: Server): void {
   if (!membership) return;
 
   playerBySocket.delete(socketId);
+  updateSocialStatus(socketId);
   const room = rooms.get(membership.roomId);
   if (!room) return;
 
@@ -585,6 +698,7 @@ function leaveRoomForSocket(socketId: string, ioServer: Server): void {
 function broadcastRoom(io: Server, room: ServerRoom): void {
   for (const player of room.players) {
     if (player.connected && !player.isBot && player.socketId) {
+      updateSocialStatus(player.socketId);
       io.to(player.socketId).emit(
         'room:update',
         toSnapshot(room, player.playerId, player.socketId),
@@ -661,6 +775,11 @@ function handleGameAction(
   }
 
   switch (action.type) {
+    case 'chooseRouletteColor': {
+      requireTurn();
+      room.game = chooseRouletteColor(state, actorIndex, action.color);
+      break;
+    }
     case 'prepareWild': {
       const card = state.players[actorIndex]?.hand.find(
         (entry) => entry.id === action.cardId,
@@ -668,7 +787,11 @@ function handleGameAction(
       if (!card) {
         throw new Error('Selected card is not in your hand.');
       }
-      if (card.color !== 'wild') {
+      if (
+        card.color !== 'wild' ||
+        state.rules.gameMode === 'all_wild' ||
+        card.value === 'wildColorRoulette'
+      ) {
         throw new Error('Only wild-style cards can open color picker.');
       }
       if (!canPlayCard(card, state, actorIndex)) {
@@ -730,7 +853,11 @@ function handleGameAction(
         actorIndex,
         action.cardId,
         action.chosenColor,
-        { secondCardId: action.secondCardId, declareUno: action.declareUno },
+        {
+          secondCardId: action.secondCardId,
+          declareUno: action.declareUno,
+          targetPlayerId: action.targetPlayerId,
+        },
       );
       room.pendingColorChoice = null;
       break;
@@ -861,18 +988,14 @@ setInterval(() => {
   // Prune stale presence records
   for (const [socketId, record] of presenceBySocket) {
     if (now - record.lastSeenAt > PRESENCE_TTL_MS) {
-      presenceBySocket.delete(socketId);
-      const current = presenceByFriendCode.get(record.friendCode);
-      if (current?.socketId === socketId) {
-        presenceByFriendCode.delete(record.friendCode);
-      }
+      removePresence(socketId);
     }
   }
 
   // Prune expired invites
   for (const [inviteId, invite] of pendingInvites) {
     if (now - invite.createdAt > INVITE_TTL_MS) {
-      pendingInvites.delete(inviteId);
+      removeInvite(inviteId, io);
     }
   }
 
@@ -886,6 +1009,89 @@ setInterval(() => {
 
 io.on('connection', (socket) => {
   socket.on(
+    'social:sync',
+    (_payload: unknown, reply?: (ack: Ack<SocialSnapshot>) => void) => {
+      try {
+        reply?.({
+          ok: true,
+          data: friends.snapshot(requireFriendCode(socket.id), socialStatus),
+        });
+      } catch (error) {
+        reply?.(ackError((error as Error).message));
+      }
+    },
+  );
+  socket.on(
+    'social:request',
+    (
+      payload: { targetFriendCode?: unknown },
+      reply?: (ack: Ack<{ requestId: string }>) => void,
+    ) => {
+      try {
+        if (typeof payload?.targetFriendCode !== 'string')
+          throw new Error('Enter a valid friend code.');
+        const from = requireFriendCode(socket.id);
+        const to = normalizeFriendCode(payload.targetFriendCode);
+        const request = friends.request(from, to);
+        publishSocial([from, to]);
+        reply?.({ ok: true, data: { requestId: request.requestId } });
+      } catch (error) {
+        reply?.(ackError((error as Error).message));
+      }
+    },
+  );
+  socket.on(
+    'social:respond',
+    (
+      payload: { requestId?: unknown; accept?: unknown },
+      reply?: (ack: Ack<{ updated: true }>) => void,
+    ) => {
+      try {
+        if (
+          typeof payload?.requestId !== 'string' ||
+          typeof payload.accept !== 'boolean'
+        )
+          throw new Error('Choose a valid friend request.');
+        const codes = friends.respond(
+          requireFriendCode(socket.id),
+          payload.requestId,
+          payload.accept,
+        );
+        publishSocial(codes);
+        reply?.({ ok: true, data: { updated: true } });
+      } catch (error) {
+        reply?.(ackError((error as Error).message));
+      }
+    },
+  );
+  socket.on(
+    'social:remove',
+    (
+      payload: { friendCode?: unknown },
+      reply?: (ack: Ack<{ updated: true }>) => void,
+    ) => {
+      try {
+        if (typeof payload?.friendCode !== 'string')
+          throw new Error('Choose a friend to remove.');
+        const code = requireFriendCode(socket.id);
+        const target = normalizeFriendCode(payload.friendCode);
+        friends.remove(code, target);
+        for (const invite of pendingInvites.values()) {
+          if (
+            (invite.fromFriendCode === code &&
+              invite.toFriendCode === target) ||
+            (invite.fromFriendCode === target && invite.toFriendCode === code)
+          )
+            removeInvite(invite.inviteId, io);
+        }
+        publishSocial([code, target]);
+        reply?.({ ok: true, data: { updated: true } });
+      } catch (error) {
+        reply?.(ackError((error as Error).message));
+      }
+    },
+  );
+  socket.on(
     'profile:avatar',
     (
       payload: { avatarId?: unknown },
@@ -896,6 +1102,19 @@ io.on('connection', (socket) => {
         if (!isAvatarId(avatarId))
           throw new Error('Choose one of the available avatars.');
         socket.handshake.auth.avatarId = avatarId;
+        const presence = presenceBySocket.get(socket.id);
+        if (presence) {
+          friends.register({
+            friendCode: presence.friendCode,
+            deviceId: presence.deviceId,
+            name: presence.playerName,
+            avatarId,
+          });
+          publishSocial([
+            presence.friendCode,
+            ...friends.friendCodes(presence.friendCode),
+          ]);
+        }
         const membership = playerBySocket.get(socket.id);
         const room = membership ? rooms.get(membership.roomId) : undefined;
         const actor = room?.players.find(
@@ -919,42 +1138,6 @@ io.on('connection', (socket) => {
     },
   );
   socket.on(
-    'friend:status',
-    (
-      payload: { friendCodes?: string[] },
-      reply?: (
-        ack: Ack<{ statuses: Record<string, FriendPresenceState> }>,
-      ) => void,
-    ) => {
-      try {
-        const codes = Array.isArray(payload.friendCodes)
-          ? payload.friendCodes
-          : [];
-
-        const statuses: Record<string, FriendPresenceState> = {};
-        for (const code of codes) {
-          const normalized = normalizeFriendCode(code ?? '');
-          if (!normalized) continue;
-
-          const presence = presenceByFriendCode.get(normalized);
-          if (!presence) {
-            statuses[normalized] = 'offline';
-            continue;
-          }
-
-          statuses[normalized] = playerBySocket.has(presence.socketId)
-            ? 'playing'
-            : 'online';
-        }
-
-        reply?.({ ok: true, data: { statuses } });
-      } catch (error) {
-        reply?.(ackError((error as Error).message));
-      }
-    },
-  );
-
-  socket.on(
     'presence:update',
     (
       payload: PresencePayload,
@@ -962,6 +1145,23 @@ io.on('connection', (socket) => {
     ) => {
       try {
         const friendCode = upsertPresence(socket.id, payload);
+        const membership = playerBySocket.get(socket.id);
+        const room = membership ? rooms.get(membership.roomId) : undefined;
+        const actor = room?.players.find(
+          (player) => player.socketId === socket.id,
+        );
+        const name = payload.playerName.trim().slice(0, 18);
+        if (room && actor) {
+          if (actor.name !== name && room.game)
+            room.game = {
+              ...room.game,
+              players: room.game.players.map((player) =>
+                player.id === actor.playerId ? { ...player, name } : player,
+              ),
+            };
+          actor.name = name;
+          broadcastRoom(io, room);
+        }
         reply?.({ ok: true, data: { friendCode } });
       } catch (error) {
         reply?.(ackError((error as Error).message));
@@ -993,6 +1193,7 @@ io.on('connection', (socket) => {
           playerName,
           deviceId,
           payload.rules,
+          payload.profileId,
         );
         socket.join(room.roomId);
 
@@ -1097,6 +1298,12 @@ io.on('connection', (socket) => {
           reply?.(ackError('You cannot invite yourself.'));
           return;
         }
+        if (!friends.isFriend(senderFriendCode, targetFriendCode)) {
+          reply?.(
+            ackError('Only accepted friends can receive a room invitation.'),
+          );
+          return;
+        }
 
         const targetPresence = presenceByFriendCode.get(targetFriendCode);
         if (!targetPresence) {
@@ -1186,7 +1393,7 @@ io.on('connection', (socket) => {
     ) => {
       try {
         const invite = pendingInvites.get(payload.inviteId);
-        if (!invite) {
+        if (!invite || Date.now() - invite.createdAt >= INVITE_TTL_MS) {
           reply?.(ackError('Invite no longer exists.'));
           return;
         }
@@ -1205,6 +1412,11 @@ io.on('connection', (socket) => {
         });
         if (invite.toFriendCode !== friendCode) {
           reply?.(ackError('This invite was not sent to your friend code.'));
+          return;
+        }
+        if (!friends.isFriend(invite.fromFriendCode, friendCode)) {
+          removeInvite(invite.inviteId, io);
+          reply?.(ackError('This invitation is no longer available.'));
           return;
         }
 
@@ -1324,18 +1536,26 @@ io.on('connection', (socket) => {
 
         // Validate and deal before changing the live room. A rejected configuration
         // must leave its lobby or current round intact.
-        const effectiveRules = payload.rules
-          ? validateGameRules({
-              ...(room.rules ?? defaultRules),
-              ...payload.rules,
-            })
+        const effectiveProfileId =
+          payload.profileId !== undefined
+            ? payload.profileId
+            : payload.rules
+              ? undefined
+              : room.profileId;
+        const mergedRules = payload.rules
+          ? { ...(room.rules ?? defaultRules), ...payload.rules }
           : (room.rules ?? defaultRules);
+        const effectiveRules = resolveImmutableRules(
+          mergedRules,
+          effectiveProfileId,
+        );
         const newGame = initializeGame(
           room.players.map((p) => p.name),
           effectiveRules,
           room.players.map((p) => p.isBot),
         );
         room.rules = effectiveRules;
+        room.profileId = effectiveProfileId;
         // Preserve room identities when a lobby seat has been removed or replaced.
         room.game = startTableRound(
           {
@@ -1397,11 +1617,21 @@ io.on('connection', (socket) => {
           return;
         }
 
-        const merged = validateGameRules({
-          ...(room.rules ?? defaultRules),
-          ...payload.rules,
-        });
+        if (room.started)
+          throw new Error('Return to the lobby before changing rules.');
+
+        const effectiveProfileId =
+          payload.profileId !== undefined
+            ? payload.profileId
+            : payload.rules
+              ? undefined
+              : room.profileId;
+        const mergedRules = payload.rules
+          ? { ...(room.rules ?? defaultRules), ...payload.rules }
+          : (room.rules ?? defaultRules);
+        const merged = resolveImmutableRules(mergedRules, effectiveProfileId);
         room.rules = merged;
+        room.profileId = effectiveProfileId;
 
         const snapshot = snapshotForSocket(room, socket.id);
         broadcastRoom(io, room);
@@ -1513,6 +1743,7 @@ io.on('connection', (socket) => {
             });
           }
           playerBySocket.delete(removed.socketId);
+          updateSocialStatus(removed.socketId);
         }
 
         const snapshot = snapshotForSocket(room, socket.id);
@@ -1645,17 +1876,7 @@ io.on('connection', (socket) => {
   );
 
   socket.on('disconnect', () => {
-    const presence = presenceBySocket.get(socket.id);
-    if (presence) {
-      for (const invite of Array.from(pendingInvites.values())) {
-        if (
-          invite.fromFriendCode === presence.friendCode ||
-          invite.toFriendCode === presence.friendCode
-        ) {
-          removeInvite(invite.inviteId, io);
-        }
-      }
-    }
+    // A refresh is not a rejection. Unanswered invitations keep their short TTL.
     removePresence(socket.id);
 
     leaveRoomForSocket(socket.id, io);

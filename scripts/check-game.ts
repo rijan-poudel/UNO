@@ -1,3 +1,4 @@
+import './check-avatar';
 import './check-hand-layout';
 import './check-card-plays';
 import './check-gesture';
@@ -27,13 +28,21 @@ import type { GameState } from '../types/game';
 
 // Regressions: shared defaults, cross-color stacking, and every action path.
 {
-  assert.ok(DEFAULT_TABLE_RULES.stackDraw2 && DEFAULT_TABLE_RULES.stackWild4);
+  assert.equal(DEFAULT_TABLE_RULES.stackDraw2, false);
+  assert.equal(DEFAULT_TABLE_RULES.stackWild4, false);
   assert.equal(DEFAULT_TABLE_RULES.allowWild4OnDraw2, false);
-  assert.equal(matchesPreset(DEFAULT_TABLE_RULES, RULE_PRESETS[1].rules), true);
-  assert.ok(parseRulePreferences(null, null).stackDraw2);
-  assert.ok(
+  assert.equal(matchesPreset(DEFAULT_TABLE_RULES, RULE_PRESETS[0].rules), true);
+  assert.equal(parseRulePreferences(null, null).stackDraw2, false);
+  assert.equal(
     parseRulePreferences(JSON.stringify(defaultRules), null).stackDraw2,
-    'Old defaults migrate once',
+    false,
+  );
+  assert.equal(
+    parseRulePreferences(
+      JSON.stringify({ ...defaultRules, stackDraw2: true, stackWild4: true }),
+      '2',
+    ).stackDraw2,
+    false,
   );
   assert.equal(
     parseRulePreferences(JSON.stringify(defaultRules), RULES_VERSION)
@@ -70,6 +79,8 @@ import type { GameState } from '../types/game';
   );
   const base = initializeGame(['You', 'Cleo', 'Jules'], {
     ...DEFAULT_TABLE_RULES,
+    stackDraw2: true,
+    stackWild4: true,
     allowStartingActionCard: false,
   });
   const draw2: Card = { id: 'blue-two', color: 'blue', value: 'draw2' };
@@ -283,7 +294,8 @@ import {
   declareUno,
   callOutUno,
 } from '../lib/gameActions';
-import { RULE_PRESETS, matchesPreset } from '../lib/rulePresets';
+import { matchesPreset } from '../lib/rulePresets';
+import { RULE_SCENARIOS as RULE_PRESETS } from './ruleScenarios';
 import {
   parseProgress,
   addRoundResult,
@@ -531,11 +543,12 @@ assert.equal(
   'display progress stops at the real goal',
 );
 for (const preset of RULE_PRESETS) {
-  assert.ok(
+  assert.equal(
     matchesPreset(
       { ...preset.rules, startingHandSize: 12, maxPlayers: 6 },
       preset.rules,
     ),
+    false,
   );
 }
 console.log('Progress and supported rule presets passed.');
@@ -678,7 +691,17 @@ try {
     'Riya',
     'A blocked store does not prevent play',
   );
-  assert.equal(getPlayerName(), 'You');
+  assert.equal(getPlayerName(), 'Riya');
+  let fallbackNotifications = 0;
+  const stopFallback = subscribePlayerName(() => fallbackNotifications++);
+  savePlayerName('Nora');
+  assert.equal(
+    fallbackNotifications,
+    1,
+    'Blocked storage still notifies every profile consumer',
+  );
+  assert.equal(getSavedPlayerNames()[0], 'Nora');
+  stopFallback();
   assert.equal(getSavedPlayerNames().length, 3);
 } finally {
   if (originalStorage)
@@ -790,3 +813,7 @@ console.log(
     'Motion continuity passed: metadata, cloned snapshots, real card changes and no overshoot.',
   );
 }
+import './check-friends';
+import './check-display';
+import './check-rule-profiles';
+import './check-editions';

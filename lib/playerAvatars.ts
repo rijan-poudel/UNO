@@ -1,4 +1,5 @@
 // Explicit portrait choices shared by local profiles and online seats.
+import { parseCustomAvatar } from './avatarCustomization';
 export const PLAYER_AVATARS = [
   { id: 'initials', label: 'Neutral player icon' },
   { id: 'portrait-0', label: 'Long dark hair, coral shirt' },
@@ -14,9 +15,13 @@ export const PLAYER_AVATARS = [
   { id: 'portrait-10', label: 'Natural afro, yellow shirt' },
   { id: 'portrait-11', label: 'High bun and coral glasses, plum shirt' },
 ] as const;
-export type AvatarId = (typeof PLAYER_AVATARS)[number]['id'];
+export type AvatarId =
+  (typeof PLAYER_AVATARS)[number]['id'] | `custom-${string}`;
 export function isAvatarId(value: unknown): value is AvatarId {
-  return PLAYER_AVATARS.some((avatar) => avatar.id === value);
+  return (
+    PLAYER_AVATARS.some((avatar) => avatar.id === value) ||
+    parseCustomAvatar(value) !== null
+  );
 }
 const AVATAR_KEY = 'uno.profile.avatar';
 const AVATAR_EVENT = 'uno:avatar-updated';
@@ -24,12 +29,16 @@ let sessionAvatar: AvatarId = 'initials';
 export function getPlayerAvatar(): AvatarId {
   try {
     const saved = localStorage.getItem(AVATAR_KEY);
-    return isAvatarId(saved) ? saved : sessionAvatar;
+    // The creator is deferred. Old recipes still validate in saved rounds.
+    return PLAYER_AVATARS.some((avatar) => avatar.id === saved)
+      ? (saved as AvatarId)
+      : 'initials';
   } catch {
     return sessionAvatar;
   }
 }
 export function savePlayerAvatar(avatarId: AvatarId): void {
+  if (!isAvatarId(avatarId)) throw new Error('Choose a valid avatar.');
   sessionAvatar = avatarId;
   try {
     localStorage.setItem(AVATAR_KEY, avatarId);

@@ -9,8 +9,11 @@
  * Pass a Partial<GameRules> to initializeGame() to override only what you need.
  */
 export type BotDifficulty = "casual" | "standard" | "tactical";
+export type GameMode = "classic" | "no_mercy" | "all_wild";
 
 export interface GameRules {
+  /** The core game edition: Classic, Show 'Em No Mercy, or All Wild. */
+  gameMode: GameMode;
   /** Card-selection strategy for bot seats; does not change turn timing. */
   botDifficulty: BotDifficulty;
   // ── Hand size ────────────────────────────────────────────────────────────
@@ -57,6 +60,9 @@ export interface GameRules {
    * (same color AND value) may "jump in" out of turn.
    */
   allowJumpIn: boolean;
+
+  /** Sevens swap hands; zeroes pass all active hands in the play direction. */
+  sevenZero: boolean;
 
   /** If true, an invalid UNO call-out penalizes the caller by +2 cards. */
   penalizeFalseCallOut: boolean;
@@ -105,17 +111,24 @@ export interface GameRules {
    */
   allowShuffleCard: boolean;
 
-  // ── Win condition ─────────────────────────────────────────────────────────
+  // ── Win condition & penalties ─────────────────────────────────────────────
   /**
    * If false, a player may NOT win by playing an action or wild card as their
    * last card. The card is simply blocked — they must play a number card to go out.
    * Default: true (standard UNO allows finishing on any card).
    */
   canFinishWithActionCard: boolean;
+
+  /** Number of cards drawn when caught without declaring UNO. Default: 2. */
+  missedUnoDrawPenalty: number;
+
+  /** Maximum cards in hand before instant elimination (Mercy rule). 0 = disabled. */
+  eliminationHandLimit: number;
 }
 
 /** Sensible defaults matching standard UNO rules. */
 export const defaultRules: GameRules = {
+  gameMode: "classic",
   botDifficulty: "standard",
   startingHandSize: 7,
   stackDraw2: false,
@@ -124,6 +137,7 @@ export const defaultRules: GameRules = {
   allowDoublePlaySameNumber: false,
   allowDoublePlayExactMatchOnly: false,
   allowJumpIn: false,
+  sevenZero: false,
   penalizeFalseCallOut: false,
   reverseActsAsSkipInTwoPlayer: true,
   mustDeclareUno: true,
@@ -133,4 +147,34 @@ export const defaultRules: GameRules = {
   allowDiscardAll: false,
   allowShuffleCard: false,
   canFinishWithActionCard: true,
+  missedUnoDrawPenalty: 2,
+  eliminationHandLimit: 0,
 };
+
+/** Immutable official Classic UNO rules. */
+export const CLASSIC_RULES: Readonly<GameRules> = Object.freeze({
+  ...defaultRules,
+  gameMode: "classic",
+});
+
+/** Immutable official UNO Show 'Em No Mercy rules. */
+export const NO_MERCY_RULES: Readonly<GameRules> = Object.freeze({
+  ...defaultRules,
+  gameMode: "no_mercy",
+  maxPlayers: 6,
+  stackDraw2: true,
+  stackWild4: true,
+  allowWild4OnDraw2: true,
+  drawUntilPlayable: true,
+  allowStartingActionCard: false,
+  allowDiscardAll: true,
+  eliminationHandLimit: 25,
+  sevenZero: true,
+});
+
+/** Immutable official UNO All Wild rules. */
+export const ALL_WILD_RULES: Readonly<GameRules> = Object.freeze({
+  ...defaultRules,
+  gameMode: "all_wild",
+  allowStartingActionCard: false,
+});

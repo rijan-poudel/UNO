@@ -4,12 +4,10 @@ import { validateGameRules } from './validateGameRules';
 
 export const SHARED_RULES_KEY = 'uno.shared.rules';
 export const RULES_VERSION_KEY = 'uno.shared.rules.version';
-export const RULES_VERSION = '2';
+export const RULES_VERSION = '3';
 export const DEFAULT_TABLE_RULES: GameRules = {
   ...defaultRules,
   maxPlayers: 6,
-  stackDraw2: true,
-  stackWild4: true,
 };
 
 export function parseRulePreferences(
@@ -28,15 +26,19 @@ export function parseRulePreferences(
       allowShuffleCard:
         saved.allowShuffleCard ?? saved.shuffleHandsOnZero ?? false,
     });
-    // Upgrade the old default once. Explicit choices made after this version persist.
-    const wasClassic = Object.entries(defaultRules).every(
+    // Retire the former stacking default without rewriting actual custom rules.
+    const wasStackingDefault = Object.entries({
+      ...defaultRules,
+      stackDraw2: true,
+      stackWild4: true,
+    }).every(
       ([key, value]) =>
         key === 'maxPlayers' ||
         key === 'botDifficulty' ||
         (saved[key] ?? value) === value,
     );
-    return version !== RULES_VERSION && wasClassic
-      ? { ...rules, stackDraw2: true, stackWild4: true }
+    return version !== RULES_VERSION && wasStackingDefault
+      ? { ...rules, stackDraw2: false, stackWild4: false }
       : rules;
   } catch {
     return { ...DEFAULT_TABLE_RULES };

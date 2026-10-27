@@ -8,12 +8,13 @@ export function toGameView(game: GameState, viewerId: string): GameView {
     roundId: game.roundId,
     tableScore: game.tableScore,
     players: game.players.map(
-      ({ hand, id, name, avatarId, saidUno, isBot }) => ({
+      ({ hand, id, name, avatarId, saidUno, isBot, eliminated }) => ({
         id,
         name,
         avatarId,
         saidUno,
         isBot,
+        eliminated,
         handCount: hand.length,
         ...(id === viewerId ? { hand } : {}),
       }),
@@ -24,6 +25,7 @@ export function toGameView(game: GameState, viewerId: string): GameView {
     direction: game.direction,
     activeColor: game.activeColor,
     pendingDraw: game.pendingDraw,
+    pendingRoulette: game.pendingRoulette,
     pendingDrawType: game.pendingDrawType,
     drawnThisTurn: game.drawnThisTurn,
     winnerId: game.winnerId,

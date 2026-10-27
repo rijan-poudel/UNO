@@ -13,6 +13,7 @@ import { getPlayableCards } from './gameRules';
 import { getNextPlayerIndex } from './turns';
 import {
   callOutUno,
+  chooseRouletteColor,
   declareUno,
   drawOneCard,
   drawRequiredCards,
@@ -58,7 +59,12 @@ export function getBotDifficultyLabel(
  * action 'drawRequired' → call drawRequiredCards(state, playerIndex)
  */
 export type BotAction =
-  | { action: 'play'; cardId: string; chosenColor?: CardColor }
+  | {
+      action: 'play';
+      cardId: string;
+      chosenColor?: CardColor;
+      targetPlayerId?: string;
+    }
   | { action: 'draw' }
   | { action: 'pass' }
   | { action: 'drawRequired' };
@@ -110,14 +116,32 @@ export function getBotPreferredColor(hand: Card[]): CardColor {
  */
 function scoreCard(card: Card): number {
   switch (card.value) {
+    case 'wildDraw10':
+      return 120;
+    case 'wildDraw6':
+      return 110;
+    case 'wildReverseDraw4':
+      return 105;
     case 'wild4':
       return 100;
+    case 'draw4':
+      return 95;
     case 'shuffle':
       return 92;
+    case 'skipEveryone':
+      return 90;
+    case 'wildColorRoulette':
+      return 88;
+    case 'wildTargetDraw2':
+      return 85;
+    case 'wildForcedSwap':
+      return 84;
     case 'draw2':
       return 80;
     case 'discardAll':
       return 76;
+    case 'wildSkip2':
+      return 75;
     case 'skip':
       return 70;
     case 'reverse':
@@ -228,15 +252,44 @@ export function getBotMove(state: GameState, playerIndex: number): BotAction {
         )[0];
 
   const chosenColor =
-    best.color === 'wild' ? getBotPreferredColor(player.hand) : undefined;
+    best.color === 'wild' && state.rules.gameMode !== 'all_wild'
+      ? getBotPreferredColor(player.hand)
+      : undefined;
 
-  return { action: 'play', cardId: best.id, chosenColor };
+  let targetPlayerId: string | undefined;
+  if (
+    (state.rules.sevenZero && best.value === '7') ||
+    best.value === 'wildForcedSwap' ||
+    best.value === 'wildTargetDraw2'
+  ) {
+    let minCards = Infinity;
+    for (let i = 0; i < state.players.length; i++) {
+      if (i === playerIndex || state.players[i].eliminated) continue;
+      if (state.players[i].hand.length < minCards) {
+        minCards = state.players[i].hand.length;
+        targetPlayerId = state.players[i].id;
+      }
+    }
+  }
+
+  return {
+    action: 'play',
+    cardId: best.id,
+    chosenColor,
+    ...(targetPlayerId ? { targetPlayerId } : {}),
+  };
 }
 
 /** Execute one recommendation, publishing draws before any follow-up play. */
 export function playBotStep(game: GameState): GameState {
   if (game.winnerId) return game;
   const index = game.currentPlayerIndex;
+  if (game.pendingRoulette)
+    return chooseRouletteColor(
+      game,
+      index,
+      getBotPreferredColor(game.players[index].hand),
+    );
   const target = game.players.findIndex(
     (player, seat) =>
       seat !== index && player.hand.length === 1 && !player.saidUno,
@@ -247,7 +300,10 @@ export function playBotStep(game: GameState): GameState {
   if (move.action === 'drawRequired') next = drawRequiredCards(state, index);
   else if (move.action === 'pass') next = passTurn(state, index);
   else if (move.action === 'draw') next = drawOneCard(state, index);
-  else next = playCard(state, index, move.cardId, move.chosenColor);
+  else
+    next = playCard(state, index, move.cardId, move.chosenColor, {
+      targetPlayerId: move.targetPlayerId,
+    });
 
   return !next.winnerId && next.players[index].hand.length === 1
     ? { ...declareUno(next, index), lastAction: next.lastAction }

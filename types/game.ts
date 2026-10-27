@@ -23,6 +23,8 @@ export interface Player {
   saidUno: boolean;
   /** If true, a bot controller should drive this player's decisions. */
   isBot: boolean;
+  /** Knocked out via the Mercy Rule (25+ cards in hand). */
+  eliminated?: boolean;
 }
 
 // ── Last-action union ────────────────────────────────────────────────────────
@@ -40,11 +42,13 @@ export type LastAction =
       shuffledHands?: boolean;
       playedCards?: Card[];
       declaredUno?: boolean;
+      targetId?: string;
     }
   | { type: "draw"; playerId: string; count: number }
   | { type: "pass"; playerId: string }
   | { type: "declareUno"; playerId: string }
-  | { type: "callOut"; callerId: string; targetId: string; penalty: number };
+  | { type: "callOut"; callerId: string; targetId: string; penalty: number }
+  | { type: "mercyElimination"; playerId: string };
 
 // ── Game State ────────────────────────────────────────────────────────────────
 
@@ -89,6 +93,12 @@ export interface GameState {
 
   /** Remaining cards available to draw. Top of pile is the last element. */
   drawPile: Card[];
+
+  /** Knocked-out hands stay aside until the stock needs recycling. */
+  outOfPlayPile?: Card[];
+
+  /** Color Roulette is chosen by its recipient, after the card is played. */
+  pendingRoulette?: { playerId: string };
 
   /**
    * Cards that have been played. The current top is the last element.

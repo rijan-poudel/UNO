@@ -1,18 +1,24 @@
 // A quiet game title screen: one immediate Play action and room choices.
 "use client";
-import { useState, type CSSProperties } from "react";
-import { ArrowRight, Bot, BookOpen, Users, LogIn } from "lucide-react";
-import type { FriendInvite } from "../../types/multiplayer";
-import type { GameRules } from "../../types/rules";
 import {
-  RULE_PRESETS,
-  getTableMood,
-  matchesPreset,
-} from "../../lib/rulePresets";
-import NotificationPanel from "../NotificationPanel";
-import PlayerProgress from "../PlayerProgress";
+  useSyncExternalStore,
+  type CSSProperties,
+  type ReactNode,
+} from "react";
+import { ArrowRight, Users, LogIn } from "lucide-react";
+import type { GameRules } from "../../types/rules";
+import { getTableMood, matchesPreset } from "../../lib/rulePresets";
+import {
+  getFavoriteProfiles,
+  getAllProfiles,
+  subscribeRuleProfiles,
+  setActiveProfileId,
+  getRuleSetLabel,
+  getActiveProfileId,
+  getRuleProfilesRevision,
+  getServerRuleProfilesRevision,
+} from "../../lib/customRuleProfiles";
 import UnoCard from "../UnoCard";
-import HowToPlayModal from "../HowToPlayModal";
 import type { Card } from "../../types/card";
 import type { GameState } from "../../types/game";
 import { getBotDifficultyLabel } from "../../lib/botSupport";
@@ -21,19 +27,11 @@ interface Props {
   savedGame?: GameState | null;
   onResume?: () => void;
   rules: Partial<GameRules>;
-  onRulesChange: (rules: Partial<GameRules>) => void;
-  themeLabel: string;
-  onSelectTheme?: (themeName: string) => void;
-  onOpenControlsSettings: () => void;
-  onOpenAudioSettings: () => void;
-  onOpenProfileSettings?: () => void;
-  onComputer: () => void;
+  controls: ReactNode;
   onQuickPlay: () => void;
   onJoin: () => void;
-  onFriends: () => void;
-  incomingInvites: FriendInvite[];
-  onAcceptFriendInvite?: (id: string) => Promise<boolean>;
-  onDeclineFriendInvite?: (id: string) => Promise<boolean>;
+  onCreateRoom: () => void;
+  onRulesChange?: (rules: Partial<GameRules>) => void;
 }
 const TITLE_CARDS: Card[] = [
   { id: "title-blue", color: "blue", value: "5" },
@@ -42,21 +40,26 @@ const TITLE_CARDS: Card[] = [
   { id: "title-red", color: "red", value: "draw2" },
 ];
 export default function HomeScreen(props: Props) {
-  const [help, setHelp] = useState(false);
-  const preset = RULE_PRESETS.find((item) =>
-    matchesPreset(props.rules, item.rules),
+  useSyncExternalStore(
+    subscribeRuleProfiles,
+    getRuleProfilesRevision,
+    getServerRuleProfilesRevision,
   );
+  const favorites = getFavoriteProfiles();
+  const activeId = getActiveProfileId();
+  const activeProfile =
+    getAllProfiles().find(
+      (p) => p.id === activeId && matchesPreset(props.rules, p.rules),
+    ) ??
+    getAllProfiles().find((p) => matchesPreset(props.rules, p.rules)) ??
+    favorites[0];
+
   return (
     <div
       className={`launch-screen mood-${getTableMood(props.rules)}${props.savedGame ? " has-saved-round" : ""}`}
       data-design-contract="color-play"
     >
-      <div className="launch-header">
-        <NotificationPanel
-          {...props}
-          incomingInviteCount={props.incomingInvites.length}
-        />
-      </div>
+      <div className="launch-header">{props.controls}</div>
       <main className="launch-main">
         <div className="launch-heading">
           <h1>
@@ -105,26 +108,39 @@ export default function HomeScreen(props: Props) {
             role="group"
             aria-label="Choose your game"
           >
-            {RULE_PRESETS.map((item) => (
-              <button
-                key={item.id}
-                aria-pressed={preset?.id === item.id}
-                onClick={() =>
-                  props.onRulesChange({
-                    ...item.rules,
-                    startingHandSize: props.rules.startingHandSize ?? 7,
-                    maxPlayers: props.rules.maxPlayers ?? 6,
-                    botDifficulty: props.rules.botDifficulty ?? "standard",
-                  })
-                }
-              >
-                {item.label}
-              </button>
-            ))}
+            {favorites.map((item) => {
+              const isSelected = activeProfile?.id === item.id;
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  aria-pressed={isSelected}
+                  onClick={() => {
+                    setActiveProfileId(item.id);
+                    props.onRulesChange?.({
+                      ...item.rules,
+                      startingHandSize: item.rules.startingHandSize ?? 7,
+                      maxPlayers:
+                        item.rules.maxPlayers ??
+                        (item.rules.gameMode === "no_mercy" ? 6 : 10),
+                      botDifficulty: props.rules.botDifficulty ?? "standard",
+                    });
+                  }}
+                >
+                  {item.isOriginal
+                    ? item.id === "classic"
+                      ? "Classic UNO"
+                      : item.id === "no_mercy"
+                        ? "No Mercy"
+                        : "All Wild"
+                    : item.name}
+                </button>
+              );
+            })}
           </div>
           <p className="launch-preset-description">
-            {preset?.description ??
-              "Your own house rules. Make yourself at home."}
+            {activeProfile?.description ??
+              "Standard deck, seven cards each, matching color or number."}
           </p>
           <button
             className="button primary launch-primary"
@@ -135,13 +151,13 @@ export default function HomeScreen(props: Props) {
               <small>
                 {props.savedGame
                   ? "Replace your saved bot round"
-                  : `Jump in with ${getBotDifficultyLabel(props.rules.botDifficulty).toLowerCase()} bots`}
+                  : `${activeProfile?.name ?? getRuleSetLabel(props.rules)} · ${getBotDifficultyLabel(props.rules.botDifficulty).toLowerCase()} bots`}
               </small>
             </span>
             <ArrowRight size={25} aria-hidden="true" />
           </button>
           <div className="launch-rooms">
-            <button className="button secondary" onClick={props.onFriends}>
+            <button className="button secondary" onClick={props.onCreateRoom}>
               <Users size={19} aria-hidden="true" />
               Create a room
             </button>
@@ -150,42 +166,8 @@ export default function HomeScreen(props: Props) {
               Join a room
             </button>
           </div>
-          <div className="launch-extras">
-            <button className="launch-text-action" onClick={props.onComputer}>
-              <Bot size={16} aria-hidden="true" />
-              Set up bots
-            </button>
-            <button
-              className="launch-text-action"
-              onClick={() => setHelp(true)}
-              aria-haspopup="dialog"
-            >
-              <BookOpen size={16} aria-hidden="true" />
-              How to play
-              <span className="launch-pill-hint">1 min</span>
-            </button>
-          </div>
-          {help && (
-            <HowToPlayModal
-              open={help}
-              rules={props.rules}
-              onClose={() => setHelp(false)}
-              onPracticeWithBots={() => {
-                setHelp(false);
-                props.onQuickPlay();
-              }}
-              onPlayWithFriends={() => {
-                setHelp(false);
-                props.onFriends();
-              }}
-            />
-          )}
         </section>
-        <div className="launch-progress">
-          <PlayerProgress />
-        </div>
       </main>
-      <footer className="launch-footer">No signup. Just one more round.</footer>
     </div>
   );
 }

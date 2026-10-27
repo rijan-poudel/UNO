@@ -1,7 +1,7 @@
 // One read-only explanation of the actual table settings, shared by help and guests.
 import { defaultRules, type GameRules } from "../types/rules";
-import { RULE_PRESETS, matchesPreset } from "../lib/rulePresets";
 import { getBotDifficultyLabel } from "../lib/botSupport";
+import { getRuleSetLabel } from "../lib/customRuleProfiles";
 
 export default function RulesSummary({
   rules,
@@ -16,7 +16,7 @@ export default function RulesSummary({
       Object.entries(rules).filter(([, value]) => value !== undefined),
     ),
   };
-  const preset = RULE_PRESETS.find((item) => matchesPreset(active, item.rules));
+
   const stacking = [
     active.stackDraw2 && "+2 on +2",
     active.stackWild4 && "+4 on +4",
@@ -27,6 +27,7 @@ export default function RulesSummary({
   const extras = [
     active.allowJumpIn && "Jump-in",
     active.allowShuffleCard && "Shuffle hands",
+    active.sevenZero && "7 swaps · 0 passes hands",
   ]
     .filter(Boolean)
     .join(" · ");
@@ -39,7 +40,12 @@ export default function RulesSummary({
       "Drawing",
       active.drawUntilPlayable ? "Until you can play" : "One card per draw",
     ],
-    ["Draw stacking", stacking || "Off"],
+    [
+      "Draw stacking",
+      active.gameMode === "no_mercy" && active.stackDraw2 && active.stackWild4
+        ? "Equal or higher draw cards"
+        : stacking || "Off",
+    ],
     [
       "Matching-number pairs",
       !active.allowDoublePlaySameNumber
@@ -64,6 +70,10 @@ export default function RulesSummary({
         ? "Any card can win"
         : "Finish with a number",
     ],
+    ["Missed UNO", `${active.missedUnoDrawPenalty} cards`],
+    ...(active.eliminationHandLimit
+      ? [["Mercy rule", `Out at ${active.eliminationHandLimit} cards`]]
+      : []),
     ["Extra rules", extras || "None"],
     [
       "Two-player reverse",
@@ -73,7 +83,11 @@ export default function RulesSummary({
     ],
     [
       "Opening card",
-      active.allowStartingActionCard ? "Numbers or actions" : "Numbers only",
+      active.gameMode === "all_wild"
+        ? "Any card; opening action ignored"
+        : active.allowStartingActionCard
+          ? "Numbers or actions"
+          : "Numbers only",
     ],
     [
       "False call-out",
@@ -83,7 +97,7 @@ export default function RulesSummary({
   return (
     <>
       <p className="rules-preset-name">
-        <strong>{preset?.label ?? "Custom rules"}</strong>
+        <strong>{getRuleSetLabel(rules)}</strong>
       </p>
       <dl className="rules-summary">
         {rows.map(([label, value]) => (

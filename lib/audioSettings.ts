@@ -19,6 +19,8 @@ export interface AudioSettings {
   muted: boolean;
   /** Immediate card texture and short tonal signatures for game events. */
   chimesEnabled: boolean;
+  /** Short room-invitation and friend-request cues. */
+  notificationsEnabled: boolean;
   /** In-game board announcer (plays from game events). */
   voiceInGame: boolean;
   /** Volume for background music (0-1) */
@@ -30,6 +32,7 @@ export interface AudioSettings {
 export const defaultAudioSettings: AudioSettings = {
   muted: false,
   chimesEnabled: true,
+  notificationsEnabled: true,
   voiceInGame: false,
   musicVolume: 0.24,
   sfxVolume: 0.55,
@@ -50,6 +53,8 @@ function parseStored(raw: string | null): Partial<AudioSettings> {
     if (typeof o.muted === 'boolean') next.muted = o.muted;
     if (typeof o.chimesEnabled === 'boolean')
       next.chimesEnabled = o.chimesEnabled;
+    if (typeof o.notificationsEnabled === 'boolean')
+      next.notificationsEnabled = o.notificationsEnabled;
     if (typeof o.voiceInGame === 'boolean') next.voiceInGame = o.voiceInGame;
     if (typeof o.musicVolume === 'number' && Number.isFinite(o.musicVolume))
       next.musicVolume = Math.max(0, Math.min(1, o.musicVolume));
@@ -76,18 +81,6 @@ function parseMusicContextStored(
   } catch {
     return {};
   }
-}
-
-export function uiToStoredVolume(uiValue: number): number {
-  const CAP = 0.6;
-  const clamped = Math.max(0, Math.min(1, uiValue));
-  return CAP * Math.pow(clamped, 2.3);
-}
-
-export function storedToUiVolume(stored: number): number {
-  const CAP = 0.6;
-  const clamped = Math.max(0, Math.min(CAP, stored));
-  return Math.pow(clamped / CAP, 1 / 2.3);
 }
 
 let fallbackAudioSettings: AudioSettings | null = null;

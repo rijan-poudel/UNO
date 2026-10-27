@@ -1,12 +1,12 @@
 // One low-latency audio context; card texture is generated once, never fetched on tap.
 import { getAudioSettings } from './audioSettings';
 export type TableChime =
+  | 'notification'
   | 'pickup'
   | 'cardPlay'
   | 'draw'
   | 'draw2'
   | 'wild4'
-  | 'shuffleMotion'
   | 'skip'
   | 'reverse'
   | 'wild'
@@ -56,7 +56,6 @@ function warmCard(ctx: AudioContext): void {
       loadingCard = false;
     });
 }
-let lastMotionAt = 0;
 const voices = new Set<AudioScheduledSourceNode>();
 function retain(source: AudioScheduledSourceNode): void {
   voices.add(source);
@@ -212,17 +211,19 @@ function landing(ctx: AudioContext, volume: number): void {
   osc.start(at);
   osc.stop(at + 0.07);
 }
-function canSound(): boolean {
+function canSound(event: TableChime): boolean {
   const settings = getAudioSettings();
   return (
     !settings.muted &&
-    settings.chimesEnabled &&
+    (event === 'notification'
+      ? settings.notificationsEnabled
+      : settings.chimesEnabled) &&
     settings.sfxVolume > 0 &&
     !document.hidden
   );
 }
 export function playTableChime(event: TableChime): void {
-  if (typeof document === 'undefined' || !canSound()) return;
+  if (typeof document === 'undefined' || !canSound(event)) return;
   const sequence = ++feedbackSequence;
   const requestedAt = performance.now();
   try {
@@ -236,7 +237,7 @@ export function playTableChime(event: TableChime): void {
           sequence === feedbackSequence &&
           performance.now() - requestedAt < 160 &&
           ctx.state === 'running' &&
-          canSound()
+          canSound(event)
         )
           renderChime(ctx, event);
       });
@@ -249,13 +250,17 @@ function renderChime(ctx: AudioContext, event: TableChime): void {
   try {
     const settings = getAudioSettings();
     const volume = settings.sfxVolume;
+    if (event === 'notification') {
+      [659, 880].forEach((frequency, i) =>
+        tone(ctx, frequency, ctx.currentTime + i * 0.12, volume * 0.45),
+      );
+      return;
+    }
     if (event === 'pickup') {
       cardTexture(ctx, volume * 0.52, false, true);
       return;
     }
-    if (
-      ['cardPlay', 'draw', 'deal', 'shuffleMotion', 'shuffle'].includes(event)
-    ) {
+    if (['cardPlay', 'draw', 'deal', 'shuffle'].includes(event)) {
       cardTexture(ctx, volume, event === 'draw');
       if (event === 'cardPlay') landing(ctx, volume);
       if (event === 'deal') landing(ctx, volume * 0.6);
@@ -301,10 +306,4 @@ function renderChime(ctx: AudioContext, event: TableChime): void {
   } catch {
     /* Audio must never interfere with play. */
   }
-}
-export function playShuffleMotionChime(): void {
-  const now = performance.now();
-  if (now - lastMotionAt < 80) return;
-  lastMotionAt = now;
-  playTableChime('shuffleMotion');
 }

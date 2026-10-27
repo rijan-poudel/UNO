@@ -36,21 +36,17 @@ else delete require.extensions['.css'];
 const ok = async () => true;
 const props: ComponentProps<typeof OnlineLobby> = {
   rules: defaultRules,
-  onRulesChange() {},
   onOpenRules() {},
   connected: true,
   playerId: 'host',
-  friendCode: 'ABCD2345',
-  incomingInvites: [],
-  outgoingInvites: [],
   error: null,
-  onSyncPresence: ok,
-  onCheckFriendOnline: async () => ({}),
+  social: { friends: [], incomingRequests: [], outgoingRequests: [] },
+  invitedCodes: [],
+  onRequestFriend: ok,
+  onInviteFriend: ok,
+  onOpenFriends() {},
   onCreateRoom: ok,
   onJoinRoom: ok,
-  onSendFriendInvite: ok,
-  onAcceptFriendInvite: ok,
-  onDeclineFriendInvite: ok,
   onLeaveRoom: ok,
   onStartGame: ok,
   onAddBotSeat: ok,
@@ -89,20 +85,21 @@ assert.match(host, /<footer class="setup-footer">[\s\S]*Deal everyone in/);
 assert.equal((host.match(/Deal everyone in/g) ?? []).length, 1);
 assert.doesNotMatch(host, /You \(you\)/);
 const guest = renderToStaticMarkup(<OnlineLobby {...props} playerId="guest" />);
-assert.match(
-  guest,
-  /5 each/,
-  'Published room rules take priority over saved preferences',
-);
-assert.match(guest, /Finish with a number/);
-assert.match(guest, /Not required/);
+assert.match(guest, /5 cards each/, 'The room summary follows published rules');
 assert.match(guest, /aria-label="Reconnecting"/);
-assert.match(
+assert.doesNotMatch(
   guest,
-  /One card per draw/,
-  'Unspecified settings retain engine defaults',
+  /class="rule-presets"|role="switch"|avatar-picker|online-name/,
 );
-assert.doesNotMatch(guest, /guest-rules-card|Double-play/);
+const joinOnly = renderToStaticMarkup(
+  <OnlineLobby {...props} room={null} initialPanel="join" />,
+);
+assert.match(joinOnly, /Join the room/);
+assert.match(joinOnly, /id="room-code"/);
+assert.doesNotMatch(
+  joinOnly,
+  /id="online-name"|avatar-picker|Friends &amp; invitations|role="switch"/,
+);
 const offline = renderToStaticMarkup(
   <OnlineLobby {...props} connected={false} />,
 );
@@ -116,41 +113,61 @@ assert.match(
 );
 const settingsProps = {
   open: true,
-  rules: defaultRules,
+  initialTab: 'controls' as const,
+  rules: { ...defaultRules, stackDraw2: true },
   onChange() {},
   onClose() {},
 };
-const rulesPanel = renderToStaticMarkup(<SettingsModal {...settingsProps} />);
-for (const group of [
-  'Drawing &amp; stacking',
-  'UNO &amp; finishing',
-  'Special cards &amp; moves',
-  'Table flow',
-]) {
-  assert.ok(rulesPanel.includes(`<legend>${group}</legend>`));
-}
+const rulesPanel = renderToStaticMarkup(
+  <SettingsModal {...settingsProps} initialTab="controls" />,
+);
+assert.match(rulesPanel, /Pin up to 3 to Home/);
+assert.match(rulesPanel, /Classic UNO/);
+assert.match(rulesPanel, /UNO Show ’Em No Mercy/);
+assert.match(rulesPanel, /UNO All Wild/);
 assert.equal(
   (rulesPanel.match(/role="switch"/g) ?? []).length,
-  14,
-  'Every supported rule remains configurable',
+  0,
+  'House-rule controls stay unmounted until editing a custom copy',
 );
 const profile = renderToStaticMarkup(
   <SettingsModal {...settingsProps} initialTab="profile" />,
 );
-assert.match(
-  profile,
-  /disabled=""[^>]*>Save name/,
-  'An unchanged name is already saved',
+const liveRules = renderToStaticMarkup(
+  <SettingsModal
+    {...settingsProps}
+    readOnlyRules
+    rules={{ ...defaultRules, startingHandSize: 12 }}
+  />,
 );
+assert.match(liveRules, /12 each/);
+assert.match(liveRules, /Rules for this table/);
+assert.doesNotMatch(
+  liveRules,
+  /role="switch"|Reset to classic rules|class="rule-presets"/,
+);
+const savingRules = renderToStaticMarkup(
+  <SettingsModal {...settingsProps} editingRoom savingRules />,
+);
+assert.match(savingRules, /<fieldset[^>]*disabled=""[^>]*aria-busy="true"/);
+assert.match(savingRules, /Saving room rules/);
+assert.match(profile, /Your name/);
 assert.equal(
   (profile.match(/aria-pressed=/g) ?? []).length,
   13,
-  'Twelve original portraits and a neutral option are selectable',
+  'Ready-made avatars are immediately available',
 );
-assert.match(
+assert.doesNotMatch(
   profile,
-  /class="avatar-preview"/,
-  'Selection has a larger portrait preview',
+  /Save name|avatar-customizer|Edit avatar|Saved on this device|Appearance/,
+);
+const overview = renderToStaticMarkup(
+  <SettingsModal {...settingsProps} initialTab="overview" />,
+);
+assert.match(overview, /aria-label="Settings sections"/);
+assert.doesNotMatch(
+  overview,
+  /avatar-options|role="switch"|Appearance|Saved on this device/,
 );
 const extendedPortrait = renderToStaticMarkup(
   <PlayerAvatar seed="portrait-check" avatarId="portrait-11" />,
@@ -211,7 +228,11 @@ const scoredLobby = renderToStaticMarkup(
     }}
   />,
 );
-assert.match(scoredLobby, /aria-label="Wins at this table"/);
+assert.doesNotMatch(
+  scoredLobby,
+  /aria-label="Wins at this table"/,
+  'Room setup stays focused on its seats',
+);
 assert.match(
   scoredLobby,
   /<footer class="setup-footer">[\s\S]*Deal everyone in/,
@@ -259,8 +280,8 @@ const publishedOnly = renderToStaticMarkup(
     }}
   />,
 );
-assert.match(publishedOnly, /Off — play one card/);
-assert.match(publishedOnly, /Not in this deck/);
+assert.match(publishedOnly, /5 cards each/);
+assert.doesNotMatch(publishedOnly, /class="rule-presets"|role="switch"/);
 const recovery = renderToStaticMarkup(
   <OnlineLobby
     {...props}
@@ -273,14 +294,6 @@ const recovery = renderToStaticMarkup(
 assert.match(recovery, /Connecting to rooms/);
 assert.match(recovery, /Play with bots/);
 assert.match(recovery, /form="[^"]+"/);
-const pairsOffRow = rulesPanel.slice(
-  rulesPanel.indexOf('Pairs must match color too'),
-  rulesPanel.indexOf(
-    '</label>',
-    rulesPanel.indexOf('Pairs must match color too'),
-  ),
-);
-assert.match(pairsOffRow, /disabled=""/);
 const guide = renderToStaticMarkup(
   <HowToPlayModal
     open

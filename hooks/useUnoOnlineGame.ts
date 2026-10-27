@@ -9,127 +9,36 @@ import type { PlayOptions } from '../lib/gameActions';
 import type {
   Ack,
   FriendInvite,
-  FriendPresenceState,
+  SocialSnapshot,
   MultiplayerAction,
   RoomSnapshot,
 } from '../types/multiplayer';
 import { toast } from 'sonner';
+import { getProfileIdForRules } from '../lib/customRuleProfiles';
 import { getPlayableCards } from '../lib/gameRules';
 import { toPresentationGame } from '../lib/gameView';
-import { resolvePlayerName } from '../lib/playerNames';
+import {
+  getPlayerName,
+  resolvePlayerName,
+  subscribePlayerName,
+} from '../lib/playerNames';
 import { getPlayerAvatar, subscribePlayerAvatar } from '../lib/playerAvatars';
 import { usePlayerActivity } from './usePlayerActivity';
 import {
   ONLINE_UNAVAILABLE_MESSAGE,
   resolveSocketEndpoint,
 } from '../lib/socketConnection';
-import {
-  voiceUiConnected,
-  voiceUiDisconnected,
-  voiceUiRoomJoined,
-} from '../lib/voiceAnnouncer';
 
 const AUTO_PASS_AFTER_DRAW_MS = 650;
 const ACTIVE_ROOM_KEY = 'uno.online.activeRoom';
 const ONLINE_DEVICE_ID_KEY = 'uno.online.deviceId';
 const ONLINE_FRIEND_CODE_KEY = 'uno.online.friendCode';
-const ONLINE_RECENT_ROOMS_KEY = 'uno.online.recentRooms';
-const ONLINE_FRIENDS_KEY = 'uno.online.friends';
-const MAX_RECENT_ROOMS = 8;
-const MAX_FRIENDS = 16;
-
-interface RecentRoomEntry {
-  roomId: string;
-  label: string;
-  lastVisitedAt: number;
-  lastPlayerName: string;
-}
-
-interface SavedFriendEntry {
-  friendCode: string;
-  name: string;
-  lastSeenAt: number;
-}
-
-function cleanFriendName(
-  rawName: string | undefined,
-  fallbackCode: string,
-): string {
-  const trimmed = (rawName ?? '').trim().slice(0, 20);
-  const normalized = trimmed.toLowerCase();
-  const blocked = new Set(['friend', 'friends', 'player', 'unknown', 'guest']);
-  if (!trimmed || blocked.has(normalized)) return fallbackCode;
-  return trimmed;
-}
 
 interface OutgoingInvitePending {
   inviteId: string;
+  createdAt: number;
   targetFriendCode: string;
   targetName?: string;
-}
-
-function normalizeFriendCode(value: string): string {
-  return value
-    .trim()
-    .toUpperCase()
-    .replace(/[^A-Z0-9]/g, '')
-    .slice(0, 8);
-}
-
-function loadSavedFriends(): SavedFriendEntry[] {
-  if (typeof window === 'undefined') return [];
-
-  try {
-    const raw = window.localStorage.getItem(ONLINE_FRIENDS_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw) as unknown;
-    if (!Array.isArray(parsed)) return [];
-
-    return parsed
-      .filter((item): item is SavedFriendEntry => {
-        if (typeof item !== 'object' || item === null) return false;
-        const candidate = item as Partial<SavedFriendEntry>;
-        return (
-          typeof candidate.friendCode === 'string' &&
-          typeof candidate.name === 'string' &&
-          typeof candidate.lastSeenAt === 'number'
-        );
-      })
-      .map((item) => ({
-        friendCode: normalizeFriendCode(item.friendCode),
-        name: cleanFriendName(item.name, normalizeFriendCode(item.friendCode)),
-        lastSeenAt: item.lastSeenAt,
-      }))
-      .filter((item) => Boolean(item.friendCode))
-      .sort((a, b) => b.lastSeenAt - a.lastSeenAt)
-      .slice(0, MAX_FRIENDS);
-  } catch {
-    return [];
-  }
-}
-
-function persistAcceptedFriend(rawCode: string, rawName?: string): void {
-  if (typeof window === 'undefined') return;
-
-  const code = normalizeFriendCode(rawCode);
-  if (!code) return;
-
-  const prev = loadSavedFriends();
-  const existing = prev.find((entry) => entry.friendCode === code);
-  const next = [
-    {
-      friendCode: code,
-      name: cleanFriendName(rawName?.trim() || existing?.name, code),
-      lastSeenAt: Date.now(),
-    },
-    ...prev.filter((entry) => entry.friendCode !== code),
-  ].slice(0, MAX_FRIENDS);
-
-  try {
-    window.localStorage.setItem(ONLINE_FRIENDS_KEY, JSON.stringify(next));
-  } catch {
-    // Ignore storage errors.
-  }
 }
 
 function getOrCreateDeviceId(): string {
@@ -173,78 +82,6 @@ function getOrCreateFriendCode(): string {
   } catch {
     return `UNO${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
   }
-}
-
-function loadRecentRooms(): RecentRoomEntry[] {
-  if (typeof window === 'undefined') return [];
-
-  try {
-    const raw = window.localStorage.getItem(ONLINE_RECENT_ROOMS_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw) as unknown;
-    if (!Array.isArray(parsed)) return [];
-
-    return parsed
-      .filter((item): item is RecentRoomEntry => {
-        if (typeof item !== 'object' || item === null) return false;
-        const candidate = item as Partial<RecentRoomEntry>;
-        return (
-          typeof candidate.roomId === 'string' &&
-          typeof candidate.label === 'string' &&
-          typeof candidate.lastVisitedAt === 'number' &&
-          typeof candidate.lastPlayerName === 'string'
-        );
-      })
-      .map((item) => ({
-        roomId: item.roomId.trim().toUpperCase().slice(0, 6),
-        label: item.label.trim(),
-        lastVisitedAt: item.lastVisitedAt,
-        lastPlayerName: item.lastPlayerName.trim(),
-      }))
-      .filter((item) => Boolean(item.roomId))
-      .sort((a, b) => b.lastVisitedAt - a.lastVisitedAt)
-      .slice(0, MAX_RECENT_ROOMS);
-  } catch {
-    return [];
-  }
-}
-
-function saveRecentRooms(entries: RecentRoomEntry[]) {
-  if (typeof window === 'undefined') return;
-
-  try {
-    window.localStorage.setItem(
-      ONLINE_RECENT_ROOMS_KEY,
-      JSON.stringify(entries.slice(0, MAX_RECENT_ROOMS)),
-    );
-  } catch {
-    // Ignore storage errors.
-  }
-}
-
-function rememberStartedRoom(room: RoomSnapshot, playerId: string | null) {
-  if (typeof window === 'undefined') return;
-  if (!room.roomId || !room.started || !room.game || !playerId) return;
-
-  const localPlayer = room.players.find(
-    (player) => player.playerId === playerId,
-  );
-  const playerName = localPlayer?.name?.trim() || 'Player';
-  const now = Date.now();
-  const prev = loadRecentRooms();
-  const existing = prev.find((entry) => entry.roomId === room.roomId);
-
-  const nextEntries = [
-    {
-      roomId: room.roomId,
-      label: existing?.label ?? '',
-      lastVisitedAt: now,
-      lastPlayerName: playerName,
-    },
-    ...prev.filter((entry) => entry.roomId !== room.roomId),
-  ].slice(0, MAX_RECENT_ROOMS);
-
-  saveRecentRooms(nextEntries);
 }
 
 interface FeedState {
@@ -308,7 +145,11 @@ export function useUnoOnlineGame() {
   );
   const [deviceId] = useState<string>(getOrCreateDeviceId);
   const [friendCode, setFriendCode] = useState<string>(getOrCreateFriendCode);
-  const startedRoomHistoryRef = useRef<Set<string>>(new Set());
+  const [social, setSocial] = useState<SocialSnapshot>({
+    friends: [],
+    incomingRequests: [],
+    outgoingRequests: [],
+  });
   const [state, setState] = useState<FeedState>({
     room: null,
     game: null,
@@ -352,7 +193,6 @@ export function useUnoOnlineGame() {
 
     socket.on('connect', () => {
       setState((prev) => ({ ...prev, connected: true, error: null }));
-      voiceUiConnected();
       try {
         const saved = JSON.parse(
           sessionStorage.getItem(ACTIVE_ROOM_KEY) ?? 'null',
@@ -363,7 +203,7 @@ export function useUnoOnlineGame() {
             'room:join',
             {
               roomId: saved.roomId,
-              playerName: saved.playerName || 'You',
+              playerName: getPlayerName(saved.playerName || 'You'),
               deviceId,
             },
             (
@@ -426,7 +266,6 @@ export function useUnoOnlineGame() {
 
     socket.on('disconnect', () => {
       setState((prev) => ({ ...prev, connected: false }));
-      voiceUiDisconnected();
     });
 
     socket.on('room:update', (room: RoomSnapshot) => {
@@ -475,6 +314,10 @@ export function useUnoOnlineGame() {
       }));
     });
 
+    socket.on('social:update', (snapshot: SocialSnapshot) =>
+      setSocial(snapshot),
+    );
+
     socket.on('friend:invite', (invite: FriendInvite) => {
       setState((prev) => ({
         ...prev,
@@ -487,9 +330,6 @@ export function useUnoOnlineGame() {
           .sort((a, b) => b.createdAt - a.createdAt)
           .slice(0, 10),
       }));
-      toast.message(`Invite from ${invite.fromName}`, {
-        description: `Room ${invite.roomId} · ${invite.fromFriendCode}`,
-      });
     });
 
     socket.on('friend:invite:removed', (payload?: { inviteId?: string }) => {
@@ -513,7 +353,6 @@ export function useUnoOnlineGame() {
         targetName?: string;
       }) => {
         if (!payload?.inviteId || !payload?.targetFriendCode) return;
-        persistAcceptedFriend(payload.targetFriendCode, payload.targetName);
         setState((prev) => ({
           ...prev,
           outgoingInvites: prev.outgoingInvites.filter(
@@ -602,22 +441,7 @@ export function useUnoOnlineGame() {
     }
     if (announcedRoomIdRef.current === id) return;
     announcedRoomIdRef.current = id;
-    voiceUiRoomJoined();
   }, [state.room?.roomId]);
-
-  useEffect(() => {
-    if (
-      !state.room?.roomId ||
-      !state.room.started ||
-      !state.room.game ||
-      !state.playerId
-    )
-      return;
-    if (startedRoomHistoryRef.current.has(state.room.roomId)) return;
-
-    rememberStartedRoom(state.room, state.playerId);
-    startedRoomHistoryRef.current.add(state.room.roomId);
-  }, [state.room, state.playerId]);
 
   const callAck = useCallback(
     <T>(event: string, payload: object): Promise<Ack<T>> => {
@@ -680,12 +504,70 @@ export function useUnoOnlineGame() {
     [callAck, deviceId, friendCode],
   );
 
+  useEffect(() => {
+    if (!state.connected) return;
+    const sync = () => void syncPresence(getPlayerName());
+    sync();
+    const unsubscribe = subscribePlayerName(sync);
+    const timer = window.setInterval(sync, 60_000);
+    return () => {
+      unsubscribe();
+      window.clearInterval(timer);
+    };
+  }, [state.connected, syncPresence]);
+
+  const socialAction = useCallback(
+    async (event: string, payload: object) => {
+      const ack = await callAck(event, payload);
+      if (!ack.ok) {
+        toast.error(ack.error);
+        return false;
+      }
+      return true;
+    },
+    [callAck],
+  );
+  const sendFriendRequest = useCallback(
+    (targetFriendCode: string) =>
+      socialAction('social:request', { targetFriendCode }),
+    [socialAction],
+  );
+  const respondToFriendRequest = useCallback(
+    (requestId: string, accept: boolean) =>
+      socialAction('social:respond', { requestId, accept }),
+    [socialAction],
+  );
+  const removeFriend = useCallback(
+    (friendCode: string) => socialAction('social:remove', { friendCode }),
+    [socialAction],
+  );
+
+  useEffect(() => {
+    const timer = window.setInterval(
+      () =>
+        setState((prev) => {
+          const fresh = prev.incomingInvites.filter(
+            (invite) => Date.now() - invite.createdAt < 120_000,
+          );
+          const outgoing = prev.outgoingInvites.filter(
+            (invite) => Date.now() - invite.createdAt < 120_000,
+          );
+          return fresh.length === prev.incomingInvites.length &&
+            outgoing.length === prev.outgoingInvites.length
+            ? prev
+            : { ...prev, incomingInvites: fresh, outgoingInvites: outgoing };
+        }),
+      15_000,
+    );
+    return () => window.clearInterval(timer);
+  }, []);
+
   const createRoom = useCallback(
     async (playerName: string, rules?: Partial<GameRules>) => {
       const revision = ++membershipRevision.current;
       const ack = await callAck<{ room: RoomSnapshot; playerId: string }>(
         'room:create',
-        { playerName, deviceId, rules },
+        { playerName, deviceId, rules, profileId: getProfileIdForRules(rules) },
       );
       if (discardStaleMembership(revision, ack.ok ? ack.data.room : undefined))
         return false;
@@ -714,6 +596,7 @@ export function useUnoOnlineGame() {
       const ack = await callAck<{ room: RoomSnapshot }>('room:set-rules', {
         roomId: state.room.roomId,
         rules,
+        profileId: getProfileIdForRules(rules),
       });
       if (discardStaleMembership(revision)) return false;
       if (!ack.ok) {
@@ -766,6 +649,7 @@ export function useUnoOnlineGame() {
       const ack = await callAck<{ room: RoomSnapshot }>('room:start', {
         roomId: state.room.roomId,
         rules,
+        profileId: state.room.profileId,
       });
       if (discardStaleMembership(revision)) return false;
       if (!ack.ok) {
@@ -898,6 +782,7 @@ export function useUnoOnlineGame() {
         outgoingInvites: [
           {
             inviteId: ack.data.invite.inviteId,
+            createdAt: ack.data.invite.createdAt,
             targetFriendCode: targetFriendCode.toUpperCase(),
             targetName: undefined,
           },
@@ -918,9 +803,6 @@ export function useUnoOnlineGame() {
 
   const acceptFriendInvite = useCallback(
     async (inviteId: string, playerName: string) => {
-      const acceptedInvite =
-        state.incomingInvites.find((invite) => invite.inviteId === inviteId) ??
-        null;
       const revision = ++membershipRevision.current;
       const ack = await callAck<{ room: RoomSnapshot; playerId: string }>(
         'friend:invite:accept',
@@ -953,22 +835,9 @@ export function useUnoOnlineGame() {
         ),
       }));
 
-      if (acceptedInvite) {
-        persistAcceptedFriend(
-          acceptedInvite.fromFriendCode,
-          acceptedInvite.fromName,
-        );
-      }
-
       return true;
     },
-    [
-      callAck,
-      discardStaleMembership,
-      deviceId,
-      friendCode,
-      state.incomingInvites,
-    ],
+    [callAck, discardStaleMembership, deviceId, friendCode],
   );
 
   const declineFriendInvite = useCallback(
@@ -1030,31 +899,6 @@ export function useUnoOnlineGame() {
     [callAck, state.room],
   );
 
-  const checkFriendOnline = useCallback(
-    async (friendCodes: string[]) => {
-      const normalized = Array.from(
-        new Set(
-          friendCodes.map((code) => normalizeFriendCode(code)).filter(Boolean),
-        ),
-      );
-      if (!normalized.length) return {} as Record<string, FriendPresenceState>;
-
-      const ack = await callAck<{
-        statuses: Record<string, FriendPresenceState>;
-      }>('friend:status', {
-        friendCodes: normalized,
-      });
-
-      if (!ack.ok) {
-        setState((prev) => ({ ...prev, error: ack.error }));
-        return {} as Record<string, FriendPresenceState>;
-      }
-
-      return ack.data.statuses;
-    },
-    [callAck],
-  );
-
   const game = state.game;
   const localPlayerIndex = useMemo(() => {
     if (!game || !state.playerId) return 0;
@@ -1088,9 +932,19 @@ export function useUnoOnlineGame() {
     [game, localPlayer, localPlayerIndex],
   );
 
-  const canPass = state.drawnThisTurn && (game?.pendingDraw ?? 0) === 0;
+  const canPass =
+    state.drawnThisTurn &&
+    !game?.pendingRoulette &&
+    (game?.pendingDraw ?? 0) === 0 &&
+    !(
+      game?.rules.gameMode === 'no_mercy' &&
+      game.rules.drawUntilPlayable &&
+      playableCardIds.size > 0
+    );
   const pendingColorChoice = state.room?.pendingColorChoice ?? null;
   const pendingWild = useMemo(() => {
+    if (game?.pendingRoulette?.playerId === state.playerId)
+      return game?.discardPile.at(-1) ?? null;
     if (!pendingColorChoice || !game || !state.playerId) return null;
     if (pendingColorChoice.playerId !== state.playerId) return null;
     const localSeat = game.players.findIndex(
@@ -1147,7 +1001,11 @@ export function useUnoOnlineGame() {
   const selectCard = useCallback(
     (card: Card, options: PlayOptions = {}) => {
       if (!game) return;
-      if (card.color === 'wild') {
+      if (
+        card.color === 'wild' &&
+        game.rules.gameMode !== 'all_wild' &&
+        card.value !== 'wildColorRoulette'
+      ) {
         void sendAction({ type: 'prepareWild', cardId: card.id });
         return;
       }
@@ -1158,6 +1016,10 @@ export function useUnoOnlineGame() {
 
   const confirmWildColor = useCallback(
     (color: CardColor) => {
+      if (game?.pendingRoulette) {
+        void sendAction({ type: 'chooseRouletteColor', color });
+        return;
+      }
       if (!pendingWild) return;
       void sendAction({
         type: 'play',
@@ -1165,7 +1027,7 @@ export function useUnoOnlineGame() {
         chosenColor: color,
       });
     },
-    [pendingWild, sendAction],
+    [pendingWild, game, sendAction],
   );
 
   const cancelWild = useCallback(() => {
@@ -1200,10 +1062,6 @@ export function useUnoOnlineGame() {
     })();
   }, [leaveRoom]);
 
-  const startGame = useCallback(() => {
-    // No-op for compatibility with GameBoard typing.
-  }, []);
-
   return {
     game,
     localPlayerIndex,
@@ -1218,7 +1076,6 @@ export function useUnoOnlineGame() {
     playableCardIds,
     canPass,
     hasPendingStackOption,
-    startGame,
     selectCard,
     confirmWildColor,
     cancelWild,
@@ -1232,10 +1089,12 @@ export function useUnoOnlineGame() {
     playerId: state.playerId,
     error: state.error,
     friendCode,
+    social,
+    sendFriendRequest,
+    respondToFriendRequest,
+    removeFriend,
     incomingInvites: state.incomingInvites,
     outgoingInvites: state.outgoingInvites,
-    syncPresence,
-    checkFriendOnline,
     createRoom,
     updateRoomRules,
     joinRoom,

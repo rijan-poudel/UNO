@@ -8,11 +8,13 @@ export default function ColorPicker({
   onCancel,
   playerName,
   hand = [],
+  roulette = false,
 }: {
   onSelect: (color: CardColor) => void;
   onCancel?: () => void;
   playerName?: string;
   hand?: Card[];
+  roulette?: boolean;
 }) {
   const choices = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -20,7 +22,7 @@ export default function ColorPicker({
   }, []);
   return (
     <Modal
-      title="Your wild. Your color."
+      title={roulette ? "Color roulette" : "Your wild. Your color."}
       onClose={onCancel}
       className="color-picker-modal"
     >
@@ -38,8 +40,9 @@ export default function ColorPicker({
         }}
       >
         <p className="muted">
-          {playerName ? `${playerName}, choose` : "Choose"} the color for the
-          next play.
+          {roulette
+            ? "Choose a color. Reveal cards until it appears, take them all, then skip this turn."
+            : `${playerName ? `${playerName}, choose` : "Choose"} the color for the next play.`}
         </p>
         <div
           className="color-choices"
