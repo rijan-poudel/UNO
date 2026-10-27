@@ -352,7 +352,10 @@ export default function RuleProfileManager({
                       }}
                     >
                       <ProfileMark profile={profile} />
-                      <strong>{profileTitle(profile)}</strong>
+                      <span className="favorite-replace-text">
+                        <strong>{profileTitle(profile)}</strong>
+                        <small>Replace with {replacement.name}</small>
+                      </span>
                       <ArrowRight size={18} aria-hidden="true" />
                     </button>
                   )
