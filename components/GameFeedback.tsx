@@ -1,6 +1,14 @@
 // Brief action signals complement the cards without blocking the next move.
 "use client";
-import { Ban, Repeat2, Shuffle } from "lucide-react";
+import {
+  Ban,
+  Repeat2,
+  Shuffle,
+  FastForward,
+  Crosshair,
+  ArrowLeftRight,
+  Disc,
+} from "lucide-react";
 import type { GameState } from "../types/game";
 export default function GameFeedback({ game }: { game: GameState }) {
   const action = game.lastAction;
@@ -21,10 +29,35 @@ export default function GameFeedback({ game }: { game: GameState }) {
       <Repeat2 />
     ) : value === "skip" ? (
       <Ban />
+    ) : value === "skipEveryone" ? (
+      <FastForward />
+    ) : value === "wildSkip2" ? (
+      <span className="feedback-skip-two">
+        <Ban />
+        <small>×2</small>
+      </span>
+    ) : value === "wildReverseDraw4" ? (
+      <span className="feedback-reverse-draw4">
+        <Repeat2 />
+        <small>+4</small>
+      </span>
+    ) : value === "wildTargetDraw2" ? (
+      <span className="feedback-target-draw2">
+        <Crosshair />
+        <small>+2</small>
+      </span>
+    ) : value === "wildForcedSwap" ? (
+      <ArrowLeftRight />
+    ) : value === "wildColorRoulette" ? (
+      <Disc />
     ) : value === "shuffle" ? (
       <Shuffle />
     ) : value === "draw2" ? (
       `+${game.pendingDraw || 2}`
+    ) : value === "wildDraw6" ? (
+      `+${game.pendingDraw || 6}`
+    ) : value === "wildDraw10" ? (
+      `+${game.pendingDraw || 10}`
     ) : value === "wild4" ? (
       `+${game.pendingDraw || 4}`
     ) : value === "uno" ? (

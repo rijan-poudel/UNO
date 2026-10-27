@@ -51,6 +51,21 @@
   --stage: #302247;
   --stage-light: #523466;
 }
+.game-page.local-turn .playing-table::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: radial-gradient(
+    ellipse at 50% 86%,
+    rgba(255, 212, 90, 0.08) 0%,
+    rgba(255, 212, 90, 0.03) 40%,
+    transparent 70%
+  );
+  opacity: 1;
+  transition: opacity 280ms ease-out;
+}
 .game-page :focus-visible {
   outline: 3px solid #ffe329;
   outline-offset: 4px;
@@ -364,21 +379,33 @@
 .game-main .wild-color {
   position: absolute;
   top: calc(100% - 24px);
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 7px;
+  gap: 6px;
   text-transform: capitalize;
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
   color: #ffffff;
+  padding: 3px 10px 3px 6px;
+  background: rgba(14, 25, 46, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 999px;
+  box-shadow:
+    0 2px 8px rgba(3, 9, 18, 0.6),
+    0 0 12px var(--active-card-color, #ffd000);
+  transition:
+    transform 160ms cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 160ms ease;
 }
 .game-main .wild-color i {
-  width: 16px;
-  height: 16px;
-  border-radius: 4px;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
   background: var(--active-card-color);
-  border: 2px solid #ffffff;
+  border: 1.5px solid #ffffff;
+  box-shadow: 0 0 6px var(--active-card-color);
 }
 .game-main .card-landing {
   inset: 106px 18% 20px;
@@ -387,12 +414,37 @@
   padding-bottom: 12px;
 }
 .game-main .receiving-card .card-landing {
-  border-color: #ffffffa0;
+  border: 1.5px dashed rgba(255, 255, 255, 0.6);
   background: #ffffff12;
+  transition:
+    border-color 160ms ease-out,
+    background 160ms ease-out,
+    box-shadow 160ms ease-out;
+}
+.game-main .receiving-card.drop-ready .card-landing {
+  border: 2px dashed #ffd000;
+  background: radial-gradient(
+    ellipse at 50% 60%,
+    rgba(255, 208, 0, 0.2),
+    transparent 75%
+  );
+  box-shadow: 0 0 24px rgba(255, 208, 0, 0.25);
 }
 .game-main .card-landing span {
   color: #ffffff;
   background: #1c293c;
+  transition:
+    transform 160ms cubic-bezier(0.16, 1, 0.3, 1),
+    background-color 160ms ease,
+    color 160ms ease,
+    box-shadow 160ms ease;
+}
+.game-main .receiving-card.drop-ready .card-landing span {
+  background: #ffd000;
+  color: #17345f;
+  font-weight: 750;
+  box-shadow: 0 4px 14px rgba(255, 208, 0, 0.5);
+  transform: scale(1.06);
 }
 .game-main .table-waiting {
   top: 22%;
@@ -547,8 +599,8 @@
     box-shadow 180ms ease;
 }
 .game-main .hand-card .uno-card:active:not([aria-disabled="true"]) {
-  --card-contact: 0.985;
-  transition-duration: 100ms, 140ms, 180ms;
+  --card-contact: 0.96;
+  transition-duration: 100ms, 120ms, 140ms;
 }
 .game-main .hand-card.legal-card {
   --card-lift: var(--hand-ready-lift);
@@ -1105,6 +1157,21 @@
     0 3px 0 #a87b1e,
     0 9px 16px #061e4c66;
 }
+@media (prefers-reduced-motion: no-preference) {
+  .turn-cue-local .turn-message {
+    animation: turn-cue-arrive 220ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+}
+@keyframes turn-cue-arrive {
+  from {
+    transform: scale(0.94);
+    opacity: 0.85;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
 .turn-cue-local .turn-message small {
   color: #5a410f;
 }
@@ -1331,9 +1398,30 @@
   text-align: center;
 }
 .game-main .feedback-reverse > span,
-.game-main .feedback-skip > span {
+.game-main .feedback-skip > span,
+.game-main .feedback-skipEveryone > span {
   background: #fff7e7;
   color: #17345f;
+}
+.game-main .feedback-skip-two,
+.game-main .feedback-reverse-draw4,
+.game-main .feedback-target-draw2 {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+.game-main .feedback-skip-two small,
+.game-main .feedback-reverse-draw4 small,
+.game-main .feedback-target-draw2 small {
+  font-size: 32px;
+  font-style: normal;
+  font-weight: 800;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  border-radius: 0;
 }
 .game-main .game-feedback svg {
   width: 54px;
@@ -1658,6 +1746,48 @@
     inset 0 -3px 2px #bd7600,
     0 4px 8px #03091260;
   min-width: 68px;
+  transition:
+    transform 140ms cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 140ms ease;
+}
+.game-main .move-buttons .uno-button:active {
+  transform: scale(0.95);
+}
+.game-main .move-buttons .uno-button.uno-ready {
+  position: relative;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  font-family: var(--font-card), sans-serif;
+  font-size: 18px;
+  background: linear-gradient(180deg, #ffe066, #ffc700);
+  box-shadow:
+    inset 0 1px 0 #fff8d6,
+    inset 0 -3px 2px #bd7600,
+    0 4px 14px rgba(255, 208, 0, 0.45);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .game-main .move-buttons .uno-button.uno-ready {
+    animation: uno-ready-breathe 1.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  }
+}
+@keyframes uno-ready-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow:
+      inset 0 1px 0 #fff8d6,
+      inset 0 -3px 2px #bd7600,
+      0 0 0 0 rgba(255, 208, 0, 0.5),
+      0 4px 14px rgba(255, 208, 0, 0.4);
+  }
+  50% {
+    transform: scale(1.04);
+    box-shadow:
+      inset 0 1px 0 #fff8d6,
+      inset 0 -3px 2px #bd7600,
+      0 0 0 4px rgba(255, 208, 0, 0),
+      0 6px 20px rgba(255, 208, 0, 0.65);
+  }
 }
 .game-main .move-buttons .uno-called {
   display: inline-flex;

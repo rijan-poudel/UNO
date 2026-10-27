@@ -28,10 +28,18 @@ import { readCardPose as cardPose } from "../lib/cardPose";
 
 const ACTION_SOUNDS: Record<string, TableChime> = {
   skip: "skip",
+  skipEveryone: "skip",
+  wildSkip2: "skip",
   reverse: "reverse",
   draw2: "draw2",
+  wildTargetDraw2: "draw2",
   wild4: "wild4",
+  wildDraw6: "wild4",
+  wildDraw10: "wild4",
+  wildReverseDraw4: "wild4",
   wild: "wild",
+  wildColorRoulette: "wild",
+  wildForcedSwap: "wild",
   shuffle: "shuffle",
 };
 

@@ -575,7 +575,7 @@ export default function GameBoard({
       )}
       <main className="game-main" data-design-contract="centered-table">
         <section
-          className={`playing-table color-${activeColor} seats-${game.players.length} ${draggingCard ? "receiving-card" : ""}`}
+          className={`playing-table color-${activeColor} seats-${game.players.length} ${draggingCard ? "receiving-card" : ""} ${draggingCard === "ready" ? "drop-ready" : ""}`}
           aria-label="Playing table"
         >
           <div className="card-landing" aria-hidden="true">

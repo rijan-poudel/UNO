@@ -86,6 +86,10 @@
   outline: 2px solid #ffd45a;
   outline-offset: 2px;
 }
+:global(.game-main) .seat:global(.last-card-seat) .label {
+  border: 1px solid rgba(255, 212, 90, 0.45);
+  box-shadow: 0 0 10px rgba(255, 212, 90, 0.2);
+}
 :global(.game-main) .seat:global(.last-card-seat) .label .count {
   color: #ffd45a;
   font-weight: 750;
