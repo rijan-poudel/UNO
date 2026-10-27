@@ -24,7 +24,22 @@ export default function PlayerProgress() {
   return <ProgressCollection progress={progress} />;
 }
 export function ProgressCollection({ progress }: { progress: Progress }) {
-  if (!progress.rounds) return null;
+  if (!progress.rounds) {
+    return (
+      <div
+        className="player-progress"
+        aria-label="Your progress on this device"
+      >
+        <p
+          className="muted"
+          style={{ margin: "8px 0 12px", fontSize: "14px", lineHeight: 1.5 }}
+        >
+          Play a round to start tracking your record and earning milestones on
+          this device.
+        </p>
+      </div>
+    );
+  }
   const milestones = getProgressMilestones(progress);
   const earned = milestones.filter((milestone) => milestone.earned).length;
   return (
