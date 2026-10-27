@@ -13,6 +13,7 @@ import {
   RULE_PROFILES_KEY,
   getRuleProfilesRevision,
   getServerRuleProfilesRevision,
+  setActiveProfileId,
 } from '../lib/customRuleProfiles';
 import { RULE_PRESETS, matchesPreset } from '../lib/rulePresets';
 import { defaultRules, NO_MERCY_RULES, ALL_WILD_RULES } from '../types/rules';
@@ -72,6 +73,14 @@ try {
   );
   assert.equal(customNoMercy.rules.gameMode, 'no_mercy');
   assert.equal(customNoMercy.name, 'My Brutal No Mercy');
+  setActiveProfileId(customNoMercy.id);
+  assert.equal(
+    getRuleSetLabel(customNoMercy.rules),
+    'My Brutal No Mercy',
+    'A selected custom copy keeps its name even when its rules match an original',
+  );
+  assert.equal(getRuleSetLabel(defaultRules), 'Classic UNO');
+  setActiveProfileId('classic');
 
   // Duplicating custom profile
   const dup = duplicateProfile(customNoMercy.id);

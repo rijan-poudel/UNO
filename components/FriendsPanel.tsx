@@ -13,6 +13,7 @@ export interface FriendsPanelProps {
   incomingInvites: FriendInvite[];
   canInvite: boolean;
   seatedCodes: string[];
+  invitedCodes?: string[];
   onRequest: (code: string) => Promise<boolean>;
   onRespond: (id: string, accept: boolean) => Promise<boolean>;
   onRemove: (code: string) => Promise<boolean>;
@@ -31,6 +32,9 @@ export default function FriendsPanel(props: FriendsPanelProps) {
     setBusy(key);
     try {
       return await action();
+    } catch {
+      toast.error("That didn’t go through. Please try again.");
+      return false;
     } finally {
       pending.current = false;
       setBusy("");
@@ -81,6 +85,7 @@ export default function FriendsPanel(props: FriendsPanelProps) {
           <span className="muted">Your code</span>
           <button
             className="text-button"
+            disabled={!props.friendCode}
             aria-label={`Copy friend code ${props.friendCode}`}
             onClick={async () => {
               try {
@@ -234,6 +239,7 @@ export default function FriendsPanel(props: FriendsPanelProps) {
                   !!busy ||
                   !props.connected ||
                   friend.status === "offline" ||
+                  props.invitedCodes?.includes(friend.friendCode) ||
                   props.seatedCodes.includes(friend.friendCode)
                 }
                 onClick={async () => {
@@ -247,7 +253,11 @@ export default function FriendsPanel(props: FriendsPanelProps) {
               >
                 {props.seatedCodes.includes(friend.friendCode)
                   ? "At table"
-                  : "Invite"}
+                  : props.invitedCodes?.includes(friend.friendCode)
+                    ? "Invited"
+                    : busy === friend.friendCode
+                      ? "Sending…"
+                      : "Invite"}
                 <ArrowRight size={16} />
               </button>
             )}

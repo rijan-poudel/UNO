@@ -5,7 +5,7 @@
   "scripts": {
     "agent": "tsx agent/agent.ts",
     "dev": "concurrently \"npm run dev:web\" \"npm run dev:socket\"",
-    "dev:web": "next dev --webpack",
+    "dev:web": "next dev --webpack --port 3004",
     "dev:socket": "tsx watch --include \"lib/**/*.ts\" --include \"types/**/*.ts\" server/socketServer.ts",
     "start:socket": "tsx server/socketServer.ts",
     "build": "next build",

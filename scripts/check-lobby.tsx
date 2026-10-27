@@ -10,6 +10,8 @@ import type PlayerAvatarComponent from '../components/PlayerAvatar';
 import type RulesSummaryComponent from '../components/RulesSummary';
 import type HowToPlayModalComponent from '../components/HowToPlayModal';
 import type CardPlayDialogComponent from '../components/CardPlayDialog';
+import type FriendInvitePickerComponent from '../components/FriendInvitePicker';
+import type FriendsPanelComponent from '../components/FriendsPanel';
 import { defaultRules } from '../types/rules';
 
 // The assertions inspect rendered content; Next owns CSS module compilation.
@@ -26,6 +28,10 @@ const PlayerAvatar: typeof PlayerAvatarComponent =
   require('../components/PlayerAvatar').default;
 const CardPlayDialog: typeof CardPlayDialogComponent =
   require('../components/CardPlayDialog').default;
+const FriendInvitePicker: typeof FriendInvitePickerComponent =
+  require('../components/FriendInvitePicker').default;
+const FriendsPanel: typeof FriendsPanelComponent =
+  require('../components/FriendsPanel').default;
 const RulesSummary: typeof RulesSummaryComponent =
   require('../components/RulesSummary').default;
 const HowToPlayModal: typeof HowToPlayModalComponent =
@@ -96,12 +102,66 @@ const joinOnly = renderToStaticMarkup(
 );
 assert.match(joinOnly, /Join the room/);
 assert.match(joinOnly, /id="room-code"/);
+assert.match(joinOnly, /focused-room mood-classic room-entry/);
+const mercyEntry = renderToStaticMarkup(
+  <OnlineLobby
+    {...props}
+    room={null}
+    rules={{ ...defaultRules, gameMode: 'no_mercy' }}
+  />,
+);
+assert.match(mercyEntry, /focused-room mood-no-mercy room-entry/);
 assert.doesNotMatch(
   joinOnly,
   /id="online-name"|avatar-picker|Friends &amp; invitations|role="switch"/,
 );
 const offline = renderToStaticMarkup(
   <OnlineLobby {...props} connected={false} />,
+);
+const friend = {
+  friendCode: 'FRIEND23',
+  name: 'Cleo',
+  status: 'online' as const,
+};
+const invitedFriends = renderToStaticMarkup(
+  <FriendsPanel
+    social={{ friends: [friend], incomingRequests: [], outgoingRequests: [] }}
+    friendCode="PLAYER23"
+    connected
+    incomingInvites={[]}
+    canInvite
+    seatedCodes={[]}
+    invitedCodes={[friend.friendCode]}
+    onRequest={ok}
+    onRespond={ok}
+    onRemove={ok}
+    onInvite={ok}
+    onAcceptInvite={ok}
+    onDeclineInvite={ok}
+  />,
+);
+assert.match(
+  invitedFriends,
+  /<button[^>]*disabled=""[^>]*>Invited/,
+  'The Friends task disables invitations that are already pending',
+);
+const inviteEmpty = renderToStaticMarkup(
+  <FriendInvitePicker
+    friends={[]}
+    invitedCodes={[]}
+    seatedCodes={[]}
+    connected
+    onInvite={ok}
+    onClose={() => {}}
+    onOpenFriends={() => {}}
+  />,
+);
+assert.match(inviteEmpty, /settings-modal friend-picker-modal/);
+assert.match(inviteEmpty, /Add a friend to invite them to your table/);
+assert.match(
+  inviteEmpty,
+  /class="modal-footer"[\s\S]*Add friends/,
+  'The invite empty state has a reachable next step in its fixed footer',
 );
 assert.match(
   offline,

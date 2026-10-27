@@ -325,6 +325,8 @@ export function getActiveProfile(): RuleProfile {
 }
 
 export function getRuleSetLabel(rules: Partial<GameRules>): string {
+  const active = getActiveProfile();
+  if (matchesPreset(rules, active.rules)) return active.name;
   return (
     RULE_PRESETS.find((preset) => matchesPreset(rules, preset.rules))?.label ??
     getRuleProfiles().find((profile) => matchesPreset(rules, profile.rules))

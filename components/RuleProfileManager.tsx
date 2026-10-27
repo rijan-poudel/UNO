@@ -95,6 +95,7 @@ export default function RuleProfileManager({
   } | null>(null);
   const [replacement, setReplacement] = useState<RuleProfile | null>(null);
   const [busy, setBusy] = useState(false);
+  const pending = useRef(false);
   const surface = useRef<HTMLDivElement>(null);
   const editing = draft !== null;
   const previousEditing = useRef(editing);
@@ -107,6 +108,8 @@ export default function RuleProfileManager({
     (target ?? surface.current)?.focus();
   }, [editing]);
   const select = async (profile: RuleProfile) => {
+    if (pending.current) return false;
+    pending.current = true;
     setBusy(true);
     const previousId = getActiveProfileId();
     setActiveProfileId(profile.id);
@@ -115,8 +118,17 @@ export default function RuleProfileManager({
         ...profile.rules,
         botDifficulty: rules.botDifficulty ?? "standard",
       });
-      if (result === false) setActiveProfileId(previousId);
+      if (result === false) {
+        setActiveProfileId(previousId);
+        return false;
+      }
+      return true;
+    } catch {
+      setActiveProfileId(previousId);
+      toast.error("Couldn’t change the game. Please try again.");
+      return false;
     } finally {
+      pending.current = false;
       setBusy(false);
     }
   };
@@ -142,16 +154,27 @@ export default function RuleProfileManager({
     return (
       <Modal
         title="Custom profile"
-        onClose={() => setDraft(null)}
+        onClose={busy ? undefined : () => setDraft(null)}
         className="settings-modal"
       >
         <form
           className="rule-profile-editor"
           onSubmit={async (event) => {
             event.preventDefault();
+            if (pending.current) return;
             try {
               const saved = saveRuleProfile(draft.name, draft.rules, draft.id);
-              await select(saved);
+              if (!(await select(saved))) {
+                setDraft({
+                  id: saved.id,
+                  name: saved.name,
+                  rules: saved.rules,
+                });
+                toast.error(
+                  "Profile saved. Try again to use it at this table.",
+                );
+                return;
+              }
               setDraft(null);
               toast.success(`Saved ${saved.name}.`);
             } catch (error) {
@@ -160,40 +183,42 @@ export default function RuleProfileManager({
           }}
         >
           <div className="settings-panel" ref={surface} tabIndex={-1}>
-            <label className="profile-name-form">
-              <span className="field-label">Profile name</span>
-              <input
-                value={draft.name}
-                maxLength={30}
-                required
-                onChange={(e) => setDraft({ ...draft, name: e.target.value })}
-              />
-            </label>
-            <p className="rule-profile-base">
-              {
-                ORIGINAL_MODES.find((m) => m.id === draft.rules.gameMode)
-                  ?.shortLabel
-              }{" "}
-              rules
-            </p>
-            {children(draft.rules, (next) =>
-              setDraft({ ...draft, rules: next }),
-            )}
-            {draft.id && (
-              <button
-                type="button"
-                className="settings-link rule-duplicate"
-                onClick={() =>
-                  setDraft({
-                    ...draft,
-                    id: undefined,
-                    name: `${draft.name} copy`.slice(0, 30),
-                  })
-                }
-              >
-                <Copy size={16} /> Make a copy
-              </button>
-            )}
+            <fieldset className="rule-editor-fields" disabled={busy}>
+              <label className="profile-name-form">
+                <span className="field-label">Profile name</span>
+                <input
+                  value={draft.name}
+                  maxLength={30}
+                  required
+                  onChange={(e) => setDraft({ ...draft, name: e.target.value })}
+                />
+              </label>
+              <p className="rule-profile-base">
+                {
+                  ORIGINAL_MODES.find((m) => m.id === draft.rules.gameMode)
+                    ?.shortLabel
+                }{" "}
+                rules
+              </p>
+              {children(draft.rules, (next) =>
+                setDraft({ ...draft, rules: next }),
+              )}
+              {draft.id && (
+                <button
+                  type="button"
+                  className="settings-link rule-duplicate"
+                  onClick={() =>
+                    setDraft({
+                      ...draft,
+                      id: undefined,
+                      name: `${draft.name} copy`.slice(0, 30),
+                    })
+                  }
+                >
+                  <Copy size={16} /> Make a copy
+                </button>
+              )}
+            </fieldset>
           </div>
           <div className="modal-footer rule-editor-actions">
             <button
@@ -201,11 +226,12 @@ export default function RuleProfileManager({
               className="button primary small"
               disabled={busy || !draft.name.trim()}
             >
-              Save and use
+              {busy ? "Saving…" : "Save and use"}
             </button>
             <button
               type="button"
               className="button secondary small"
+              disabled={busy}
               onClick={() => setDraft(null)}
             >
               Cancel
@@ -219,7 +245,8 @@ export default function RuleProfileManager({
                   try {
                     const id = draft.id;
                     if (!id) return;
-                    if (selected?.id === id) await select(profiles[0]);
+                    if (selected?.id === id && !(await select(profiles[0])))
+                      return;
                     deleteRuleProfile(id);
                     setDraft(null);
                   } catch (error) {
@@ -278,6 +305,7 @@ export default function RuleProfileManager({
             <button
               type="button"
               className="icon-button"
+              disabled={busy}
               aria-pressed={favorites.includes(profile.id)}
               aria-label={`${favorites.includes(profile.id) ? "Unpin" : "Pin"} ${profile.name}`}
               title={
@@ -298,6 +326,7 @@ export default function RuleProfileManager({
               <button
                 type="button"
                 className="icon-button"
+                disabled={busy}
                 aria-label={`Edit ${profile.name}`}
                 title="Edit rules"
                 onClick={() => edit(profile)}
@@ -309,6 +338,7 @@ export default function RuleProfileManager({
               <button
                 type="button"
                 className="icon-button"
+                disabled={busy}
                 aria-label={`Copy ${profile.name}`}
                 title="Make a custom copy"
                 onClick={() => edit(profile, true)}

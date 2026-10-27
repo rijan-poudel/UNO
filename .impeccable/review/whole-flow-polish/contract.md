@@ -1,0 +1,8 @@
+# Whole-flow polish — October 27
+
+THESIS: Keep one obvious next step throughout home, setup, rooms, settings and play, removing friction while preserving Color play.
+OWN-WORLD: Inherit seed 2fba311c, Outfit UI, Barlow Condensed native cards, existing cream panels, amber actions and edition mood palettes. No new visual world, artwork, dependency or engine rule.
+STORY: Home retains three favorites and Play/Create/Join. Join and Create are compact focused forms. Open rooms retain seat space. Setup carries the chosen mood. Invite friends uses the shared blue-header task sheet and one useful empty-state action. Settings custom drafts remain isolated; network failure keeps the draft open and the previous game selected. Friends indicate pending invites.
+FIRST VIEWPORT: Compact room entry has a 560px maximum width, 28px desktop inset, 20px phone inset and an Outfit 18px primary decision. Body scrolls when height is constrained; the decision remains visible. Open rooms and local bot setup retain their larger bounded shell. Native card geometry is unchanged.
+FORM: Narrow polish continuation on existing implementation. Existing product decisions supply authority; no roll or comp approval needed. Preserve ready-made avatars, three immutable originals, custom copies and independent pinning.
+FINISH: Required checks, representative browser interactions, eleven validated JPEGs at user 826x765, phone 390x844, short 568x320 and gameplay 844x390. Use fresh finish review and bounded design documentation merge. Active automatic hook means no additional detector run. Inherited legacy-token advisories in globals and audio are outside this change; the new room-action size uses the existing 18px scale.

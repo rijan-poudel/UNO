@@ -24,7 +24,9 @@ export default function InvitationNotifications({
 }) {
   const seen = useRef(new Set<string>());
   const [dismissed, setDismissed] = useState<string[]>([]);
-  const [busy, setBusy] = useState("");
+  const [busy, setBusy] = useState<{ id: string; accepting: boolean } | null>(
+    null,
+  );
   const pending = useRef(false);
   const [host, setHost] = useState<HTMLElement | null>(null);
   const active = invites.some((invite) => !dismissed.includes(invite.inviteId));
@@ -69,12 +71,14 @@ export default function InvitationNotifications({
   const act = async (id: string, action: (id: string) => Promise<boolean>) => {
     if (pending.current) return;
     pending.current = true;
-    setBusy(id);
+    setBusy({ id, accepting: action === onAccept });
     try {
       if (await action(id)) setDismissed((current) => [...current, id]);
+    } catch {
+      toast.error("Couldn’t update that invitation. Please try again.");
     } finally {
       pending.current = false;
-      setBusy("");
+      setBusy(null);
     }
   };
   const visible = invites
@@ -109,14 +113,18 @@ export default function InvitationNotifications({
               disabled={!!busy || !connected}
               onClick={() => void act(invite.inviteId, onDecline)}
             >
-              Decline
+              {busy?.id === invite.inviteId && !busy.accepting
+                ? "Declining…"
+                : "Decline"}
             </button>
             <button
               className="button primary small"
               disabled={!!busy || !connected}
               onClick={() => void act(invite.inviteId, onAccept)}
             >
-              {busy === invite.inviteId ? "Joining…" : "Accept"}
+              {busy?.id === invite.inviteId && busy.accepting
+                ? "Joining…"
+                : "Accept"}
               <ArrowRight size={17} />
             </button>
           </div>

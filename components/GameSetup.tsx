@@ -16,6 +16,7 @@ import {
 } from "../lib/playerNames";
 import BotDifficultyControl from "./BotDifficultyControl";
 import { getBotDifficultyLabel } from "../lib/botSupport";
+import { getTableMood } from "../lib/rulePresets";
 export default function GameSetup({
   onStart,
   controls,
@@ -52,6 +53,7 @@ export default function GameSetup({
   }, [names]);
   return (
     <SetupShell
+      className={`mood-${getTableMood(rules)}`}
       subtitle="Play with bots"
       controls={controls}
       footer={

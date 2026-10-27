@@ -43,6 +43,7 @@ import {
 import type { PlayOptions } from "../lib/gameActions";
 import { getPlayedCards } from "../lib/cardMotion";
 import { getHandSort, saveHandSort, sortHand } from "../lib/handSorting";
+import { getNextPlayerIndex } from "../lib/turns";
 import { getHandOverlap, getHandCropMargin } from "../lib/handLayout";
 import CardPlayDialog from "./CardPlayDialog";
 import { getTableMood } from "../lib/rulePresets";
@@ -1042,15 +1043,7 @@ export default function GameBoard({
             <p className="game-turn-order">
               Turn order:{" "}
               {game.direction === 1 ? "clockwise" : "counterclockwise"}. Next:{" "}
-              {
-                game.players[
-                  (game.currentPlayerIndex +
-                    game.direction +
-                    game.players.length) %
-                    game.players.length
-                ].name
-              }
-              .
+              {game.players[getNextPlayerIndex(game)].name}.
               {game.players.some((player) => player.isBot) &&
                 ` ${getBotDifficultyLabel(game.rules.botDifficulty)} bots.`}
             </p>

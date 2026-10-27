@@ -28,86 +28,99 @@ export default function FriendInvitePicker({
   return (
     <Modal
       title="Invite friends"
-      className="friend-picker-modal"
+      className="settings-modal friend-picker-modal"
       onClose={onClose}
     >
-      {friends.length === 0 ? (
-        <>
-          <p className="muted">
-            Your accepted friends will appear here. Add someone from your room,
-            or send them a friend request.
+      <div className="settings-panel">
+        {!connected && (
+          <p className="muted" role="status">
+            Reconnecting. You can invite friends when you’re back online.
           </p>
-          <button className="button secondary" onClick={onOpenFriends}>
-            Open Friends
-            <ArrowRight size={18} />
-          </button>
-        </>
-      ) : (
-        <div className="friend-picker-list">
-          {friends.map((friend) => {
-            const seated = seatedCodes.includes(friend.friendCode);
-            const invited = invitedCodes.includes(friend.friendCode);
-            return (
-              <div className="friend-row" key={friend.friendCode}>
-                <PlayerAvatar
-                  seed={friend.friendCode}
-                  avatarId={friend.avatarId}
-                />
-                <div>
-                  <strong>{friend.name}</strong>
-                  <small>
-                    {seated
-                      ? "Already here"
-                      : friend.status === "offline"
-                        ? "Offline"
-                        : friend.status === "playing"
-                          ? "At a table"
-                          : "Online"}
-                  </small>
-                </div>
-                <button
-                  className="button secondary small"
-                  disabled={
-                    !connected ||
-                    !!busy ||
-                    seated ||
-                    invited ||
-                    friend.status === "offline"
-                  }
-                  onClick={async () => {
-                    if (pending.current) return;
-                    pending.current = true;
-                    setBusy(friend.friendCode);
-                    try {
-                      if (await onInvite(friend.friendCode))
-                        toast.success(`Invited ${friend.name}.`);
-                    } finally {
-                      pending.current = false;
-                      setBusy("");
+        )}
+        {friends.length === 0 ? (
+          <p className="empty-copy">
+            Add a friend to invite them to your table.
+          </p>
+        ) : (
+          <div>
+            {friends.map((friend) => {
+              const seated = seatedCodes.includes(friend.friendCode);
+              const invited = invitedCodes.includes(friend.friendCode);
+              return (
+                <div className="friend-row" key={friend.friendCode}>
+                  <PlayerAvatar
+                    seed={friend.friendCode}
+                    avatarId={friend.avatarId}
+                  />
+                  <div>
+                    <strong>{friend.name}</strong>
+                    <small>
+                      {seated
+                        ? "Already here"
+                        : friend.status === "offline"
+                          ? "Offline"
+                          : friend.status === "playing"
+                            ? "At a table"
+                            : "Online"}
+                    </small>
+                  </div>
+                  <button
+                    className="button secondary small"
+                    disabled={
+                      !connected ||
+                      !!busy ||
+                      seated ||
+                      invited ||
+                      friend.status === "offline"
                     }
-                  }}
-                >
-                  {seated ? (
-                    "At table"
-                  ) : invited ? (
-                    <>
-                      <Check size={16} />
-                      Invited
-                    </>
-                  ) : busy === friend.friendCode ? (
-                    "Sending…"
-                  ) : (
-                    <>
-                      Invite
-                      <ArrowRight size={16} />
-                    </>
-                  )}
-                </button>
-              </div>
-            );
-          })}
-        </div>
-      )}
+                    onClick={async () => {
+                      if (pending.current) return;
+                      pending.current = true;
+                      setBusy(friend.friendCode);
+                      try {
+                        if (await onInvite(friend.friendCode))
+                          toast.success(`Invited ${friend.name}.`);
+                      } catch {
+                        toast.error("Couldn’t send the invitation. Try again.");
+                      } finally {
+                        pending.current = false;
+                        setBusy("");
+                      }
+                    }}
+                  >
+                    {seated ? (
+                      "At table"
+                    ) : invited ? (
+                      <>
+                        <Check size={16} />
+                        Invited
+                      </>
+                    ) : busy === friend.friendCode ? (
+                      "Sending…"
+                    ) : (
+                      <>
+                        Invite
+                        <ArrowRight size={16} />
+                      </>
+                    )}
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+      <div className="modal-footer">
+        {friends.length === 0 ? (
+          <button className="button primary" onClick={onOpenFriends}>
+            Add friends <ArrowRight size={18} />
+          </button>
+        ) : (
+          <button className="button primary" onClick={onClose}>
+            Done
+          </button>
+        )}
+      </div>
     </Modal>
   );
 }

@@ -1,7 +1,14 @@
 // Join first. Once inside, share the room and fill its seats.
 "use client";
 import dynamic from "next/dynamic";
-import { useId, useRef, useState, type ReactNode } from "react";
+import {
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  type ReactNode,
+} from "react";
 import {
   ArrowRight,
   Check,
@@ -19,7 +26,8 @@ import { getRuleSetLabel } from "../lib/customRuleProfiles";
 import type { RoomSnapshot, SocialSnapshot } from "../types/multiplayer";
 import type { GameRules } from "../types/rules";
 import { parseRoomCode, isRoomCode } from "../lib/roomCodes";
-import { getPlayerName } from "../lib/playerNames";
+import { getPlayerName, subscribePlayerName } from "../lib/playerNames";
+import { getTableMood } from "../lib/rulePresets";
 import SetupShell from "./SetupShell";
 import { CountBadge, SetupIntro } from "./ui/PageChrome";
 import PlayerAvatar from "./PlayerAvatar";
@@ -84,6 +92,16 @@ export default function OnlineLobby(props: Props) {
   const formId = useId();
   const isHost = room?.hostPlayerId === playerId;
   const publishedRules = room?.rules ?? props.rules;
+  const name = useSyncExternalStore(
+    subscribePlayerName,
+    getPlayerName,
+    () => "You",
+  );
+  useEffect(() => {
+    if (!copied) return;
+    const timer = setTimeout(() => setCopied(""), 2000);
+    return () => clearTimeout(timer);
+  }, [copied]);
 
   const run = async (label: string, action: () => Promise<boolean>) => {
     if (pending.current) return false;
@@ -118,7 +136,7 @@ export default function OnlineLobby(props: Props) {
   };
   return (
     <SetupShell
-      className="focused-room"
+      className={`focused-room mood-${getTableMood(publishedRules)}${room ? "" : " room-entry"}`}
       subtitle={
         room ? "Your room" : panel === "join" ? "Join a room" : "Create a room"
       }
@@ -263,7 +281,7 @@ export default function OnlineLobby(props: Props) {
             </>
           )}
           <p className="room-joining-as muted">
-            Taking a seat as <strong>{getPlayerName()}</strong>
+            Taking a seat as <strong>{name}</strong>
           </p>
         </form>
       )}

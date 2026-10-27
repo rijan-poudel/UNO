@@ -200,7 +200,11 @@ input[type="range"] {
   display: flex;
   flex-direction: column;
   padding-bottom: max(12px, env(safe-area-inset-bottom));
-  background: radial-gradient(ellipse at 50% 20%, #2259a1, #123d86 80%);
+  background: radial-gradient(
+    ellipse at 50% 20%,
+    var(--stage-light, #1d56a3),
+    var(--stage, #123d86) 80%
+  );
 }
 .setup-page > .app-header {
   flex-shrink: 0;
@@ -323,11 +327,6 @@ input[type="range"] {
   font-size: 13px;
   line-height: 1.4;
 }
-.setup-footer .room-start-actions {
-  margin: 0;
-  padding: 0;
-  border: 0;
-}
 .room-connection-note {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
@@ -418,31 +417,6 @@ input[type="range"] {
 .room-seat-list .seat-row {
   min-width: 0;
   border-bottom: 1px solid var(--ui-line);
-}
-.room-start-actions {
-  display: grid;
-  gap: 12px;
-  margin-top: 24px;
-}
-.room-rules-summary > p {
-  margin-block: 16px;
-}
-.room-rules-summary dl > div {
-  display: grid;
-  grid-template-columns: minmax(110px, 1fr) minmax(0, 2fr);
-  gap: 16px;
-  padding-block: 12px;
-  border-bottom: 1px solid var(--ui-line);
-  font-size: 14px;
-  line-height: 1.5;
-}
-.room-rules-summary dt {
-  color: var(--ui-muted);
-}
-.room-rules-summary dd {
-  margin: 0;
-  color: var(--ui-text);
-  overflow-wrap: anywhere;
 }
 @media (max-width: 540px) {
   .room-seat-list {
@@ -620,7 +594,7 @@ input[type="range"] {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.bot-rule-disclosure summary > span {
+.setup-disclosure summary > span {
   margin-left: 8px;
   color: var(--ui-muted);
   font-weight: 500;
@@ -729,12 +703,6 @@ input[type="range"] {
 }
 .player-progress {
   color: var(--ui-text);
-}
-.launch-progress {
-  --ui-text: #17345f;
-  --ui-muted: #58687a;
-  --ui-line: #ccd3da;
-  --ui-surface: #fffcf4;
 }
 .milestone-stamp {
   border-radius: 6px;
@@ -895,12 +863,6 @@ input[type="range"] {
     padding: 24px 20px;
     gap: 22px;
   }
-  .setup-content:has(.bot-rule-disclosure) {
-    gap: 16px;
-  }
-  .setup-content:has(.bot-rule-disclosure) .setup-footer {
-    padding-top: 12px;
-  }
   .setup-intro h1 {
     font-size: 34px;
   }
@@ -940,8 +902,7 @@ input[type="range"] {
     height: 44px;
     min-height: 44px;
   }
-  .setup-content,
-  .setup-content:has(.bot-rule-disclosure) {
+  .setup-content {
     width: calc(100% - 24px);
     padding: 12px 20px;
     gap: 10px;
@@ -955,8 +916,7 @@ input[type="range"] {
   .setup-intro p {
     font-size: 14px;
   }
-  .setup-footer,
-  .setup-content:has(.bot-rule-disclosure) .setup-footer {
+  .setup-footer {
     padding-top: 10px;
     gap: 6px;
   }

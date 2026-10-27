@@ -11,7 +11,7 @@ npm ci
 npm run dev
 ```
 
-Open [localhost:3000](http://localhost:3000). The frontend and socket server start together; socket, engine and type changes restart the socket server. Restarting that process clears its in-memory rooms.
+Open [localhost:3004](http://localhost:3004). The frontend uses port 3004 and the socket server uses port 3001, so they cannot compete for the same port. Both start together; socket, engine and type changes restart the socket server. Restarting that process clears its in-memory rooms.
 
 ## What’s here
 

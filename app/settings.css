@@ -540,10 +540,6 @@ html[data-reduced-motion="true"] *::after {
   width: min(520px, calc(100vw - 24px));
   max-height: calc(100dvh - 24px);
 }
-.friend-picker-list {
-  overflow-y: auto;
-  max-height: 60dvh;
-}
 .invitation-notices {
   position: fixed;
   top: max(80px, env(safe-area-inset-top));
@@ -642,6 +638,46 @@ html[data-reduced-motion="true"] *::after {
 .focused-room .room-seat-list .seat-row {
   padding-block: 12px;
   min-height: 64px;
+}
+/* Joining and creating are small tasks; the open room keeps its full seat space. */
+.room-entry .setup-content {
+  flex: 0 1 auto;
+  width: min(560px, calc(100% - 48px));
+  max-height: calc(100dvh - 100px);
+  margin-block: auto;
+  padding: 28px;
+  gap: 24px;
+}
+.room-entry .setup-body {
+  gap: 20px;
+}
+.room-entry .focused-room-form {
+  padding-block: 0;
+}
+.room-entry .setup-footer > .button.primary {
+  font-family: var(--font-body), sans-serif;
+  font-size: 18px;
+  font-style: normal;
+  text-transform: none;
+}
+@media (max-width: 640px) {
+  .room-entry .setup-content {
+    width: calc(100% - 24px);
+    padding: 24px 20px;
+    gap: 20px;
+  }
+}
+@media (max-height: 540px) {
+  .room-entry .setup-content {
+    max-height: calc(100dvh - 64px);
+    width: calc(100% - 24px);
+    padding: 12px 20px;
+    gap: 10px;
+  }
+  .room-entry .setup-footer > .button.primary {
+    min-height: 44px;
+    font-size: 18px;
+  }
 }
 .modal .invitation-notices {
   position: absolute;
@@ -832,6 +868,12 @@ html[data-reduced-motion="true"] *::after {
   flex: 1 1 auto;
   min-height: 0;
   flex-direction: column;
+}
+.rule-editor-fields {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
 }
 .rule-editor-actions {
   display: flex;

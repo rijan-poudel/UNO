@@ -1,5 +1,9 @@
 # Product
 
+## Whole-flow polish — October 27
+
+The owner asks to keep improving the complete journey while preserving the chosen home. Use the existing edition mood through bot setup and room creation, make Join/Create compact focused tasks, and keep the open room spacious enough for six seats. Invitation pickers carry the settings blue/cream/amber vocabulary and provide a direct next step when no friends exist. Pending invitations must remain visibly pending; failed room-rule updates must preserve a usable draft and the previous selection. A named custom profile keeps its identity even if copied rules still equal an original. Remove styles for retired flows rather than extending them.
+
 ## October 27 — Settings should carry the homepage
 
 The owner explicitly rejects settings spacing, cramped selects, repeated explanatory copy and the lack of the homepage’s color/simplicity. Refine the full settings flow in the established blue/cream/amber world: blue task headers, integrated back navigation, consistent gutters and native select sizing, shorter game/profile text, native card previews and clear selected rows. Treat Settings as a primary product surface. This supersedes the all-cream settings-header prescription; keep one task, ready-made portraits, existing rule behavior and fixed decisions.

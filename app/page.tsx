@@ -164,7 +164,7 @@ export default function Home() {
     online.room.hostPlayerId === online.playerId;
   const lobbyRules = online.room?.rules ?? rules;
   const changeRules = async (newRules: Partial<GameRules>) => {
-    if (savingRules) return;
+    if (savingRules) return false;
     if (editingRoom) {
       setSavingRules(true);
       try {
@@ -265,6 +265,9 @@ export default function Home() {
               player.friendCode ? [player.friendCode] : [],
             ) ?? []
           }
+          invitedCodes={online.outgoingInvites.map(
+            (invite) => invite.targetFriendCode,
+          )}
           onRequest={online.sendFriendRequest}
           onRespond={online.respondToFriendRequest}
           onRemove={online.removeFriend}
