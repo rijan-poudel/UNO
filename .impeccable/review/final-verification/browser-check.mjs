@@ -1,8 +1,9 @@
-import { chromium } from '/Users/rizx/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright/index.mjs';
 import assert from 'node:assert/strict';
 import path from 'node:path';
+import { getChromium } from '../../scripts/playwright-loader.mjs';
 
 const outDir = '/Users/rizx/projects/UNO/.impeccable/review/final-verification';
+const chromium = await getChromium();
 const browser = await chromium.launch({ headless: true });
 
 try {

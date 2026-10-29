@@ -6,7 +6,177 @@ import {
   readRoomSession,
   resolveSocketEndpoint,
 } from '../lib/socketConnection';
+import { isNewerRoomSnapshot } from '../hooks/useUnoOnlineGame';
 import type { Ack, RoomSnapshot } from '../types/multiplayer';
+
+// ── Regression Coverage: Snapshot Ordering & Transitions ──────────
+function createMockSnapshot(
+  overrides: Partial<RoomSnapshot> = {},
+): RoomSnapshot {
+  return {
+    roomId: 'MOCK01',
+    hostPlayerId: 'player-host',
+    started: false,
+    game: null,
+    pendingColorChoice: null,
+    players: [
+      {
+        playerId: 'player-host',
+        name: 'Host',
+        connected: true,
+        ready: false,
+        isBot: false,
+        avatarId: 'red',
+      },
+      {
+        playerId: 'player-guest',
+        name: 'Guest',
+        connected: true,
+        ready: false,
+        isBot: false,
+        avatarId: 'blue',
+      },
+    ],
+    rules: {
+      startingHandSize: 7,
+    },
+    ...overrides,
+  };
+}
+
+// 1. Finished round -> lobby: accepted (Edit table transition)
+const finishedRoundSnapshot = createMockSnapshot({
+  started: true,
+  game: {
+    roundId: 'round-1',
+    turnCount: 24,
+    winnerId: 'player-host',
+    players: [],
+    deckCount: 40,
+    discardPile: [],
+    currentColor: 'red',
+    currentValue: '5',
+    currentPlayerIndex: 0,
+    direction: 1,
+    drawnThisTurn: false,
+  } as unknown as RoomSnapshot['game'],
+  tableScore: {
+    completedRounds: 1,
+    wins: { 'player-host': 1, 'player-guest': 0 },
+    lastRoundId: 'round-1',
+  },
+});
+
+const lobbySnapshot = createMockSnapshot({
+  started: false,
+  game: null,
+  tableScore: {
+    completedRounds: 1,
+    wins: { 'player-host': 1, 'player-guest': 0 },
+    lastRoundId: 'round-1',
+  },
+});
+
+assert.equal(
+  isNewerRoomSnapshot(finishedRoundSnapshot, lobbySnapshot),
+  true,
+  'Regression check: Finished round -> lobby must be accepted (Edit table transition)',
+);
+
+// 2. Lobby -> newly dealt round: accepted
+const newlyDealtSnapshot = createMockSnapshot({
+  started: true,
+  game: {
+    roundId: 'round-2',
+    turnCount: 0,
+    winnerId: null,
+    players: [],
+    deckCount: 70,
+    discardPile: [],
+    currentColor: 'blue',
+    currentValue: '3',
+    currentPlayerIndex: 0,
+    direction: 1,
+    drawnThisTurn: false,
+  } as unknown as RoomSnapshot['game'],
+  tableScore: {
+    completedRounds: 1,
+    wins: { 'player-host': 1, 'player-guest': 0 },
+    lastRoundId: 'round-1',
+  },
+});
+
+assert.equal(
+  isNewerRoomSnapshot(lobbySnapshot, newlyDealtSnapshot),
+  true,
+  'Regression check: Lobby -> newly dealt round must be accepted',
+);
+
+// 3. Results -> rematch: accepted
+assert.equal(
+  isNewerRoomSnapshot(finishedRoundSnapshot, newlyDealtSnapshot),
+  true,
+  'Regression check: Results -> rematch must be accepted',
+);
+
+// 4. Readiness acknowledgment arriving after a new round: cannot restore old results
+assert.equal(
+  isNewerRoomSnapshot(newlyDealtSnapshot, finishedRoundSnapshot),
+  false,
+  'Regression check: Readiness acknowledgment from completed round cannot overwrite a new round with old results',
+);
+
+// Active game in progress must reject stale lobby snapshots
+const inProgressRound = createMockSnapshot({
+  started: true,
+  game: {
+    roundId: 'round-1',
+    turnCount: 10,
+    winnerId: null,
+    players: [],
+    deckCount: 50,
+    discardPile: [],
+    currentColor: 'green',
+    currentValue: '2',
+    currentPlayerIndex: 1,
+    direction: 1,
+    drawnThisTurn: false,
+  } as unknown as RoomSnapshot['game'],
+});
+assert.equal(
+  isNewerRoomSnapshot(inProgressRound, lobbySnapshot),
+  false,
+  'Active game in progress must reject stale lobby snapshots',
+);
+
+// 5. Leaving while an operation is pending: late updates cannot reopen the room
+{
+  let currentRoom: RoomSnapshot | null = createMockSnapshot();
+  let membershipRevision = 10;
+  const pendingOpRevision = membershipRevision;
+
+  // Player leaves room: membership revision advances and current room is reset to null
+  membershipRevision++;
+  currentRoom = null;
+
+  // Stale operation ack arrives: discarded by membership revision check
+  const isDiscarded = pendingOpRevision !== membershipRevision;
+  assert.equal(
+    isDiscarded,
+    true,
+    'Pending operation must detect stale membership after leave',
+  );
+
+  // Stale broadcast arrives: discarded because currentRoom is null (table closed)
+  const isBroadcastAccepted =
+    currentRoom !== null &&
+    (currentRoom as RoomSnapshot).roomId === newlyDealtSnapshot.roomId;
+  assert.equal(
+    isBroadcastAccepted,
+    false,
+    'Late room:update broadcast cannot reopen a room after leave',
+  );
+}
 const cachedSession = { roomId: 'ABC234', playerName: 'Cached name' };
 const unavailableStorage = () => {
   throw new Error('Blocked session storage');

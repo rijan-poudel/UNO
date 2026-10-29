@@ -96,23 +96,22 @@ interface FeedState {
   connected: boolean;
 }
 
-function isNewerRoomSnapshot(
+export function isNewerRoomSnapshot(
   current: RoomSnapshot | null,
   incoming: RoomSnapshot,
 ): boolean {
   if (!current) return true;
   if (current.roomId !== incoming.roomId) return true;
 
+  const isCurrentActiveGame = Boolean(
+    current.started && current.game && !current.game.winnerId,
+  );
+
   // An active game should not be overwritten by a lobby snapshot.
-  if (current.started && !incoming.started) return false;
+  if (isCurrentActiveGame && !incoming.started) return false;
 
   // A returned-to-lobby room should not be overwritten by an old finished game.
-  if (
-    !current.started &&
-    incoming.started &&
-    incoming.game?.winnerId &&
-    current.players.length > 0
-  )
+  if (!current.started && incoming.started && incoming.game?.winnerId)
     return false;
 
   if (current.game && incoming.game) {
@@ -806,8 +805,17 @@ export function useUnoOnlineGame() {
         return false;
       }
 
-      // room:update owns readiness and round transitions. A delayed Ready reply
-      // may describe the old results after the host has already dealt again.
+      setState((prev) => {
+        if (!prev.room || prev.room.roomId !== ack.data.room.roomId)
+          return prev;
+        if (!isNewerRoomSnapshot(prev.room, ack.data.room)) return prev;
+        return {
+          ...prev,
+          room: ack.data.room,
+          game: toPresentationGame(ack.data.room.game),
+          error: null,
+        };
+      });
       return true;
     } finally {
       pendingOps.current.delete('room:ready');
@@ -831,8 +839,17 @@ export function useUnoOnlineGame() {
         setState((prev) => ({ ...prev, error: ack.error }));
         return false;
       }
-      // The ordered room:update broadcast owns the transition. A delayed reply
-      // must not overwrite a new round dealt from the returned lobby.
+      setState((prev) => {
+        if (!prev.room || prev.room.roomId !== ack.data.room.roomId)
+          return prev;
+        if (!isNewerRoomSnapshot(prev.room, ack.data.room)) return prev;
+        return {
+          ...prev,
+          room: ack.data.room,
+          game: toPresentationGame(ack.data.room.game),
+          error: null,
+        };
+      });
       return true;
     } finally {
       pendingOps.current.delete('room:return-to-lobby');
