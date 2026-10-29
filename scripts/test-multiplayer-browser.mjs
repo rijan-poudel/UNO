@@ -56,6 +56,71 @@ try {
 
   await guestPage.addInitScript(() => {
     window.localStorage.setItem('uno.online.playerName', 'GuestBob');
+
+    const OriginalWebSocket = window.WebSocket;
+    window.__unoSocketHarness = {
+      holdRoomUpdates: false,
+      heldRoomUpdates: [],
+      holdJoinAck: false,
+      heldJoinAcks: [],
+      deliverHeldRoomUpdates() {
+        const callbacks = this.heldRoomUpdates.slice();
+        this.heldRoomUpdates = [];
+        for (const cb of callbacks) cb();
+      },
+      deliverHeldJoinAcks() {
+        const callbacks = this.heldJoinAcks.slice();
+        this.heldJoinAcks = [];
+        for (const cb of callbacks) cb();
+      },
+    };
+
+    class InterceptedWebSocket extends OriginalWebSocket {
+      #userOnMessage = null;
+      get onmessage() {
+        return this.#userOnMessage;
+      }
+      set onmessage(fn) {
+        this.#userOnMessage = fn;
+        super.onmessage = (event) => {
+          this.#handleMessage(event, fn);
+        };
+      }
+      addEventListener(type, listener, options) {
+        if (type === 'message' && typeof listener === 'function') {
+          const wrapped = (event) => {
+            this.#handleMessage(event, listener);
+          };
+          return super.addEventListener(type, wrapped, options);
+        }
+        return super.addEventListener(type, listener, options);
+      }
+      #handleMessage(event, callback) {
+        if (typeof event.data === 'string') {
+          if (
+            window.__unoSocketHarness.holdRoomUpdates &&
+            event.data.startsWith('42["room:update"')
+          ) {
+            window.__unoSocketHarness.heldRoomUpdates.push(() => {
+              callback.call(this, event);
+            });
+            return;
+          }
+          if (
+            window.__unoSocketHarness.holdJoinAck &&
+            event.data.startsWith('43') &&
+            event.data.includes('"room"')
+          ) {
+            window.__unoSocketHarness.heldJoinAcks.push(() => {
+              callback.call(this, event);
+            });
+            return;
+          }
+        }
+        callback.call(this, event);
+      }
+    }
+    window.WebSocket = InterceptedWebSocket;
   });
 
   // ── Step 1: Create and join a room ──────────────────────────────────────────
@@ -388,7 +453,150 @@ try {
   console.log(
     'Step 7 Passed: Both players successfully entered new round with private hands.',
   );
-  console.log('=== ALL 7 STEPS VERIFIED IN BROWSER AUTOMATION ===');
+
+  // ── Step 8: Production Hook Regression - Late Broadcast & Delayed Reply Guard
+  console.log(
+    'Step 8: Production hook regression - Late broadcast and delayed reply handling',
+  );
+
+  // Part A: Late room:update broadcast after explicit leave
+  // 1. Enable holdRoomUpdates on Guest
+  await guestPage.evaluate(() => {
+    window.__unoSocketHarness.holdRoomUpdates = true;
+  });
+
+  // 2. Active player performs an in-game action (plays a card or draws)
+  const isHostTurn = await hostPage
+    .locator('.hand-section.your-turn')
+    .isVisible();
+  const activePage = isHostTurn ? hostPage : guestPage;
+  const playable = activePage.locator('button.uno-card.playable');
+  if (
+    await playable
+      .first()
+      .isVisible({ timeout: 1000 })
+      .catch(() => false)
+  ) {
+    await playable.first().click();
+  } else {
+    await activePage.locator('button.draw-pile').click();
+  }
+  const colorChoice = activePage.locator('.color-choice-dialog button');
+  if ((await colorChoice.count()) > 0) {
+    await colorChoice
+      .first()
+      .click()
+      .catch(() => {});
+  }
+
+  // 3. Verify Guest intercepted and buffered the room:update broadcast
+  await guestPage.waitForFunction(
+    () => window.__unoSocketHarness.heldRoomUpdates.length > 0,
+    { timeout: 5000 },
+  );
+  const heldUpdatesCount = await guestPage.evaluate(
+    () => window.__unoSocketHarness.heldRoomUpdates.length,
+  );
+  assert.ok(
+    heldUpdatesCount > 0,
+    `Guest captured ${heldUpdatesCount} late room:update broadcast(s)`,
+  );
+
+  // 4. Guest explicitly leaves the game table
+  await guestPage.locator('button[aria-label="Leave game"]').click();
+  await guestPage.getByRole('button', { name: 'Leave table' }).click();
+  await guestPage.locator('.game-page').waitFor({ state: 'hidden' });
+  assert.equal(
+    await guestPage.locator('.game-page').isVisible(),
+    false,
+    'Guest is outside the table after leaving',
+  );
+
+  // 5. Deliver the held late room:update broadcast
+  await guestPage.evaluate(() => {
+    window.__unoSocketHarness.deliverHeldRoomUpdates();
+  });
+  await guestPage.waitForTimeout(400);
+
+  // 6. Assert the application remains outside the room (late broadcast rejected by reconcileRoomUpdate)
+  assert.equal(
+    await guestPage.locator('.game-page').isVisible(),
+    false,
+    'Late room:update broadcast did NOT reopen the table after leave',
+  );
+  assert.equal(
+    await guestPage.locator('.focused-room').isVisible(),
+    false,
+    'Late room:update broadcast did NOT reopen the lobby after leave',
+  );
+  console.log(
+    'Step 8 Part A Passed: Late room:update rejected after explicit leave.',
+  );
+
+  // Part B: Delayed acquisition reply arriving after membership invalidated
+  // 1. Guest navigates from Home to Join a room
+  await guestPage.getByRole('button', { name: 'Join a room' }).click();
+  await guestPage.locator('#room-code').waitFor({ state: 'visible' });
+  await guestPage.locator('#room-code').fill(roomCode);
+
+  // 2. Enable holdJoinAck on Guest
+  await guestPage.evaluate(() => {
+    window.__unoSocketHarness.holdRoomUpdates = false;
+    window.__unoSocketHarness.holdJoinAck = true;
+  });
+
+  // 3. Guest attempts to join the room
+  await guestPage.getByRole('button', { name: 'Join the room' }).click();
+
+  // 4. Verify the acquisition acknowledgment is captured and held
+  await guestPage.waitForFunction(
+    () => window.__unoSocketHarness.heldJoinAcks.length > 0,
+    { timeout: 5000 },
+  );
+  const heldAcksCount = await guestPage.evaluate(
+    () => window.__unoSocketHarness.heldJoinAcks.length,
+  );
+  assert.ok(
+    heldAcksCount > 0,
+    `Guest captured ${heldAcksCount} join acknowledgment reply`,
+  );
+
+  // 5. Invalidate membership by leaving before reply completes
+  await guestPage.getByRole('button', { name: 'Back' }).click();
+  await guestPage.locator('.launch-screen').waitFor({ state: 'visible' });
+  assert.equal(
+    await guestPage.locator('.focused-room').isVisible(),
+    false,
+    'Guest is outside the room after clicking Back',
+  );
+
+  // 6. Deliver the held delayed join ack
+  await guestPage.evaluate(() => {
+    window.__unoSocketHarness.deliverHeldJoinAcks();
+  });
+  await guestPage.waitForTimeout(400);
+
+  // 7. Assert the application remains outside the room (delayed reply rejected by reconcileAcquisitionAck)
+  assert.equal(
+    await guestPage.locator('.focused-room').isVisible(),
+    false,
+    'Delayed acquisition ack did NOT reopen the room after leave',
+  );
+  assert.equal(
+    await guestPage.locator('.game-page').isVisible(),
+    false,
+    'Delayed acquisition ack did NOT reopen the table after leave',
+  );
+  assert.equal(
+    await guestPage.locator('.launch-screen').isVisible(),
+    true,
+    'Guest remains on the launch screen after late join ack delivered',
+  );
+  console.log(
+    'Step 8 Part B Passed: Delayed acquisition reply rejected after leave.',
+  );
+
+  console.log('=== ALL 8 STEPS VERIFIED IN BROWSER AUTOMATION ===');
 } finally {
   await browser.close();
 }

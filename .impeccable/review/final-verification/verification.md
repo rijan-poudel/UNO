@@ -6,11 +6,14 @@ Home → settings/setup → local or online table → playing → results → re
 ## Summary of Changes
 
 - **Online Reliability & Room Transitions (`hooks/useUnoOnlineGame.ts`, `lib/roomMembership.ts`)**:
-  - Extracted pure membership and snapshot reconciliation logic into `lib/roomMembership.ts` (`isNewerRoomSnapshot`, `RoomMembershipManager`).
+  - Extracted pure membership and snapshot reconciliation logic into `lib/roomMembership.ts` (`isNewerRoomSnapshot`, `reconcileRoomUpdate`, `reconcileAcquisitionAck`, `shouldDiscardStaleMembership`).
   - Corrected `isNewerRoomSnapshot`: Replaced the over-restrictive `if (current.started && !incoming.started) return false;` with active (unfinished) game qualification: `const isCurrentActiveGame = Boolean(current.started && current.game && !current.game.winnerId); if (isCurrentActiveGame && !incoming.started) return false;`. This correctly accepts legitimate transitions from a finished online round back to the lobby when the host selects "Edit table" (`started: false`, `game: null`).
-  - Integrated `RoomMembershipManager` in `hooks/useUnoOnlineGame.ts` to manage operation revisions, stale membership discards, and authoritative room snapshots.
-  - Hardened state reconciliation in `returnToLobby`, `toggleReady`, and rule updates by applying acknowledgment snapshots guarded by `isNewerRoomSnapshot`, ensuring late broadcasts or delayed replies cannot overwrite newer authoritative rounds or restore old results.
-  - Enforced strict safeguards against stale room reopening after leaving via `RoomMembershipManager.leaveRoom()`, `discardStaleMembership`, and revision invalidation.
+  - Integrated pure reconciliation functions directly into `hooks/useUnoOnlineGame.ts`:
+    - `reconcileRoomUpdate`: Used in `socket.on('room:update')` setState updater. Rejects late broadcasts when outside a room (`prev.room` is null), room ID mismatches, and stale snapshots.
+    - `reconcileAcquisitionAck`: Used in all operation acknowledgment setRoom/setState handlers (`createRoom`, `joinRoom`, `updateRoomRules`, `startOnlineGame`, `kickPlayer`, `addBotToRoom`, `toggleReady`, `returnToLobby`, `sendFriendInvite`, `acceptFriendInvite`, `reconnect`).
+    - `shouldDiscardStaleMembership`: Evaluates stale operation revisions on returned acknowledgments and safely emits `room:leave` to the server if a stale room was acknowledged after explicit leave.
+  - Preserved React updater purity without introducing artificial external duplicate state machines or separate authoritative stores outside React state.
+  - Enforced strict safeguards against stale room reopening: `leaveRoom()` increments `membershipRevision.current++`, clears session keys, emits `room:leave`, and resets state. Navigation back from the join lobby also invokes `leaveRoom()` to invalidate pending in-flight acquisitions.
 - **Game & Persistence Correctness (`lib/gameActions.ts`, `lib/gameRules.ts`, `lib/playerProgress.ts`, `lib/savedRound.ts`)**:
   - Corrected `wildReverseDraw4` pending draw type to `'wild4'` for proper stacking responses under No Mercy.
   - Guaranteed Mercy elimination immediately crowns the survivor when opponents are eliminated during targeted plays.
@@ -118,14 +121,36 @@ Every claim in this report is mapped directly to the automated test assertion th
     assert.equal(isTriggerFocused, true, 'Focus restored to connected .profile-menu-trigger after closing Settings with Escape');
     ```
 
-### 6. Room Membership Race Guard & Delayed Replies
+### 6. Room Membership Race Guard & Delayed Replies (Unit & Integration)
 - **Claim**: Leaving a room while an operation is pending prevents delayed replies or late updates from reopening the table.
-- **Proving Assertion (`scripts/check-multiplayer.ts`)**:
-  - Uses real `RoomMembershipManager` implementation:
-    - `const pendingOpRevision = manager.beginOperation()`
-    - `manager.leaveRoom()` -> `assert.equal(manager.currentRoom, null)`
-    - `manager.applyOperationAck(pendingOpRevision, ...)` -> `assert.equal(ackResult, null)` and `assert.equal(leaveEmittedFor, roomId)`
-    - `manager.applyRoomUpdate(...)` -> `assert.equal(updateResult, null)` and `assert.equal(manager.currentRoom, null)`
+- **Helper-Level Unit Assertions (`scripts/check-multiplayer.ts`)**:
+  - Exercises the pure production reconciliation functions directly:
+    - Late broadcast rejection: `reconcileRoomUpdate(null, roundActiveRoom) === null`
+    - Legitimate broadcast acceptance: `reconcileRoomUpdate(roundActiveRoom, roundActiveRoom) !== null`
+    - Delayed ack rejection: `reconcileAcquisitionAck(staleRev, currentRev, ackRoom, null) === null`
+    - Stale membership cleanup: `shouldDiscardStaleMembership(staleRev, currentRev, ackRoom, onLeave)` calls `onLeave(roomId)` and returns `true`.
+- **Hook & Browser Integration Regression (`scripts/test-multiplayer-browser.mjs` Step 8)**:
+  - Exact command:
+    ```bash
+    PLAYWRIGHT_PATH=<path-to-playwright>/index.mjs node scripts/test-multiplayer-browser.mjs
+    ```
+  - **Step 8 Part A (Late `room:update` broadcast after explicit leave)**:
+    - Intercepts and holds live WebSocket message `42["room:update", ...]` on Guest.
+    - Guest leaves the table via `brand-button` / "Leave table".
+    - Dispatches held `room:update` to Guest's Socket.IO connection.
+    - Asserts `reconcileRoomUpdate(prev.room, incomingRoom)` rejects the update; Guest remains on `.launch-screen` and neither `.game-page` nor `.focused-room` reopens.
+  - **Step 8 Part B (Delayed acquisition reply after cancellation)**:
+    - Guest enters room code and clicks "Join the room".
+    - Intercepts and holds WebSocket acknowledgment packet `43...{"room": ...}` on Guest.
+    - Guest clicks "Back", calling `leaveRoom()` and incrementing `membershipRevision.current++`.
+    - Dispatches held join acknowledgment.
+    - Asserts `reconcileAcquisitionAck` rejects the reply due to stale operation revision; Guest remains on `.launch-screen` without reopening the lobby.
+  - Result: Step 8 Part A and Part B PASSED (exit code 0).
+- **Mutation Verification (Defect Detection Proof)**:
+  - Temporarily removed the production guard `if (!currentRoom) return null;` in `lib/roomMembership.ts` line 58.
+  - Checked `npx tsx scripts/check-multiplayer.ts`: FAILED with `AssertionError [ERR_ASSERTION]: Late room:update broadcast must be rejected by reconcileRoomUpdate when outside the room`.
+  - Checked `node scripts/test-multiplayer-browser.mjs`: FAILED at Step 8 Part A with `AssertionError [ERR_ASSERTION]: Late room:update broadcast did NOT reopen the table after leave: true !== false`.
+  - Restored production guard: Both `scripts/check-multiplayer.ts` and `scripts/test-multiplayer-browser.mjs` PASSED with exit code 0.
 
 ### 7. Layout & Viewport Geometry
 - **Claim**: 0 horizontal overflow across compact landscape phones and desktops.

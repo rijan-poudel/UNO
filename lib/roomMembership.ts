@@ -45,74 +45,51 @@ export function isNewerRoomSnapshot(
 }
 
 /**
- * Manages client-side room membership lifecycle and guards against race conditions.
- * Prevents late operation replies and broadcast updates from reopening a table after leaving.
+ * Pure room update reconciliation function.
+ * Returns the reconciled RoomSnapshot if accepted, or null if rejected.
+ * Rejects late broadcasts when outside a room (currentRoom is null), room ID mismatches,
+ * and stale snapshots.
  */
-export class RoomMembershipManager {
-  private revision = 0;
-  private room: RoomSnapshot | null = null;
+export function reconcileRoomUpdate(
+  currentRoom: RoomSnapshot | null,
+  incomingRoom: RoomSnapshot,
+): RoomSnapshot | null {
+  // Late bot/action broadcasts cannot re-open a table after leaving.
+  if (!currentRoom || currentRoom.roomId !== incomingRoom.roomId) return null;
+  if (!isNewerRoomSnapshot(currentRoom, incomingRoom)) return null;
+  return incomingRoom;
+}
 
-  get currentRevision(): number {
-    return this.revision;
+/**
+ * Pure operation acknowledgment reconciliation function.
+ * Returns the acknowledged RoomSnapshot if accepted, or null if discarded (stale revision,
+ * room ID mismatch, or stale snapshot).
+ */
+export function reconcileAcquisitionAck(
+  opRevision: number,
+  currentRevision: number,
+  ackRoom: RoomSnapshot,
+  currentRoom: RoomSnapshot | null = null,
+): RoomSnapshot | null {
+  if (opRevision !== currentRevision) return null;
+  if (currentRoom && currentRoom.roomId === ackRoom.roomId) {
+    if (!isNewerRoomSnapshot(currentRoom, ackRoom)) return null;
   }
+  return ackRoom;
+}
 
-  get currentRoom(): RoomSnapshot | null {
-    return this.room;
+/**
+ * Checks whether an operation revision is stale and triggers server leave cleanup if needed.
+ */
+export function shouldDiscardStaleMembership(
+  opRevision: number,
+  currentRevision: number,
+  room?: RoomSnapshot,
+  onEmitLeave?: (roomId: string) => void,
+): boolean {
+  if (opRevision === currentRevision) return false;
+  if (room && onEmitLeave) {
+    onEmitLeave(room.roomId);
   }
-
-  setRoom(room: RoomSnapshot | null): void {
-    this.room = room;
-  }
-
-  beginOperation(): number {
-    return ++this.revision;
-  }
-
-  markOperationStarted(): number {
-    return this.revision;
-  }
-
-  leaveRoom(): void {
-    this.revision++;
-    this.room = null;
-  }
-
-  isStale(revision: number): boolean {
-    return revision !== this.revision;
-  }
-
-  discardStaleMembership(
-    revision: number,
-    room?: RoomSnapshot,
-    onEmitLeave?: (roomId: string) => void,
-  ): boolean {
-    if (revision === this.revision) return false;
-    if (room && onEmitLeave) {
-      onEmitLeave(room.roomId);
-    }
-    return true;
-  }
-
-  applyOperationAck(
-    revision: number,
-    ackRoom: RoomSnapshot,
-    onEmitLeaveIfStale?: (roomId: string) => void,
-  ): RoomSnapshot | null {
-    if (this.discardStaleMembership(revision, ackRoom, onEmitLeaveIfStale)) {
-      return null;
-    }
-    if (this.room && this.room.roomId === ackRoom.roomId) {
-      if (!isNewerRoomSnapshot(this.room, ackRoom)) return null;
-    }
-    this.room = ackRoom;
-    return ackRoom;
-  }
-
-  applyRoomUpdate(incomingRoom: RoomSnapshot): RoomSnapshot | null {
-    // Late bot/action broadcasts cannot re-open a table after leaving.
-    if (!this.room || this.room.roomId !== incomingRoom.roomId) return null;
-    if (!isNewerRoomSnapshot(this.room, incomingRoom)) return null;
-    this.room = incomingRoom;
-    return incomingRoom;
-  }
+  return true;
 }

@@ -8,7 +8,9 @@ import {
 } from '../lib/socketConnection';
 import {
   isNewerRoomSnapshot,
-  RoomMembershipManager,
+  reconcileRoomUpdate,
+  reconcileAcquisitionAck,
+  shouldDiscardStaleMembership,
 } from '../lib/roomMembership';
 import type { Ack, RoomSnapshot } from '../types/multiplayer';
 
@@ -154,41 +156,28 @@ assert.equal(
 
 // 5. Leaving while an operation is pending: late updates cannot reopen the room
 {
-  const manager = new RoomMembershipManager();
-  const initialRoom = createMockSnapshot();
-  manager.setRoom(initialRoom);
+  let currentRoom: RoomSnapshot | null = createMockSnapshot();
+  let membershipRevision = 1;
+  const pendingOpRevision = membershipRevision;
 
-  // Begin a room operation
-  const pendingOpRevision = manager.beginOperation();
+  // Player leaves room: membership revision advances and current room is reset to null
+  membershipRevision++;
+  currentRoom = null;
 
-  // Leave or invalidate membership before its reply completes
+  // Delayed acquisition reply arrives: discarded by shouldDiscardStaleMembership
   let leaveEmittedFor: string | null = null;
-  manager.leaveRoom();
-  assert.equal(
-    manager.currentRoom,
-    null,
-    'Manager must be outside the room after leave',
-  );
-
-  // Deliver the delayed reply
-  const ackResult = manager.applyOperationAck(
+  const isStale = shouldDiscardStaleMembership(
     pendingOpRevision,
+    membershipRevision,
     newlyDealtSnapshot,
     (roomId) => {
       leaveEmittedFor = roomId;
     },
   );
-
-  // Verify the application remains outside the room
   assert.equal(
-    ackResult,
-    null,
-    'Delayed operation ack must be rejected after leave',
-  );
-  assert.equal(
-    manager.currentRoom,
-    null,
-    'Application must remain outside the room after delayed ack',
+    isStale,
+    true,
+    'Delayed operation ack must detect stale membership revision',
   );
   assert.equal(
     leaveEmittedFor,
@@ -196,19 +185,25 @@ assert.equal(
     'Delayed ack must trigger server-side leave cleanup if server joined room',
   );
 
-  // Deliver a late room update
-  const updateResult = manager.applyRoomUpdate(newlyDealtSnapshot);
+  // Reconcile acquisition ack helper verifies rejection
+  const ackResult = reconcileAcquisitionAck(
+    pendingOpRevision,
+    membershipRevision,
+    newlyDealtSnapshot,
+    currentRoom,
+  );
+  assert.equal(
+    ackResult,
+    null,
+    'Delayed acquisition ack must be rejected by reconcileAcquisitionAck after leave',
+  );
 
-  // Verify it still does not reopen the table
+  // Late room:update broadcast arrives: rejected by reconcileRoomUpdate because currentRoom is null
+  const updateResult = reconcileRoomUpdate(currentRoom, newlyDealtSnapshot);
   assert.equal(
     updateResult,
     null,
-    'Late room:update broadcast cannot reopen a room after leave',
-  );
-  assert.equal(
-    manager.currentRoom,
-    null,
-    'Application must still remain outside the room after late update',
+    'Late room:update broadcast must be rejected by reconcileRoomUpdate when outside the room',
   );
 }
 const cachedSession = { roomId: 'ABC234', playerName: 'Cached name' };

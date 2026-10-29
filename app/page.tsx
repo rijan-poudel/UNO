@@ -412,7 +412,10 @@ export default function Home() {
             setView("computer");
           }}
           controls={topBar}
-          onBack={() => setView("home")}
+          onBack={() => {
+            void online.leaveRoom();
+            setView("home");
+          }}
           initialPanel={panel}
           connected={online.connected}
           room={online.room}
