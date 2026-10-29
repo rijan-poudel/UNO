@@ -83,7 +83,9 @@ export function recordRound(game: GameState, playerId: string): void {
     const next = addRoundResult(previous, id, game.winnerId === playerId);
     if (next !== previous) {
       localStorage.setItem(KEY, JSON.stringify(next));
-      window.dispatchEvent(new Event('uno:progress'));
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new Event('uno:progress'));
+      }
     }
   } catch {
     /* Private browsing must not interrupt a round. */

@@ -321,7 +321,7 @@ function resolveCardEffect(
       return advanceTurn({
         ...state,
         pendingDraw: newPending,
-        pendingDrawType: 'draw2',
+        pendingDrawType: 'wild4',
       });
     }
 
@@ -387,6 +387,7 @@ function resolveCardEffect(
         saidUno: false,
       });
       updated = applyMercyRule(updated);
+      if (updated.winnerId) return updated;
       return advanceTurn(updated, 1);
     }
 
@@ -603,7 +604,9 @@ export function playCard(
   // ── Win condition ────────────────────────────────────────────────────────
   if (
     postPlayHand.length === 0 &&
-    !(state.rules.sevenZero && (card.value === '7' || card.value === '0'))
+    !(state.rules.sevenZero && (card.value === '7' || card.value === '0')) &&
+    card.value !== 'wildForcedSwap' &&
+    card.value !== 'shuffle'
   ) {
     // Player is out of cards — they win! Turn is not advanced.
     return { ...newState, winnerId: player.id };

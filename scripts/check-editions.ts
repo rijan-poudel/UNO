@@ -156,6 +156,127 @@ const hit = playCard(targetState, 0, targeted.id, undefined, {
 });
 assert.equal(hit.currentPlayerIndex, 1);
 assert.equal(hit.players[1].hand.length, wild.players[1].hand.length + 2);
+
+// Playing wildForcedSwap as the last card transfers the empty hand to the target.
+const swapOut = card('swap-out', 'wildForcedSwap');
+const swapOutState = {
+  ...wild,
+  players: wild.players.map((p, i) =>
+    i === 0 ? { ...p, hand: [swapOut] } : p,
+  ),
+};
+const swappedOut = playCard(swapOutState, 0, swapOut.id, undefined, {
+  targetPlayerId: wild.players[1].id,
+});
+assert.equal(
+  swappedOut.winnerId,
+  wild.players[1].id,
+  'Swap recipient gets empty hand and wins',
+);
+assert.equal(swappedOut.players[0].hand.length, wild.players[1].hand.length);
+assert.equal(swappedOut.players[1].hand.length, 0);
+
+// Targeted draw two cannot be played to stack on a draw pool penalty.
+const draw2Penalty: GameState = {
+  ...wild,
+  pendingDraw: 2,
+  pendingDrawType: 'draw2',
+  discardPile: [card('top-draw2', 'draw2')],
+  players: wild.players.map((p, i) =>
+    i === 0 ? { ...p, hand: [targeted, card('valid-draw2', 'draw2')] } : p,
+  ),
+};
+assert.equal(
+  canPlayCard(targeted, draw2Penalty, 0),
+  false,
+  'Targeted draw two cannot stack',
+);
+
+// In No Mercy, draw4 sets pendingDrawType to wild4; a draw2 cannot stack on draw4.
+const draw4Card = card('color-draw4', 'draw4', 'red');
+const draw2Card = card('color-draw2', 'draw2', 'red');
+const noMercyState: GameState = {
+  ...base,
+  activeColor: 'red',
+  discardPile: [card('top-number', '5', 'red')],
+  players: base.players.map((p, i) =>
+    i === 0
+      ? { ...p, hand: [draw4Card, card('extra', '1', 'red')] }
+      : i === 1
+        ? { ...p, hand: [draw2Card] }
+        : p,
+  ),
+};
+const afterDraw4 = playCard(noMercyState, 0, draw4Card.id);
+assert.equal(afterDraw4.pendingDraw, 4);
+assert.equal(afterDraw4.pendingDrawType, 'wild4');
+assert.equal(
+  canPlayCard(draw2Card, afterDraw4, 1),
+  false,
+  'Draw 2 cannot stack on Draw 4 in No Mercy',
+);
+
+// Knocking out the last opponent with wildTargetDraw2 crowns the survivor without advancing turn.
+const mercyTarget = card('mercy-targeted', 'wildTargetDraw2');
+const targetKnockoutState: GameState = {
+  ...wild,
+  rules: { ...wild.rules, eliminationHandLimit: 25 },
+  players: wild.players.map((p, i) =>
+    i === 0
+      ? { ...p, hand: [mercyTarget, card('spare', 'wild')] }
+      : {
+          ...p,
+          hand: Array.from({ length: 24 }, (_, j) =>
+            card(`victim-${j}`, 'wild'),
+          ),
+        },
+  ),
+};
+const knockoutHit = playCard(
+  targetKnockoutState,
+  0,
+  mercyTarget.id,
+  undefined,
+  {
+    targetPlayerId: wild.players[1].id,
+  },
+);
+assert.equal(
+  knockoutHit.winnerId,
+  wild.players[0].id,
+  'Knocking out the opponent crowns the survivor',
+);
+assert.equal(knockoutHit.players[1].eliminated, true);
+
+// Playing shuffle hands as last card re-deals instead of winning before the shuffle.
+const shuffleCard = card('last-shuffle', 'shuffle', 'wild');
+const shuffleState: GameState = {
+  ...base,
+  rules: { ...base.rules, allowShuffleCard: true },
+  activeColor: 'red',
+  discardPile: [card('top-red', '5', 'red')],
+  players: base.players.map((p, i) =>
+    i === 0
+      ? { ...p, hand: [shuffleCard] }
+      : {
+          ...p,
+          hand: [
+            card(`opp-${i}-a`, '5', 'red'),
+            card(`opp-${i}-b`, '6', 'blue'),
+          ],
+        },
+  ),
+};
+const afterShuffle = playCard(shuffleState, 0, shuffleCard.id, 'blue');
+assert.equal(
+  afterShuffle.winnerId,
+  null,
+  'Playing shuffle hands as last card re-deals instead of winning',
+);
+assert.ok(
+  afterShuffle.players[0].hand.length > 0,
+  'Player receives cards from shuffled pool',
+);
 const knockout = applyMercyRule({
   ...state,
   players: state.players.map((p, i) =>

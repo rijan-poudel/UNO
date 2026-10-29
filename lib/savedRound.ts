@@ -135,7 +135,11 @@ export function parseSavedRound(raw: string | null): GameState | null {
       drawPile: game.drawPile,
       ...(game.outOfPlayPile ? { outOfPlayPile: game.outOfPlayPile } : {}),
       ...(game.pendingRoulette
-        ? { pendingRoulette: game.pendingRoulette }
+        ? {
+            pendingRoulette: {
+              playerId: game.pendingRoulette.playerId,
+            },
+          }
         : {}),
       discardPile: game.discardPile,
       currentPlayerIndex: game.currentPlayerIndex,

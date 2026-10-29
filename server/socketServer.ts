@@ -6,6 +6,7 @@ import { FriendStore } from './friendStore';
 import { initializeGame } from '../lib/gameSetup';
 import { isAvatarId } from '../lib/playerAvatars';
 import { validateGameRules } from '../lib/validateGameRules';
+import { isRoomCode } from '../lib/roomCodes';
 import { toGameView, toPresentationGame } from '../lib/gameView';
 import { recordTableWin, startTableRound } from '../lib/tableScore';
 import {
@@ -1229,6 +1230,11 @@ io.on('connection', (socket) => {
           return;
         }
 
+        if (!isRoomCode(roomId)) {
+          reply?.(ackError('Room not found.'));
+          return;
+        }
+
         if (playerBySocket.has(socket.id)) {
           reply?.(ackError('You are already in a room.'));
           return;
@@ -1351,21 +1357,30 @@ io.on('connection', (socket) => {
           return;
         }
 
+        const now = Date.now();
         const existingInvite = Array.from(pendingInvites.values()).find(
           (invite) =>
             invite.roomId === room.roomId &&
-            invite.fromPlayerId === playerId &&
             invite.toFriendCode === targetFriendCode,
         );
 
-        const inviteRecord: PendingInviteRecord = existingInvite ?? {
+        if (existingInvite && now - existingInvite.createdAt >= INVITE_TTL_MS) {
+          removeInvite(existingInvite.inviteId, io);
+        } else if (existingInvite) {
+          reply?.(
+            ackError('An invitation has already been sent to this friend.'),
+          );
+          return;
+        }
+
+        const inviteRecord: PendingInviteRecord = {
           inviteId: makeInviteId(),
           roomId: room.roomId,
           fromPlayerId: playerId,
           fromName: playerName,
           fromFriendCode: senderFriendCode,
           toFriendCode: targetFriendCode,
-          createdAt: Date.now(),
+          createdAt: now,
         };
 
         pendingInvites.set(inviteRecord.inviteId, inviteRecord);
@@ -1398,6 +1413,7 @@ io.on('connection', (socket) => {
       try {
         const invite = pendingInvites.get(payload.inviteId);
         if (!invite || Date.now() - invite.createdAt >= INVITE_TTL_MS) {
+          if (invite) removeInvite(invite.inviteId, io);
           reply?.(ackError('Invite no longer exists.'));
           return;
         }
@@ -1479,7 +1495,8 @@ io.on('connection', (socket) => {
     ) => {
       try {
         const invite = pendingInvites.get(payload.inviteId);
-        if (!invite) {
+        if (!invite || Date.now() - invite.createdAt >= INVITE_TTL_MS) {
+          if (invite) removeInvite(payload.inviteId, io);
           reply?.(ackError('Invite no longer exists.'));
           return;
         }
@@ -1806,6 +1823,14 @@ io.on('connection', (socket) => {
         const player = room.players.find((p) => p.socketId === socket.id);
         if (!player) {
           reply?.(ackError('You are not in this room.'));
+          return;
+        }
+
+        if (room.started && !room.game?.winnerId) {
+          reply?.({
+            ok: true,
+            data: { room: snapshotForSocket(room, socket.id) },
+          });
           return;
         }
 

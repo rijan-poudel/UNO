@@ -10,6 +10,7 @@ import type { GameRules } from '../types/rules';
 import {
   isWildCard,
   isActionCard,
+  isDrawCard,
   NUMBER_VALUES,
   getCardDrawPenalty,
 } from '../types/card';
@@ -98,6 +99,7 @@ export function canPlayCard(
  */
 function isValidStackCard(card: Card, state: GameState): boolean {
   const { rules, pendingDrawType, discardPile } = state;
+  if (!isDrawCard(card)) return false;
   const cardPenalty = getCardDrawPenalty(card.value);
   if (cardPenalty === 0) return false;
 
@@ -360,7 +362,10 @@ export function getCardPlayBlockReason(
   }
   if (state.drawnThisTurn && card.id !== player.hand.at(-1)?.id)
     return 'After drawing, only the card you just drew can be played.';
-  if (matchesPreset(state.rules, RULE_PRESETS[0].rules)) {
+  if (
+    state.rules.gameMode === 'classic' ||
+    matchesPreset(state.rules, RULE_PRESETS[0].rules)
+  ) {
     if (
       card.value === 'wild4' &&
       player.hand.some((entry) => entry.color === state.activeColor)
