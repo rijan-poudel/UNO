@@ -96,41 +96,12 @@ interface FeedState {
   connected: boolean;
 }
 
-export function isNewerRoomSnapshot(
-  current: RoomSnapshot | null,
-  incoming: RoomSnapshot,
-): boolean {
-  if (!current) return true;
-  if (current.roomId !== incoming.roomId) return true;
+import {
+  isNewerRoomSnapshot,
+  RoomMembershipManager,
+} from '../lib/roomMembership';
 
-  const isCurrentActiveGame = Boolean(
-    current.started && current.game && !current.game.winnerId,
-  );
-
-  // An active game should not be overwritten by a lobby snapshot.
-  if (isCurrentActiveGame && !incoming.started) return false;
-
-  // A returned-to-lobby room should not be overwritten by an old finished game.
-  if (!current.started && incoming.started && incoming.game?.winnerId)
-    return false;
-
-  if (current.game && incoming.game) {
-    if (current.game.roundId === incoming.game.roundId) {
-      if (current.game.winnerId && !incoming.game.winnerId) return false;
-      const currentTurn = current.game.turnCount ?? 0;
-      const incomingTurn = incoming.game.turnCount ?? 0;
-      if (currentTurn > incomingTurn) return false;
-    } else {
-      // Rematch dealt: incoming is an old results screen if it has winnerId and current is active.
-      if (incoming.game.winnerId && !current.game.winnerId) return false;
-      const currentRounds = current.tableScore?.completedRounds ?? 0;
-      const incomingRounds = incoming.tableScore?.completedRounds ?? 0;
-      if (currentRounds > incomingRounds) return false;
-    }
-  }
-
-  return true;
-}
+export { isNewerRoomSnapshot, RoomMembershipManager };
 
 export function useUnoOnlineGame() {
   const socketRef = useRef<Socket | null>(null);
@@ -139,14 +110,15 @@ export function useUnoOnlineGame() {
     cardId: string;
     options: PlayOptions;
   } | null>(null);
-  const membershipRevision = useRef(0);
+  const membershipManager = useRef(new RoomMembershipManager());
   const pendingOps = useRef<Set<string>>(new Set());
   const discardStaleMembership = useCallback(
     (revision: number, room?: RoomSnapshot) => {
-      if (revision === membershipRevision.current) return false;
-      // A cancelled join may still have created server membership. Release only that room.
-      if (room) socketRef.current?.emit('room:leave', { roomId: room.roomId });
-      return true;
+      return membershipManager.current.discardStaleMembership(
+        revision,
+        room,
+        (roomId) => socketRef.current?.emit('room:leave', { roomId }),
+      );
     },
     [],
   );
@@ -203,7 +175,7 @@ export function useUnoOnlineGame() {
         roomSession.current,
       );
       if (saved) {
-        const revision = ++membershipRevision.current;
+        const revision = membershipManager.current.beginOperation();
         socket.timeout(6000).emit(
           'room:join',
           {
@@ -224,6 +196,7 @@ export function useUnoOnlineGame() {
               return;
             if (error || !ack?.ok) {
               // A vanished server/room ends this session; don't send actions with stale membership.
+              membershipManager.current.leaveRoom();
               roomSession.current = null;
               pendingWildPlay.current = null;
               try {
@@ -245,6 +218,7 @@ export function useUnoOnlineGame() {
               }));
               return;
             }
+            membershipManager.current.setRoom(ack.data.room);
             setState((prev) => ({
               ...prev,
               room: ack.data.room,
@@ -280,6 +254,7 @@ export function useUnoOnlineGame() {
         // Late bot/action broadcasts cannot re-open a table after leaving.
         if (!prev.room || prev.room.roomId !== room.roomId) return prev;
         if (!isNewerRoomSnapshot(prev.room, room)) return prev;
+        membershipManager.current.setRoom(room);
         let nextLog = room.started ? prev.log : [];
         if (room.game) {
           const actionLine = describeGameAction(room.game);
@@ -306,7 +281,7 @@ export function useUnoOnlineGame() {
     });
 
     socket.on('room:kicked', (payload?: { message?: string }) => {
-      membershipRevision.current++;
+      membershipManager.current.leaveRoom();
       roomSession.current = null;
       pendingWildPlay.current = null;
       try {
@@ -573,7 +548,7 @@ export function useUnoOnlineGame() {
       if (pendingOps.current.has('room:acquisition')) return false;
       pendingOps.current.add('room:acquisition');
       try {
-        const revision = ++membershipRevision.current;
+        const revision = membershipManager.current.beginOperation();
         const ack = await callAck<{ room: RoomSnapshot; playerId: string }>(
           'room:create',
           {
@@ -592,8 +567,9 @@ export function useUnoOnlineGame() {
           return false;
         }
 
+        membershipManager.current.setRoom(ack.data.room);
         setState((prev) => {
-          if (revision !== membershipRevision.current) return prev;
+          if (membershipManager.current.isStale(revision)) return prev;
           return {
             ...prev,
             room: ack.data.room,
@@ -616,7 +592,7 @@ export function useUnoOnlineGame() {
       if (!state.room || pendingOps.current.has('room:rules')) return false;
       pendingOps.current.add('room:rules');
       try {
-        const revision = membershipRevision.current;
+        const revision = membershipManager.current.currentRevision;
         const ack = await callAck<{ room: RoomSnapshot }>('room:set-rules', {
           roomId: state.room.roomId,
           rules,
@@ -628,6 +604,7 @@ export function useUnoOnlineGame() {
           return false;
         }
 
+        membershipManager.current.setRoom(ack.data.room);
         setState((prev) => {
           if (!prev.room || prev.room.roomId !== ack.data.room.roomId)
             return prev;
@@ -652,7 +629,7 @@ export function useUnoOnlineGame() {
       if (pendingOps.current.has('room:acquisition')) return false;
       pendingOps.current.add('room:acquisition');
       try {
-        const revision = ++membershipRevision.current;
+        const revision = membershipManager.current.beginOperation();
         const ack = await callAck<{ room: RoomSnapshot; playerId: string }>(
           'room:join',
           { roomId, playerName, deviceId },
@@ -666,8 +643,9 @@ export function useUnoOnlineGame() {
           return false;
         }
 
+        membershipManager.current.setRoom(ack.data.room);
         setState((prev) => {
-          if (revision !== membershipRevision.current) return prev;
+          if (membershipManager.current.isStale(revision)) return prev;
           return {
             ...prev,
             room: ack.data.room,
@@ -690,7 +668,7 @@ export function useUnoOnlineGame() {
       if (!state.room || pendingOps.current.has('room:start')) return false;
       pendingOps.current.add('room:start');
       try {
-        const revision = membershipRevision.current;
+        const revision = membershipManager.current.currentRevision;
         const ack = await callAck<{ room: RoomSnapshot }>('room:start', {
           roomId: state.room.roomId,
           rules,
@@ -702,6 +680,7 @@ export function useUnoOnlineGame() {
           return false;
         }
 
+        membershipManager.current.setRoom(ack.data.room);
         setState((prev) => {
           if (!prev.room || prev.room.roomId !== ack.data.room.roomId)
             return prev;
@@ -728,7 +707,7 @@ export function useUnoOnlineGame() {
       if (!state.room || pendingOps.current.has(opKey)) return false;
       pendingOps.current.add(opKey);
       try {
-        const revision = membershipRevision.current;
+        const revision = membershipManager.current.currentRevision;
         const ack = await callAck<{ room: RoomSnapshot }>('room:kick', {
           roomId: state.room.roomId,
           targetPlayerId,
@@ -739,6 +718,7 @@ export function useUnoOnlineGame() {
           return false;
         }
 
+        membershipManager.current.setRoom(ack.data.room);
         setState((prev) => {
           if (!prev.room || prev.room.roomId !== ack.data.room.roomId)
             return prev;
@@ -763,7 +743,7 @@ export function useUnoOnlineGame() {
     if (!state.room || pendingOps.current.has('room:add-bot')) return false;
     pendingOps.current.add('room:add-bot');
     try {
-      const revision = membershipRevision.current;
+      const revision = membershipManager.current.currentRevision;
       const ack = await callAck<{ room: RoomSnapshot }>('room:add-bot', {
         roomId: state.room.roomId,
       });
@@ -773,6 +753,7 @@ export function useUnoOnlineGame() {
         return false;
       }
 
+      membershipManager.current.setRoom(ack.data.room);
       setState((prev) => {
         if (!prev.room || prev.room.roomId !== ack.data.room.roomId)
           return prev;
@@ -795,7 +776,7 @@ export function useUnoOnlineGame() {
     if (!state.room || pendingOps.current.has('room:ready')) return false;
     pendingOps.current.add('room:ready');
     try {
-      const revision = membershipRevision.current;
+      const revision = membershipManager.current.currentRevision;
       const ack = await callAck<{ room: RoomSnapshot }>('room:ready', {
         roomId: state.room.roomId,
       });
@@ -805,6 +786,7 @@ export function useUnoOnlineGame() {
         return false;
       }
 
+      membershipManager.current.setRoom(ack.data.room);
       setState((prev) => {
         if (!prev.room || prev.room.roomId !== ack.data.room.roomId)
           return prev;
@@ -827,7 +809,7 @@ export function useUnoOnlineGame() {
       return false;
     pendingOps.current.add('room:return-to-lobby');
     try {
-      const revision = membershipRevision.current;
+      const revision = membershipManager.current.currentRevision;
       const ack = await callAck<{ room: RoomSnapshot }>(
         'room:return-to-lobby',
         {
@@ -839,6 +821,7 @@ export function useUnoOnlineGame() {
         setState((prev) => ({ ...prev, error: ack.error }));
         return false;
       }
+      membershipManager.current.setRoom(ack.data.room);
       setState((prev) => {
         if (!prev.room || prev.room.roomId !== ack.data.room.roomId)
           return prev;
@@ -873,7 +856,7 @@ export function useUnoOnlineGame() {
       }
       pendingOps.current.add(opKey);
       try {
-        const revision = ++membershipRevision.current;
+        const revision = membershipManager.current.beginOperation();
         const ack = await callAck<{
           room: RoomSnapshot;
           playerId: string;
@@ -893,6 +876,9 @@ export function useUnoOnlineGame() {
           return false;
         }
 
+        if (isNewerRoomSnapshot(state.room, ack.data.room)) {
+          membershipManager.current.setRoom(ack.data.room);
+        }
         setState((prev) => ({
           ...prev,
           room: isNewerRoomSnapshot(prev.room, ack.data.room)
@@ -927,6 +913,7 @@ export function useUnoOnlineGame() {
       deviceId,
       friendCode,
       state.outgoingInvites,
+      state.room,
     ],
   );
 
@@ -941,7 +928,7 @@ export function useUnoOnlineGame() {
       pendingOps.current.add(opKey);
       pendingOps.current.add('room:acquisition');
       try {
-        const revision = ++membershipRevision.current;
+        const revision = membershipManager.current.beginOperation();
         const ack = await callAck<{ room: RoomSnapshot; playerId: string }>(
           'friend:invite:accept',
           {
@@ -967,8 +954,9 @@ export function useUnoOnlineGame() {
           return false;
         }
 
+        membershipManager.current.setRoom(ack.data.room);
         setState((prev) => {
-          if (revision !== membershipRevision.current) return prev;
+          if (membershipManager.current.isStale(revision)) return prev;
           return {
             ...prev,
             room: ack.data.room,
@@ -1022,7 +1010,7 @@ export function useUnoOnlineGame() {
   );
 
   const leaveRoom = useCallback(async () => {
-    membershipRevision.current++;
+    membershipManager.current.leaveRoom();
     roomSession.current = null;
     pendingWildPlay.current = null;
     pendingOps.current.clear();
@@ -1056,7 +1044,7 @@ export function useUnoOnlineGame() {
       if (pendingOps.current.has(actionKey)) return;
       pendingOps.current.add(actionKey);
       try {
-        const revision = membershipRevision.current;
+        const revision = membershipManager.current.currentRevision;
         const ack = await callAck<{ room: RoomSnapshot }>('game:action', {
           roomId: state.room.roomId,
           action,

@@ -50,6 +50,16 @@ try {
     false,
     'Settings modal closed on Escape',
   );
+  const isTriggerFocused = await desktop.evaluate(() => {
+    return (
+      document.activeElement === document.querySelector('.profile-menu-trigger')
+    );
+  });
+  assert.equal(
+    isTriggerFocused,
+    true,
+    'Focus restored to connected .profile-menu-trigger after closing Settings with Escape',
+  );
 
   // Start local game
   await playButton.first().click();

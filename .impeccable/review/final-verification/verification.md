@@ -5,73 +5,140 @@ Home → settings/setup → local or online table → playing → results → re
 
 ## Summary of Changes
 
-- **Online Reliability & Room Transitions (`hooks/useUnoOnlineGame.ts`)**:
+- **Online Reliability & Room Transitions (`hooks/useUnoOnlineGame.ts`, `lib/roomMembership.ts`)**:
+  - Extracted pure membership and snapshot reconciliation logic into `lib/roomMembership.ts` (`isNewerRoomSnapshot`, `RoomMembershipManager`).
   - Corrected `isNewerRoomSnapshot`: Replaced the over-restrictive `if (current.started && !incoming.started) return false;` with active (unfinished) game qualification: `const isCurrentActiveGame = Boolean(current.started && current.game && !current.game.winnerId); if (isCurrentActiveGame && !incoming.started) return false;`. This correctly accepts legitimate transitions from a finished online round back to the lobby when the host selects "Edit table" (`started: false`, `game: null`).
-  - Hardened state reconciliation in `returnToLobby` and `toggleReady` by applying acknowledgment snapshots guarded by `isNewerRoomSnapshot`, ensuring late broadcasts or delayed replies cannot overwrite newer authoritative rounds or restore old results.
-  - Retained strict safeguards against stale room reopening after leaving via `discardStaleMembership` and `membershipRevision` invalidation.
+  - Integrated `RoomMembershipManager` in `hooks/useUnoOnlineGame.ts` to manage operation revisions, stale membership discards, and authoritative room snapshots.
+  - Hardened state reconciliation in `returnToLobby`, `toggleReady`, and rule updates by applying acknowledgment snapshots guarded by `isNewerRoomSnapshot`, ensuring late broadcasts or delayed replies cannot overwrite newer authoritative rounds or restore old results.
+  - Enforced strict safeguards against stale room reopening after leaving via `RoomMembershipManager.leaveRoom()`, `discardStaleMembership`, and revision invalidation.
 - **Game & Persistence Correctness (`lib/gameActions.ts`, `lib/gameRules.ts`, `lib/playerProgress.ts`, `lib/savedRound.ts`)**:
   - Corrected `wildReverseDraw4` pending draw type to `'wild4'` for proper stacking responses under No Mercy.
   - Guaranteed Mercy elimination immediately crowns the survivor when opponents are eliminated during targeted plays.
   - Guarded `wildForcedSwap` and `shuffle` against premature empty-hand victory triggers prior to hand transfer.
   - SSR safety on progress storage events and normalized recovery for roulette state.
-- **Supported Browser Test Infrastructure (`scripts/playwright-loader.mjs`)**:
-  - Replaced machine-specific hardcoded Playwright import paths with standard dynamic resolution and environment fallbacks (`process.env.PLAYWRIGHT_PATH`).
-  - Added runnable automated browser journey (`scripts/test-full-journey.mjs`) and 2-player multiplayer journey (`scripts/test-multiplayer-browser.mjs`).
+- **Portability & Supported Test Infrastructure (`scripts/playwright-loader.mjs`, `scripts/test-multiplayer-browser.mjs`, `scripts/test-full-journey.mjs`)**:
+  - Removed machine-specific hardcoded Playwright import paths from `scripts/playwright-loader.mjs`. It now relies strictly on standard package resolution and documented environment variables (`PLAYWRIGHT_PATH` or `PLAYWRIGHT_MODULE_PATH`), throwing an informative configuration error when neither is set.
+  - Upgraded `scripts/test-multiplayer-browser.mjs` to use `uno.online.playerName`, verify distinct roster identities, assert initial edition and hand size, execute a full custom profile rule-change flow with DOM and deal assertions, and distinguish DOM hand rendering from wire privacy.
+  - Added true focus assertion to `scripts/test-full-journey.mjs` verifying `document.activeElement` matches the opener trigger after closing Settings via Escape.
+
+---
 
 ## Exact Verification Commands
 
-To run all checks deterministically:
+To reproduce all checks deterministically:
 
 ```bash
 # 1. Format and code quality
-npm run format:check
+npm run format
 npm run lint
 npm run check:types
 
-# 2. Local game logic and audio assertions
+# 2. Pure game logic and audio assertions (no server needed)
 npm run check:game
 npm run check:audio
 
-# 3. Multiplayer network assertion suites (requires socket server on port 3001)
+# 3. Multiplayer network assertion suites (start socket server on port 3001)
 npm run start:socket &
 npm run check:multiplayer
 
 # 4. Production build check
 npm run build
 
-# 5. Automated Browser Verification (requires dev server on port 3004 and socket server on 3001)
+# 5. Automated Browser Verification (start Next.js on port 3004 and socket server on 3001)
 npm run dev:web &
-node scripts/test-full-journey.mjs
-node scripts/test-multiplayer-browser.mjs
+# Run Playwright tests using standard resolution or PLAYWRIGHT_PATH
+PLAYWRIGHT_PATH=<path-to-playwright>/index.mjs node scripts/test-full-journey.mjs
+PLAYWRIGHT_PATH=<path-to-playwright>/index.mjs node scripts/test-multiplayer-browser.mjs
 ```
 
-## Behavioral Assertions vs. Screenshot Capture
+---
 
-### Behavioral Assertions (Deterministic Pass/Fail)
-1. **Single-Player / Responsive Layout (`scripts/test-full-journey.mjs`)**:
-   - Desktop 1280×720: Verified Home screen controls, profile menu trigger, Settings dialog opening and Escape key focus return, Play transition to table, and hand card rendering.
-   - Short Landscape 568×320: Verified document scroll width equals client width (`scrollWidth === clientWidth`) on both Home screen and active Game table (0 horizontal overflow).
-   - Wide Landscape 844×390: Verified 0 horizontal document overflow on Game table.
-   - Portrait Phone 390×844: Verified orientation guidance gate (`.rotate-phone`) appears when entering game in portrait mode.
-2. **Online Multiplayer Journey (`scripts/test-multiplayer-browser.mjs`)**:
-   - 2 isolated browser contexts (Host & Guest) with separate storage/sessions.
-   - Step 1: Host creates room, Guest joins via room code. Both verify 2 seated players in `.room-seats-heading`.
-   - Step 2: Host deals, both enter live table, play cards until round completes, and both verify "Round over" modal.
-   - Step 3: Host selects "Edit table" (`returnToLobby`).
-   - Step 4: Behavioral assertion: BOTH Host and Guest actually transition back to the lobby (`started: false`, `game: null`, room code panel visible).
-   - Step 5: Host opens settings and updates an allowed table rule.
-   - Step 6: Host deals again.
-   - Step 7: Behavioral assertion: Both players enter the new round with private hands dealt and round results reset.
-3. **Multiplayer State Transitions (`scripts/check-multiplayer.ts`)**:
-   - Finished round (`started: true`, `game.winnerId: 'p1'`) → Lobby (`started: false`, `game: null`): accepted.
-   - Lobby (`started: false`, `game: null`) → Newly dealt round (`started: true`, `turnCount: 0`): accepted.
-   - Results → Rematch: accepted.
-   - Readiness acknowledgment arriving after a new round: cannot restore old results.
-   - In-progress active round (`started: true`, `winnerId: null`) receiving late lobby snapshot: rejected.
-   - Leaving while an operation is pending: late updates cannot reopen the room.
+## Proving Assertions & Verification Evidence
 
-### Screenshot Artifacts Captured
-Stored in `.impeccable/review/final-verification/`:
+Every claim in this report is mapped directly to the automated test assertion that proves it.
+
+### 1. Player Identity & Lobby Roster
+- **Claim**: Host and Guest join with distinct identities and are reflected in the lobby.
+- **Proving Assertion (`scripts/test-multiplayer-browser.mjs`)**:
+  - Local storage key: `uno.online.playerName` (`HostAlice` and `GuestBob`).
+  - Distinct roster text:
+    `assert.match(hostRosterText, /HostAlice/)`
+    `assert.match(hostRosterText, /GuestBob/)`
+    `assert.match(guestRosterText, /HostAlice/)`
+    `assert.match(guestRosterText, /GuestBob/)`
+  - Seat count badge: `assert.equal(await hostPage.locator('.room-seats-heading').isVisible(), true)`
+
+### 2. Initial Room Edition & Starting Hand Size
+- **Claim**: The created room actually initializes with the intended edition (All Wild) and hand size (2 cards), not default assumptions.
+- **Proving Assertion (`scripts/test-multiplayer-browser.mjs`)**:
+  - Edition class verification:
+    `assert.match(await hostPage.locator('.focused-room').getAttribute('class'), /mood-all-wild/)`
+    `assert.match(await guestPage.locator('.focused-room').getAttribute('class'), /mood-all-wild/)`
+  - Hand size text verification:
+    `assert.match(await hostPage.locator('.room-rules-link span').textContent(), /2 cards each/)`
+    `assert.match(await guestPage.locator('.room-rules-link span').textContent(), /2 cards each/)`
+  - Live table deal verification:
+    `assert.equal(await hostPage.locator('.hand-card').count(), 2)`
+    `assert.equal(await guestPage.locator('.hand-card').count(), 2)`
+
+### 3. Rule Change via Custom Profile
+- **Claim**: Changing a rule via custom profile publishes the changed rule to both players and takes effect in the next round.
+- **Proving Assertion (`scripts/test-multiplayer-browser.mjs`)**:
+  - Control navigation: Opens `.room-rules-link`, clicks `.rule-profile-new`, fills profile name "Five Card Custom".
+  - Rule selection: Selects `select[aria-label="Starting hand size"]`.
+  - Initial value assertion: `assert.equal(initialHandSize, '7')`.
+  - Value change assertion: `assert.equal(await handSizeSelect.inputValue(), '5')`.
+  - Save & publish: Clicks "Save and use", closes dialogs, and asserts published label:
+    `assert.match(await hostPage.locator('.room-rules-link span').textContent(), /5 cards each/)`
+    `assert.match(await guestPage.locator('.room-rules-link span').textContent(), /5 cards each/)`
+  - Deal verification: Deals next round and asserts hand card count:
+    `assert.equal(await hostPage.locator('.hand-card').count(), 5)`
+    `assert.equal(await guestPage.locator('.hand-card').count(), 5)`
+
+### 4. DOM Hand Rendering vs. Wire Network Privacy
+- **Claim**: Nonempty hand in the browser proves DOM rendering only. Wire privacy is verified at the network packet level.
+- **Proving Assertions**:
+  - Browser DOM rendering (`scripts/test-multiplayer-browser.mjs`):
+    `assert.equal(hostCardsNewRound, 5, 'Host received exactly 5 cards (DOM rendering verified)')`
+  - Network packet privacy (`scripts/check-private-network.ts`):
+    - Recipient-only hands: `'hand' in player === (player.id === playerId)` proves each packet contains only its recipient's hand.
+    - Stripped opponent hands: Opponents in `room.game.players` have card faces omitted.
+    - Server stock isolation: `'drawPile' in game === false` proves stock identities never leave the server.
+    - Outsider access rejection: Outsider sockets emitting `room:ready`, `room:set-rules`, `game:action`, `room:return-to-lobby` receive `ok: false` and `'data' in rejected === false` (no state leaked).
+
+### 5. Keyboard Focus Restoration
+- **Claim**: Closing Settings with Escape returns focus to the connected trigger element.
+- **Proving Assertion (`scripts/test-full-journey.mjs`)**:
+  - Dialog closure: `assert.equal(await desktop.locator('.settings-modal').isVisible(), false)`
+  - Active element check:
+    ```js
+    const isTriggerFocused = await desktop.evaluate(() => {
+      return document.activeElement === document.querySelector('.profile-menu-trigger');
+    });
+    assert.equal(isTriggerFocused, true, 'Focus restored to connected .profile-menu-trigger after closing Settings with Escape');
+    ```
+
+### 6. Room Membership Race Guard & Delayed Replies
+- **Claim**: Leaving a room while an operation is pending prevents delayed replies or late updates from reopening the table.
+- **Proving Assertion (`scripts/check-multiplayer.ts`)**:
+  - Uses real `RoomMembershipManager` implementation:
+    - `const pendingOpRevision = manager.beginOperation()`
+    - `manager.leaveRoom()` -> `assert.equal(manager.currentRoom, null)`
+    - `manager.applyOperationAck(pendingOpRevision, ...)` -> `assert.equal(ackResult, null)` and `assert.equal(leaveEmittedFor, roomId)`
+    - `manager.applyRoomUpdate(...)` -> `assert.equal(updateResult, null)` and `assert.equal(manager.currentRoom, null)`
+
+### 7. Layout & Viewport Geometry
+- **Claim**: 0 horizontal overflow across compact landscape phones and desktops.
+- **Proving Assertion (`scripts/test-full-journey.mjs`)**:
+  - 568×320 short landscape: `assert.equal(homeScrollWidth, homeClientWidth)` and `assert.equal(tableScrollWidth, tableClientWidth)`
+  - 844×390 wide landscape: `assert.equal(tableScrollWidth, tableClientWidth)`
+  - 390×844 phone portrait: `assert.equal(await portrait.locator('.rotate-phone').isVisible(), true)`
+
+---
+
+## Screenshot Artifacts Captured
+
+Stored under `.impeccable/review/final-verification/`:
 - `home-desktop.png`: 1280×720 desktop landing view.
 - `settings-desktop.png`: 1280×720 modal dialog and focus presentation.
 - `game-desktop-6seats.png`: 1280×720 tabletop with held hand and turn cues.
@@ -80,6 +147,10 @@ Stored in `.impeccable/review/final-verification/`:
 - `home-phone-portrait.png`: 390×844 phone portrait home view.
 - `phone-orientation-gate.png`: 390×844 phone portrait guidance gate requesting landscape rotation.
 
-## Remaining Physical Limitations
-- Real physical touchscreen touch-flick velocity and hardware multi-touch gesture feel cannot be fully simulated via headless Chromium synthetic pointer events; verified via programmatic pointer gesture calculations and release predicates.
-- Physical audio hardware output levels and analog speaker fidelity require device-level listening; verified via Web Audio API context mock unlock, state transitions, muted tab events, and audio preparation scripts.
+---
+
+## Hardware Limitations (Marked as Unverified)
+
+In accordance with verification integrity guidelines, software assertions cannot replace physical hardware:
+- **Physical Touchscreen Feel (UNVERIFIED)**: Touch-flick velocity, multi-touch friction, and physical finger ergonomics on physical touch digitizers cannot be verified in headless Chromium. Verified only via software pointer event streams and release threshold predicates (`lib/cardGestures.ts`).
+- **Acoustic Speaker Fidelity & Hardware Mute (UNVERIFIED)**: Physical audio transducer frequency response, clipping, output volume, and physical device mute toggle switches cannot be verified in software. Verified only via Web Audio API context unlock states, audio graph node routing, and muted tab lifecycle checks (`scripts/check-audio.ts`).
