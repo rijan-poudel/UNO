@@ -271,3 +271,19 @@ The development frontend explicitly binds port 3004, leaving 3001 for the room s
 `FriendInvitePicker` reuses the settings sheet heading, scrolling body and fixed decision footer. The root supplies outgoing invite codes to Friends so a pending invitation disables repeat sends. Async social actions catch unexpected failures and preserve retry; notification buttons distinguish accepting from declining.
 
 Rule selection serializes in-flight changes and restores the prior profile identity when a room update fails. A saved custom draft stays open on apply failure and retains its saved ID for retry, avoiding duplicate copies; deletion of the active profile proceeds only after switching succeeds. The shared label resolver preserves the active custom name even when its rules equal an original. The game menu queries `getNextPlayerIndex` so knocked-out seats are omitted from its next-player text. No engine rules or protocol changes are introduced.
+
+## Whole-site reliability follow-up
+
+Room invitation acceptance validates authorization, availability and capacity before synchronously transferring membership, preserving the original table on failure. Reconnect updates both lobby and game names. Local delayed auto-pass rechecks live phase, turn and legality. Local and online color choices retain a copied, card-scoped PlayOptions value and clear it on cancellation; the local controller regression exercises the real hook without a test framework. Rule-profile storage events use one shared listener regardless of subscriber count.
+
+## Help and completed-round cleanup — October 29
+
+Edition help renders original card references/practice separately from the actual RulesSummary; custom switches no longer contradict hardcoded original-rule copy. Practice target cancellation consumes Escape before the native parent dialog and restores the card; completion and lesson changes retain keyboard focus. The shared ColorPicker derives vertical keyboard movement from its rendered grid column count.
+
+`hasCompletedRound` is shared by table wins and device progress, rejecting winners that do not satisfy a completed-round state. Saved unfinished hands discard contradictory already-counted table results; progress hydration keeps best streak at least the current streak. Local bot timing uses the same fixed 1150ms delay previously produced by an always-clamped calculation. No engine action, network field or dependency changes were needed.
+
+## Final activity and reconnect cleanup — October 29
+
+`lib/gameActivity.ts` shares readable public action descriptions between local/online history and live announcements. It uses the native card labels, includes matching pairs, targeting, UNO and draw penalties, and reports Mercy elimination explicitly. Menu destination dialogs restore the Game menu trigger when their removed opener cannot receive native focus; they never override another open dialog. Result count graphics have atomic accessible names including their units.
+
+Online room recovery retains an in-memory session if browser storage is unavailable. An explicit leave/kick clears that session even when stored removal fails; failed restoration discards old game/turn state. Ready and return-to-lobby acknowledgements confirm success while ordered room broadcasts own transitions, preventing stale responses from replacing a later round. HTTPS pages reject configured insecure socket endpoints.

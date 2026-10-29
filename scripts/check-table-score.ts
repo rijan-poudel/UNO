@@ -139,6 +139,24 @@ const damaged = parseSavedRound(
 );
 assert.ok(damaged, 'A damaged score must not destroy a valid saved hand');
 assert.equal(damaged.tableScore, undefined);
+const prematurelyCounted = parseSavedRound(
+  JSON.stringify({
+    version: 1,
+    game: {
+      ...second,
+      tableScore: { ...second.tableScore, lastRoundId: second.roundId },
+    },
+  }),
+);
+assert.ok(
+  prematurelyCounted,
+  'A contradictory score must not destroy the saved hand',
+);
+assert.equal(
+  prematurelyCounted.tableScore,
+  undefined,
+  'The unfinished round cannot already be a recorded win',
+);
 const view = toPresentationGame(toGameView(second, 'player_0'));
 assert.equal(view?.roundId, second.roundId);
 assert.deepEqual(
@@ -165,6 +183,44 @@ try {
     configurable: true,
     value: { dispatchEvent() {} },
   });
+  for (const unfinished of [
+    { ...first, winnerId: first.players[0].id },
+    { ...first, winnerId: 'missing-player' },
+  ])
+    recordRound(unfinished, 'player_0');
+  assert.equal(
+    parseProgress(readProgressSnapshot()).rounds,
+    0,
+    'Unfinished or invalid winners never enter device progress',
+  );
+  const survival = {
+    ...first,
+    roundId: 'survival-result',
+    winnerId: first.players[0].id,
+    players: first.players.map((player, index) =>
+      index === 0 ? player : { ...player, eliminated: true, hand: [] },
+    ),
+  };
+  recordRound(survival, 'player_0');
+  assert.equal(
+    parseProgress(readProgressSnapshot()).wins,
+    1,
+    'A last-survivor result counts even with cards remaining',
+  );
+  data.clear();
+  assert.equal(
+    parseProgress(
+      JSON.stringify({
+        rounds: 4,
+        wins: 3,
+        streak: 3,
+        bestStreak: 1,
+        recent: [],
+      }),
+    ).bestStreak,
+    3,
+    'A current streak cannot exceed the recovered best streak',
+  );
   recordRound(terminal, 'player_0');
   recordRound(
     {

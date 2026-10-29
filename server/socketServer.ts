@@ -464,7 +464,11 @@ function joinRoomAsPlayer(
         ...room.game,
         players: room.game.players.map((player) =>
           player.id === existingPlayerForDevice.playerId
-            ? { ...player, avatarId: existingPlayerForDevice.avatarId }
+            ? {
+                ...player,
+                name: playerName,
+                avatarId: existingPlayerForDevice.avatarId,
+              }
             : player,
         ),
       };
@@ -1421,20 +1425,25 @@ io.on('connection', (socket) => {
         }
 
         const membership = playerBySocket.get(socket.id);
-        if (membership && membership.roomId !== invite.roomId) {
-          reply?.(
-            ackError(
-              'Leave your current room before accepting another invite.',
-            ),
-          );
-          return;
-        }
-
         const room = rooms.get(invite.roomId);
         if (!room || room.started) {
           removeInvite(invite.inviteId, io);
           reply?.(ackError('That room is no longer available.'));
           return;
+        }
+        if (
+          room.players.length >= MAX_ROOM_PLAYERS &&
+          !room.players.some((player) => player.deviceId === deviceId)
+        ) {
+          reply?.(ackError('Room is full.'));
+          return;
+        }
+
+        // Validate the destination before giving up a live seat. This switch
+        // is synchronous, so a failed invitation leaves the current round intact.
+        if (membership && membership.roomId !== room.roomId) {
+          socket.leave(membership.roomId);
+          leaveRoomForSocket(socket.id, io);
         }
 
         const playerId =

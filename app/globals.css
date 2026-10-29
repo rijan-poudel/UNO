@@ -132,7 +132,6 @@ select {
   height: 50px;
   padding: 12px 15px;
   border: 1px solid var(--ui-line);
-  border-radius: 10px;
   background: var(--ui-surface);
   color: var(--ui-text);
   transition: border-color 150ms;
@@ -177,7 +176,6 @@ input[type="range"] {
   font-size: 14px;
   line-height: 1.25;
   border: 1px solid transparent;
-  border-radius: 10px;
   text-decoration: none;
   transition:
     background 160ms,
@@ -216,7 +214,6 @@ input[type="range"] {
   width: 42px;
   height: 42px;
   border: 0;
-  border-radius: 10px;
   background: transparent;
   color: var(--ui-text);
   transition:
@@ -240,7 +237,6 @@ input[type="range"] {
 .wordmark {
   font-family: var(--font-display), sans-serif;
   display: inline-block;
-  font-size: 64px;
   font-weight: 700;
   letter-spacing: -0.04em;
   line-height: 1;
@@ -279,12 +275,6 @@ input[type="range"] {
   background: var(--ui-muted);
   flex-shrink: 0;
 }
-.presence-dot.online {
-  background: #38835d;
-}
-.presence-dot.playing {
-  background: #3265a0;
-}
 .loading-screen {
   min-height: 100dvh;
   display: flex;
@@ -319,7 +309,6 @@ input[type="range"] {
   gap: 20px;
 }
 .setup-intro h1 {
-  font-size: clamp(34px, 4vw, 46px);
   letter-spacing: -0.035em;
   line-height: 1.1;
 }
@@ -395,11 +384,6 @@ input[type="range"] {
 .seat-row:last-child {
   border: 0;
 }
-.setup-hint {
-  color: var(--ui-muted);
-  font-size: 13px;
-  line-height: 1.7;
-}
 .setup-footer {
   display: grid;
   gap: 16px;
@@ -442,7 +426,6 @@ input[type="range"] {
 .room-code-panel strong {
   display: block;
   font-family: var(--font-display);
-  font-size: 34px;
   letter-spacing: 0.08em;
 }
 .room-code-panel span {
@@ -471,18 +454,6 @@ input[type="range"] {
   color: var(--ui-muted);
   font-size: 12px;
 }
-.your-code {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  font-size: 12px;
-  color: var(--ui-muted);
-}
-.your-code .text-button {
-  font-family: var(--font-display);
-  letter-spacing: 0.05em;
-}
 .waiting-host {
   padding: 18px;
   display: flex;
@@ -490,16 +461,13 @@ input[type="range"] {
   justify-content: center;
   gap: 10px;
   border: 1px solid var(--ui-line);
-  border-radius: 10px;
+  border-radius: 12px;
   font-size: 14px;
 }
 .error-message,
 .game-error {
-  background: #f9dfd4;
-  color: #8b2f20;
   font-size: 13px;
   padding: 14px 18px;
-  border-radius: 10px;
 }
 .modal {
   position: fixed;
@@ -554,7 +522,6 @@ input[type="range"] {
   overflow-wrap: anywhere;
 }
 .modal-heading h2 {
-  font-size: 29px;
   letter-spacing: -0.03em;
   line-height: 1.2;
 }
@@ -645,7 +612,6 @@ input[type="range"] {
   height: 19px;
   border-radius: 50%;
   background: var(--ui-surface);
-  box-shadow: 0 1px 3px #0002;
   transition:
     transform 160ms var(--ease-out),
     width 120ms ease;
@@ -682,18 +648,6 @@ input[type="range"] {
 .volume-row .text-button {
   justify-self: start;
 }
-.code-button {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  font-family: var(--font-display);
-  font-size: 26px;
-  letter-spacing: 0.08em;
-  background: transparent;
-  border: 0;
-  padding: 0;
-  color: var(--ui-text);
-}
 .color-choices {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -709,7 +663,6 @@ input[type="range"] {
   justify-content: center;
   gap: 12px;
   text-transform: capitalize;
-  font-size: 17px;
   font-weight: 700;
   cursor: pointer;
   transition:
@@ -726,31 +679,6 @@ input[type="range"] {
   display: inline-block;
   flex-shrink: 0;
   transition: transform 140ms var(--ease-out);
-}
-.choose-red {
-  background: #bf422e;
-  box-shadow:
-    inset 0 -5px 0 #8f2314,
-    0 6px 14px #bf422e40;
-}
-.choose-yellow {
-  background: #ecc04c;
-  color: #292b27;
-  box-shadow:
-    inset 0 -5px 0 #b38820,
-    0 6px 14px #ecc04c40;
-}
-.choose-green {
-  background: #317257;
-  box-shadow:
-    inset 0 -5px 0 #1a4a36,
-    0 6px 14px #31725740;
-}
-.choose-blue {
-  background: #3265a0;
-  box-shadow:
-    inset 0 -5px 0 #1d4678,
-    0 6px 14px #3265a040;
 }
 @media (hover: hover) and (pointer: fine) {
   .color-choice:hover {
@@ -783,16 +711,6 @@ input[type="range"] {
   box-shadow:
     inset 0 -1px 0 #1d4678,
     0 2px 4px #3265a030;
-}
-.help-rules {
-  display: grid;
-  gap: 18px;
-  color: var(--ui-muted);
-  font-size: 14px;
-  line-height: 1.7;
-}
-.help-rules strong {
-  color: var(--ui-text);
 }
 .activity-list {
   list-style: none;
@@ -842,9 +760,6 @@ input[type="range"] {
     padding-inline: 20px;
     gap: 10px;
   }
-  .wordmark.compact {
-    font-size: 36px;
-  }
   .header-brand {
     gap: 14px;
   }
@@ -858,9 +773,6 @@ input[type="range"] {
   .setup-content {
     padding-top: 26px;
     gap: 23px;
-  }
-  .setup-intro h1 {
-    font-size: 35px;
   }
   .setup-intro p {
     font-size: 14px;
@@ -946,124 +858,6 @@ input[type="range"] {
   height: 84px;
   border-bottom: 0;
 }
-.hero-color {
-  color: var(--ui-accent-red);
-}
-.choice-art {
-  flex: 0 0 62px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 60px;
-  position: relative;
-}
-.choice-art .player-avatar {
-  flex-shrink: 0;
-}
-.choice-art .player-avatar + .player-avatar {
-  margin-left: -12px;
-  transform: rotate(13deg) translateY(5px);
-}
-.mini-card {
-  display: grid;
-  place-content: center;
-  background: #fdf6e5;
-  color: #a33829;
-  width: 28px;
-  height: 40px;
-  border: 2px solid #a33829;
-  border-radius: 6px;
-  font-family: var(--font-display);
-  font-size: 25px;
-  transform: rotate(18deg);
-  margin-left: -10px;
-  margin-top: 18px;
-  transition: transform 180ms var(--ease-out);
-}
-.player-avatar {
-  --avatar-color: #a8c991;
-  position: relative;
-  display: inline-flex;
-  width: 33px;
-  height: 41px;
-  flex-shrink: 0;
-  background: var(--avatar-color);
-  border: 2px solid #323139;
-  border-radius: 8px;
-  box-shadow: 1px 3px 6px #32313938;
-  transform: rotate(var(--avatar-tilt, -8deg));
-}
-.player-avatar.large {
-  width: 44px;
-  height: 53px;
-  border-radius: 11px;
-}
-@media (prefers-reduced-motion: no-preference) {
-  /* Subtle natural character blink — makes avatars feel alive like Duolingo characters */
-  @keyframes avatar-blink {
-    0%,
-    94%,
-    98%,
-    100% {
-      transform: scaleY(1);
-    }
-    96% {
-      transform: scaleY(0.12);
-    }
-  }
-  .opponent-label .player-avatar:not([data-expression="neutral"]) {
-    animation: player-react 350ms var(--ease-out) both;
-  }
-  @keyframes player-react {
-    0% {
-      transform: rotate(-5deg) scale(0.88);
-    }
-    35% {
-      transform: rotate(6deg) scale(1.15);
-    }
-    65% {
-      transform: rotate(-3deg) scale(1.04);
-    }
-    100% {
-      transform: rotate(-5deg) scale(1);
-    }
-  }
-  /* Gentle idle float for home art characters — Duolingo's mascot energy */
-  @keyframes avatar-float-left {
-    0%,
-    100% {
-      transform: rotate(-13deg) translateY(0px);
-    }
-    50% {
-      transform: rotate(-10deg) translateY(-8px);
-    }
-  }
-  @keyframes avatar-float-right {
-    0%,
-    100% {
-      transform: rotate(15deg) translateY(0px);
-    }
-    50% {
-      transform: rotate(18deg) translateY(-10px);
-    }
-  }
-  /* Stagger entrance for play choices */
-  @keyframes choice-arrive {
-    from {
-      opacity: 0;
-      transform: translateY(12px) scale(0.96);
-    }
-    to {
-      opacity: 1;
-      transform: none;
-    }
-  }
-}
-@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
-  .choice-art .player-avatar {
-    transition: transform 180ms var(--ease-out);
-  }
-}
 .seat-row {
   gap: 22px;
 }
@@ -1104,12 +898,8 @@ input[type="range"] {
   height: 72px;
   padding-inline: 14px;
   border-radius: 24px;
-  background: #f5cb55;
-  color: #302f33;
-  border: 3px solid #302f33;
   box-shadow: 2px 5px 12px #162c2550;
   font-family: var(--font-display);
-  font-size: 44px;
   font-weight: 600;
   transform: rotate(-9deg);
 }
@@ -1118,47 +908,31 @@ input[type="range"] {
   height: 46px;
   stroke-width: 3;
 }
-.feedback-wild > span,
-.feedback-wild4 > span {
-  background: #c8b4e2;
-}
-.feedback-uno > span {
-  background: #f18b6b;
-}
 .wild-burst {
   display: grid;
   grid-template-columns: 1fr 1fr;
   width: 40px;
   height: 40px;
-  border: 2px solid #302f33;
+  border: 2px solid var(--club-ink);
   border-radius: 50%;
   overflow: hidden;
   transform: rotate(20deg);
 }
 .wild-burst i:nth-child(1) {
-  background: #e46c51;
+  background: var(--club-red);
 }
 .wild-burst i:nth-child(2) {
-  background: #ecd065;
+  background: var(--club-yellow);
 }
 .wild-burst i:nth-child(3) {
-  background: #84a5d6;
+  background: var(--club-blue);
 }
 .wild-burst i:nth-child(4) {
-  background: #a6c58b;
+  background: var(--club-green);
 }
 .winner-modal {
   position: relative;
   overflow: hidden;
-}
-.winner-result .player-avatar {
-  width: 65px;
-  height: 82px;
-  margin-bottom: 10px;
-}
-.winner-result > svg {
-  width: 28px;
-  height: 28px;
 }
 .victory-burst {
   position: absolute;
@@ -1216,18 +990,9 @@ input[type="range"] {
     color: var(--ui-accent-red);
   }
 }
-@media (max-width: 1000px) and (min-width: 701px) {
-  .choice-art {
-    flex-basis: 45px;
-  }
-}
 @media (max-width: 700px) {
   .app-header {
     height: 72px;
-  }
-  .choice-art {
-    height: 53px;
-    flex-basis: 53px;
   }
   .game-feedback {
     top: 48%;
@@ -1331,10 +1096,6 @@ input[type="range"] {
   background: var(--ui-surface);
   transform: rotate(calc(-12deg + var(--stamp-i) * 8deg));
 }
-.collection-fan i.collected {
-  background: #f7c934;
-  border-color: #8b600b;
-}
 .milestone-stamps {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -1372,11 +1133,6 @@ input[type="range"] {
 .milestone-stamp small {
   font-size: 10px;
   line-height: 1.4;
-}
-.milestone-stamp.earned {
-  background: #f7c934;
-  border-color: transparent;
-  color: #332810;
 }
 .winner-modal .player-progress {
   margin: 0;
@@ -1427,8 +1183,7 @@ input[type="range"] {
     width: 21px;
     height: 28px;
     border-width: 1px;
-    border-radius: 5px;
-    box-shadow: 1px 2px 4px #32313940;
+    border-radius: 50%;
   }
   .seats-5 .opponent-label strong,
   .seats-6 .opponent-label strong {
@@ -1439,10 +1194,6 @@ input[type="range"] {
   .seats-6 .opponent-label small {
     font-size: 12px;
     white-space: nowrap;
-  }
-  .seats-5 .opponent-label .turn-marker,
-  .seats-6 .opponent-label .turn-marker {
-    display: none;
   }
   .seats-5 .seat-left,
   .seats-6 .seat-left {
@@ -1476,56 +1227,7 @@ input[type="range"] {
   }
 }
 
-.connection-recovery {
-  display: grid;
-  gap: 6px;
-}
-.connection-recovery .text-button {
-  min-height: 40px;
-  font-weight: 800;
-}
-
 /* Journey controls: one obvious next step; optional setup stays folded. */
-.entry-shortcuts {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  margin-top: 14px;
-}
-.entry-shortcuts .text-button {
-  min-height: 42px;
-  padding: 8px 18px;
-  border-radius: 999px;
-  background: var(--ui-surface);
-  border: 1px solid var(--ui-line);
-  font-weight: 600;
-  box-shadow: 0 2px 5px #0000000a;
-  transition:
-    transform 140ms var(--ease-out),
-    background 140ms,
-    border-color 140ms,
-    box-shadow 140ms,
-    color 140ms;
-}
-.entry-shortcuts .text-button svg {
-  transition: transform 140ms var(--ease-out);
-}
-@media (hover: hover) and (pointer: fine) {
-  .entry-shortcuts .text-button:hover {
-    background: var(--ui-surface);
-    border-color: var(--ui-accent-red);
-    color: var(--ui-text);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px #00000014;
-    text-decoration: none;
-  }
-  .entry-shortcuts .text-button:hover svg {
-    transform: translateX(3px);
-  }
-}
-.entry-shortcuts .text-button:active {
-  transform: translateY(1px);
-}
 .crew-line {
   display: flex;
   gap: 18px;
@@ -1567,13 +1269,6 @@ input[type="range"] {
   margin: 10px 0;
   font-size: 14px;
 }
-.setup-name-field {
-  display: grid;
-  gap: 8px;
-}
-.setup-name-field input {
-  width: 100%;
-}
 .icon-button {
   min-width: 44px;
   min-height: 44px;
@@ -1602,15 +1297,6 @@ input[type="range"] {
   }
 }
 
-@media (max-width: 700px) {
-  .entry-shortcuts {
-    order: 3;
-    width: 100%;
-    max-width: 470px;
-    margin-top: 10px;
-  }
-}
-
 /* Reduced motion keeps meaningful state feedback without spatial entrances. */
 @keyframes action-fade {
   0%,
@@ -1633,47 +1319,17 @@ input[type="range"] {
   .switch-track::after,
   .milestone-collection summary > svg,
   .color-choice,
-  .entry-shortcuts .text-button,
   .stepper .icon-button {
     transition: none;
   }
   .button:active:not(:disabled),
   .icon-button:active:not(:disabled),
   .color-choice:active,
-  .color-choice:hover,
-  .entry-shortcuts .text-button:hover,
-  .entry-shortcuts .text-button:active {
+  .color-choice:hover {
     transform: none;
   }
   .game-page .game-feedback {
     animation: action-fade 900ms both;
-  }
-}
-
-/* A shared profile picker in setup, rooms and preferences. */
-.avatar-choice-status {
-  display: block;
-  margin-top: 10px;
-  font-size: 12px;
-  color: var(--ui-muted);
-}
-
-.avatar-picker-content {
-  display: grid;
-  grid-template-columns: 96px minmax(0, 1fr);
-  align-items: start;
-  gap: 16px;
-}
-@media (max-width: 600px) {
-  .avatar-picker-content {
-    grid-template-columns: 80px minmax(0, 1fr);
-    gap: 12px;
-  }
-}
-@media (max-height: 500px) and (orientation: landscape) {
-  .avatar-picker-content {
-    grid-template-columns: 72px minmax(0, 1fr);
-    gap: 12px;
   }
 }
 

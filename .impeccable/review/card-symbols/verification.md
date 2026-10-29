@@ -1,0 +1,5 @@
+# Verification
+
+Required lint, types, game, audio, build and multiplayer checks passed on the combined working tree. Supporting UI assertions cover fourteen rendered card motifs, accessible names, unmounted closed references and knockout warnings only with an actual limit. Existing direct play, gesture and edition/network suites passed. No test framework or dependency added.
+
+Read all three primary illustrated instruction sheets. SavedNoMercy top/middle/special826 captures show all ten reference faces. AllWild top/special826, phone390x844 and short568x320 show distinct card marks with reachable Close/Done and a scrolling body. Opened every capture and checked JPEG dimensions. Native Enter closes the help; mode selection restored to the original NoMercy after checking AllWild; viewport reset. No profile, friendship, audio setting or active round was edited. A transient chunk-load message during production rebuilding preceded the final reload; a fresh final production tab is checked separately. Other agents’ pre-existing pending changes remain intact.

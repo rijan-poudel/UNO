@@ -97,6 +97,15 @@ export default function OnlineLobby(props: Props) {
     getPlayerName,
     () => "You",
   );
+  const roomStatus = !connected
+    ? "Reconnecting to your room…"
+    : room && room.players.some((player) => !player.isBot && !player.connected)
+      ? isHost
+        ? "Someone is reconnecting. You can wait or deal."
+        : "Someone is reconnecting."
+      : room && isHost && room.players.length < 2
+        ? "Share your code or add a bot to start."
+        : null;
   useEffect(() => {
     if (!copied) return;
     const timer = setTimeout(() => setCopied(""), 2000);
@@ -144,17 +153,11 @@ export default function OnlineLobby(props: Props) {
       footer={
         room ? (
           <>
-            <p className="muted" role="status">
-              {!connected
-                ? "Reconnecting to your room…"
-                : isHost
-                  ? room.players.length < 2
-                    ? "Share your code or add a bot to start."
-                    : room.players.some((p) => !p.isBot && !p.connected)
-                      ? "Someone is reconnecting. You can wait or deal."
-                      : "Everyone here? Deal when you’re ready."
-                  : "Your host will deal when everyone is here."}
-            </p>
+            {roomStatus && (
+              <p className="muted" role="status">
+                {roomStatus}
+              </p>
+            )}
             {isHost ? (
               <button
                 className="button primary wide"
@@ -165,8 +168,9 @@ export default function OnlineLobby(props: Props) {
                   room.players.length < 2
                 }
                 onClick={() => void run("Dealing cards…", props.onStartGame)}
+                aria-busy={busy === "Dealing cards…"}
               >
-                {busy ||
+                {(busy === "Dealing cards…" ? busy : "") ||
                   (room.players.length < 2
                     ? "Waiting for another player"
                     : "Deal everyone in")}
@@ -197,27 +201,20 @@ export default function OnlineLobby(props: Props) {
       <SetupIntro
         title={
           room
-            ? "Your table is open."
+            ? "Your room"
             : panel === "join"
-              ? "Join your people."
-              : "A table for your people."
-        }
-        description={
-          room
-            ? "Make room for one more."
-            : panel === "join"
-              ? "Enter the room code. Take your seat."
-              : "Create a private room, then invite your crew."
+              ? "Join a room"
+              : "Create a room"
         }
         onBack={() => void leave()}
+        backDisabled={!!room && !!busy}
         trailing={
-          <span
-            className={`connection-state ${connected ? "online" : "offline"}`}
-            role="status"
-          >
-            <i className={`presence-dot ${connected ? "online" : "offline"}`} />
-            {connected ? "Connected" : "Connecting…"}
-          </span>
+          !connected && (
+            <span className="connection-state offline" role="status">
+              <i className="presence-dot offline" />
+              Connecting…
+            </span>
+          )
         }
       />
       {(error || props.error) && (
@@ -268,20 +265,23 @@ export default function OnlineLobby(props: Props) {
                 placeholder="Code or invitation link"
                 autoComplete="off"
                 autoCapitalize="characters"
-                aria-describedby="room-code-help"
+                aria-describedby={
+                  code && !isRoomCode(code) ? "room-code-help" : undefined
+                }
                 aria-invalid={code.length > 0 && !isRoomCode(code)}
+                spellCheck={false}
                 onChange={(e) => setCode(parseRoomCode(e.target.value))}
                 required
               />
-              <p id="room-code-help" className="muted">
-                {code && !isRoomCode(code)
-                  ? "Use the 6-character code or paste the invitation link."
-                  : "Your friend can find it inside their room."}
-              </p>
+              {code && !isRoomCode(code) && (
+                <p id="room-code-help" className="muted">
+                  Use the 6-character code or paste the invitation link.
+                </p>
+              )}
             </>
           )}
           <p className="room-joining-as muted">
-            Taking a seat as <strong>{name}</strong>
+            Playing as <strong>{name}</strong>
           </p>
         </form>
       )}
@@ -353,14 +353,15 @@ export default function OnlineLobby(props: Props) {
                 className="button secondary"
                 disabled={!!busy || !connected || room.players.length >= 6}
                 onClick={() => void run("Adding bot…", props.onAddBotSeat)}
+                aria-busy={busy === "Adding bot…"}
               >
                 <Plus size={18} />
-                Add a bot
+                {busy === "Adding bot…" ? "Adding…" : "Add a bot"}
               </button>
             )}
             <button
               className="button secondary"
-              disabled={!connected || room.players.length >= 6}
+              disabled={!!busy || !connected || room.players.length >= 6}
               onClick={() => setInviteOpen(true)}
             >
               <Users size={18} />
@@ -457,6 +458,7 @@ export default function OnlineLobby(props: Props) {
           </div>
           <button
             className="room-rules-link text-button"
+            disabled={!!busy || props.savingRules}
             onClick={props.onOpenRules}
           >
             <SlidersHorizontal size={17} />

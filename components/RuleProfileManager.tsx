@@ -18,7 +18,11 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import type { GameRules } from "../types/rules";
-import { ORIGINAL_MODES, matchesPreset } from "../lib/rulePresets";
+import {
+  ORIGINAL_MODES,
+  matchesPreset,
+  getTableMood,
+} from "../lib/rulePresets";
 import {
   getAllProfiles,
   getFavoriteProfileIds,
@@ -95,6 +99,8 @@ export default function RuleProfileManager({
   } | null>(null);
   const [replacement, setReplacement] = useState<RuleProfile | null>(null);
   const [busy, setBusy] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const deleteTrigger = useRef<HTMLButtonElement>(null);
   const pending = useRef(false);
   const surface = useRef<HTMLDivElement>(null);
   const editing = draft !== null;
@@ -139,7 +145,8 @@ export default function RuleProfileManager({
       toast.error((error as Error).message);
     }
   };
-  const edit = (profile: RuleProfile, copy = false) =>
+  const edit = (profile: RuleProfile, copy = false) => {
+    setConfirmDelete(false);
     setDraft({
       id: copy ? undefined : profile.id,
       name: copy
@@ -150,18 +157,42 @@ export default function RuleProfileManager({
         : profile.name,
       rules: { ...profile.rules },
     });
+  };
+  const removeDraft = async () => {
+    const id = draft?.id;
+    if (!id || pending.current) return;
+    try {
+      if (selected?.id === id && !(await select(profiles[0]))) return;
+      deleteRuleProfile(id);
+      setConfirmDelete(false);
+      setDraft(null);
+      toast.success("Profile deleted.");
+    } catch (error) {
+      toast.error((error as Error).message);
+    }
+  };
+  const cancelDelete = () => {
+    setConfirmDelete(false);
+    requestAnimationFrame(() =>
+      deleteTrigger.current?.focus({ preventScroll: true }),
+    );
+  };
   if (draft)
     return (
       <Modal
         title="Custom profile"
-        onClose={busy ? undefined : () => setDraft(null)}
-        className="settings-modal"
+        onClose={
+          busy
+            ? undefined
+            : () => (confirmDelete ? cancelDelete() : setDraft(null))
+        }
+        className={`settings-modal settings-tone-${getTableMood(rules)}`}
       >
         <form
           className="rule-profile-editor"
           onSubmit={async (event) => {
             event.preventDefault();
-            if (pending.current) return;
+            if (pending.current || confirmDelete) return;
             try {
               const saved = saveRuleProfile(draft.name, draft.rules, draft.id);
               if (!(await select(saved))) {
@@ -183,7 +214,10 @@ export default function RuleProfileManager({
           }}
         >
           <div className="settings-panel" ref={surface} tabIndex={-1}>
-            <fieldset className="rule-editor-fields" disabled={busy}>
+            <fieldset
+              className="rule-editor-fields"
+              disabled={busy || confirmDelete}
+            >
               <label className="profile-name-form">
                 <span className="field-label">Profile name</span>
                 <input
@@ -221,41 +255,61 @@ export default function RuleProfileManager({
             </fieldset>
           </div>
           <div className="modal-footer rule-editor-actions">
-            <button
-              type="submit"
-              className="button primary small"
-              disabled={busy || !draft.name.trim()}
-            >
-              {busy ? "Saving…" : "Save and use"}
-            </button>
-            <button
-              type="button"
-              className="button secondary small"
-              disabled={busy}
-              onClick={() => setDraft(null)}
-            >
-              Cancel
-            </button>
-            {draft.id && (
-              <button
-                type="button"
-                className="text-button rule-delete"
-                disabled={busy}
-                onClick={async () => {
-                  try {
-                    const id = draft.id;
-                    if (!id) return;
-                    if (selected?.id === id && !(await select(profiles[0])))
-                      return;
-                    deleteRuleProfile(id);
-                    setDraft(null);
-                  } catch (error) {
-                    toast.error((error as Error).message);
-                  }
-                }}
-              >
-                <Trash2 size={16} /> Delete
-              </button>
+            {confirmDelete ? (
+              <>
+                <p className="rule-delete-prompt">
+                  Delete <strong>{draft.name}</strong>?
+                </p>
+                <button
+                  key="keep-profile"
+                  type="button"
+                  className="button secondary small"
+                  autoFocus
+                  disabled={busy}
+                  onClick={cancelDelete}
+                >
+                  Keep profile
+                </button>
+                <button
+                  key="confirm-delete-profile"
+                  type="button"
+                  className="button secondary small rule-delete"
+                  disabled={busy}
+                  aria-busy={busy}
+                  onClick={() => void removeDraft()}
+                >
+                  {busy ? "Deleting…" : "Delete profile"}
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  type="submit"
+                  className="button primary small"
+                  disabled={busy || !draft.name.trim()}
+                >
+                  {busy ? "Saving…" : "Save and use"}
+                </button>
+                <button
+                  type="button"
+                  className="button secondary small"
+                  disabled={busy}
+                  onClick={() => setDraft(null)}
+                >
+                  Cancel
+                </button>
+                {draft.id && (
+                  <button
+                    ref={deleteTrigger}
+                    type="button"
+                    className="text-button rule-delete"
+                    disabled={busy}
+                    onClick={() => setConfirmDelete(true)}
+                  >
+                    <Trash2 size={16} /> Delete
+                  </button>
+                )}
+              </>
             )}
           </div>
         </form>
@@ -352,6 +406,7 @@ export default function RuleProfileManager({
       <button
         type="button"
         className="settings-link rule-profile-new"
+        disabled={busy}
         onClick={() => edit(selected ?? profiles[0], true)}
       >
         <Plus size={17} /> Create custom profile
@@ -360,7 +415,7 @@ export default function RuleProfileManager({
         <Modal
           title="Pin to home"
           onClose={() => setReplacement(null)}
-          className="settings-modal favorite-replace-modal"
+          className={`settings-modal favorite-replace-modal settings-tone-${getTableMood(rules)}`}
         >
           <div className="settings-panel">
             <p className="rule-profile-caption">

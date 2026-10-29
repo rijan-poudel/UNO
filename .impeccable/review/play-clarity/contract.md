@@ -1,0 +1,8 @@
+# Clear special-card decisions
+
+THESIS: A player can see the exact response to a stack and choose an opponent directly, with optional practical examples for unfamiliar actions.
+OWN-WORLD: Inherit Color play, seed2fba311c: native vivid UnoCard graphics, Outfit and Barlow Condensed, quiet edition field, cream task body, blue heading and amber decisions. No new world, assets, fonts or dependencies.
+STORY: Stack response labels share the engine validation predicate and distinguish minimum card value from accumulated penalty. Targeted plays use the actual opponent portraits, with first-target focus, Escape/Cancel recovery, stale-turn guards and preserved play options. Unrequested examples remain unmounted under native disclosure in edition help.
+FIRST VIEWPORT: Routine play stays quiet. Only an actionable stack or selected target card adds short decision text. No target list dialog interrupts the table. Help remains optional and scrolls between its existing heading and Done.
+FORM: Bounded gameplay clarity extension. Six scripted practice scenes run actual original-edition engine actions without clocks, automatic bots, storage or progress writes. The existing classic tutorial is unchanged. The live round keeps its real timer and server authority.
+FINISH: Required evidence: practice-stack-826.jpg (826x765), roulette-phone.jpg (390x844), targeting-826.jpg (826x765), targeting-phone.jpg (844x390), all-wild-practice-short.jpg (568x320), practice-target-final.jpg (1280x720). Automatic design hook active; inherited classic-help token advisories remain outside scope. No approved comp or catalog QUALITY BAR applies. Review source plus supplied interaction evidence, not unrelated dirty home/card-symbol work.

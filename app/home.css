@@ -143,6 +143,59 @@
   border-radius: 12px;
   background: #061e4c55;
 }
+.launch-mode-picker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.launch-mode-picker .launch-presets {
+  flex: 1;
+  min-width: 0;
+}
+.launch-mode-info {
+  anchor-name: --game-info;
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #dae8ff;
+  cursor: pointer;
+}
+.launch-mode-popover {
+  position: fixed;
+  inset: 50% auto auto 50%;
+  margin: 0;
+  transform: translate(-50%, -50%);
+  width: min(340px, calc(100vw - 48px));
+  padding: 20px;
+  border: 0;
+  border-radius: 16px;
+  background: #fff7e7;
+  color: #17345f;
+  box-shadow: 0 12px 32px #02071850;
+  font-size: 15px;
+  line-height: 1.5;
+}
+@supports (anchor-name: --game-info) {
+  .launch-mode-popover {
+    position-anchor: --game-info;
+    inset: auto;
+    top: anchor(bottom);
+    left: anchor(right);
+    transform: translate(-100%, 8px);
+  }
+}
+.launch-mode-popover p {
+  margin: 8px 0 0;
+}
+.launch-mode-info:hover {
+  background: #ffffff14;
+}
 .launch-presets button {
   flex: 1;
   min-width: 0;
@@ -165,19 +218,10 @@
   color: #17345f;
   box-shadow: 0 3px 8px #061c4540;
 }
-.launch-preset-description {
-  min-height: 38px;
-  max-width: 40ch;
-  margin: 10px auto 16px;
-  text-align: center;
-  font-size: 13px;
-  line-height: 1.4;
-  color: #dce9ff;
-}
 .launch-screen .launch-primary {
   width: 100%;
   min-height: 70px;
-  justify-content: space-between;
+  justify-content: center;
   padding: 12px 22px;
   border: 0;
   border-radius: 14px;
@@ -186,19 +230,9 @@
   box-shadow:
     inset 0 -4px 0 #bf8a28,
     0 8px 18px #061e4c45;
-  text-align: left;
+  text-align: center;
   font-size: 24px;
   font-weight: 750;
-}
-.launch-primary small {
-  display: block;
-  margin-top: 1px;
-  font-size: 13px;
-  font-weight: 500;
-  color: #5a410f;
-}
-.launch-primary svg {
-  transition: transform 160ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 .launch-rooms {
   display: grid;
@@ -222,11 +256,6 @@
 }
 .launch-screen .launch-rooms .button:active {
   transform: scale(0.97);
-}
-@media (hover: hover) and (pointer: fine) {
-  .launch-screen .launch-primary:hover svg {
-    transform: translateX(4px);
-  }
 }
 .launch-screen :focus-visible {
   outline: 3px solid #ffd45a;
@@ -324,14 +353,6 @@
   }
   .has-saved-round .launch-presets {
     margin-bottom: 10px;
-  }
-  .has-saved-round .launch-preset-description {
-    display: none;
-  }
-  .launch-preset-description {
-    margin: 6px auto 8px;
-    min-height: 30px;
-    font-size: 12px;
   }
   .launch-screen .launch-primary {
     min-height: 58px;

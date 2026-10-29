@@ -1,0 +1,95 @@
+.practice {
+  margin-block: 20px;
+  border-block: 1px solid var(--ui-line);
+}
+.practice summary {
+  min-height: 48px;
+  padding-block: 12px;
+  font-weight: 650;
+  cursor: pointer;
+}
+.lessons,
+.actions,
+.hand,
+.colors,
+.targets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.lessons {
+  gap: 4px;
+}
+.lessons button {
+  flex: 1;
+  min-height: 44px;
+  padding: 8px;
+  border: 1px solid var(--ui-line);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ui-text);
+  font-size: 13px;
+}
+.lessons button[aria-pressed="true"] {
+  background: var(--club-yellow);
+  color: var(--club-ink);
+  border-color: transparent;
+}
+.example {
+  padding-block: 16px;
+}
+.example > p {
+  margin: 0 0 16px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.table {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  margin-bottom: 20px;
+  border-radius: 12px;
+  background: #123d86;
+  color: var(--club-paper);
+  font-size: 14px;
+  font-weight: 650;
+}
+.hand {
+  padding: 4px 4px 12px;
+}
+.colors > button {
+  flex: 1 1 40%;
+  text-transform: capitalize;
+}
+.colors i {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+}
+.targets {
+  margin-block: 12px;
+}
+.targets :global(.button) {
+  flex: 1;
+  gap: 8px;
+  justify-content: flex-start;
+  text-align: left;
+}
+.targets :global(.player-avatar) {
+  width: 32px;
+  height: 32px;
+}
+.targets small {
+  display: block;
+  color: var(--ui-muted);
+  font-size: 12px;
+}
+.example > .result {
+  min-height: 42px;
+  margin-block: 12px;
+  color: var(--ui-muted);
+}
+.actions {
+  justify-content: flex-end;
+}

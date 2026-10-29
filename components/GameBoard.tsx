@@ -26,21 +26,20 @@ import {
   Volume2,
   VolumeX,
   X,
-  AlertCircle,
-  Clock,
 } from "lucide-react";
 import { toast } from "sonner";
 import type { useUnoGame } from "../hooks/useUnoGame";
 import type { useUnoOnlineGame } from "../hooks/useUnoOnlineGame";
 import type { Card } from "../types/card";
-import type { GameState } from "../types/game";
 import {
   canDeclareUno,
   getCardPlayChoices,
   getCardPlayHint,
   getCardPlayBlockReason,
+  getStackResponseLabel,
 } from "../lib/gameRules";
 import type { PlayOptions } from "../lib/gameActions";
+import { describeGameAction } from "../lib/gameActivity";
 import { getPlayedCards } from "../lib/cardMotion";
 import { getHandSort, saveHandSort, sortHand } from "../lib/handSorting";
 import { getNextPlayerIndex } from "../lib/turns";
@@ -54,11 +53,10 @@ import { getAudioSettings, setAudioSettings } from "../lib/audioSettings";
 import { usePhonePortrait } from "../hooks/usePhonePortrait";
 import { useGamePresentation } from "../hooks/useGamePresentation";
 import { useHandNavigation } from "../hooks/useHandNavigation";
-import PlayerProgress from "./PlayerProgress";
+import RematchStatus from "./RematchStatus";
 import RoundSummary from "./RoundSummary";
 import TableScoreCard from "./TableScoreCard";
 import OpponentSeat from "./OpponentSeat";
-import PlayerAvatar from "./PlayerAvatar";
 import GameFeedback, { VictoryBurst } from "./GameFeedback";
 import UnoCard from "./UnoCard";
 import HandCard from "./HandCard";
@@ -73,6 +71,7 @@ import ChoiceDialog from "./ChoiceDialog";
 import Modal from "./Modal";
 import HowToPlayModal from "./HowToPlayModal";
 import { UnoWordmark } from "./ui/PageChrome";
+import { NoMercyIcon } from "./icons/NoMercyIcons";
 export type GameApi =
   ReturnType<typeof useUnoGame> | ReturnType<typeof useUnoOnlineGame>;
 interface Props {
@@ -117,21 +116,6 @@ function cardLabel(card: Card): string {
     card.value === "wild4" ? "Wild +4" : (VALUES[card.value] ?? card.value);
   return `${card.color === "wild" ? "" : card.color + " "}${value}`;
 }
-function describeAction(game: GameState) {
-  const a = game.lastAction;
-  if (a.type === "init") return "Cards dealt. Let’s play.";
-  const name = (id: string) =>
-    game.players.find((p) => p.id === id)?.name ?? "A player";
-  if (a.type === "play")
-    return `${name(a.playerId)} ${a.declaredUno ? "called UNO and " : ""}played ${a.playedCards ? a.playedCards.map(cardLabel).join(" and ") : `${a.card.color === "wild" ? "" : `${a.card.color} `}${VALUES[a.card.value] ?? a.card.value}`}${a.discardAllCount ? `, clearing ${a.discardAllCount + 1} cards` : ""}${a.chosenColor ? ` · ${a.chosenColor} is up` : ""}`;
-  if (a.type === "draw")
-    return `${name(a.playerId)} drew ${a.count} ${a.count === 1 ? "card" : "cards"}`;
-  if (a.type === "pass") return `${name(a.playerId)} passed`;
-  if (a.type === "declareUno") return `${name(a.playerId)} called UNO!`;
-  if (a.type === "mercyElimination")
-    return `${name(a.playerId)} was knocked out by the Mercy Rule (25+ cards)!`;
-  return `${name(a.callerId)} called out ${name(a.targetId)} · +${a.penalty} cards`;
-}
 export default function GameBoard({
   gameApi: api,
   onReset,
@@ -153,11 +137,31 @@ export default function GameBoard({
   const [targetChoice, setTargetChoice] = useState<{
     cardId: string;
     turnCount: number;
+    options: PlayOptions;
   } | null>(null);
+  const targetOrigin = useRef<HTMLElement | null>(null);
   const [exit, setExit] = useState(false);
   const [menu, setMenu] = useState(false);
   const [help, setHelp] = useState(false);
   const [history, setHistory] = useState(false);
+  const tableDialogOpen = menu || help || history || exit;
+  useEffect(() => {
+    if (!tableDialogOpen) return;
+    const board = root.current;
+    return () => {
+      queueMicrotask(() => {
+        // Menu destinations replace their opener, so native focus return needs a fallback.
+        if (
+          board?.isConnected &&
+          document.activeElement === document.body &&
+          !document.querySelector("dialog[open]")
+        )
+          board
+            .querySelector<HTMLButtonElement>(".game-menu-trigger")
+            ?.focus({ preventScroll: true });
+      });
+    };
+  }, [tableDialogOpen]);
   const [sort, setSort] = useState(getHandSort);
   const [copiedRoomCode, setCopiedRoomCode] = useState(false);
   const [manualRoomCode, setManualRoomCode] = useState(false);
@@ -200,8 +204,47 @@ export default function GameBoard({
     () => sortHand(localPlayer?.hand ?? [], sort),
     [localPlayer?.hand, sort],
   );
+  const cardChoices = useMemo(
+    () =>
+      new Map(
+        cards.map((card) => [
+          card.id,
+          game ? getCardPlayChoices(game, localPlayerIndex, card) : [],
+        ]),
+      ),
+    [cards, game, localPlayerIndex],
+  );
   const handNavigation = useHandNavigation(cards);
   const { hand } = handNavigation;
+  const targetCard =
+    targetChoice &&
+    targetChoice.turnCount === game?.turnCount &&
+    isLocalTurn &&
+    !game?.winnerId &&
+    !pendingWild &&
+    !pendingAction &&
+    !phonePortrait &&
+    (!online || online.connected)
+      ? cards.find((card) => card.id === targetChoice.cardId)
+      : undefined;
+  const previousTarget = useRef(false);
+  const targetingId = targetCard?.id;
+  useEffect(() => {
+    if (targetingId)
+      root.current
+        ?.querySelector<HTMLButtonElement>("[data-target]")
+        ?.focus({ preventScroll: true });
+    else if (previousTarget.current) {
+      const origin = targetOrigin.current;
+      (origin?.isConnected
+        ? origin
+        : hand.current?.querySelector<HTMLButtonElement>(
+            '.uno-card[tabindex="0"]',
+          )
+      )?.focus({ preventScroll: true });
+    }
+    previousTarget.current = !!targetingId;
+  }, [targetingId, hand]);
   // Fit by overlap only. A larger hand scrolls at the same readable card size.
   const [handFit, setHandFit] = useState({ overlap: -36, crop: 0 });
   useLayoutEffect(() => {
@@ -299,6 +342,10 @@ export default function GameBoard({
     function onKey(event: KeyboardEvent) {
       if (phonePortrait) return;
       if (event.key === "Escape" && !document.querySelector("dialog[open]")) {
+        if (targetCard) {
+          event.preventDefault();
+          setTargetChoice(null);
+        }
         setInspectedId(null);
         return;
       }
@@ -311,6 +358,7 @@ export default function GameBoard({
         !game ||
         game.winnerId ||
         pendingWild ||
+        targetCard ||
         pendingRef.current ||
         (online && !online.connected)
       )
@@ -366,7 +414,7 @@ export default function GameBoard({
                 "seat-right",
               ];
   const playable = cards.filter(
-    (card) => getCardPlayChoices(game, localPlayerIndex, card).length > 0,
+    (card) => (cardChoices.get(card.id)?.length ?? 0) > 0,
   );
   const top = game.discardPile.at(-1);
   const playedCards = getPlayedCards(game);
@@ -387,6 +435,7 @@ export default function GameBoard({
     !isLocalTurn ||
     drawnThisTurn ||
     !!pendingWild ||
+    !!targetCard ||
     !!winner ||
     pendingAction ||
     !!(online && !online.connected);
@@ -408,6 +457,7 @@ export default function GameBoard({
               ? "Your move."
               : "No match? Take a card."
         : `${currentPlayer.name}’s turn`;
+  const stackResponse = getStackResponseLabel(game);
   const commitCard = (card: Card, options: PlayOptions = {}) => {
     if (
       !options.targetPlayerId &&
@@ -416,7 +466,12 @@ export default function GameBoard({
         card.value === "wildTargetDraw2")
     ) {
       setPlayChoice(null);
-      setTargetChoice({ cardId: card.id, turnCount: game.turnCount });
+      setInspectedId(null);
+      targetOrigin.current =
+        document.activeElement instanceof HTMLElement
+          ? document.activeElement
+          : null;
+      setTargetChoice({ cardId: card.id, turnCount: game.turnCount, options });
       return;
     }
     setTargetChoice(null);
@@ -428,7 +483,7 @@ export default function GameBoard({
   const select = (card: Card, element: HTMLElement) => {
     // Capture before a choice moves focus or a released drag ghost is removed.
     rememberOrigin(card.id, element);
-    const choices = getCardPlayChoices(game, localPlayerIndex, card);
+    const choices = cardChoices.get(card.id) ?? [];
     if (card.value === "discardAll" && choices.length) {
       commitCard(card, {
         declareUno: game.rules.mustDeclareUno && choices[0].remaining === 1,
@@ -454,9 +509,7 @@ export default function GameBoard({
     playChoice.playerIndex === game.currentPlayerIndex
       ? cards.find((card) => card.id === playChoice.cardId)
       : undefined;
-  const playChoices = choiceCard
-    ? getCardPlayChoices(game, localPlayerIndex, choiceCard)
-    : [];
+  const playChoices = choiceCard ? (cardChoices.get(choiceCard.id) ?? []) : [];
   const selectedCard = cards.find((card) => card.id === inspectedId);
   const canPlaySelected =
     selectedCard &&
@@ -501,7 +554,7 @@ export default function GameBoard({
                     ? `Match ${activeColor}${top?.color !== "wild" && top ? ` or ${VALUES[top.value] ?? top.value}` : ""}, or play a wild.`
                     : game.pendingDraw
                       ? playable.length
-                        ? "Stack a matching draw card, or take the penalty."
+                        ? `Stack ${stackResponse ?? "a matching draw card"}, or draw ${game.pendingDraw} total.`
                         : `Draw ${game.pendingDraw} to take the penalty.`
                       : playable.length
                         ? ""
@@ -528,17 +581,10 @@ export default function GameBoard({
             <Smartphone size={76} strokeWidth={1.5} />
             <RotateCw size={32} />
           </div>
-          <h1>
-            Turn your phone.
-            <br />
-            Take your seat.
-          </h1>
-          <p>We play sideways. More room for your cards.</p>
-          <small>
-            {online
-              ? "Your online round continues while you rotate."
-              : "Your round is paused until you’re ready."}
-          </small>
+          <h1>Turn your phone.</h1>
+          <p>
+            {online ? "The online round continues." : "Your round is paused."}
+          </p>
           <button className="button secondary" onClick={() => setExit(true)}>
             Leave table
           </button>
@@ -593,6 +639,21 @@ export default function GameBoard({
             <OpponentSeat
               key={player.id}
               player={player}
+              mercyLimit={game.rules.eliminationHandLimit}
+              targetAction={
+                targetCard?.value === "wildTargetDraw2"
+                  ? "Give two cards to"
+                  : "Swap hands with"
+              }
+              onTarget={
+                targetCard && !player.eliminated
+                  ? () =>
+                      commitCard(targetCard, {
+                        ...targetChoice?.options,
+                        targetPlayerId: player.id,
+                      })
+                  : undefined
+              }
               active={game.currentPlayerIndex === index}
               expression={getPlayerExpression(game, player.id)}
               position={positions[i]}
@@ -602,6 +663,7 @@ export default function GameBoard({
                   ?.connected === false
               }
               canCatch={
+                !targetCard &&
                 !localPlayer.eliminated &&
                 !player.eliminated &&
                 (!online || isLocalTurn) &&
@@ -663,15 +725,6 @@ export default function GameBoard({
                   </span>
                 )}
               </button>
-              <span
-                className={`pile-label ${!drawDisabled ? "draw-available" : "sr-only"} ${mustDraw ? "must-draw" : ""}`}
-              >
-                {!drawDisabled
-                  ? game.pendingDraw
-                    ? `Draw ${game.pendingDraw}`
-                    : "Draw"
-                  : "Draw pile"}
-              </span>
             </div>
             <div className="pile-zone">
               <div className="discard-stack">
@@ -718,7 +771,7 @@ export default function GameBoard({
             </div>
           </div>
           <div className="sr-only" role="status">
-            {describeAction(game)}
+            {describeGameAction(game)}
           </div>
           {"wildPickerPlayerName" in api &&
             api.wildPickerPlayerName &&
@@ -744,10 +797,11 @@ export default function GameBoard({
         >
           {canSayUno && <span className="sr-only">You can call UNO.</span>}
           <div className="hand-toolbar">
-            {(isLocalTurn ||
-              canPlaySelected ||
-              canSayUno ||
-              localPlayer.saidUno) &&
+            {!targetCard &&
+              (isLocalTurn ||
+                canPlaySelected ||
+                canSayUno ||
+                localPlayer.saidUno) &&
               !pendingWild &&
               !winner && (
                 <div
@@ -804,7 +858,28 @@ export default function GameBoard({
                   )}
                 </div>
               )}
+            {targetCard && (
+              <div
+                className="move-buttons"
+                role="group"
+                aria-label="Choose a player"
+              >
+                <button
+                  className="button secondary target-cancel"
+                  onClick={() => setTargetChoice(null)}
+                >
+                  <X size={16} /> Cancel
+                </button>
+              </div>
+            )}
             <TurnCue
+              targetAction={
+                targetCard
+                  ? targetCard.value === "wildTargetDraw2"
+                    ? "Who draws two?"
+                    : "Swap hands with…"
+                  : undefined
+              }
               game={game}
               local={isLocalTurn}
               choosing={!!pendingWild}
@@ -880,20 +955,26 @@ export default function GameBoard({
               }
             >
               {localPlayer.eliminated && (
-                <p className="mercy-watch-note" role="status">
-                  Out by the Mercy Rule. Stay to watch this round.
-                </p>
+                <div className="mercy-knockout-card" role="status">
+                  <NoMercyIcon size={32} />
+                  <div>
+                    <strong>Knocked out by the Mercy Rule</strong>
+                    <small>
+                      Reached {game.rules.eliminationHandLimit || 25} cards.
+                    </small>
+                  </div>
+                </div>
               )}
               {cards.map((card, i) => {
                 // Request locks block interaction without making the whole hand
                 // briefly lose/reacquire its legal-card lift and color.
                 const legal =
-                  getCardPlayChoices(game, localPlayerIndex, card).length > 0 &&
-                  !winner;
+                  (cardChoices.get(card.id)?.length ?? 0) > 0 && !winner;
                 const disabled =
                   !!pendingWild ||
                   !!winner ||
                   pendingAction ||
+                  !!targetCard ||
                   !!(online && !online.connected);
                 return (
                   <HandCard
@@ -972,49 +1053,6 @@ export default function GameBoard({
           }
         />
       )}
-      {targetChoice &&
-        targetChoice.turnCount === game.turnCount &&
-        isLocalTurn &&
-        !winner && (
-          <Modal
-            title={
-              cards.find((card) => card.id === targetChoice.cardId)?.value ===
-              "wildTargetDraw2"
-                ? "Who draws two?"
-                : "Swap hands with…"
-            }
-            onClose={() => setTargetChoice(null)}
-            className="friend-picker-modal"
-          >
-            <div className="target-player-options">
-              {opponents
-                .filter(({ player }) => !player.eliminated)
-                .map(({ player }) => (
-                  <button
-                    type="button"
-                    key={player.id}
-                    className="button secondary"
-                    onClick={() => {
-                      const card = cards.find(
-                        (entry) => entry.id === targetChoice.cardId,
-                      );
-                      if (card) commitCard(card, { targetPlayerId: player.id });
-                    }}
-                  >
-                    <PlayerAvatar
-                      seed={player.id}
-                      avatarId={player.avatarId}
-                      isBot={player.isBot}
-                    />
-                    <span>
-                      {player.name}
-                      <small>{player.hand.length} cards</small>
-                    </span>
-                  </button>
-                ))}
-            </div>
-          </Modal>
-        )}
       {exit && (
         <ChoiceDialog
           title="Leave the table?"
@@ -1216,7 +1254,7 @@ export default function GameBoard({
         />
       )}
       {history && (
-        <Modal title="Around the table." onClose={() => setHistory(false)}>
+        <Modal title="Table activity" onClose={() => setHistory(false)}>
           <TableScoreCard
             score={game.tableScore}
             players={game.players}
@@ -1248,136 +1286,14 @@ export default function GameBoard({
             tabIndex={0}
           >
             <RoundSummary game={game} localPlayerId={localPlayer.id} />
-            <PlayerProgress />
-            {online?.room &&
-              (() => {
-                const isHost = online.room.hostPlayerId === online.playerId;
-                const players = online.room.players;
-                const guests = players.filter(
-                  (p) => p.playerId !== online.room?.hostPlayerId,
-                );
-                const readyGuests = guests.filter(
-                  (p) => (p.ready || p.isBot) && p.connected,
-                );
-                const waitingGuests = guests.filter(
-                  (p) => !p.ready && !p.isBot && p.connected,
-                );
-                const allGuestsReady =
-                  guests.length > 0 && readyGuests.length === guests.length;
-                const myPlayer = players.find(
-                  (p) => p.playerId === online.playerId,
-                );
-                const isMyPlayerReady = !!myPlayer?.ready;
-
-                let headline = "";
-                let subtext = "";
-                if (startingRematch) {
-                  headline = "Dealing cards for the next round…";
-                  subtext =
-                    "Shuffling the deck and dealing cards to all players.";
-                } else if (isHost) {
-                  if (allGuestsReady) {
-                    headline = "Everyone is ready for a rematch!";
-                    subtext = "Deal whenever you’re ready to start.";
-                  } else if (waitingGuests.length > 0) {
-                    headline = `Waiting on players (${readyGuests.length} of ${guests.length} ready)`;
-                    subtext = `Waiting for ${waitingGuests.map((g) => g.name).join(", ")} to ready up.`;
-                  } else {
-                    headline = "Ready for the next round?";
-                    subtext = "Deal whenever you’re ready.";
-                  }
-                } else {
-                  if (isMyPlayerReady) {
-                    headline = "You’re marked ready!";
-                    subtext = allGuestsReady
-                      ? "All players ready. Waiting for the host to deal."
-                      : "Waiting for other players and the host to deal.";
-                  } else {
-                    headline = "Ready for another round?";
-                    subtext = "Tap Ready below to let the host know you’re in.";
-                  }
-                }
-
-                return (
-                  <div
-                    className="rematch-readiness-card"
-                    role="region"
-                    aria-label="Rematch readiness"
-                  >
-                    <div className="rematch-card-header">
-                      <strong>{headline}</strong>
-                      <small>{subtext}</small>
-                    </div>
-                    <div className="rematch-seats-list">
-                      {players.map((p) => {
-                        const isPlayerHost =
-                          p.playerId === online.room?.hostPlayerId;
-                        const isMe = p.playerId === online.playerId;
-                        let badgeState:
-                          "waiting" | "ready" | "disconnected" | "starting" =
-                          "waiting";
-                        let stateLabel = "";
-
-                        if (!p.connected && !p.isBot) {
-                          badgeState = "disconnected";
-                          stateLabel = "Disconnected";
-                        } else if (startingRematch) {
-                          badgeState = "starting";
-                          stateLabel = "Dealing in…";
-                        } else if (isPlayerHost) {
-                          badgeState = "ready";
-                          stateLabel = "Host";
-                        } else if (p.ready || p.isBot) {
-                          badgeState = "ready";
-                          stateLabel = p.isBot ? "Bot · Ready" : "Ready";
-                        } else {
-                          badgeState = "waiting";
-                          stateLabel = "Waiting…";
-                        }
-
-                        return (
-                          <div
-                            key={p.playerId}
-                            className={`rematch-seat-item status-${badgeState}`}
-                          >
-                            <PlayerAvatar
-                              seed={p.playerId}
-                              avatarId={p.avatarId}
-                              isBot={p.isBot}
-                            />
-                            <span className="rematch-seat-name">
-                              <strong>{p.name}</strong>
-                              <small>
-                                {isMe
-                                  ? "You"
-                                  : isPlayerHost
-                                    ? "Host"
-                                    : p.isBot
-                                      ? "Bot"
-                                      : "Guest"}
-                              </small>
-                            </span>
-                            <span
-                              className={`rematch-status-badge status-${badgeState}`}
-                            >
-                              {badgeState === "starting" ? (
-                                <RotateCw size={12} className="spin" />
-                              ) : badgeState === "disconnected" ? (
-                                <AlertCircle size={12} />
-                              ) : badgeState === "ready" ? (
-                                <Check size={12} />
-                              ) : (
-                                <Clock size={12} />
-                              )}
-                              {stateLabel}
-                            </span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                );
-              })()}
+            {online?.room && (
+              <RematchStatus
+                room={online.room}
+                playerId={online.playerId}
+                starting={startingRematch}
+                connected={online.connected}
+              />
+            )}
           </div>
           <div className="dialog-actions round-actions">
             {!online || online.room?.hostPlayerId === online.playerId ? (
@@ -1398,25 +1314,31 @@ export default function GameBoard({
                 disabled={
                   startingRematch ||
                   returningToLobby ||
-                  (!!online && !online.connected)
+                  (!!online &&
+                    (!online.connected ||
+                      (online.room?.players.length ?? 0) < 2))
                 }
               >
-                {startingRematch ? "Dealing cards…" : "One more round"}
+                {startingRematch
+                  ? "Dealing cards…"
+                  : online && (online.room?.players.length ?? 0) < 2
+                    ? "Waiting for a player"
+                    : "One more round"}
                 <ArrowRight size={18} />
               </button>
             ) : (
               <button
                 className={`button ${online.room?.players.find((p) => p.playerId === online.playerId)?.ready ? "secondary ready-active" : "primary"}`}
-                onClick={() => void online.toggleReady()}
+                aria-pressed={
+                  !!online.room?.players.find(
+                    (p) => p.playerId === online.playerId,
+                  )?.ready
+                }
+                aria-label="Ready for the next round"
+                onClick={() => act(() => void online.toggleReady())}
                 disabled={startingRematch || pendingAction || !online.connected}
               >
-                {startingRematch
-                  ? "Host is dealing…"
-                  : online.room?.players.find(
-                        (p) => p.playerId === online.playerId,
-                      )?.ready
-                    ? "Ready · Tap to unready"
-                    : "Ready for a rematch"}
+                {startingRematch ? "Dealing…" : "Ready"}
                 <Check size={17} />
               </button>
             )}
@@ -1450,11 +1372,6 @@ export default function GameBoard({
               Back to home
             </button>
           </div>
-          {online &&
-            online.room?.hostPlayerId !== online.playerId &&
-            !startingRematch && (
-              <p className="muted">The host will start the next round.</p>
-            )}
         </Modal>
       )}
     </div>

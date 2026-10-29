@@ -34,7 +34,7 @@ export default function FriendInvitePicker({
       <div className="settings-panel">
         {!connected && (
           <p className="muted" role="status">
-            Reconnecting. You can invite friends when you’re back online.
+            Reconnecting…
           </p>
         )}
         {friends.length === 0 ? (
@@ -66,6 +66,13 @@ export default function FriendInvitePicker({
                   </div>
                   <button
                     className="button secondary small"
+                    aria-label={
+                      seated
+                        ? `${friend.name} is at your table`
+                        : invited
+                          ? `Invitation sent to ${friend.name}`
+                          : `Invite ${friend.name}`
+                    }
                     disabled={
                       !connected ||
                       !!busy ||

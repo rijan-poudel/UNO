@@ -44,14 +44,25 @@ export default function RoundSummary({
             </span>
             <span
               className="result-card-count"
-              aria-label={`${player.hand.length} ${player.hand.length === 1 ? "card" : "cards"} left`}
+              role="img"
+              aria-label={
+                player.eliminated
+                  ? "Knocked out"
+                  : `${player.hand.length} ${player.hand.length === 1 ? "card" : "cards"} left`
+              }
             >
-              {player.id === winner.id ? (
-                <Trophy size={16} aria-hidden="true" />
+              {player.eliminated ? (
+                <span className="result-player-out">Out</span>
               ) : (
-                <Layers size={16} aria-hidden="true" />
+                <>
+                  {player.id === winner.id ? (
+                    <Trophy size={16} aria-hidden="true" />
+                  ) : (
+                    <Layers size={16} aria-hidden="true" />
+                  )}
+                  <strong>{player.hand.length}</strong>
+                </>
               )}
-              <strong>{player.hand.length}</strong>
             </span>
           </li>
         ))}
@@ -84,6 +95,10 @@ export default function RoundSummary({
         />
         <Trophy className="winner-crown" size={27} />
       </div>
+      {winner.hand.length > 0 &&
+        game.players.every(
+          (player) => player.id === winner.id || player.eliminated,
+        ) && <p className="muted round-finish-reason">Last player standing.</p>}
       {game.tableScore?.completedRounds ? (
         <>
           <TableScoreCard

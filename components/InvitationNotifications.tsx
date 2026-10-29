@@ -11,6 +11,7 @@ export default function InvitationNotifications({
   invites,
   requests,
   connected,
+  suspended = false,
   onAccept,
   onDecline,
   onOpenFriends,
@@ -18,6 +19,7 @@ export default function InvitationNotifications({
   invites: FriendInvite[];
   requests: FriendRequest[];
   connected: boolean;
+  suspended?: boolean;
   onAccept: (id: string) => Promise<boolean>;
   onDecline: (id: string) => Promise<boolean>;
   onOpenFriends: () => void;
@@ -29,7 +31,9 @@ export default function InvitationNotifications({
   );
   const pending = useRef(false);
   const [host, setHost] = useState<HTMLElement | null>(null);
-  const active = invites.some((invite) => !dismissed.includes(invite.inviteId));
+  const active =
+    !suspended &&
+    invites.some((invite) => !dismissed.includes(invite.inviteId));
   useEffect(() => {
     if (!active) return;
     const update = () =>
@@ -53,6 +57,13 @@ export default function InvitationNotifications({
   }, [active]);
   useEffect(() => {
     let fresh = false;
+    const currentIds = new Set([
+      ...invites.map((invite) => invite.inviteId),
+      ...requests.map((request) => request.requestId),
+    ]);
+    seen.current = new Set(
+      [...seen.current].filter((id) => currentIds.has(id)),
+    );
     for (const invite of invites)
       if (!seen.current.has(invite.inviteId)) {
         seen.current.add(invite.inviteId);
@@ -68,12 +79,18 @@ export default function InvitationNotifications({
       }
     if (fresh) playTableChime("notification");
   }, [invites, requests, onOpenFriends]);
-  const act = async (id: string, action: (id: string) => Promise<boolean>) => {
+  const act = async (id: string, accepting: boolean) => {
     if (pending.current) return;
     pending.current = true;
-    setBusy({ id, accepting: action === onAccept });
+    setBusy({ id, accepting });
     try {
-      if (await action(id)) setDismissed((current) => [...current, id]);
+      if (await (accepting ? onAccept(id) : onDecline(id)))
+        setDismissed((current) => [
+          ...current.filter((entry) =>
+            invites.some((invite) => invite.inviteId === entry),
+          ),
+          id,
+        ]);
     } catch {
       toast.error("Couldn’t update that invitation. Please try again.");
     } finally {
@@ -81,9 +98,11 @@ export default function InvitationNotifications({
       setBusy(null);
     }
   };
-  const visible = invites
-    .filter((invite) => !dismissed.includes(invite.inviteId))
-    .slice(0, 2);
+  const visible = suspended
+    ? []
+    : invites
+        .filter((invite) => !dismissed.includes(invite.inviteId))
+        .slice(0, 2);
   if (!visible.length || !host) return null;
   return createPortal(
     <aside
@@ -97,21 +116,30 @@ export default function InvitationNotifications({
             className="icon-button invite-notice-close"
             aria-label="Dismiss invitation popup"
             onClick={() =>
-              setDismissed((current) => [...current, invite.inviteId])
+              setDismissed((current) => [
+                ...current.filter((entry) =>
+                  invites.some((item) => item.inviteId === entry),
+                ),
+                invite.inviteId,
+              ])
             }
           >
             <X size={16} />
           </button>
           <Users size={22} aria-hidden="true" />
           <div>
-            <strong>{invite.fromName} saved you a seat</strong>
-            <p>Join room {invite.roomId}?</p>
+            <strong>{invite.fromName} invited you</strong>
+            <p>
+              Room {invite.roomId}
+              {!connected && " · Reconnecting…"}
+            </p>
           </div>
           <div className="invite-notice-actions">
             <button
               className="button secondary small"
+              aria-label={`Decline invitation from ${invite.fromName}`}
               disabled={!!busy || !connected}
-              onClick={() => void act(invite.inviteId, onDecline)}
+              onClick={() => void act(invite.inviteId, false)}
             >
               {busy?.id === invite.inviteId && !busy.accepting
                 ? "Declining…"
@@ -119,8 +147,9 @@ export default function InvitationNotifications({
             </button>
             <button
               className="button primary small"
+              aria-label={`Accept invitation from ${invite.fromName}`}
               disabled={!!busy || !connected}
-              onClick={() => void act(invite.inviteId, onAccept)}
+              onClick={() => void act(invite.inviteId, true)}
             >
               {busy?.id === invite.inviteId && busy.accepting
                 ? "Joining…"

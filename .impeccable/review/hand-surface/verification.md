@@ -1,0 +1,5 @@
+# Verification
+
+Passed lint, types, game/hand-layout/gesture checks, audio, production build, multiplayer and diff checks. No engine, card geometry or controller change. The change only deletes the clipped turn wash from arena.css.
+
+The original active user tab was read without input or reload. A separate production-preview tab created a disposable three-seat online No Mercy round; it was left normally afterward. The826x765 capture shows a true human turn with7cards, the phone844x390 capture shows9cards; both were opened and verified. An earlier phone capture included an auto-resolving Color Roulette dialog and was replaced with the unobscured hand capture. The user’s16-card complaint is addressed by the same count-independent paint removal; existing large-hand tests passed, while large-hand geometry itself is unchanged. Home/End moved focus between first/last cards, and computed styles show transparent table/hand surfaces with no generated after content during your-turn. Phone document dimensions match the viewport. Temporary viewport override restored. User round and saved preferences were not edited.

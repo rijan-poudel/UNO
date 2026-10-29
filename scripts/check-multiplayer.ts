@@ -2,7 +2,58 @@
 import assert from 'node:assert/strict';
 import { randomBytes } from 'node:crypto';
 import { io, type Socket } from 'socket.io-client';
+import {
+  readRoomSession,
+  resolveSocketEndpoint,
+} from '../lib/socketConnection';
 import type { Ack, RoomSnapshot } from '../types/multiplayer';
+const cachedSession = { roomId: 'ABC234', playerName: 'Cached name' };
+const unavailableStorage = () => {
+  throw new Error('Blocked session storage');
+};
+assert.equal(
+  readRoomSession(unavailableStorage, cachedSession),
+  cachedSession,
+  'Reconnect retains the live room when browser storage is blocked',
+);
+assert.equal(readRoomSession(unavailableStorage), null);
+let storedReads = 0;
+assert.equal(
+  readRoomSession(() => {
+    storedReads++;
+    return JSON.stringify(cachedSession);
+  }, null),
+  null,
+  'Explicitly leaving suppresses a stale stored room even if removal failed',
+);
+assert.equal(storedReads, 0);
+assert.deepEqual(
+  readRoomSession(() => JSON.stringify(cachedSession)),
+  cachedSession,
+);
+for (const raw of ['{', 'null', JSON.stringify({ roomId: 'invalid' })])
+  assert.equal(
+    readRoomSession(() => raw),
+    null,
+  );
+const secureLocation = {
+  protocol: 'https:',
+  hostname: 'uno.example.com',
+  port: '',
+};
+assert.equal(
+  resolveSocketEndpoint('http://rooms.example.com', secureLocation),
+  null,
+);
+assert.equal(
+  resolveSocketEndpoint('ws://rooms.example.com', secureLocation),
+  null,
+);
+assert.equal(
+  resolveSocketEndpoint('wss://rooms.example.com', secureLocation),
+  'wss://rooms.example.com/',
+);
+
 const url = process.env.UNO_CHECK_SOCKET_URL ?? 'http://localhost:3001';
 const sockets: Socket[] = [];
 async function connect() {
@@ -256,7 +307,7 @@ async function main() {
     const resumed = await request<{ room: RoomSnapshot; playerId: string }>(
       replacement,
       'room:join',
-      { roomId, playerName: 'Smoke guest', deviceId: guestDevice },
+      { roomId, playerName: 'Renamed guest', deviceId: guestDevice },
     );
     assert.equal(
       resumed.playerId,
@@ -267,6 +318,19 @@ async function main() {
       resumed.room.players.length,
       6,
       'Reconnect does not add a seat',
+    );
+    assert.equal(
+      resumed.room.players.find(
+        (player) => player.playerId === resumed.playerId,
+      )?.name,
+      'Renamed guest',
+    );
+    assert.equal(
+      resumed.room.game?.players.find(
+        (player) => player.id === resumed.playerId,
+      )?.name,
+      'Renamed guest',
+      'Rejoining with an updated profile keeps lobby and live-game names in sync',
     );
     await request(host, 'room:leave', { roomId });
     const promoted = await request<{ room: RoomSnapshot }>(

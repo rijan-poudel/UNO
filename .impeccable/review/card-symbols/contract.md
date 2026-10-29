@@ -1,0 +1,8 @@
+# Recognizable action cards
+
+THESIS: Players should recognize special-card actions from their physical decks without decoding app icons.
+OWN-WORLD: Preserve Color play, native UnoCard geometry, deck colors, Outfit and Barlow Condensed, seed2fba311c. Functional card silhouettes are precise source-authored SVG geometry referenced against the three Mattel sheets; no new world or illustration assets.
+STORY: The same symbols appear in hand, pile, motion, existing previews and feedback. Draw amounts stay in corners. Edition help offers optional Card symbols, rendered only after disclosure, with a real face and short effect. The help body scrolls under the shared blue heading and above Done.
+FIRST VIEWPORT: Card centers show the printed action motif rather than FastForward, Repeat2, Layers or arrow utility icons. All Wild action ovals use four colors, distinct dual Skip and targeted+2. No routine instructional HUD or play confirmation is added.
+FORM: Bounded correction to existing card vocabulary. Preserve concurrent existing work in arena/home/game logic. No engine/protocol/action-timing change. Shared UnoActionSymbol owns card motifs; existing RouletteWheelIcon call sites keep compatibility but now render mystery-card motif.
+FINISH: NoMercy top/middle/special826x765, AllWild top/special826x765, AllWild390x844, help568x320. All captures opened and validated; geometry/readability/native disclosure/keyboard Done checked. Automatic hook active; unchanged legacy classic-help token advisories are inherited and are not suppressed. Required checks and exact new icon/accessibility/closed-guide/Mercy-scope assertions pass. New AllWild paint correction received final visual confirmation; no further independent polish hunt.

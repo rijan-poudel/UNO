@@ -136,6 +136,24 @@ function isValidStackCard(card: Card, state: GameState): boolean {
   return false;
 }
 
+/** Written responses come from the same predicate as engine stack validation. */
+export function getStackResponseLabel(state: GameState): string | null {
+  if (state.pendingDraw <= 0) return null;
+  const values =
+    state.rules.gameMode === 'no_mercy'
+      ? (['draw2', 'draw4', 'wildDraw6', 'wildDraw10'] as const)
+      : (['draw2', 'wild4'] as const);
+  const amounts = values
+    .filter((value) =>
+      isValidStackCard({ id: 'stack-reference', color: 'wild', value }, state),
+    )
+    .map(getCardDrawPenalty);
+  if (!amounts.length) return null;
+  return state.rules.gameMode === 'no_mercy' && amounts.length > 1
+    ? `+${amounts[0]} or higher`
+    : amounts.map((amount) => `+${amount}`).join(' or ');
+}
+
 /**
  * Convenience: filters a player's hand to cards playable right now.
  */
@@ -324,13 +342,25 @@ export function getCardPlayBlockReason(
         ? state.rules.stackDraw2 || state.rules.allowWild4OnDraw2
         : state.rules.stackWild4;
     if (!stackingAllowed) return `Stacking is off. Draw ${state.pendingDraw}.`;
+    if (state.rules.gameMode === 'no_mercy') {
+      const topDiscard = state.discardPile[state.discardPile.length - 1];
+      const incomingDrawPenalty = topDiscard
+        ? getCardDrawPenalty(topDiscard.value)
+        : state.pendingDrawType === 'wild4'
+          ? 4
+          : 2;
+      const cardPenalty = getCardDrawPenalty(card.value);
+      if (cardPenalty > 0 && cardPenalty < incomingDrawPenalty) {
+        return `In No Mercy, draw cards must be +${incomingDrawPenalty} or higher to stack.`;
+      }
+    }
     return getPlayableCards(player.hand, state, playerIndex).length > 0
       ? 'Only draw cards can stack.'
       : `No stack. Draw ${state.pendingDraw}.`;
   }
+  if (state.drawnThisTurn && card.id !== player.hand.at(-1)?.id)
+    return 'After drawing, only the card you just drew can be played.';
   if (matchesPreset(state.rules, RULE_PRESETS[0].rules)) {
-    if (state.drawnThisTurn && card.id !== player.hand.at(-1)?.id)
-      return 'After drawing, only the card you just drew can be played.';
     if (
       card.value === 'wild4' &&
       player.hand.some((entry) => entry.color === state.activeColor)

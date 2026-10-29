@@ -1,14 +1,8 @@
 // Brief action signals complement the cards without blocking the next move.
 "use client";
-import {
-  Ban,
-  Repeat2,
-  Shuffle,
-  FastForward,
-  Crosshair,
-  ArrowLeftRight,
-  Disc,
-} from "lucide-react";
+import { RotateCw } from "lucide-react";
+import { UnoActionSymbol } from "./icons/UnoActionSymbol";
+import { RouletteWheelIcon, NoMercyIcon } from "./icons/NoMercyIcons";
 import type { GameState } from "../types/game";
 export default function GameFeedback({ game }: { game: GameState }) {
   const action = game.lastAction;
@@ -16,50 +10,65 @@ export default function GameFeedback({ game }: { game: GameState }) {
     action.type === "play"
       ? action.declaredUno
         ? "uno"
-        : action.card.value
+        : game.rules.sevenZero && action.card.value === "7"
+          ? "swap"
+          : game.rules.sevenZero && action.card.value === "0"
+            ? "passAll"
+            : action.card.value
       : action.type === "declareUno"
         ? "uno"
         : action.type === "callOut"
           ? "caught"
           : action.type === "draw" && action.count > 1
             ? "penalty"
-            : null;
+            : action.type === "mercyElimination"
+              ? "mercyElimination"
+              : null;
   const visual =
     value === "reverse" ? (
-      <Repeat2 />
+      <UnoActionSymbol value="reverse" />
     ) : value === "skip" ? (
-      <Ban />
+      <UnoActionSymbol value="skip" />
     ) : value === "skipEveryone" ? (
-      <FastForward />
+      <UnoActionSymbol value="skipEveryone" />
     ) : value === "wildSkip2" ? (
-      <span className="feedback-skip-two">
-        <Ban />
-        <small>×2</small>
-      </span>
+      <UnoActionSymbol value="wildSkip2" />
     ) : value === "wildReverseDraw4" ? (
       <span className="feedback-reverse-draw4">
-        <Repeat2 />
+        <UnoActionSymbol value="wildReverseDraw4" />
         <small>+4</small>
       </span>
     ) : value === "wildTargetDraw2" ? (
-      <span className="feedback-target-draw2">
-        <Crosshair />
-        <small>+2</small>
+      <UnoActionSymbol value="wildTargetDraw2" />
+    ) : value === "wildForcedSwap" || value === "swap" ? (
+      <span className="feedback-swap">
+        <UnoActionSymbol value="wildForcedSwap" />
+        <small>SWAP</small>
       </span>
-    ) : value === "wildForcedSwap" ? (
-      <ArrowLeftRight />
+    ) : value === "passAll" ? (
+      <span className="feedback-pass-all">
+        <RotateCw />
+        <small>PASS ALL</small>
+      </span>
     ) : value === "wildColorRoulette" ? (
-      <Disc />
+      <RouletteWheelIcon size={52} />
     ) : value === "shuffle" ? (
-      <Shuffle />
+      <UnoActionSymbol value="shuffle" />
     ) : value === "draw2" ? (
       `+${game.pendingDraw || 2}`
+    ) : value === "draw4" ? (
+      `+${game.pendingDraw || 4}`
     ) : value === "wildDraw6" ? (
       `+${game.pendingDraw || 6}`
     ) : value === "wildDraw10" ? (
       `+${game.pendingDraw || 10}`
     ) : value === "wild4" ? (
       `+${game.pendingDraw || 4}`
+    ) : value === "mercyElimination" ? (
+      <span className="feedback-mercy-elimination">
+        <NoMercyIcon size={44} />
+        <small>KNOCKOUT</small>
+      </span>
     ) : value === "uno" ? (
       "UNO!"
     ) : value === "penalty" && action.type === "draw" ? (
@@ -90,12 +99,15 @@ export default function GameFeedback({ game }: { game: GameState }) {
       aria-hidden="true"
     >
       <span>{visual}</span>
-      {(game.pendingDraw > 0 || value === "penalty") && (
+      {(game.pendingDraw > 0 ||
+        value === "penalty" ||
+        action.type === "mercyElimination") && (
         <small>
-          {value === "penalty" && action.type === "draw"
-            ? game.players.find((player) => player.id === action.playerId)?.name
-            : game.players[game.currentPlayerIndex].name}
-          {value === "penalty" ? " takes the cards" : " is up next"}
+          {action.type === "mercyElimination"
+            ? `${game.players.find((player) => player.id === action.playerId)?.name ?? "Player"} knocked out`
+            : value === "penalty" && action.type === "draw"
+              ? `${game.players.find((player) => player.id === action.playerId)?.name} takes the cards`
+              : `${game.players[game.currentPlayerIndex].name} is up next`}
         </small>
       )}
     </div>

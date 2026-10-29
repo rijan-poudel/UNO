@@ -2,6 +2,7 @@
 import { useEffect, useRef } from "react";
 import type { Card, CardColor } from "../types/card";
 import Modal from "./Modal";
+import { RouletteWheelIcon } from "./icons/NoMercyIcons";
 const COLORS = ["red", "yellow", "green", "blue"] as const;
 export default function ColorPicker({
   onSelect,
@@ -22,9 +23,9 @@ export default function ColorPicker({
   }, []);
   return (
     <Modal
-      title={roulette ? "Color roulette" : "Your wild. Your color."}
+      title={roulette ? "Color roulette" : "Choose a color"}
       onClose={onCancel}
-      className="color-picker-modal"
+      className={`color-picker-modal ${roulette ? "color-roulette-modal" : ""}`}
     >
       <div
         onKeyDown={(event) => {
@@ -39,21 +40,35 @@ export default function ColorPicker({
           }
         }}
       >
-        <p className="muted">
-          {roulette
-            ? "Choose a color. Reveal cards until it appears, take them all, then skip this turn."
-            : `${playerName ? `${playerName}, choose` : "Choose"} the color for the next play.`}
-        </p>
+        {roulette && (
+          <div className="roulette-wheel-badge" aria-hidden="true">
+            <RouletteWheelIcon size={38} />
+          </div>
+        )}
+        {roulette && (
+          <p className="muted">
+            Pick a color. Draw until it appears, keep the cards, and miss this
+            turn.
+          </p>
+        )}
         <div
           className="color-choices"
           ref={choices}
+          role="group"
+          aria-label={
+            playerName ? `${playerName}’s color choice` : "Color choice"
+          }
           onKeyDown={(event) => {
+            if (event.ctrlKey || event.altKey || event.metaKey) return;
+            const columns = getComputedStyle(
+              event.currentTarget,
+            ).gridTemplateColumns.split(/\s+/).length;
             const offset = (
               {
                 ArrowRight: 1,
                 ArrowLeft: -1,
-                ArrowDown: 2,
-                ArrowUp: -2,
+                ArrowDown: columns,
+                ArrowUp: -columns,
               } as Record<string, number>
             )[event.key];
             if (!offset && event.key !== "Home" && event.key !== "End") return;
@@ -67,7 +82,7 @@ export default function ColorPicker({
               event.key === "Home"
                 ? 0
                 : event.key === "End"
-                  ? 3
+                  ? buttons.length - 1
                   : (index + offset + 4) % 4;
             buttons[next]?.focus();
           }}
@@ -77,6 +92,7 @@ export default function ColorPicker({
             return (
               <button
                 key={color}
+                type="button"
                 className={`color-choice choose-${color}`}
                 onClick={() => onSelect(color)}
                 aria-label={`Choose ${color}, ${count} ${count === 1 ? "card" : "cards"} in your hand`}
@@ -93,7 +109,7 @@ export default function ColorPicker({
           })}
         </div>
         {onCancel && (
-          <button className="text-button" onClick={onCancel}>
+          <button type="button" className="text-button" onClick={onCancel}>
             Keep the wild card
           </button>
         )}

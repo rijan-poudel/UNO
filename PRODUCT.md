@@ -1,5 +1,21 @@
 # Product
 
+## October 29 — Whole-site ownership
+
+The owner authorizes a coordinated improvement pass across every section: fix concrete problems as discovered, delegate focused work, and add or remove UI when it improves the experience. Keep interface copy and conversation updates brief. Preserve the approved card world, supported game rules, direct play and working local/online journeys; remove obsolete implementation instead of maintaining parallel flows.
+
+## October 27 — Remove ornamental clutter
+
+The owner rejects icons in home mode buttons, the visible mode description and Play subtitle, the pale settings surface, repeated horizontal separators, the confused Reverse +4 drawing, the Draw pill, the persistent Mercy hand meter and the No Mercy logo badge. Keep text-only favorites, a centered Play label and mode information behind a small native info control. Settings follows the selected edition with cream lettering and amber decisions; spacing and subtle group surfaces replace separator lines. This explicitly supersedes the fixed-light Settings treatment. Preserve the real clock, legal actions, hand counts, original rules and exceptional round outcomes. Reverse cards need two visibly separated opposing arrow bodies at actual card sizes.
+
+## October 27 — Recognizable printed card symbols
+
+The owner finds generic app icons on special cards confusing and asks for the physical editions’ visual vocabulary. Reference Mattel’s illustrated Classic, Show ’Em No Mercy and All Wild instruction sheets. Use diagonal Reverse arrows, circular Skip Everyone, paired Skip Two marks, card-stack draw illustrations, a card fan for Discard All/Forced Swap, and mystery cards for Color Roulette. Keep amounts in corners, preserve native cards and direct play, and use the same symbols in action feedback. All Wild action faces retain the four-color oval. Optional help may show the actual card with one short consequence; keep it behind Card symbols and mount faces only when opened. Do not add routine coaching or more gameplay settings. Knockout warnings apply only when the table actually has an elimination limit.
+
+## October 27 — Continuous hand background
+
+The owner rejects the rectangular block behind the held hand. Keep the arena background continuous through the table and hand, with no section-bounded turn wash. Preserve card crop, fan geometry, horizontal scrolling, paging and controls. Local-turn emphasis stays on the cue and legal cards.
+
 ## Whole-flow polish — October 27
 
 The owner asks to keep improving the complete journey while preserving the chosen home. Use the existing edition mood through bot setup and room creation, make Join/Create compact focused tasks, and keep the open room spacious enough for six seats. Invitation pickers carry the settings blue/cream/amber vocabulary and provide a direct next step when no friends exist. Pending invitations must remain visibly pending; failed room-rule updates must preserve a usable draft and the previous selection. A named custom profile keeps its identity even if copied rules still equal an original. Remove styles for retired flows rather than extending them.

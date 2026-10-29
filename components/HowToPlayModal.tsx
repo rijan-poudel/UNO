@@ -2,21 +2,26 @@
 // Ground-zero tactile, animated UNO table demonstration for new players.
 "use client";
 
-import { useState, useEffect, useCallback, type CSSProperties } from "react";
+import {
+  useState,
+  useCallback,
+  useEffect,
+  useRef,
+  type CSSProperties,
+} from "react";
 import {
   ArrowRight,
   ArrowLeft,
-  Bot,
-  Users,
   CheckCircle2,
   RotateCw,
   RotateCcw,
-  Sparkles,
   Trophy,
   RotateCcw as ResetIcon,
 } from "lucide-react";
 import Modal from "./Modal";
 import UnoCard from "./UnoCard";
+import CardSymbolGuide from "./CardSymbolGuide";
+import PracticeHand from "./PracticeHand";
 import PlayerAvatar from "./PlayerAvatar";
 import RulesSummary from "./RulesSummary";
 import { defaultRules, type GameRules } from "../types/rules";
@@ -29,7 +34,6 @@ interface HowToPlayModalProps {
   open: boolean;
   onClose: () => void;
   onPracticeWithBots?: () => void;
-  onPlayWithFriends?: () => void;
   inGame?: boolean;
   rules?: Partial<GameRules>;
 }
@@ -122,11 +126,13 @@ function ClassicHowToPlayModal({
   open,
   onClose,
   onPracticeWithBots,
-  onPlayWithFriends,
   inGame = false,
   rules = defaultRules,
 }: HowToPlayModalProps) {
   const [step, setStep] = useState(0);
+  const matchingHand = useRef<HTMLDivElement>(null);
+  const drawDeck = useRef<HTMLButtonElement>(null);
+  const finish = useRef<HTMLButtonElement>(null);
 
   // Turn Direction & Active Seat
   const [direction, setDirection] = useState<"clockwise" | "counter-clockwise">(
@@ -140,15 +146,12 @@ function ClassicHowToPlayModal({
     null,
   );
   const [matchStatus, setMatchStatus] = useState<string | null>(null);
-  const [wobbleId, setWobbleId] = useState<string | null>(null);
 
   // Step 2: Stuck / Drawing / Wild
   const [pileCardStep2, setPileCardStep2] = useState<Card>(CARD_MID_YELLOW4);
-  const [hasDrawnCard, setHasDrawnCard] = useState(false);
-  const [hasPlayedDrawnCard, setHasPlayedDrawnCard] = useState(false);
-  const [wildPickedColor, setWildPickedColor] = useState<CardColor | null>(
-    null,
-  );
+  const [drawPhase, setDrawPhase] = useState<
+    "choose" | "wild-color" | "drawn" | "complete"
+  >("choose");
   const [drawStatus, setDrawStatus] = useState<string | null>(null);
 
   // Step 3: Trick Cards Tester
@@ -159,11 +162,16 @@ function ClassicHowToPlayModal({
   // Step 4: Calling UNO & Winning
   const [calledUno, setCalledUno] = useState(false);
   const [hasWon, setHasWon] = useState(false);
+  useEffect(() => {
+    if (hasWon) finish.current?.focus({ preventScroll: true });
+  }, [hasWon]);
 
   // Step change helper
   const changeStep = useCallback((targetStep: number) => {
     const next = Math.max(0, Math.min(targetStep, TOTAL_STEPS - 1));
     setStep(next);
+    setCalledUno(false);
+    setHasWon(false);
     if (next === 0) {
       setDirection("clockwise");
       setActiveSeat("you");
@@ -175,9 +183,7 @@ function ClassicHowToPlayModal({
       setDirection("clockwise");
     } else if (next === 2) {
       setPileCardStep2(CARD_MID_YELLOW4);
-      setHasDrawnCard(false);
-      setHasPlayedDrawnCard(false);
-      setWildPickedColor(null);
+      setDrawPhase("choose");
       setDrawStatus(null);
       setActiveSeat("you");
       setDirection("clockwise");
@@ -188,32 +194,10 @@ function ClassicHowToPlayModal({
       setActiveSeat("alex");
       setCleoStatus(null);
     } else if (next === 4) {
-      setCalledUno(false);
-      setHasWon(false);
       setActiveSeat("you");
       setDirection("clockwise");
     }
   }, []);
-
-  // Keyboard navigation
-  const handleKeyDown = useCallback(
-    (e: KeyboardEvent) => {
-      if (!open) return;
-      if (e.key === "ArrowRight") {
-        e.preventDefault();
-        changeStep(step + 1);
-      } else if (e.key === "ArrowLeft") {
-        e.preventDefault();
-        changeStep(step - 1);
-      }
-    },
-    [open, step, changeStep],
-  );
-
-  useEffect(() => {
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [handleKeyDown]);
 
   // Step 1: Matching Card Action
   const handlePlayMatchingCard = (card: Card) => {
@@ -234,8 +218,6 @@ function ClassicHowToPlayModal({
         "Great! Played Blue 7 (matched number 7). Your turn ends, play passes to Cleo.",
       );
     } else {
-      setWobbleId(card.id);
-      setTimeout(() => setWobbleId(null), 350);
       setMatchStatus(
         "Cannot play Green 2. It has neither color Red nor number 7.",
       );
@@ -243,6 +225,11 @@ function ClassicHowToPlayModal({
   };
 
   const handleResetStep1 = () => {
+    requestAnimationFrame(() =>
+      matchingHand.current
+        ?.querySelector<HTMLButtonElement>("button")
+        ?.focus({ preventScroll: true }),
+    );
     setPileCardStep1(CARD_MID_RED7);
     setPlayedCardStep1Id(null);
     setMatchStatus(null);
@@ -251,18 +238,20 @@ function ClassicHowToPlayModal({
 
   // Step 2: Draw from deck
   const handleDrawCard = () => {
+    if (drawPhase !== "choose") return;
     playTableChime("draw");
-    setHasDrawnCard(true);
+    setDrawPhase("drawn");
     setDrawStatus(
-      "You drew Yellow 1! Since it matches the Yellow 4, tap it to play it now.",
+      "You drew Yellow 1. Play this new card, or pass to keep it. You cannot play a card from your earlier hand after drawing.",
     );
   };
 
   // Step 2: Play drawn card
   const handlePlayDrawnCard = () => {
+    if (drawPhase !== "drawn") return;
     playTableChime("cardPlay");
     setPileCardStep2(CARD_DREW_YELLOW1);
-    setHasPlayedDrawnCard(true);
+    setDrawPhase("complete");
     setActiveSeat("cleo");
     setDrawStatus(
       "Played Yellow 1! Your turn is complete, and play passes to Cleo.",
@@ -271,8 +260,9 @@ function ClassicHowToPlayModal({
 
   // Step 2: Pick wild color
   const handleChooseWildColor = (color: CardColor) => {
+    if (drawPhase !== "wild-color") return;
     playTableChime("wild");
-    setWildPickedColor(color);
+    setDrawPhase("complete");
     setPileCardStep2({ id: "wild-played", color: "wild", value: "wild" });
     setActiveSeat("cleo");
     setDrawStatus(`${color.toUpperCase()} is now active. Cleo plays next.`);
@@ -357,6 +347,27 @@ function ClassicHowToPlayModal({
             className={styles.stepIndicators}
             role="navigation"
             aria-label="Steps"
+            onKeyDown={(event) => {
+              if (event.altKey || event.ctrlKey || event.metaKey) return;
+              if (event.key !== "ArrowRight" && event.key !== "ArrowLeft")
+                return;
+              const buttons = Array.from(
+                event.currentTarget.querySelectorAll("button"),
+              );
+              const index = buttons.indexOf(event.target as HTMLButtonElement);
+              if (index < 0) return;
+              event.preventDefault();
+              const next = Math.max(
+                0,
+                Math.min(
+                  index + (event.key === "ArrowRight" ? 1 : -1),
+                  TOTAL_STEPS - 1,
+                ),
+              );
+              if (next === index) return;
+              changeStep(next);
+              buttons[next]?.focus();
+            }}
           >
             {Array.from({ length: TOTAL_STEPS }).map((_, i) => (
               <button
@@ -635,10 +646,11 @@ function ClassicHowToPlayModal({
               {/* Draw Deck */}
               <div className={styles.pileContainer}>
                 <span className={styles.pileLabel}>Draw deck</span>
-                {step === 2 && !hasDrawnCard ? (
+                {step === 2 && drawPhase === "choose" ? (
                   <button
                     type="button"
                     className={styles.deckTapBtn}
+                    ref={drawDeck}
                     onClick={handleDrawCard}
                     aria-label="Draw 1 card from deck"
                   >
@@ -763,6 +775,7 @@ function ClassicHowToPlayModal({
                       type="button"
                       className={styles.resetHandBtn}
                       onClick={handleResetStep1}
+                      autoFocus
                     >
                       <ResetIcon size={12} />
                       Reset Hand
@@ -770,7 +783,7 @@ function ClassicHowToPlayModal({
                   )}
                 </div>
 
-                <div className={styles.playerHandRow}>
+                <div className={styles.playerHandRow} ref={matchingHand}>
                   {playedCardStep1Id !== CARD_HAND_RED3.id && (
                     <button
                       type="button"
@@ -813,9 +826,7 @@ function ClassicHowToPlayModal({
 
                   <button
                     type="button"
-                    className={`${styles.handCardBtn} ${
-                      wobbleId === CARD_HAND_GREEN2.id ? styles.wobbleAnim : ""
-                    }`}
+                    className={styles.handCardBtn}
                     onClick={() => handlePlayMatchingCard(CARD_HAND_GREEN2)}
                     disabled={playedCardStep1Id !== null}
                   >
@@ -833,7 +844,7 @@ function ClassicHowToPlayModal({
                 </div>
 
                 {matchStatus && (
-                  <div className={styles.feedbackBanner}>
+                  <div className={styles.feedbackBanner} role="status">
                     <span>{matchStatus}</span>
                   </div>
                 )}
@@ -843,7 +854,7 @@ function ClassicHowToPlayModal({
             {/* STEP 2: Stuck? Draw or Wild */}
             {step === 2 && (
               <div className={styles.stepInteractiveContainer}>
-                {!hasDrawnCard && !wildPickedColor ? (
+                {drawPhase === "choose" ? (
                   <>
                     <span className={styles.playerLabel}>
                       No match for Yellow 4! Draw a card or drop a Wild:
@@ -852,7 +863,12 @@ function ClassicHowToPlayModal({
                       <button
                         type="button"
                         className={styles.handCardBtn}
-                        onClick={() => handleChooseWildColor("blue")}
+                        onClick={() => {
+                          setDrawPhase("wild-color");
+                          setDrawStatus(
+                            "Choose a color to finish playing your Wild.",
+                          );
+                        }}
                       >
                         <UnoCard
                           card={CARD_HAND_WILD}
@@ -884,12 +900,13 @@ function ClassicHowToPlayModal({
                       </button>
                     </div>
                   </>
-                ) : hasDrawnCard && !hasPlayedDrawnCard ? (
+                ) : drawPhase === "drawn" ? (
                   <div className={styles.drawnCardActionRow}>
                     <button
                       type="button"
                       className={styles.handCardBtn}
                       onClick={handlePlayDrawnCard}
+                      autoFocus
                     >
                       <UnoCard
                         card={CARD_DREW_YELLOW1}
@@ -902,47 +919,78 @@ function ClassicHowToPlayModal({
                         Tap to play Yellow 1!
                       </span>
                     </button>
+                    <button
+                      type="button"
+                      className={styles.resetHandBtn}
+                      onClick={() => {
+                        if (drawPhase !== "drawn") return;
+                        setDrawPhase("complete");
+                        setActiveSeat("cleo");
+                        setDrawStatus(
+                          "You kept Yellow 1 and passed. Cleo plays next.",
+                        );
+                      }}
+                    >
+                      Pass
+                    </button>
                   </div>
-                ) : wildPickedColor || hasPlayedDrawnCard ? (
+                ) : drawPhase === "wild-color" ? (
                   <div className={styles.wildChoiceRow}>
-                    {!hasPlayedDrawnCard && (
-                      <>
-                        <span className={styles.playerLabel}>
-                          Choose next color:
-                        </span>
-                        <div className={styles.colorPickerRow}>
-                          <button
-                            type="button"
-                            className={`${styles.colorDisc} ${styles.colorDiscRed}`}
-                            onClick={() => handleChooseWildColor("red")}
-                            aria-label="Red"
-                          />
-                          <button
-                            type="button"
-                            className={`${styles.colorDisc} ${styles.colorDiscYellow}`}
-                            onClick={() => handleChooseWildColor("yellow")}
-                            aria-label="Yellow"
-                          />
-                          <button
-                            type="button"
-                            className={`${styles.colorDisc} ${styles.colorDiscGreen}`}
-                            onClick={() => handleChooseWildColor("green")}
-                            aria-label="Green"
-                          />
-                          <button
-                            type="button"
-                            className={`${styles.colorDisc} ${styles.colorDiscBlue}`}
-                            onClick={() => handleChooseWildColor("blue")}
-                            aria-label="Blue"
-                          />
-                        </div>
-                      </>
-                    )}
+                    <span className={styles.playerLabel}>
+                      Choose next color:
+                    </span>
+                    <div
+                      className={styles.colorPickerRow}
+                      role="group"
+                      aria-label="Choose the Wild color"
+                    >
+                      <button
+                        type="button"
+                        className={`${styles.colorDisc} ${styles.colorDiscRed}`}
+                        onClick={() => handleChooseWildColor("red")}
+                        aria-label="Red"
+                        autoFocus
+                      />
+                      <button
+                        type="button"
+                        className={`${styles.colorDisc} ${styles.colorDiscYellow}`}
+                        onClick={() => handleChooseWildColor("yellow")}
+                        aria-label="Yellow"
+                      />
+                      <button
+                        type="button"
+                        className={`${styles.colorDisc} ${styles.colorDiscGreen}`}
+                        onClick={() => handleChooseWildColor("green")}
+                        aria-label="Green"
+                      />
+                      <button
+                        type="button"
+                        className={`${styles.colorDisc} ${styles.colorDiscBlue}`}
+                        onClick={() => handleChooseWildColor("blue")}
+                        aria-label="Blue"
+                      />
+                    </div>
                   </div>
                 ) : null}
 
+                {drawPhase === "complete" && (
+                  <button
+                    type="button"
+                    className={styles.resetHandBtn}
+                    onClick={() => {
+                      changeStep(2);
+                      requestAnimationFrame(() =>
+                        drawDeck.current?.focus({ preventScroll: true }),
+                      );
+                    }}
+                    autoFocus
+                  >
+                    <ResetIcon size={12} />
+                    Try again
+                  </button>
+                )}
                 {drawStatus && (
-                  <div className={styles.feedbackBanner}>
+                  <div className={styles.feedbackBanner} role="status">
                     <span>{drawStatus}</span>
                   </div>
                 )}
@@ -1008,7 +1056,7 @@ function ClassicHowToPlayModal({
                     </div>
                     <button
                       type="button"
-                      className={styles.unoActionBtn}
+                      className="button primary"
                       onClick={handleDeclareUno}
                     >
                       CALL UNO!
@@ -1016,7 +1064,7 @@ function ClassicHowToPlayModal({
                   </div>
                 ) : !hasWon ? (
                   <div className={styles.unoActionBox}>
-                    <div className={styles.unoSuccessBanner}>
+                    <div className={styles.unoSuccessBanner} role="status">
                       <CheckCircle2 size={18} className={styles.successIcon} />
                       <span>UNO CALLED! Protected from penalty!</span>
                     </div>
@@ -1044,39 +1092,20 @@ function ClassicHowToPlayModal({
                   </div>
                 ) : (
                   <div className={styles.readyLaunchScreen}>
-                    <div className={styles.victoryBanner}>
+                    <div className={styles.victoryBanner} role="status">
                       <Trophy size={24} className={styles.trophyIcon} />
                       <span>YOU WIN! CONGRATULATIONS!</span>
                     </div>
 
-                    <p className={styles.unoSuccessSubtext}>
-                      Hand emptied to 0 cards! You know the whole game. Now jump
-                      in with bots or play online with friends:
-                    </p>
-
-                    <div className={styles.launchButtonsGroup}>
-                      {!inGame && onPracticeWithBots && (
-                        <button
-                          type="button"
-                          className={styles.btnPlayBots}
-                          onClick={onPracticeWithBots}
-                        >
-                          <Bot size={20} />
-                          Play with bots
-                        </button>
-                      )}
-
-                      {!inGame && onPlayWithFriends && (
-                        <button
-                          type="button"
-                          className={styles.btnPlayFriends}
-                          onClick={onPlayWithFriends}
-                        >
-                          <Users size={20} />
-                          Play with friends
-                        </button>
-                      )}
-                    </div>
+                    {!inGame && onPracticeWithBots && (
+                      <button
+                        type="button"
+                        className="button primary"
+                        onClick={onPracticeWithBots}
+                      >
+                        Play with bots
+                      </button>
+                    )}
                   </div>
                 )}
               </div>
@@ -1106,8 +1135,12 @@ function ClassicHowToPlayModal({
             <ArrowRight size={16} />
           </button>
         ) : (
-          <button type="button" className={styles.btnNavDone} onClick={onClose}>
-            <Sparkles size={16} style={{ marginRight: 6 }} />
+          <button
+            type="button"
+            ref={finish}
+            className={styles.btnNavDone}
+            onClick={onClose}
+          >
             {inGame ? "Back to table" : "Done"}
           </button>
         )}
@@ -1125,82 +1158,40 @@ export default function HowToPlayModal(props: HowToPlayModalProps) {
       open={props.open}
       title="How to play"
       onClose={props.onClose}
-      className="friend-picker-modal"
+      className="settings-modal friend-picker-modal"
     >
-      <p>
-        {mercy
-          ? "Match a color, number or symbol. If you draw, keep going until you can play; play that card."
-          : "Every card is wild. Play any one card—no color matching or color choice needed. After a voluntary draw, play only the new card or pass."}
-      </p>
-      <ul className="edition-guide">
-        {mercy ? (
-          <>
-            <li>
-              <strong>Draw cards:</strong> stack an equal or higher value,
-              regardless of color. The first player who cannot respond takes the
-              whole total and loses a turn.
-            </li>
-            <li>
-              <strong>7 and 0:</strong> choose someone to swap with on a 7; a 0
-              passes everyone’s hand in the current direction.
-            </li>
-            <li>
-              <strong>Discard All:</strong> one tap clears the card’s whole
-              color. Skip Everyone gives you another turn.
-            </li>
-            <li>
-              <strong>Reverse +4:</strong> reverse and pass the penalty. With
-              two active players you take the penalty yourself, or stack it
-              back.
-            </li>
-            <li>
-              <strong>Color Roulette:</strong> the next player chooses a color,
-              reveals until it appears, takes all the revealed cards and loses a
-              turn.
-            </li>
-            <li>
-              <strong>Mercy:</strong> reach the table’s hand limit and you are
-              out. Win with an empty hand or as the last player standing.
-            </li>
-          </>
-        ) : (
-          <>
-            <li>
-              <strong>Skip / Skip Two:</strong> the next one or two players lose
-              their turns.
-            </li>
-            <li>
-              <strong>Draw Two / Four:</strong> the next player draws and loses
-              a turn.
-            </li>
-            <li>
-              <strong>Targeted Draw Two:</strong> choose anyone to draw two.
-              They keep their next turn.
-            </li>
-            <li>
-              <strong>Forced Swap:</strong> choose another player and exchange
-              hands.
-            </li>
-          </>
-        )}
-        <li>
-          <strong>UNO:</strong> call it when you have one card left. This table
-          uses the exact rules listed below.
-        </li>
-      </ul>
-      <RulesSummary rules={props.rules ?? {}} includeBots />
-      <a
-        className="settings-link"
-        href={
-          mercy
-            ? "https://service.mattel.com/instruction_sheets/HVW18-Eng.pdf"
-            : "https://service.mattel.com/instruction_sheets/HHL33-Eng.pdf"
-        }
-        target="_blank"
-        rel="noreferrer"
-      >
-        Mattel instruction sheet <ArrowRight size={16} />
-      </a>
+      <div className="settings-panel">
+        <p>
+          {mercy
+            ? "Match a color, number or symbol."
+            : "Play any card. No color matching or color choice."}
+        </p>
+        <CardSymbolGuide mode={mercy ? "no_mercy" : "all_wild"} />
+        <PracticeHand mode={mercy ? "no_mercy" : "all_wild"} />
+        <details className={styles.currentRules}>
+          <summary>
+            {props.inGame ? "Rules at this table" : "Rules for your next round"}
+          </summary>
+          <RulesSummary rules={props.rules ?? {}} includeBots />
+        </details>
+        <a
+          className="settings-link"
+          href={
+            mercy
+              ? "https://service.mattel.com/instruction_sheets/HVW18-Eng.pdf"
+              : "https://service.mattel.com/instruction-sheets/files/HHL33_UNO%20All%20Wild%5BEnglish%20%28non-US%29%20_%20French%20_%20German%20_%20Dutch%20_%20Italian%20_%20Spanish%20_%20Portuguese%5D%5B7LA%5DPDF.pdf"
+          }
+          target="_blank"
+          rel="noreferrer"
+        >
+          Mattel instruction sheet <ArrowRight size={16} />
+        </a>
+      </div>
+      <div className="modal-footer">
+        <button className="button primary" onClick={props.onClose}>
+          Done
+        </button>
+      </div>
     </Modal>
   );
 }

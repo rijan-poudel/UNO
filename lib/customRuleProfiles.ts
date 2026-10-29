@@ -48,26 +48,27 @@ function notify(): void {
   }
 }
 
+function syncStorage(event: StorageEvent): void {
+  if (
+    event.key === null ||
+    [RULE_PROFILES_KEY, FAVORITE_PROFILES_KEY, ACTIVE_PROFILE_KEY].includes(
+      event.key,
+    )
+  ) {
+    fallback = null;
+    fallbackFavorites = null;
+    fallbackActive = null;
+    notify();
+  }
+}
+
 export function subscribeRuleProfiles(listener: () => void): () => void {
-  listeners.add(listener);
-  const syncStorage = (event: StorageEvent) => {
-    if (
-      event.key === null ||
-      [RULE_PROFILES_KEY, FAVORITE_PROFILES_KEY, ACTIVE_PROFILE_KEY].includes(
-        event.key,
-      )
-    ) {
-      fallback = null;
-      fallbackFavorites = null;
-      fallbackActive = null;
-      notify();
-    }
-  };
-  if (typeof window !== 'undefined')
+  if (listeners.size === 0 && typeof window !== 'undefined')
     window.addEventListener('storage', syncStorage);
+  listeners.add(listener);
   return () => {
     listeners.delete(listener);
-    if (typeof window !== 'undefined')
+    if (listeners.size === 0 && typeof window !== 'undefined')
       window.removeEventListener('storage', syncStorage);
   };
 }

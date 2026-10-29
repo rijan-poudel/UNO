@@ -50,6 +50,7 @@ export default function TableScoreCard({
               </span>
               <span
                 className="result-card-count"
+                role="img"
                 aria-label={`${wins} ${wins === 1 ? "win" : "wins"}`}
               >
                 <Trophy size={16} aria-hidden="true" />

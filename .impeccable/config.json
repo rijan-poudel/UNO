@@ -344,6 +344,222 @@
         ],
         "createdAt": "2026-10-24T09:11:07.667Z",
         "reason": "User-approved Color play composite: primary and color-choice controls retain a shallow pressed bottom lip as functional game-control depth, not decorative information-container side accents."
+      },
+      {
+        "rule": "design-system-radius",
+        "value": "3px",
+        "files": [
+          "app/globals.css"
+        ],
+        "createdAt": "2026-10-29T01:33:21.182Z",
+        "reason": "Maintainer review: functional confetti pieces and tiny collection-card print geometry use a 3px radius; DESIGN.md keeps native cards and earned-progress art distinct from panel rounding."
+      },
+      {
+        "rule": "design-system-radius",
+        "value": "4px",
+        "files": [
+          "app/globals.css"
+        ],
+        "createdAt": "2026-10-29T01:33:21.249Z",
+        "reason": "Maintainer review: this 4px radius follows the milestone disclosure focus outline, not a panel or card; preserve the existing visible keyboard focus geometry."
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#64748b",
+        "files": [
+          "components/HowToPlayModal.module.css"
+        ],
+        "createdAt": "2026-10-29T02:01:23.059Z",
+        "reason": "Maintainer review: preserve the existing Classic help miniature-table palette and compact card/status geometry recorded in DESIGN.md. These scoped values predate this cleanup; actual contrast and motion defects are fixed separately. This is not a new app-wide token or visual direction."
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#2365b8",
+        "files": [
+          "components/HowToPlayModal.module.css"
+        ],
+        "createdAt": "2026-10-29T02:01:23.109Z",
+        "reason": "Maintainer review: preserve the existing Classic help miniature-table palette and compact card/status geometry recorded in DESIGN.md. These scoped values predate this cleanup; actual contrast and motion defects are fixed separately. This is not a new app-wide token or visual direction."
+      },
+      {
+        "rule": "design-system-radius",
+        "value": "10px",
+        "files": [
+          "components/HowToPlayModal.module.css"
+        ],
+        "createdAt": "2026-10-29T02:01:23.160Z",
+        "reason": "Maintainer review: preserve the existing Classic help miniature-table palette and compact card/status geometry recorded in DESIGN.md. These scoped values predate this cleanup; actual contrast and motion defects are fixed separately. This is not a new app-wide token or visual direction."
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#00000030",
+        "files": [
+          "components/HowToPlayModal.module.css"
+        ],
+        "createdAt": "2026-10-29T02:01:23.211Z",
+        "reason": "Maintainer review: preserve the existing Classic help miniature-table palette and compact card/status geometry recorded in DESIGN.md. These scoped values predate this cleanup; actual contrast and motion defects are fixed separately. This is not a new app-wide token or visual direction."
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#1c4587",
+        "files": [
+          "components/HowToPlayModal.module.css"
+        ],
+        "createdAt": "2026-10-29T02:01:23.264Z",
+        "reason": "Maintainer review: preserve the existing Classic help miniature-table palette and compact card/status geometry recorded in DESIGN.md. These scoped values predate this cleanup; actual contrast and motion defects are fixed separately. This is not a new app-wide token or visual direction."
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#00000040",
+        "files": [
+          "components/HowToPlayModal.module.css"
+        ],
+        "createdAt": "2026-10-29T02:01:23.317Z",
+        "reason": "Maintainer review: preserve the existing Classic help miniature-table palette and compact card/status geometry recorded in DESIGN.md. These scoped values predate this cleanup; actual contrast and motion defects are fixed separately. This is not a new app-wide token or visual direction."
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#00000050",
+        "files": [
+          "components/HowToPlayModal.module.css"
+        ],
+        "createdAt": "2026-10-29T02:01:23.369Z",
+        "reason": "Maintainer review: preserve the existing Classic help miniature-table palette and compact card/status geometry recorded in DESIGN.md. These scoped values predate this cleanup; actual contrast and motion defects are fixed separately. This is not a new app-wide token or visual direction."
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#486282",
+        "files": [
+          "components/HowToPlayModal.module.css"
+        ],
+        "createdAt": "2026-10-29T02:01:23.423Z",
+        "reason": "Maintainer review: preserve the existing Classic help miniature-table palette and compact card/status geometry recorded in DESIGN.md. These scoped values predate this cleanup; actual contrast and motion defects are fixed separately. This is not a new app-wide token or visual direction."
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#a4c4f5",
+        "files": [
+          "components/HowToPlayModal.module.css"
+        ],
+        "createdAt": "2026-10-29T02:01:23.487Z",
+        "reason": "Maintainer review: preserve the existing Classic help miniature-table palette and compact card/status geometry recorded in DESIGN.md. These scoped values predate this cleanup; actual contrast and motion defects are fixed separately. This is not a new app-wide token or visual direction."
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#00000070",
+        "files": [
+          "components/HowToPlayModal.module.css"
+        ],
+        "createdAt": "2026-10-29T02:01:23.546Z",
+        "reason": "Maintainer review: preserve the existing Classic help miniature-table palette and compact card/status geometry recorded in DESIGN.md. These scoped values predate this cleanup; actual contrast and motion defects are fixed separately. This is not a new app-wide token or visual direction."
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#b8d4fe",
+        "files": [
+          "components/HowToPlayModal.module.css"
+        ],
+        "createdAt": "2026-10-29T02:01:23.599Z",
+        "reason": "Maintainer review: preserve the existing Classic help miniature-table palette and compact card/status geometry recorded in DESIGN.md. These scoped values predate this cleanup; actual contrast and motion defects are fixed separately. This is not a new app-wide token or visual direction."
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#39e38f",
+        "files": [
+          "components/HowToPlayModal.module.css"
+        ],
+        "createdAt": "2026-10-29T02:01:23.652Z",
+        "reason": "Maintainer review: preserve the existing Classic help miniature-table palette and compact card/status geometry recorded in DESIGN.md. These scoped values predate this cleanup; actual contrast and motion defects are fixed separately. This is not a new app-wide token or visual direction."
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#00000045",
+        "files": [
+          "components/HowToPlayModal.module.css"
+        ],
+        "createdAt": "2026-10-29T02:01:23.707Z",
+        "reason": "Maintainer review: preserve the existing Classic help miniature-table palette and compact card/status geometry recorded in DESIGN.md. These scoped values predate this cleanup; actual contrast and motion defects are fixed separately. This is not a new app-wide token or visual direction."
+      },
+      {
+        "rule": "design-system-color",
+        "value": "rgba(0, 0, 0, 0.35)",
+        "files": [
+          "components/HowToPlayModal.module.css"
+        ],
+        "createdAt": "2026-10-29T02:01:23.761Z",
+        "reason": "Maintainer review: preserve the existing Classic help miniature-table palette and compact card/status geometry recorded in DESIGN.md. These scoped values predate this cleanup; actual contrast and motion defects are fixed separately. This is not a new app-wide token or visual direction."
+      },
+      {
+        "rule": "design-system-radius",
+        "value": "5px",
+        "files": [
+          "components/HowToPlayModal.module.css"
+        ],
+        "createdAt": "2026-10-29T02:01:23.815Z",
+        "reason": "Maintainer review: preserve the existing Classic help miniature-table palette and compact card/status geometry recorded in DESIGN.md. These scoped values predate this cleanup; actual contrast and motion defects are fixed separately. This is not a new app-wide token or visual direction."
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#8daed8",
+        "files": [
+          "components/HowToPlayModal.module.css"
+        ],
+        "createdAt": "2026-10-29T02:01:23.871Z",
+        "reason": "Maintainer review: preserve the existing Classic help miniature-table palette and compact card/status geometry recorded in DESIGN.md. These scoped values predate this cleanup; actual contrast and motion defects are fixed separately. This is not a new app-wide token or visual direction."
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#79f5ba",
+        "files": [
+          "components/HowToPlayModal.module.css"
+        ],
+        "createdAt": "2026-10-29T02:01:23.924Z",
+        "reason": "Maintainer review: preserve the existing Classic help miniature-table palette and compact card/status geometry recorded in DESIGN.md. These scoped values predate this cleanup; actual contrast and motion defects are fixed separately. This is not a new app-wide token or visual direction."
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "19px",
+        "files": [
+          "components/HowToPlayModal.module.css"
+        ],
+        "createdAt": "2026-10-29T02:01:23.978Z",
+        "reason": "Maintainer review: preserve the existing Classic help miniature-table palette and compact card/status geometry recorded in DESIGN.md. These scoped values predate this cleanup; actual contrast and motion defects are fixed separately. This is not a new app-wide token or visual direction."
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#e5eaf0",
+        "files": [
+          "components/HowToPlayModal.module.css"
+        ],
+        "createdAt": "2026-10-29T02:01:24.031Z",
+        "reason": "Maintainer review: preserve the existing Classic help miniature-table palette and compact card/status geometry recorded in DESIGN.md. These scoped values predate this cleanup; actual contrast and motion defects are fixed separately. This is not a new app-wide token or visual direction."
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#eb1442",
+        "files": [
+          "components/HowToPlayModal.module.css"
+        ],
+        "createdAt": "2026-10-29T02:01:24.089Z",
+        "reason": "Maintainer review: preserve the existing Classic help miniature-table palette and compact card/status geometry recorded in DESIGN.md. These scoped values predate this cleanup; actual contrast and motion defects are fixed separately. This is not a new app-wide token or visual direction."
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#0fcb76",
+        "files": [
+          "components/HowToPlayModal.module.css"
+        ],
+        "createdAt": "2026-10-29T02:01:24.143Z",
+        "reason": "Maintainer review: preserve the existing Classic help miniature-table palette and compact card/status geometry recorded in DESIGN.md. These scoped values predate this cleanup; actual contrast and motion defects are fixed separately. This is not a new app-wide token or visual direction."
+      },
+      {
+        "rule": "design-system-radius",
+        "value": "4px",
+        "files": [
+          "components/HowToPlayModal.module.css"
+        ],
+        "createdAt": "2026-10-29T02:01:24.195Z",
+        "reason": "Maintainer review: preserve the existing Classic help miniature-table palette and compact card/status geometry recorded in DESIGN.md. These scoped values predate this cleanup; actual contrast and motion defects are fixed separately. This is not a new app-wide token or visual direction."
       }
     ]
   }

@@ -16,17 +16,16 @@ import type {
 import { toast } from 'sonner';
 import { getProfileIdForRules } from '../lib/customRuleProfiles';
 import { getPlayableCards } from '../lib/gameRules';
+import { describeGameAction } from '../lib/gameActivity';
 import { toPresentationGame } from '../lib/gameView';
-import {
-  getPlayerName,
-  resolvePlayerName,
-  subscribePlayerName,
-} from '../lib/playerNames';
+import { getPlayerName, subscribePlayerName } from '../lib/playerNames';
 import { getPlayerAvatar, subscribePlayerAvatar } from '../lib/playerAvatars';
 import { usePlayerActivity } from './usePlayerActivity';
 import {
   ONLINE_UNAVAILABLE_MESSAGE,
+  readRoomSession,
   resolveSocketEndpoint,
+  type RoomSession,
 } from '../lib/socketConnection';
 
 const AUTO_PASS_AFTER_DRAW_MS = 650;
@@ -97,42 +96,13 @@ interface FeedState {
   connected: boolean;
 }
 
-function describeAction(game: {
-  lastAction: GameState['lastAction'];
-  players: Array<{ id: string; name: string }>;
-}): string {
-  const action = game.lastAction;
-
-  switch (action.type) {
-    case 'play': {
-      const extras: string[] = [];
-      if (action.playedCards) extras.push('played both matching numbers');
-      if (action.declaredUno) extras.push('called UNO');
-      if (action.discardAllCount && action.discardAllCount > 0) {
-        extras.push(`discarded ${action.discardAllCount} extra`);
-      }
-      if (action.shuffledHands) {
-        extras.push('shuffled all hands');
-      }
-      return `${resolvePlayerName(game.players, action.playerId)} played ${action.card.color} ${action.card.value}${
-        action.chosenColor ? ` -> chose ${action.chosenColor}` : ''
-      }${extras.length ? ` (${extras.join(', ')})` : ''}`;
-    }
-    case 'draw':
-      return `${resolvePlayerName(game.players, action.playerId)} drew ${action.count} card${action.count !== 1 ? 's' : ''}`;
-    case 'pass':
-      return `${resolvePlayerName(game.players, action.playerId)} passed`;
-    case 'declareUno':
-      return `${resolvePlayerName(game.players, action.playerId)} said UNO`;
-    case 'callOut':
-      return `${resolvePlayerName(game.players, action.callerId)} called out ${resolvePlayerName(game.players, action.targetId)}`;
-    default:
-      return 'Game started';
-  }
-}
-
 export function useUnoOnlineGame() {
   const socketRef = useRef<Socket | null>(null);
+  const roomSession = useRef<RoomSession | null | undefined>(undefined);
+  const pendingWildPlay = useRef<{
+    cardId: string;
+    options: PlayOptions;
+  } | null>(null);
   const membershipRevision = useRef(0);
   const discardStaleMembership = useCallback(
     (revision: number, room?: RoomSnapshot) => {
@@ -163,8 +133,6 @@ export function useUnoOnlineGame() {
     connected: false,
   });
 
-  const announcedRoomIdRef = useRef<string | null>(null);
-
   useEffect(() => {
     const socketUrl = resolveSocketEndpoint(
       process.env.NEXT_PUBLIC_SOCKET_URL,
@@ -193,66 +161,68 @@ export function useUnoOnlineGame() {
 
     socket.on('connect', () => {
       setState((prev) => ({ ...prev, connected: true, error: null }));
-      try {
-        const saved = JSON.parse(
-          sessionStorage.getItem(ACTIVE_ROOM_KEY) ?? 'null',
-        ) as { roomId?: string; playerName?: string } | null;
-        if (saved?.roomId && typeof saved.roomId === 'string') {
-          const revision = ++membershipRevision.current;
-          socket.timeout(6000).emit(
-            'room:join',
-            {
-              roomId: saved.roomId,
-              playerName: getPlayerName(saved.playerName || 'You'),
-              deviceId,
-            },
-            (
-              error: Error | null,
-              ack?: Ack<{ room: RoomSnapshot; playerId: string }>,
-            ) => {
-              if (
-                discardStaleMembership(
-                  revision,
-                  ack?.ok ? ack.data.room : undefined,
-                )
+      const saved = readRoomSession(
+        () => sessionStorage.getItem(ACTIVE_ROOM_KEY),
+        roomSession.current,
+      );
+      if (saved) {
+        const revision = ++membershipRevision.current;
+        socket.timeout(6000).emit(
+          'room:join',
+          {
+            roomId: saved.roomId,
+            playerName: getPlayerName(saved.playerName || 'You'),
+            deviceId,
+          },
+          (
+            error: Error | null,
+            ack?: Ack<{ room: RoomSnapshot; playerId: string }>,
+          ) => {
+            if (
+              discardStaleMembership(
+                revision,
+                ack?.ok ? ack.data.room : undefined,
               )
-                return;
-              if (error || !ack?.ok) {
-                // A vanished server/room ends this session; don't send actions with stale membership.
-                try {
-                  sessionStorage.removeItem(ACTIVE_ROOM_KEY);
-                } catch {}
-                setState((prev) => ({
-                  ...prev,
-                  room: null,
-                  game: null,
-                  playerId: null,
-                  error: error
-                    ? 'Could not reconnect. Join the room again.'
-                    : ack && !ack.ok
-                      ? ack.error
-                      : 'Could not restore your table.',
-                }));
-                return;
-              }
+            )
+              return;
+            if (error || !ack?.ok) {
+              // A vanished server/room ends this session; don't send actions with stale membership.
+              roomSession.current = null;
+              pendingWildPlay.current = null;
+              try {
+                sessionStorage.removeItem(ACTIVE_ROOM_KEY);
+              } catch {}
               setState((prev) => ({
                 ...prev,
-                room: ack.data.room,
-                game: toPresentationGame(ack.data.room.game),
-                playerId: ack.data.playerId,
-                drawnThisTurn: Boolean(
-                  ack.data.room.game?.drawnThisTurn &&
-                  ack.data.room.game.players[
-                    ack.data.room.game.currentPlayerIndex
-                  ]?.id === ack.data.playerId,
-                ),
-                error: null,
+                room: null,
+                game: null,
+                playerId: null,
+                outgoingInvites: [],
+                drawnThisTurn: false,
+                log: [],
+                error: error
+                  ? 'Could not reconnect. Join the room again.'
+                  : ack && !ack.ok
+                    ? ack.error
+                    : 'Could not restore your table.',
               }));
-            },
-          );
-        }
-      } catch {
-        /* Session storage is optional. */
+              return;
+            }
+            setState((prev) => ({
+              ...prev,
+              room: ack.data.room,
+              game: toPresentationGame(ack.data.room.game),
+              playerId: ack.data.playerId,
+              drawnThisTurn: Boolean(
+                ack.data.room.game?.drawnThisTurn &&
+                ack.data.room.game.players[
+                  ack.data.room.game.currentPlayerIndex
+                ]?.id === ack.data.playerId,
+              ),
+              error: null,
+            }));
+          },
+        );
       }
     });
 
@@ -274,7 +244,7 @@ export function useUnoOnlineGame() {
         if (!prev.room || prev.room.roomId !== room.roomId) return prev;
         let nextLog = room.started ? prev.log : [];
         if (room.game) {
-          const actionLine = describeAction(room.game);
+          const actionLine = describeGameAction(room.game);
           nextLog = [
             actionLine,
             ...prev.log.filter((entry) => entry !== actionLine),
@@ -299,6 +269,8 @@ export function useUnoOnlineGame() {
 
     socket.on('room:kicked', (payload?: { message?: string }) => {
       membershipRevision.current++;
+      roomSession.current = null;
+      pendingWildPlay.current = null;
       try {
         sessionStorage.removeItem(ACTIVE_ROOM_KEY);
       } catch {}
@@ -420,28 +392,19 @@ export function useUnoOnlineGame() {
 
   useEffect(() => {
     if (!state.room || !state.playerId) return;
+    roomSession.current = {
+      roomId: state.room.roomId,
+      playerName:
+        state.room.players.find((p) => p.playerId === state.playerId)?.name ??
+        'You',
+    };
     try {
       sessionStorage.setItem(
         ACTIVE_ROOM_KEY,
-        JSON.stringify({
-          roomId: state.room.roomId,
-          playerName:
-            state.room.players.find((p) => p.playerId === state.playerId)
-              ?.name ?? 'You',
-        }),
+        JSON.stringify(roomSession.current),
       );
     } catch {}
   }, [state.room, state.playerId]);
-
-  useEffect(() => {
-    const id = state.room?.roomId ?? null;
-    if (!id) {
-      announcedRoomIdRef.current = null;
-      return;
-    }
-    if (announcedRoomIdRef.current === id) return;
-    announcedRoomIdRef.current = id;
-  }, [state.room?.roomId]);
 
   const callAck = useCallback(
     <T>(event: string, payload: object): Promise<Ack<T>> => {
@@ -729,12 +692,8 @@ export function useUnoOnlineGame() {
       return false;
     }
 
-    setState((prev) => ({
-      ...prev,
-      room: ack.data.room,
-      game: toPresentationGame(ack.data.room.game),
-      error: null,
-    }));
+    // room:update owns readiness and round transitions. A delayed Ready reply
+    // may describe the old results after the host has already dealt again.
     return true;
   }, [callAck, discardStaleMembership, state.room]);
 
@@ -864,6 +823,8 @@ export function useUnoOnlineGame() {
 
   const leaveRoom = useCallback(async () => {
     membershipRevision.current++;
+    roomSession.current = null;
+    pendingWildPlay.current = null;
     const roomId = state.room?.roomId;
     try {
       sessionStorage.removeItem(ACTIVE_ROOM_KEY);
@@ -887,16 +848,17 @@ export function useUnoOnlineGame() {
   const sendAction = useCallback(
     async (action: MultiplayerAction) => {
       if (!state.room) return;
+      const revision = membershipRevision.current;
       const ack = await callAck<{ room: RoomSnapshot }>('game:action', {
         roomId: state.room.roomId,
         action,
       });
-
+      if (discardStaleMembership(revision)) return;
       if (!ack.ok) {
         setState((prev) => ({ ...prev, error: ack.error }));
       }
     },
-    [callAck, state.room],
+    [callAck, discardStaleMembership, state.room],
   );
 
   const game = state.game;
@@ -981,11 +943,9 @@ export function useUnoOnlineGame() {
     if ((game.pendingDraw ?? 0) > 0) return;
     if (playableCardIds.size > 0) return;
 
-    const coordinatedAutoPassDelay = AUTO_PASS_AFTER_DRAW_MS;
-
     const timer = window.setTimeout(() => {
       void sendAction({ type: 'pass' });
-    }, coordinatedAutoPassDelay);
+    }, AUTO_PASS_AFTER_DRAW_MS);
 
     return () => window.clearTimeout(timer);
   }, [
@@ -1006,6 +966,7 @@ export function useUnoOnlineGame() {
         game.rules.gameMode !== 'all_wild' &&
         card.value !== 'wildColorRoulette'
       ) {
+        pendingWildPlay.current = { cardId: card.id, options: { ...options } };
         void sendAction({ type: 'prepareWild', cardId: card.id });
         return;
       }
@@ -1025,12 +986,16 @@ export function useUnoOnlineGame() {
         type: 'play',
         cardId: pendingWild.id,
         chosenColor: color,
+        ...(pendingWildPlay.current?.cardId === pendingWild.id
+          ? pendingWildPlay.current.options
+          : {}),
       });
     },
     [pendingWild, game, sendAction],
   );
 
   const cancelWild = useCallback(() => {
+    pendingWildPlay.current = null;
     void sendAction({ type: 'cancelWildChoice' });
   }, [sendAction]);
 

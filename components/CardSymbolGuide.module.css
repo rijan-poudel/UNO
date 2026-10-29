@@ -1,0 +1,36 @@
+.guide {
+  margin-block: 20px;
+  border-block: 1px solid var(--ui-line);
+}
+.guide summary {
+  min-height: 48px;
+  padding-block: 12px;
+  font-weight: 650;
+  cursor: pointer;
+}
+.guide dl {
+  margin: 0;
+}
+.row {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  align-items: center;
+  gap: 16px;
+  min-height: 80px;
+  padding-block: 12px;
+  border-top: 1px solid var(--ui-line);
+}
+.preview {
+  display: grid;
+  place-items: center;
+}
+.row dt {
+  font-size: 15px;
+  font-weight: 650;
+}
+.row dd {
+  margin: 4px 0 0;
+  color: var(--ui-muted);
+  font-size: 14px;
+  line-height: 1.5;
+}

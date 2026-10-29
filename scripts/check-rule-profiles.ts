@@ -14,6 +14,7 @@ import {
   getRuleProfilesRevision,
   getServerRuleProfilesRevision,
   setActiveProfileId,
+  subscribeRuleProfiles,
 } from '../lib/customRuleProfiles';
 import { RULE_PRESETS, matchesPreset } from '../lib/rulePresets';
 import { defaultRules, NO_MERCY_RULES, ALL_WILD_RULES } from '../types/rules';
@@ -28,7 +29,13 @@ import {
 import type { GameState } from '../types/game';
 const original = Object.getOwnPropertyDescriptor(globalThis, 'localStorage');
 const data = new Map<string, string>();
+const originalWindow = Object.getOwnPropertyDescriptor(globalThis, 'window');
+const storageEvents = new EventTarget();
 try {
+  Object.defineProperty(globalThis, 'window', {
+    configurable: true,
+    value: storageEvents,
+  });
   Object.defineProperty(globalThis, 'localStorage', {
     configurable: true,
     value: {
@@ -65,6 +72,35 @@ try {
     'React snapshot stays stable between mutations',
   );
   assert.equal(getServerRuleProfilesRevision(), 0);
+  let firstUpdates = 0;
+  let secondUpdates = 0;
+  const stopFirst = subscribeRuleProfiles(() => firstUpdates++);
+  const stopSecond = subscribeRuleProfiles(() => secondUpdates++);
+  const dispatchStorage = (key: string) =>
+    storageEvents.dispatchEvent(Object.assign(new Event('storage'), { key }));
+  const beforeStorage = getRuleProfilesRevision();
+  dispatchStorage('another-setting');
+  assert.equal(getRuleProfilesRevision(), beforeStorage);
+  dispatchStorage(RULE_PROFILES_KEY);
+  assert.equal(
+    getRuleProfilesRevision(),
+    beforeStorage + 1,
+    'One storage event publishes one revision, regardless of subscriber count',
+  );
+  assert.equal(firstUpdates, 1);
+  assert.equal(secondUpdates, 1);
+  stopFirst();
+  dispatchStorage(RULE_PROFILES_KEY);
+  assert.equal(firstUpdates, 1);
+  assert.equal(secondUpdates, 2);
+  stopSecond();
+  const afterUnsubscribe = getRuleProfilesRevision();
+  dispatchStorage(RULE_PROFILES_KEY);
+  assert.equal(
+    getRuleProfilesRevision(),
+    afterUnsubscribe,
+    'The final unsubscribe removes the shared storage listener',
+  );
   // Copying original modes to custom profiles
   const customNoMercy = copyOriginalToCustom('no_mercy', 'My Brutal No Mercy');
   assert.ok(
@@ -131,6 +167,9 @@ try {
   data.set(RULE_PROFILES_KEY, '{broken');
   assert.deepEqual(getRuleProfiles(), []);
 } finally {
+  if (originalWindow)
+    Object.defineProperty(globalThis, 'window', originalWindow);
+  else Reflect.deleteProperty(globalThis, 'window');
   if (original) Object.defineProperty(globalThis, 'localStorage', original);
   else Reflect.deleteProperty(globalThis, 'localStorage');
 }

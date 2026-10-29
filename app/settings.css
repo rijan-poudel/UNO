@@ -19,6 +19,31 @@ html[data-reduced-motion="true"] *::after {
   --ui-accent-red: #c50730;
   --ui-accent-green: #007943;
 }
+:root .modal.settings-modal[class*="settings-tone-"] {
+  color-scheme: dark;
+  --settings-ground: #17345f;
+  --settings-highlight: #24466f;
+  --ui-bg: var(--settings-ground);
+  --ui-surface: var(--settings-ground);
+  --ui-text: var(--club-paper);
+  --ui-muted: #c3d5ee;
+  --ui-line: #557194;
+  --ui-accent-blue: var(--club-yellow);
+  --ui-accent-red: #ff93aa;
+  --ui-accent-green: #7de0b0;
+}
+:root .modal.settings-modal.settings-tone-no-mercy {
+  --settings-ground: #2c1e29;
+  --settings-highlight: #40303d;
+  --ui-muted: #d6c1d0;
+  --ui-line: #7a6373;
+}
+:root .modal.settings-modal.settings-tone-all-wild {
+  --settings-ground: #322447;
+  --settings-highlight: #49365f;
+  --ui-muted: #d6c7e8;
+  --ui-line: #7d6a94;
+}
 .settings-modal {
   width: min(620px, calc(100vw - 32px));
   height: fit-content;
@@ -40,7 +65,7 @@ html[data-reduced-motion="true"] *::after {
   min-height: 80px;
   padding: 18px var(--settings-gutter);
   border: 0;
-  background: #123d86;
+  background: var(--settings-ground, #123d86);
   color: var(--club-paper);
 }
 .settings-modal > .modal-content > .modal-heading h2 {
@@ -73,22 +98,23 @@ html[data-reduced-motion="true"] *::after {
 }
 .settings-choices {
   display: grid;
+  gap: 8px;
 }
 .settings-choices > button {
   display: flex;
   align-items: center;
   gap: 16px;
   min-height: 76px;
-  padding: 16px 0;
+  padding: 16px;
   border: 0;
-  border-bottom: 1px solid var(--ui-line);
+  border-radius: 12px;
   background: transparent;
   color: var(--ui-text);
   text-align: left;
   cursor: pointer;
   transition:
     transform 120ms ease-out,
-    color 150ms ease-out;
+    background-color 150ms ease-out;
 }
 .settings-choices > button:active {
   transform: scale(0.99);
@@ -143,6 +169,7 @@ html[data-reduced-motion="true"] *::after {
   min-height: 64px;
   padding-block: 12px;
   gap: 16px;
+  border: 0;
 }
 .settings-modal .switch-track {
   width: 44px;
@@ -181,10 +208,11 @@ html[data-reduced-motion="true"] *::after {
 }
 .settings-modal .settings-disclosure {
   display: block;
-  margin: 0;
-  padding: 0;
+  margin: 8px 0;
+  padding: 0 16px;
   border: 0;
-  border-bottom: 1px solid var(--ui-line);
+  border-radius: 12px;
+  background: var(--settings-highlight, #f0eadf);
   color: var(--ui-text);
 }
 .settings-disclosure > summary {
@@ -273,7 +301,7 @@ html[data-reduced-motion="true"] *::after {
 }
 .settings-modal .avatar-options button[aria-pressed="true"] {
   border-color: var(--ui-accent-blue);
-  background: #e8f0ff;
+  background: var(--settings-highlight, #e8f0ff);
 }
 .settings-modal .avatar-options .player-avatar.large {
   width: 44px;
@@ -288,10 +316,10 @@ html[data-reduced-motion="true"] *::after {
   height: 20px;
   border-radius: 50%;
   background: var(--ui-accent-blue);
-  color: #fff;
+  color: var(--settings-ground, #fff);
 }
 .profile-history .player-progress {
-  margin: 16px 0;
+  margin: 8px 0 20px;
 }
 .settings-game-actions {
   display: flex;
@@ -299,7 +327,7 @@ html[data-reduced-motion="true"] *::after {
   gap: 20px;
   padding-top: 16px;
   margin-top: 12px;
-  border-top: 1px solid var(--ui-line);
+  border: 0;
 }
 .settings-link {
   display: inline-flex;
@@ -316,7 +344,7 @@ html[data-reduced-motion="true"] *::after {
 }
 @media (hover: hover) {
   .settings-choices > button:hover {
-    color: var(--ui-accent-blue);
+    background: var(--settings-highlight, #f0eadf);
   }
   .settings-back:hover {
     color: var(--ui-text);
@@ -429,7 +457,7 @@ html[data-reduced-motion="true"] *::after {
   gap: 12px;
   align-items: center;
   padding: 12px;
-  border-bottom: 1px solid var(--ui-line);
+  border: 0;
 }
 .profile-popover-identity strong {
   overflow-wrap: anywhere;
@@ -509,7 +537,7 @@ html[data-reduced-motion="true"] *::after {
   gap: 12px;
   min-height: 76px;
   padding-block: 12px;
-  border-bottom: 1px solid var(--ui-line);
+  border-bottom: 0;
 }
 .friend-row > .player-avatar {
   width: 40px;
@@ -535,6 +563,27 @@ html[data-reduced-motion="true"] *::after {
 }
 .friend-row .button {
   flex: none;
+}
+.friend-remove-confirm {
+  margin-bottom: 12px;
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--settings-highlight, var(--ui-bg));
+}
+.friend-remove-confirm p {
+  margin: 0 0 12px;
+  overflow-wrap: anywhere;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.friend-remove-confirm > div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.friend-remove-confirm .button {
+  min-height: 44px;
 }
 .friend-picker-modal {
   width: min(520px, calc(100vw - 24px));
@@ -775,11 +824,11 @@ html[data-reduced-motion="true"] *::after {
   min-height: 80px;
   padding: 12px;
   margin-inline: -12px;
-  border-bottom: 1px solid var(--ui-line);
+  border-bottom: 0;
   transition: background-color 150ms ease-out;
 }
 .rule-profile-row[data-selected] {
-  background: #e8f0ff;
+  background: var(--settings-highlight, #e8f0ff);
   border-color: transparent;
   border-radius: 12px;
 }
@@ -888,6 +937,13 @@ html[data-reduced-motion="true"] *::after {
   color: var(--ui-accent-red);
   margin-left: auto;
 }
+.rule-delete-prompt {
+  flex-basis: 100%;
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-size: 14px;
+  line-height: 1.4;
+}
 .favorite-replace-options {
   display: grid;
   gap: 8px;
@@ -936,15 +992,6 @@ html[data-reduced-motion="true"] *::after {
   outline-offset: 3px;
 }
 
-.edition-guide {
-  padding-left: 20px;
-  margin-block: 16px;
-}
-.edition-guide li {
-  padding-bottom: 12px;
-  line-height: 1.55;
-}
-
 :root .favorite-replace-modal {
   width: min(520px, calc(100vw - 32px));
 }
@@ -963,7 +1010,7 @@ html[data-reduced-motion="true"] *::after {
   display: grid;
   gap: 10px;
   padding-block: 14px;
-  border-bottom: 1px solid var(--ui-line);
+  border: 0;
 }
 .settings-modal .volume-row label {
   display: flex;
@@ -1004,8 +1051,8 @@ html[data-reduced-motion="true"] *::after {
 .settings-modal .audio-muted-note {
   margin: 4px 0 12px;
   padding: 10px 14px;
-  border-radius: 10px;
-  background: #e8f0ff;
+  border-radius: 12px;
+  background: var(--settings-highlight, #e8f0ff);
   color: var(--ui-text);
   font-size: 13px;
   line-height: 1.4;
@@ -1022,7 +1069,7 @@ html[data-reduced-motion="true"] *::after {
     color: var(--ui-accent-blue);
   }
   .favorite-replace-option-btn:hover {
-    background: #e8f0ff;
+    background: var(--settings-highlight, #e8f0ff);
     border-color: var(--ui-accent-blue);
   }
   .favorite-replace-option-btn:hover > svg:last-child {

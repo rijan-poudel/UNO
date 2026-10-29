@@ -5,6 +5,7 @@ import type { Player } from "../types/game";
 import type { PlayerExpression } from "../lib/playerExpression";
 import PlayerAvatar from "./PlayerAvatar";
 import UnoCard from "./UnoCard";
+import { NoMercyIcon } from "./icons/NoMercyIcons";
 import styles from "./OpponentSeat.module.css";
 
 export default function OpponentSeat({
@@ -15,6 +16,9 @@ export default function OpponentSeat({
   offline,
   canCatch,
   onCatch,
+  mercyLimit = 0,
+  onTarget,
+  targetAction,
 }: {
   player: Player;
   active: boolean;
@@ -23,11 +27,22 @@ export default function OpponentSeat({
   offline: boolean;
   canCatch: boolean;
   onCatch: () => void;
+  mercyLimit?: number;
+  onTarget?: () => void;
+  targetAction?: string;
 }) {
-  const SeatLabel = canCatch ? "button" : "div";
+  const selectable = !!onTarget || canCatch;
+  const SeatLabel = selectable ? "button" : "div";
   const count = player.hand.length;
+  const isDanger =
+    mercyLimit > 0 && count >= mercyLimit - 5 && !player.eliminated;
+  const isWarning =
+    mercyLimit > 0 &&
+    count >= mercyLimit - 10 &&
+    !isDanger &&
+    !player.eliminated;
   const status = player.eliminated
-    ? "Out"
+    ? "Knocked out"
     : canCatch
       ? "Catch!"
       : offline
@@ -37,7 +52,7 @@ export default function OpponentSeat({
           : null;
   return (
     <div
-      className={`${styles.seat} ${player.eliminated ? "eliminated-seat" : ""} opponent ${position} ${active ? "active-seat" : ""} ${count === 1 ? "last-card-seat" : ""}`}
+      className={`${styles.seat} ${player.eliminated ? "eliminated-seat" : ""} opponent ${position} ${active ? "active-seat" : ""} ${count === 1 ? "last-card-seat" : ""} ${isDanger ? "seat-mercy-danger" : ""}`}
       data-seat={player.id}
     >
       <div className="opponent-hand" aria-hidden="true">
@@ -60,10 +75,17 @@ export default function OpponentSeat({
         ))}
       </div>
       <SeatLabel
-        className={`${styles.label} opponent-label ${canCatch ? "catch-seat" : ""}`}
-        type={canCatch ? "button" : undefined}
-        onClick={canCatch ? onCatch : undefined}
-        aria-label={canCatch ? `Catch ${player.name}’s missed UNO` : undefined}
+        className={`${styles.label} opponent-label ${onTarget ? "target-seat" : canCatch ? "catch-seat" : ""}`}
+        type={selectable ? "button" : undefined}
+        onClick={onTarget ?? (canCatch ? onCatch : undefined)}
+        data-target={onTarget ? player.id : undefined}
+        aria-label={
+          onTarget
+            ? `${targetAction} ${player.name}, ${count} cards`
+            : canCatch
+              ? `Catch ${player.name}’s missed UNO`
+              : undefined
+        }
       >
         <PlayerAvatar
           seed={player.id}
@@ -75,12 +97,15 @@ export default function OpponentSeat({
           <strong title={player.name}>{player.name}</strong>
           <span className={styles.details}>
             <span
-              className={styles.count}
+              className={`${styles.count} ${isDanger ? "mercy-count-danger" : isWarning ? "mercy-count-warning" : ""}`}
               role="img"
-              aria-label={`${count} ${count === 1 ? "card" : "cards"}`}
+              aria-label={`${count} ${count === 1 ? "card" : "cards"}${isDanger ? " (Mercy Danger)" : ""}`}
               data-count={count}
             >
-              <span aria-hidden="true">
+              <span aria-hidden="true" className="mercy-count-inner">
+                {isDanger && (
+                  <NoMercyIcon size={12} className="mercy-seat-flame" />
+                )}
                 {count}
                 <span className={styles.countUnit}>
                   {count === 1 ? " card" : " cards"}

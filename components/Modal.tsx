@@ -45,6 +45,7 @@ export default function Modal({
       {...({ closedby: onClose ? "any" : "none" } as Record<string, string>)}
       onCancel={(e) => {
         e.preventDefault();
+        e.stopPropagation();
         onClose?.();
       }}
       onClick={(e) => {

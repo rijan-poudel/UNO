@@ -23,9 +23,11 @@
 .modalContent {
   display: flex;
   flex-direction: column;
-  height: 100%;
-  max-height: min(90dvh, 670px);
-  padding: 14px 16px;
+  flex: 1;
+  min-height: 0;
+  height: auto;
+  max-height: none;
+  padding: 0 4px 8px;
   overflow-y: auto;
   overscroll-behavior: contain;
 }
@@ -48,24 +50,14 @@
 
 .stepDot {
   flex: 1;
-  height: 4px;
+  position: relative;
+  height: 44px;
+  min-height: 44px;
   border-radius: 999px;
-  background: #00000015;
+  background: transparent;
   border: none;
   padding: 0;
   cursor: pointer;
-  transition:
-    background 150ms ease,
-    transform 150ms ease;
-}
-
-.stepDotActive {
-  background: #df0735;
-  transform: scaleY(1.3);
-}
-
-.stepDotCompleted {
-  background: #00bc68;
 }
 
 .stepCounter {
@@ -80,7 +72,7 @@
 
 /* Main Miniature Table Arena */
 .tableArena {
-  flex: 1;
+  flex: 0 0 auto;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -532,12 +524,12 @@
 
 .cardHintWild {
   background: #00bc68;
-  color: #ffffff;
+  color: #17345f;
 }
 
 .cardHintWinning {
   background: #00bc68;
-  color: #ffffff;
+  color: #17345f;
   animation: pulseButton 1s infinite;
 }
 
@@ -551,6 +543,8 @@
 
 .resetHandBtn {
   display: inline-flex;
+  align-self: center;
+  min-height: 44px;
   align-items: center;
   gap: 4px;
   background: #09285c;
@@ -570,10 +564,6 @@
   border-color: #ffd45a;
 }
 
-.wobbleAnim {
-  animation: wobble 350ms ease;
-}
-
 .feedbackBanner {
   font-size: 12px;
   font-weight: 750;
@@ -586,7 +576,10 @@
 
 .drawnCardActionRow {
   display: flex;
+  align-items: center;
   justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
   margin-top: 2px;
 }
 
@@ -603,8 +596,8 @@
 }
 
 .colorDisc {
-  width: 32px;
-  height: 32px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   border: 2px solid #ffffff;
   cursor: pointer;
@@ -727,36 +720,6 @@
   width: 100%;
 }
 
-.unoActionBtn {
-  font-family: var(--font-card, "Barlow Condensed"), "Outfit", sans-serif;
-  font-size: 26px;
-  font-weight: 900;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  padding: 8px 36px;
-  border-radius: 12px;
-  border: 0;
-  background: #ffd45a;
-  color: #17345f;
-  box-shadow:
-    inset 0 -3px 0 #bf8a28,
-    0 4px 14px #00000045;
-  cursor: pointer;
-  transition: transform 100ms ease;
-  animation: pulseButton 1.2s infinite;
-}
-
-.unoActionBtn:hover {
-  transform: scale(1.04);
-}
-
-.unoActionBtn:active {
-  transform: translateY(2px);
-  box-shadow:
-    inset 0 -1px 0 #bf8a28,
-    0 2px 4px #00000045;
-}
-
 .readyLaunchScreen {
   display: flex;
   flex-direction: column;
@@ -792,17 +755,6 @@
 
 .trophyIcon {
   color: #ffd45a;
-  animation: bounceTrophy 1.2s ease infinite;
-}
-
-@keyframes bounceTrophy {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-4px);
-  }
 }
 
 .successIcon {
@@ -815,80 +767,6 @@
   margin: 0;
   max-width: 440px;
   line-height: 1.35;
-}
-
-.launchButtonsGroup {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  width: 100%;
-  margin-top: 4px;
-  flex-wrap: wrap;
-}
-
-.btnPlayBots {
-  font-family: var(--font-card, "Barlow Condensed"), "Outfit", sans-serif;
-  font-size: 17px;
-  font-weight: 850;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  padding: 8px 20px;
-  border-radius: 10px;
-  border: 0;
-  background: #ffd45a;
-  color: #17345f;
-  box-shadow:
-    inset 0 -3px 0 #bf8a28,
-    0 3px 8px #00000030;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  transition: transform 100ms ease;
-}
-
-.btnPlayBots:hover {
-  background: #ffdb6e;
-}
-
-.btnPlayBots:active {
-  transform: translateY(2px);
-  box-shadow:
-    inset 0 -1px 0 #bf8a28,
-    0 1px 3px #00000030;
-}
-
-.btnPlayFriends {
-  font-family: var(--font-card, "Barlow Condensed"), "Outfit", sans-serif;
-  font-size: 17px;
-  font-weight: 850;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  padding: 8px 18px;
-  border-radius: 10px;
-  border: 0;
-  background: #075bee;
-  color: #ffffff;
-  box-shadow:
-    inset 0 -3px 0 #0540a8,
-    0 3px 8px #00000030;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  transition: transform 100ms ease;
-}
-
-.btnPlayFriends:hover {
-  background: #196bf5;
-}
-
-.btnPlayFriends:active {
-  transform: translateY(2px);
-  box-shadow:
-    inset 0 -1px 0 #0540a8,
-    0 1px 3px #00000030;
 }
 
 /* Footer Navigation Controls */
@@ -968,7 +846,7 @@
   border-radius: 8px;
   border: 0;
   background: #00bc68;
-  color: #ffffff;
+  color: #17345f;
   box-shadow:
     inset 0 -2px 0 #007a44,
     0 2px 6px #00bc6830;
@@ -998,20 +876,6 @@
   100% {
     transform: translateY(0) scale(1) rotate(-2.5deg);
     opacity: 1;
-  }
-}
-
-@keyframes wobble {
-  0%,
-  100% {
-    transform: translateX(0);
-  }
-  25%,
-  75% {
-    transform: translateX(-4px);
-  }
-  50% {
-    transform: translateX(4px);
   }
 }
 
@@ -1068,9 +932,6 @@
 
 /* Mobile responsive */
 @media (max-width: 600px) {
-  .modalContent {
-    padding: 10px 12px;
-  }
   .trickCardsGrid {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -1085,25 +946,15 @@
     justify-content: center;
     font-size: 11px;
   }
-  .btnPlayBots,
-  .btnPlayFriends {
-    width: 100%;
-    justify-content: center;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .handCardBtn,
-  .btnNavNext,
-  .btnNavDone,
-  .unoActionBtn,
-  .btnPlayBots,
-  .btnPlayFriends,
-  .spinIconCw,
-  .spinIconCcw,
-  .directionPillReversed {
+  .modalBackdrop *,
+  .modalBackdrop *::before,
+  .modalBackdrop *::after {
     transition: none !important;
     animation: none !important;
+    scroll-behavior: auto !important;
   }
 }
 
@@ -1116,13 +967,6 @@
   padding: 16px;
   gap: 12px;
   overflow: hidden;
-}
-.modalContent {
-  flex: 1;
-  min-height: 0;
-  height: auto;
-  max-height: none;
-  padding: 0 4px 8px;
 }
 .footer {
   flex-shrink: 0;
@@ -1151,13 +995,6 @@
   line-height: 1.45;
   color: #58687a;
 }
-.stepDot {
-  position: relative;
-  height: 44px;
-  min-height: 44px;
-  background: transparent;
-  transform: none;
-}
 .stepDot::before {
   content: "";
   position: absolute;
@@ -1168,15 +1005,8 @@
   top: calc(50% - 2px);
   background: #ccd3da;
 }
-.stepDotActive {
-  background: transparent;
-  transform: none;
-}
 .stepDotActive::before {
   background: #df0735;
-}
-.stepDotCompleted {
-  background: transparent;
 }
 .stepDotCompleted::before {
   background: #007d46;

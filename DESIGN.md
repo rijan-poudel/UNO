@@ -22,8 +22,11 @@ colors:
   ui-muted: "#58687a"
   ui-line: "#ccd3da"
   portrait-selected: "#e8f0ff"
-  draw-label-surface: "rgba(14, 25, 46, 0.9)"
-  forced-draw-label-surface: "rgba(28, 20, 5, 0.95)"
+  settings-classic-highlight: "#24466f"
+  settings-no-mercy-ground: "#2c1e29"
+  settings-no-mercy-highlight: "#40303d"
+  settings-all-wild-ground: "#322447"
+  settings-all-wild-highlight: "#49365f"
   ui-accent-red: "#c50730"
   ui-accent-green: "#007943"
   cue-surface: "#09285c"
@@ -176,7 +179,6 @@ typography:
     fontWeight: 800
     lineHeight: 1
 rounded:
-  annotation: "4px"
   field: "6px"
   small: "8px"
   inset: "9px"
@@ -231,24 +233,25 @@ components:
     height: "50px"
   settings-choice:
     backgroundColor: "transparent"
-    textColor: "{colors.club-ink}"
+    textColor: "{colors.club-paper}"
     typography: "{typography.account-section}"
-    padding: "16px 0"
+    rounded: "{rounded.control}"
+    padding: "16px"
     height: "76px"
   settings-sheet:
-    backgroundColor: "{colors.ui-surface}"
-    textColor: "{colors.club-ink}"
+    backgroundColor: "{colors.club-ink}"
+    textColor: "{colors.club-paper}"
     rounded: "{rounded.settings-sheet}"
     width: "620px"
   settings-header:
-    backgroundColor: "{colors.stage}"
+    backgroundColor: "{colors.club-ink}"
     textColor: "{colors.club-paper}"
     typography: "{typography.settings-title}"
     padding: "18px 24px"
     height: "80px"
   setting-select:
-    backgroundColor: "{colors.ui-surface}"
-    textColor: "{colors.club-ink}"
+    backgroundColor: "{colors.club-ink}"
+    textColor: "{colors.club-paper}"
     typography: "{typography.body-large}"
     rounded: "{rounded.control}"
     padding: "10px 40px 10px 14px"
@@ -260,7 +263,7 @@ components:
     width: "44px"
     height: "26px"
   settings-switch-checked:
-    backgroundColor: "{colors.club-blue}"
+    backgroundColor: "{colors.club-yellow}"
   settings-portrait-selected:
     backgroundColor: "{colors.portrait-selected}"
     rounded: "{rounded.identity}"
@@ -272,17 +275,17 @@ components:
     height: "48px"
   rule-profile-select:
     backgroundColor: "transparent"
-    textColor: "{colors.club-ink}"
+    textColor: "{colors.club-paper}"
     padding: "0"
     height: "48px"
   rule-profile-row-active:
-    backgroundColor: "{colors.portrait-selected}"
-    textColor: "{colors.club-ink}"
+    backgroundColor: "{colors.settings-classic-highlight}"
+    textColor: "{colors.club-paper}"
     rounded: "{rounded.control}"
     padding: "12px"
     height: "80px"
   rule-profile-active-check:
-    textColor: "{colors.club-blue}"
+    textColor: "{colors.club-yellow}"
     size: "16px"
   home-favorite:
     backgroundColor: "transparent"
@@ -294,8 +297,8 @@ components:
     backgroundColor: "{colors.club-paper}"
     textColor: "{colors.club-ink}"
   favorite-replacement:
-    backgroundColor: "{colors.ui-surface}"
-    textColor: "{colors.club-ink}"
+    backgroundColor: "{colors.club-ink}"
+    textColor: "{colors.club-paper}"
     rounded: "{rounded.control}"
     padding: "12px 16px"
     height: "76px"
@@ -353,6 +356,12 @@ The October 27 edition hardening (`.impeccable/review/edition-hardening/contract
 
 The October 27 settings refinement (`.impeccable/review/settings-spacing/contract.md`) inherits the same world and FORM seed `2fba311c` as a local refinement, with no new world roll or comp. It carries the homepage palette into blue settings headers, cream scrolling bodies, amber decisions, pale-blue active rows and native card miniatures. This supersedes all-cream headers, separate body back rows, blue-filled stars, three custom-row actions and the earlier settings gutters. The shipped profile rows use an 80px minimum including padding; the contract’s provisional 72px row target is not the implemented rule.
 
+The October 27 printed-symbol correction (`.impeccable/review/card-symbols/contract.md`) is a bounded extension of Color play and FORM seed `2fba311c`. The shipped geometric SVG motifs follow the functional printed vocabulary in Mattel’s illustrated Classic, Show ’Em No Mercy and All Wild instruction sheets; they introduce no raster assets or generated artwork. Seven validated JPEG captures and the ship review remain in `.impeccable/review/card-symbols/`. This correction changes card vocabulary and optional edition help, without replacing the existing world.
+
+The October 27 play-clarity extension (`.impeccable/review/play-clarity/contract.md`) inherits Color play and FORM seed `2fba311c`. Engine-derived stack responses, direct opponent-seat targeting and optional original-edition practice clarify exceptional decisions while preserving the existing native cards, portraits and quiet routine play. Its six captures and ship review remain in `.impeccable/review/play-clarity/`; no new tokens, imagery or visual world were introduced.
+
+The October 27 quiet-play cleanup (`.impeccable/review/quiet-play/contract.md`) inherits Color play and FORM seed `2fba311c`. The owner explicitly supersedes pale Settings and horizontal separators: main tasks, custom drafts and favorite replacement now use edition-colored grounds, cream lettering, amber decisions and tonal grouping. Home favors text-only choices and a centered Play label; mode details stay in an optional native info popover. The table drops the edition badge, persistent Mercy meter, Draw caption and idle draw pulse. Two separated bent arrows now define Reverse, including the white navy-outlined pair over solid colored cards for Reverse +4. Twelve JPEG captures and the resolved ship verdict remain in `.impeccable/review/quiet-play/`; no new visual world, dependencies or artwork were introduced. Informational help retains its cream body.
+
 Source authority: `app/layout.tsx` imports globals, legacy table geometry, arena, home, club, then settings styles. `app/club.css` owns shared palette/chrome; `app/settings.css` owns the settings sheet, avatar popover, portrait picker and invitation surfaces; `app/home.css` owns home; `app/arena.css` owns live geometry/cues, with its final centered-board section superseding earlier geometry; `PlayerAvatar.module.css`, `OpponentSeat.module.css` and `UnoCard.module.css` own their materials. Component module specificity matters: the active portrait badge is cream, not the older arena yellow badge. Source takes precedence over older captures.
 
 ## Colors
@@ -361,7 +370,7 @@ The primary palette is saturated blue with cream and amber; the native deck reta
 
 ### Primary
 
-- **Club blue and stage blue:** shared action/focus blue and the deeper arena ground. The same stage blue heads settings tasks, with cream titles and header icons. Stage light creates a broad radial lift rather than a competing object.
+- **Club blue and stage blue:** shared action/focus blue and the deeper arena ground. Informational help keeps its blue heading and cream body; main Settings uses its scoped edition task palette below. Stage light creates a broad radial lift rather than a competing object.
 - **Edition grounds:** Classic UNO uses stage blue, UNO Show ’Em No Mercy uses charcoal with a crimson lift, and UNO All Wild uses plum. The selected edition carries the same ground through home, bot setup, room creation and its board; setup reads the shared edition stage colors. Named Classic custom profiles can still derive the inherited stack-blue or wild-plum house-rule moods; these are not additional original editions.
 
 ### Secondary
@@ -373,9 +382,11 @@ The primary palette is saturated blue with cream and amber; the native deck reta
 
 - **Club paper and UI surface:** warm foreground and default light native dialogs, account popover and invitation notices.
 - **Club ink, UI muted and UI line:** supporting-page text, secondary text and field/divider strokes.
-- **Cue surface:** opaque dark blue identity and remote-turn surfaces; no scene detail shows through names. Draw labels retain separate translucent navy and forced-draw brown overlay inks, scoped to readable pile status rather than general panel surfaces.
-- **Portrait selected:** pale blue is the fixed-light picker and active game-profile row fill. Portrait tiles pair it with a blue border/check; game rows pair it with an inline blue check. Favorite stars have an amber fill and blue outline when pinned, independently of active selection.
-- **Saved appearances:** paper is the default; midnight, forest and sunset override supporting UI tokens in `club.css`, including other native dialogs, the avatar popover and invitation notices. Midnight uses a navy surface and cream text rather than charcoal. The settings body always uses warm UI surface, club ink and the light supporting tokens, including blue focus and selected portrait states; its stage-blue header uses cream text/icons and yellow keyboard focus. No Appearance controls are offered; saved theme readers remain compatible. Home and arena retain their edition or supported custom-rule grounds.
+- **Cue surface:** opaque dark blue identity and remote-turn surfaces; no scene detail shows through names. The draw pile retains its native card-back affordance without a caption pill.
+- **Portrait selected:** portrait tiles retain pale blue with a blue border/check. Active game-profile rows use the edition task highlight and an amber check. Pinned stars use amber independently of active selection.
+- **Saved appearances:** paper is the default; midnight, forest and sunset override supporting UI tokens in `club.css`, including other native dialogs, the avatar popover and invitation notices. Midnight uses a navy surface and cream text rather than charcoal. Main Settings, custom drafts and favorite replacement instead use the edition task grounds: Classic reuses club ink with its navy highlight; No Mercy uses muted plum and All Wild violet. Heading, scrolling body and footer share this ground, with cream text and amber focus/actions. Highlights group selected profiles, progress, rule disclosures and audio notes. These scoped settings tokens do not recolor informational help or other dialogs. No Appearance controls are offered; saved theme readers remain compatible. Home and arena retain their edition or supported custom-rule grounds.
+
+**The Edition Task Rule.** Main Settings and its editors inherit the selected edition through ground and inset highlight, cream lettering and amber controls. Use spacing and subtle tonal groups instead of horizontal separators; informational help keeps its cream reading body.
 
 **The Published Color Rule.** Amber, cream active badges, legal-card outlines and wild swatches describe actual published state. Retain names, counts and written action/color labels alongside color.
 
@@ -392,7 +403,7 @@ The ramp is role-based, not a geometric scale. The frontmatter records the actua
 - **Headline / section / dialog:** Outfit with compact tracking and weight 750. Setup headline is responsive; dialog and section titles use their own roles. Settings uses the distinct 26px title role with 1.15 line height on desktop and phones, then 24px at heights of 500px or less; other dialogs retain their own responsive roles.
 - **Body / large body:** supporting content and setup explanations, with measured line lengths (setup 50ch, home rules explanatory copy).
 - **Account section / preference label:** medium-weight Outfit identifies overview choices and Friends groups (18px, 650); disclosures and preference labels use a quieter 14px, 600 role.
-- **Control / support:** regular button and field labels, rule descriptions and secondary actions. Home Play is a larger Outfit role with a smaller explanatory line.
+- **Control / support:** regular button and field labels, rule descriptions and secondary actions. Home Play is a larger centered Outfit label with no mode/bot subtitle or decorative arrow.
 - **Player name / count:** names are 13px by default, 12px in narrow or short usable panels and 11px at the shortest panel tier. Counts remain 11px and inline status 10px in the identity module. Outfit carries both name and count. Tabular numerals keep counts and the clock stable.
 - **Cue:** existing viewport rules retain the 18px/16px title roles and compact helper/clock roles; the centered board overrides titles to 12px and helper copy to 10px when usable panel height is at most 600px. A 28px clock fits that panel tier. The board container, rather than whole-window phone width, owns compact control placement.
 - **Native deck:** face values and corner indices scale together through `--card-scale`. Preserve the native card-back Outfit wordmark and Barlow Condensed face numerals.
@@ -401,15 +412,15 @@ The ramp is role-based, not a geometric scale. The frontmatter records the actua
 
 ## Layout
 
-Home is a centered title/start composition: main width capped at 760px and play lane at 400px. A small decorative native-card fan sits above up to three compact pinned profile choices and one dominant Play action; Create/Join share the secondary row. The favorite track uses equal flexible buttons with a 44px minimum height, a cream selected state and short edition labels; the active profile description remains below it even when the active profile is not pinned. Pinning and selecting are independent. The top-right avatar opens optional identity, social and settings tasks; bot setup and help are reached through Game rules, and completed-round progress through Profile. Setup and rooms do not repeat the avatar editor or decorative footer slogans. Under 700px width, spacing and type adapt; short landscape (height ≤540px, width ≥541px) uses a 900px two-column composition with an 0.85fr/1.15fr split.
+Home is a centered title/start composition: main width capped at 760px and play lane at 400px. A small decorative native-card fan sits above up to three compact pinned profile choices and one dominant Play action; Create/Join share the secondary row. The favorite track uses equal flexible buttons with a 44px minimum height, a cream selected state and short edition labels; choices are text only. A separate 44px info trigger opens the active profile description in a native auto popover, anchored below the trigger with a centered fixed-position fallback. Description copy is concealed at rest, including for an unpinned active profile. Pinning and selecting are independent. The top-right avatar opens optional identity, social and settings tasks; bot setup and help are reached through Game rules, and completed-round progress through Profile. Setup and rooms do not repeat the avatar editor or decorative footer slogans. Under 700px width, spacing and type adapt; short landscape (height ≤540px, width ≥541px) uses a 900px two-column composition with an 0.85fr/1.15fr split.
 
-The arena fills the usable `100dvh` viewport, clips page overflow and caps its internal stage at 1600px. The draw/discard pair anchors the optical center: its vertical target is 48% of the board height, bounded upward when the full hand needs clearance. Opponents occupy the perimeter. A separate lower grid row holds the curved hand with only its bottom quarter intentionally beyond the screen edge, as the owner requested on October 25. The full-height scrollport extends beyond the clipped page; shared fan geometry bounds the deepest resting corner to about 25% cropping. Focused or inspected cards lift fully into view. The measured negative bottom margin includes the fan’s lower-corner excursion around its 50% 120% pivot and the 26px scrollport tail budget. Hidden portrait measurements retain the last stable fit until landscape returns. The hand scrollport reserves 44px paging gutters on each side; large hands overflow horizontally inside it. Safe-area insets protect the outer edges.
+The arena fills the usable `100dvh` viewport, clips page overflow and caps its internal stage at 1600px. The draw/discard pair anchors the optical center: its vertical target is 48% of the board height, bounded upward when the full hand needs clearance. Opponents occupy the perimeter. A separate lower grid row holds the curved hand with only its bottom quarter intentionally beyond the screen edge, as the owner requested on October 25. The full-height scrollport extends beyond the clipped page; shared fan geometry bounds the deepest resting corner to about 25% cropping. Focused or inspected cards lift fully into view. The measured negative bottom margin includes the fan’s lower-corner excursion around its 50% 120% pivot and the 26px scrollport tail budget. Hidden portrait measurements retain the last stable fit until landscape returns. The hand scrollport reserves 44px paging gutters on each side; large hands overflow horizontally inside it. Safe-area insets protect the outer edges. The background remains continuous across table and hand; do not add a section-bounded turn wash that exposes a rectangular edge. Turn emphasis belongs to the cue and legal cards.
 
-Density follows the usable board size through container queries. Default hand/pile scales are 1.35/1.25; panels at least 1000px wide and 900px high use 1.55/1.5. At most 700px high they use 1.1/1; at most 600px high, 0.94/0.78; at most 360px high, 0.78/0.66. At most 300px high, pile scale becomes 0.6 and its center targets 45% of board height minus header height; upper seats move to −8px and flanks to 6%, while ordinary draw-pile bobbing stops to keep inspection and identities clear. The wide short-laptop exception (width at least 1000px, height 501–600px) uses 1.1/1.05. These are panel-density decisions, never a response to hand count. `app/arena.css` is the exact geometry authority; `lib/handLayout.ts` computes overlap from the measured scrollport and current card width, and shares `getHandFan` geometry between the rendered cards and `getHandCropMargin`.
+Density follows the usable board size through container queries. Default hand/pile scales are 1.35/1.25; panels at least 1000px wide and 900px high use 1.55/1.5. At most 700px high they use 1.1/1; at most 600px high, 0.94/0.78; at most 360px high, 0.78/0.66. At most 300px high, pile scale becomes 0.6 and its center targets 45% of board height minus header height; upper seats move to −8px and flanks to 6%, with the same static idle draw pile used at every panel size. The wide short-laptop exception (width at least 1000px, height 501–600px) uses 1.1/1.05. These are panel-density decisions, never a response to hand count. `app/arena.css` is the exact geometry authority; `lib/handLayout.ts` computes overlap from the measured scrollport and current card width, and shares `getHandFan` geometry between the rendered cards and `getHandCropMargin`.
 
 Default identity badges are 128px wide with 32px portraits and 13px names. Panels at most 1000px wide use 112px/28px/12px; at most 600px high use 104px/26px/12px; at most 360px high use 96px/24px/11px. All retain the 44px target floor, opaque backing, exact count and inline status. Decorative opponent back fans scale with panel height; short panels hide side fans and all fans at five or six seats, and the shortest tier hides every fan. Pointer hover on visible back fans retains its existing dock response.
 
-Desktop turn and inspection cues occupy the central hand-toolbar slot, while UNO/Pass occupy the right slot. At most 600px panel height, the cue and actions flank a reserved central pile lane. Inspection has a separate bounded lane below the player badges with a 44px dismiss target. At most 360px height, Draw is inset into its card back and the complete chosen-wild label into its pile, clear of identities and the hand.
+Desktop turn and inspection cues occupy the central hand-toolbar slot, while UNO/Pass occupy the right slot. At most 600px panel height, the cue and actions flank a reserved central pile lane. Inspection has a separate bounded lane below the player badges with a 44px dismiss target. At most 360px height, the complete chosen-wild label is inset into its pile, clear of identities and the hand. The Draw caption pill is removed at every size.
 
 Duo means a dual-screen or foldable device. When the browser reports two viewport segments, both the arena and native game dialogs stay in the first uninterrupted segment; dialogs retain a 12px inset. Container queries follow that panel. The phone portrait gate uses exact `window.viewport.segments` dimensions when available, then the reported segment arrangement, then the ordinary viewport. An upright panel at most 700px wide shows the rotate gate; local play pauses and online play continues. Browsers without segment reporting keep the ordinary responsive viewport layout. Panel-sized screenshots establish layout, not physical hinge or touch behavior.
 
@@ -417,9 +428,9 @@ Join and Create are compact focused forms: a centered panel capped at 560px with
 
 Setup and room flows use a viewport-bounded panel with one independently scrolling content body and a separate, nonshrinking primary footer. Long names, avatar choices, expanded rules and room details consume body space rather than pushing Deal/Create/Join beyond the viewport. At heights of 540px or less, compact header, panel padding and body gaps take precedence over narrow-width styling; the supporting footnote hides while the primary target retains at least 44px. Help follows the same separation inside its native dialog: heading and Back/Next remain outside the scrolling examples and rule reference.
 
-Account settings uses a content-sized native dialog (up to 620px wide; maximum height 800px or viewport minus 40px). Its blue heading and cream Done footer stay outside one cream scrolling task region. Heading, body and footer align to a shared 24px desktop gutter. The heading has an 80px minimum height and 18px vertical padding; the body uses 20px above and 16px below, and the footer 16px above and 20px below. The overview has four divider-separated rows: Profile, Friends, Game rules and Audio, with a 76px minimum height. One 44px back-arrow target inside the task header, accessibly named All settings, returns to this list without closing the dialog. Only the active view is mounted. At widths of 640px or less, the sheet uses a 12px viewport inset, a shared 20px gutter, a 72px-minimum header and unchanged 76px overview rows; body padding is 16px vertically and footer padding is 12px above / 16px below. At heights of 500px or less, an 8px viewport inset, 52px-minimum header and compact heading/footer retain the scrolling body and reachable decisions. Profile shows thirteen ready-made avatar choices immediately: seven columns on desktop, four on phones, seven again in short landscape. Progress stays collapsed beneath the portraits until opened. Joining uses one code/link field with the saved identity displayed as context. Room actions pair Add a bot and Invite friends at equal width and a 48px minimum height.
+Account settings uses a content-sized native dialog (up to 620px wide; maximum height 800px or viewport minus 40px). Its edition-colored heading and Done footer stay outside one scrolling task region on the same ground. Heading, body and footer align to a shared 24px desktop gutter. The heading has an 80px minimum height and 18px vertical padding; the body uses 20px above and 16px below, and the footer 16px above and 20px below. The overview uses 8px gaps and rounded, 16px-padded choices without separator lines: Profile, Friends, Game rules and Audio, with a 76px minimum height. One 44px back-arrow target inside the task header, accessibly named All settings, returns to this list without closing the dialog. Only the active view is mounted. At widths of 640px or less, the sheet uses a 12px viewport inset, a shared 20px gutter, a 72px-minimum header and unchanged 76px overview rows; body padding is 16px vertically and footer padding is 12px above / 16px below. At heights of 500px or less, an 8px viewport inset, 52px-minimum header and compact heading/footer retain the scrolling body and reachable decisions. Profile shows thirteen ready-made avatar choices immediately: seven columns on desktop, four on phones, seven again in short landscape. Progress stays collapsed beneath the portraits until opened. Joining uses one code/link field with the saved identity displayed as context. Room actions pair Add a bot and Invite friends at equal width and a 48px minimum height.
 
-Game rules uses divider-separated profile rows with an 80px minimum including 12px padding. Each row has a native card miniature, short name, one-line description, inline active check and two secondary actions. Selected rows use pale blue; originals offer star/copy and customs star/edit. A 32×44px mark holds the actual UnoCard face at scale 0.34. The list exposes no house-rule toggles. Copy or Create custom profile opens a separate native task dialog; a named draft owns the scrolling body while Save and use / Cancel stay in its footer. The parent settings Done action is inaccessible while that top-layer editor is open. Make a copy lives inside an existing custom draft; delete retains its footer action. A full favorite set opens a narrower replacement task (up to 520px), with a short caption and three 76px-minimum choices using native card marks, short names and arrows, plus fixed Cancel. Nested dialogs inherit the same header/gutter/body/footer structure; heading/content layout rules are scoped to each sheet’s direct children. Game rules keeps only the short pin caption above profiles and places Bot seats / How to play links below them. The custom draft uses a short edition-rules caption and field labels, with no repeated explanatory introduction.
+Game rules uses spaced profile rows with an 80px minimum including 12px padding. Each row has a native card miniature, short name, one-line description, inline active check and two secondary actions. Selected rows use the edition highlight; originals offer star/copy and customs star/edit. A 32×44px mark holds the actual UnoCard face at scale 0.34. The list exposes no house-rule toggles. Copy or Create custom profile opens a separate native task dialog; a named draft owns the scrolling body while Save and use / Cancel stay in its footer. The parent settings Done action is inaccessible while that top-layer editor is open. Make a copy lives inside an existing custom draft; delete retains its footer action. A full favorite set opens a narrower replacement task (up to 520px), with a short caption and three 76px-minimum choices using native card marks, short names and arrows, plus fixed Cancel. Nested dialogs inherit the same header/gutter/body/footer structure; heading/content layout rules are scoped to each sheet’s direct children. Game rules keeps only the short pin caption above profiles and places Bot seats / How to play links below them. The custom draft uses a short edition-rules caption and field labels, with no repeated explanatory introduction.
 
 The observed spacing vocabulary runs from micro/detail gaps through compact, regular, section and dialog steps. It is not an instruction to normalize every card-specific overlap. See the two surface briefs for geometry and the sidecar for exact responsive conditions.
 
@@ -453,9 +464,9 @@ Avatar popovers use a brief 160ms reveal, and incoming invitation notices use 18
 
 ## Shapes
 
-The small composite action-symbol annotations use the annotation radius to keep the white quantity marker legible across Skip Two, Reverse Draw Four and Target Draw Two. This is card-print geometry, not a new panel shape.
+Printed action symbols use card silhouettes, opposing arrows, skip marks and targets as functional deck geometry. Draw amounts remain in corner indices; the targeted draw places +2 inside its target. These marks do not establish a panel radius or an app-icon style.
 
-Forms use gently rounded rectangles: small field corners, medium controls, larger identity/cue surfaces and soft panel corners. Home Play has its own action radius. Portraits are circular with a cream rim. Native cards keep their scaled small corners and white oval print. These distinct silhouettes identify material and function; do not flatten them to one radius. The settings sheet uses its own soft corners (24px desktop, 20px phone). Its plain sliding switches use a full pill radius (999px, geometrically capped at 13px by the 26px track height); this is native control geometry, not a general container radius.
+Forms use gently rounded rectangles: small field corners, medium controls, larger identity/cue surfaces and soft panel corners. Home Play has its own action radius. Portraits are circular with a cream rim. Native cards keep their scaled small corners and oval print: white on colored faces, four deck colors behind All Wild action marks. These distinct silhouettes identify material and function; do not flatten them to one radius. The settings sheet uses its own soft corners (24px desktop, 20px phone). Its plain sliding switches use a full pill radius (999px, geometrically capped at 13px by the 26px track height); this is native control geometry, not a general container radius.
 
 ## Components
 
@@ -465,21 +476,45 @@ Warm yellow primary controls have club ink text, weight 750, a shallow amber bot
 
 ### Chips and preset choices
 
-Three fixed playable originals—Classic UNO, UNO Show ’Em No Mercy and UNO All Wild—anchor the profile list. The home track shows up to three pinned originals or named custom profiles; its cream selected button reflects active identity, while amber-filled, blue-outlined stars in Game rules reflect pinning. A selected unpinned profile remains active. Do not collapse those states or infer identity only from identical rule values.
+Three fixed playable originals—Classic UNO, UNO Show ’Em No Mercy and UNO All Wild—anchor the profile list. The home track shows up to three pinned originals or named custom profiles; its cream selected button reflects active identity, while amber stars in Game rules reflect pinning. A selected unpinned profile remains active. Do not collapse those states or infer identity only from identical rule values.
 
-Game rules uses divider-separated rows with native card miniatures, concise written names/descriptions and an inline blue active check on a pale-blue selected row. Each row has exactly two secondary actions: star/copy for originals, star/edit for customs. Originals are copied into a named draft rather than edited in place. Only the separate custom editor mounts supported rule groups and controls. Save and use saves the named profile and applies its rules; only successful application closes the draft and reports success. A failed room update keeps the saved draft open for retry, restores the previous selected game and reuses the saved profile rather than creating another copy. Cancel leaves the active game unchanged. An active custom name remains visible even when its rules match an original. Existing custom drafts offer Make a copy in their body. When all three pins are occupied, an explicit replacement dialog offers three named card choices. These focused views retain the sheet’s scrolling body and fixed decision footer.
+Game rules uses spaced rows with native card miniatures, concise written names/descriptions and an inline amber active check on an edition-highlight selected row. Each row has exactly two secondary actions: star/copy for originals, star/edit for customs. Originals are copied into a named draft rather than edited in place. Only the separate custom editor mounts supported rule groups and controls. Save and use saves the named profile and applies its rules; only successful application closes the draft and reports success. A failed room update keeps the saved draft open for retry, restores the previous selected game and reuses the saved profile rather than creating another copy. Cancel leaves the active game unchanged. An active custom name remains visible even when its rules match an original. Existing custom drafts offer Make a copy in their body. When all three pins are occupied, an explicit replacement dialog offers three named card choices. These focused views retain the sheet’s scrolling body and fixed decision footer.
 
 **The Distinct State Rule.** The active check identifies the selected profile; the star identifies a home favorite. Saving a custom draft is the explicit boundary before its rules become active.
 
 ### Cards / containers
 
-Setup uses a centered rounded theme-aware panel. Native dialogs use Outfit headings, explicit Close and reachable decisions in short landscape. Other dialogs follow saved appearances; Settings combines a blue/cream header, warm-white scrolling body with navy text and amber decisions. Settings, rules, results and earned progress use the same shared palette/control vocabulary; progress always reflects completed-round device-local data. Keep the native `Modal` primitive.
+Setup uses a centered rounded theme-aware panel. Native dialogs use Outfit headings, explicit Close and reachable decisions in short landscape. Other dialogs follow saved appearances; main Settings and its nested rule tasks use the scoped navy/plum/violet ground, cream text and amber decisions. Informational help retains its cream scrolling body. Settings, rules, results and earned progress use the same shared palette/control vocabulary; progress always reflects completed-round device-local data. Keep the native `Modal` primitive. When a menu destination replaces its opener, closing it restores the Game menu trigger if native focus return has no connected target. Result-count graphics expose an atomic accessible name containing the number and its unit.
 
 Settings and results bound their scrolling to the content body: the settings heading, All settings back action and Done remain visible, as do result rematch/home decisions. Related rule toggles use native fieldsets with ordinary Outfit legends. Profile has one labeled name field; edits apply on blur, Enter, All settings or close, with no separate Save step. Bot setup keeps rule editing in a native disclosure, names the active preset/hand size beside the pinned deal action, and uses the same portraits as the subsequent round. Its shared setup shell keeps the primary decision visible in portrait and short landscape, including when rules are expanded; profile customization remains in its separate dialog.
 
 Room footers pair the primary action with a short readiness or connection explanation. Pending labels describe the actual operation, such as opening, joining or dealing; unavailable room actions retain a visible explanation and an available bot-play recovery path. Moving a submit button into the footer preserves native form submission, including Enter from a field.
 
 Help uses the native dialog heading and Close, one scrolling lesson body and pinned Back/Next/Done controls. The compact step marks retain 44px activation targets. A native disclosure separates the read-only current-rule reference from interactive basic-play examples. Guests and help share the same written rule rows: a quiet label/value grid with fine dividers, explicit off states and wrapped values. Show the published room settings for guests; basic examples are identified as practice rather than presented as the chosen table rules.
+
+### Printed card symbols and edition help
+
+`UnoActionSymbol` owns the printed action vocabulary within `UnoCard`: two visibly separated bent opposing arrows for Reverse, a circular arrow for Skip Everyone, two overlapping Skip marks for Skip Two, counted card stacks for draws, a centered target +2 for Targeted Draw Two, and card fans with discard or exchange arrows for Discard All and Forced Swap. Color Roulette uses four mystery cards bearing question marks; the compatibility `RouletteWheelIcon` wrapper renders that same motif. These source-authored SVG shapes represent functional physical-card print. Lucide remains the ordinary app-navigation/control icon vocabulary; utility-icon substitutions do not define these printed actions.
+
+Reverse +4 places solid native-color cards behind the same separated arrow pair, filled white and outlined in navy. Preserve the negative-space channel at held-card and help-miniature sizes.
+
+All Wild action detection uses both the wild color and the action value, including Reverse, Skip, Draw Two and Draw Four values that lack a wild prefix. Its action oval retains the existing red, blue, green and yellow deck quadrants, with white marks and a dark edge for contrast. Keep this treatment in shared faces across hand, pile, motion and previews. Action feedback reuses the shared relevant motifs; draw feedback retains the actual penalty total rather than substituting a fixed printed amount. Accessible card labels carry the written action name while the SVG is decorative.
+
+No Mercy and All Wild help use the shared native blue heading with cream text, cream scrolling body and fixed amber Done action. The optional native **Card symbols** disclosure mounts actual `UnoCard` faces only after it opens. Divider-separated reference rows pair each face with its written name and one concise effect, using a 48px preview column, 16px gap, 15px names and 14px consequence text. Keep the actual table-rule summary separate from these reference faces and retain reachable Close/Done controls in phone and short landscape layouts. Classic retains its existing interactive lesson flow. Original-edition references and practice are explicitly labeled; the actual configurable rules appear only in the separate native disclosure. Do not repeat unconditional original-rule claims above a custom table summary.
+
+**The Printed Vocabulary Rule.** Reuse the functional deck motif across native faces and relevant action feedback. Keep corner draw amounts and four-color All Wild action ovals; offer explanations through the optional reference rather than routine play coaching.
+
+The persistent Mercy hand meter is removed. Exact hand counts and exceptional knockout outcomes remain; a large hand alone does not imply knockout danger when the elimination limit is disabled.
+
+### Classic practice turn boundaries
+
+The draw/Wild lesson keeps one explicit decision phase. Tapping Wild opens color selection without drawing or ending the turn; choosing a color finishes the turn and removes competing actions. A voluntary draw offers only the new card or Pass, followed by Try again. Written outcomes use a live status region. Arrow-key lesson navigation belongs to the step controls, so arrows on a card or color choice do not leave the example. Stepper arrows follow the focused mark and stop at the boundary without resetting a completed example. Matching and draw replay restore their action focus; completing the last lesson moves focus to Done. Success messages retain status semantics and dark ink on green controls. Color and replay controls have 44px targets; the miniature table keeps its natural height inside the scrolling lesson body, with heading and footer protected on short phones.
+
+### Optional edition practice
+
+No Mercy and All Wild help add a native **Try a practice hand** disclosure alongside the separate Card symbols reference. Only an open disclosure mounts its lesson controls, native card faces and example state. No Mercy offers stacking, a hand swap triggered by a 7 and Color Roulette; All Wild offers Skip Two, Targeted Draw Two and Forced Swap. The existing Classic tutorial retains its own flow. Shared cream help surfaces, Outfit copy, amber selected lessons and native cards keep these examples within the established world; the heading, Close and fixed Done remain reachable outside the scrolling body.
+
+`PracticeHand` and `lib/practiceRounds.ts` use conserved original-edition decks and actual game-engine legality, plays and Roulette consequences. Written results follow resulting totals, hand counts and next players. The examples are explicitly practice, use original-edition rules and remain separate from the actual table-rule summary, including custom rules. They run no clocks, automatic bots, persistence or progress writes; Try again resets the example and Next example advances only after completion. Target selection focuses the first player; Escape cancels only that decision and restores the originating card. Completion focuses Next example, which advances focus to the next lesson mark. Classic help honors both saved and operating-system reduced motion, without invalid-card shaking or an idle trophy bounce.
 
 ### Inputs / fields
 
@@ -489,17 +524,35 @@ Theme-aware fields use UI surface/text, a two-pixel divider border, 50px height 
 
 A small wordmark and one top-right avatar keep account navigation at the perimeter. The circular 48px trigger opens a native auto popover containing the saved portrait/name and Edit profile, Friends and Game settings actions. Rows are at least 48px tall with 12px padding, an 8px radius and written labels beside Lucide icons. Counts describe actual outstanding invitations/requests. The popover closes before opening its chosen task and focus returns through the shared native dialog.
 
-Settings navigation is a four-row overview with 18px labels, 14px secondary descriptions, Lucide destination icons and chevrons. A task replaces the list and integrates its All settings back arrow into the blue header; no sidebar, tabs or phone section select is rendered. Direct avatar-menu Profile and Friends shortcuts remain. Focus uses a visible three-pixel blue outline in the body and yellow against the blue header. Do not add a parallel navigation library.
+Settings navigation is a four-row overview with 18px labels, 14px secondary descriptions, Lucide destination icons and chevrons. A task replaces the list and integrates its All settings back arrow into the edition-colored header; no sidebar, tabs or phone section select is rendered. Direct avatar-menu Profile and Friends shortcuts remain. Main Settings focus uses a visible three-pixel amber outline throughout; informational help retains its own light-body treatment. Do not add a parallel navigation library.
 
 ### Friends and room invitations
 
-Friends separates Add a friend, room invitations, incoming requests, accepted friends and sent requests. Human portraits, names and written presence/operation labels share divider-separated rows; accept, decline, remove and invite remain explicit actions. The room picker uses the shared blue task heading, cream scrolling body and fixed amber decision, with a compact 520px width cap. It contains only accepted friends and explains offline, invited and already-seated states. An empty picker gives one concise explanation and an Add friends footer action; a populated picker ends with Done. Pending invitations remain labeled Invited and disable repeated sends in both the picker and Friends. Friendship requires acceptance independently of room invitations.
+Friends separates Add a friend, room invitations, incoming requests, accepted friends and sent requests. Human portraits, names and written presence/operation labels share spaced rows without separator lines; accept, decline, remove and invite remain explicit actions. The room picker uses the shared blue task heading, cream scrolling body and fixed amber decision, with a compact 520px width cap. It contains only accepted friends and explains offline, invited and already-seated states. An empty picker gives one concise explanation and an Add friends footer action; a populated picker ends with Done. Pending invitations remain labeled Invited and disable repeated sends in both the picker and Friends. Friendship requires acceptance independently of room invitations.
 
 Incoming invitations are nonblocking, theme-aware notices with an explicit room, Accept, Decline and Dismiss. They remain available above the topmost open dialog and use polite accessible announcements. The shared muted-aware cue accompanies new invitations and friend requests. Master mute preserves individual audio settings; Invitation sounds is its own preference. The existing saved reduced-motion preference still supplements the OS setting; its Appearance control is removed.
+
+Friend removal expands a tonal inline decision below the selected row, with Keep friend focused first and a separate Remove friend action. Escape cancels that decision and returns focus to its trigger; failed removal retains a retry, while success focuses the friends heading. Requests, invitation acceptance and removal use action-specific pending labels. A newly typed friend code survives completion of an older request.
+
+### Whole-site refinement
+
+Entry, setup, room and account surfaces use short task labels without repeated marketing or status paragraphs. Room action labels describe only their own operation. Original favorite buttons stay unselected when an unpinned custom profile is active. Rematch readiness is one native disclosure with a live ready count and optional seat details; it excludes disconnected humans from that count. Device progress remains available in Profile rather than repeating in round results.
+
+Custom-profile deletion names the profile and focuses Keep profile before its separate delete action. Escape cancels the innermost decision without closing its parent settings sheet. Invitation transfers keep their confirmation and busy state until completion, preserve retry focus, and suspend popups until that decision closes. Profile name drafts preserve deliberate edits while untouched fields follow shared name updates. Imperative held-card motion and hand paging respect both device and operating-system reduced motion. Obsolete clay-era and superseded global styles are removed; functional confetti, collection-card and focus-outline geometry remain deliberate exceptions to panel rounding.
+
+### Round outcomes
+
+The finish list preserves actual remaining-card counts for active players. Knocked-out players show **Out**, announced as **Knocked out**, instead of the zero-card hand left by engine cleanup. A winner with cards remaining and every other player eliminated is labeled **Last player standing**. Setup names that win condition only when the selected table has an elimination limit. Existing round wins, result artwork and pinned rematch/home decisions retain their established presentation.
 
 ### Multi-card choices
 
 Ordinary legal cards still play immediately. When a table permits matching-number pairs, activating either matching number opens a native choice dialog. The card that can lead goes first automatically; a card that cannot play alone only offers the legal pair. Equivalent physical copies produce one visible outcome. Discard All directly plays every matching-color card without opening a choice dialog, including an atomic UNO declaration when one card remains. Matching-number choices show the remaining hand size; a pair leaving one card explicitly offers Call UNO + play as one action. An empty hand wins automatically. Matching pairs carry a small ×2 cue in the exposed left strip of their held card; Discard All carries its removal count, with the full remaining-hand preview on hover or keyboard focus. UNO and Pass have fixed 72px / 84px slots with a 44px target floor, so contextual availability does not move either action. Every publicly discarded face travels in a short shared throw; total stagger stays at or below 120ms and reduced motion skips travel. Short landscape dialogs keep the choices and cancel control visible. Game Menu offers a native Color / Number / Original hand-order selector; the display preference persists on the device without changing the authoritative hand. Inspecting a blocked card explains the applicable rule in a short sentence.
+
+### Direct opponent targeting
+
+A hand swap triggered by a 7, Forced Swap or Targeted Draw Two chooses among the actual non-eliminated opponent portrait/name/count badges. The existing opaque seats become native buttons with amber outlines; keyboard focus switches to a cream outline with a blue outer ring. Accessible names state the action, player and card count. A compact action cue asks who receives the cards or exchanges hands, and a dark secondary Cancel remains in the toolbar; no duplicate player-list dialog interrupts the table.
+
+The first eligible seat receives focus. Escape or Cancel abandons selection without playing the card and returns focus to its origin, falling back to the current roving hand card when needed. While selecting, competing hand/draw actions are blocked and the published turn clock continues. Selection retains existing play options, including an atomic UNO declaration, and becomes inactive when the turn, selected card, connection or other live decision no longer permits it.
 
 ### Portrait identities
 
@@ -507,15 +560,19 @@ Ordinary legal cards still play immediately. When a table permits matching-numbe
 
 ### Audio preferences
 
-Plain sliding pill switches retain native checkbox/switch semantics, a 44×26px track and an 18px white thumb. Checked tracks use club blue and shift the thumb 18px; the thumb stays circular when pressed. One Music switch controls both existing lobby and game contexts. Master mute preserves individual card, invitation and voice settings; effects/voice and music volumes remain independent. No sound delays a decision.
+Plain sliding pill switches retain native checkbox/switch semantics, a 44×26px track and an 18px white thumb. Main Settings checked tracks use amber and shift the thumb 18px; the thumb stays circular when pressed. One Music switch controls both existing lobby and game contexts. Master mute preserves individual card, invitation and voice settings; effects/voice and music volumes remain independent. No sound delays a decision.
 
 ### Held cards and live turn cue
 
 `UnoCard` owns card print; `HandCard` owns direct tap/drag handling; `useGamePresentation` owns transitions/audio. Legal cards play on first activation, with the shared gesture predicate governing drag readiness. Inspection, roving keyboard navigation and overflow paging stay available. On pointers, hovering a held card magnifies it dock-style, spreads its neighbors and lifts the quiet-card dim; touch and keyboard paths stay unchanged. Legal-card lift and 1.04 growth are static, with stable resting stacking so neighboring corners remain visible; the ordinary legal-card idle breathe is removed. Inspection and keyboard focus use a lift of 30.5px × hand scale + 8px and headroom of 30.5px × hand scale + 16px, revealing the complete face. Their growth is 1 and extra pointer-hover lift/growth is suppressed; ordinary legal cards retain their static 1.04 growth. Wild decisions preserve written chosen-color state and accessible counts.
 
-Routine hand captions, browse/tap/drag coaching and recurring move tips stay visually quiet; accessible status, the real turn clock, explicit penalties and deliberate blocked-card inspection remain.
+No edition badge, persistent Mercy hand meter, Draw caption pill or decorative idle draw pulse appears in routine play. Routine hand captions, browse/tap/drag coaching and recurring move tips stay visually quiet; accessible status, the real turn clock, explicit penalties and deliberate blocked-card inspection remain.
 
 `TurnCue` presents the real actor, direction, current action and deadline. Human turns last 30 seconds; the ring and tabular number derive from the published deadline, never a sample comp value. Drawing and metadata do not restart it; online timing belongs to the server. Forced penalties show the actual total/target and resolve automatically when no stack response exists. At five seconds or fewer the cue uses its urgency treatment. Local portrait gating pauses local timing; online rounds continue. Music and sound respect saved preferences and never gate a turn.
+
+An actionable draw stack exposes the exact legal response in the cue and draw decision. `getStackResponseLabel` uses the engine’s stack-validation predicate, so the last draw card’s minimum is distinct from the accumulated penalty: a No Mercy +6 over a total of ten reads **Stack +6 or higher** and **or draw 10 total**. Other supported configurations list their permitted amounts. Forced draws retain their actual total and automatic resolution; routine turn hints remain visually quiet.
+
+**The Exact Response Rule.** Derive stack response wording from engine legality and show the accumulated draw total separately. Keep targeted decisions on the existing opponent seats and retain the authoritative clock throughout selection.
 
 ## Do's and Don'ts
 
@@ -523,8 +580,9 @@ Routine hand captions, browse/tap/drag coaching and recurring move tips stay vis
 
 - **Do** use the quiet edition field, warm cream, human portraits and vivid native deck as one shared identity.
 - **Do** keep Outfit ordinary headings and the separate Barlow Condensed brand/deck roles.
-- **Do** retain saved appearances on other dialogs, the avatar popover and invitation notices, while keeping Settings bodies warm-white with navy text, blue/cream headers and amber decisions.
+- **Do** retain saved appearances on other dialogs, the avatar popover and invitation notices; use navy/plum/violet main Settings with cream text, amber decisions and tonal grouping, while informational help keeps its cream body.
 - **Do** keep exact hand counts, inline compact status, a real turn clock and written action/color cues.
+- **Do** share printed deck motifs across card faces and relevant feedback, preserve All Wild’s four-color action oval, and keep real-face explanations behind the native Card symbols disclosure.
 - **Do** preserve the quarter-cropped curved held hand, readable overlap, independent overflow, direct legal play and visible keyboard focus.
 - **Do** keep compact cues, inspection and actions clear of identities and piles, and confine game dialogs to the reported usable panel.
 - **Do** keep setup, account and help decisions outside the scrolling content body, and distinguish actual table rules from practice examples.
@@ -537,11 +595,13 @@ Routine hand captions, browse/tap/drag coaching and recurring move tips stay vis
 
 - **Don't** restore giant background cast, painted menu-card actions, ink swashes, poker felt/rail or the giant orbit field.
 - **Don't** add decoration behind the piles or allow compact player states to expand into their space.
-- **Don't** add another font family, glyph icons, mixed display systems or a parallel component library.
+- **Don't** add another font family, glyph icons, mixed display systems or a parallel component library. Functional authored SVG card print remains part of the native deck.
+- **Don't** replace printed action motifs with app utility icons or a physical roulette wheel, or merge the two Reverse arrow bodies.
+- **Don't** restore home mode icons, an always-visible mode description, Play subtitles, Settings separator lines, the Draw pill, persistent Mercy meter, No Mercy header badge or idle draw pulse.
 - **Don't** replace the live deadline with a decorative countdown or reset it after a draw or metadata update.
 - **Don't** add blocking splashes or let audio, reactions or motion gate game turns.
 - **Don't** repeat identity editors in joining or room setup, or add routine hand coaching.
 - **Don't** offer Stack party or Wild table as built-in choices; use named custom profiles for house rules.
 - **Don't** label Flip or Flex playable before their actual decks/actions exist, or describe the three originals as editable house-rule presets.
 
-Not canonized: the former crowded selects, long repeated settings explanations, 32px settings gutters, all-cream headers, separate body back row, circular active check, solid-blue favorite stars and third custom-row action were corrected or superseded; none is a reusable rule. The rejected settings sidebar/mobile selector, Appearance controls, persistence slogan and custom avatar creator are superseded by the compact task sheet; none should be restored as a system rule. Historical custom recipes remain compatible data, not an editing pattern. Legacy tab selectors, the earlier single-Classic restriction, the removed-home-track instruction and the earlier tabbed blue-title-bar preference layout remain superseded; the current integrated blue settings header is intentional, not a restoration of that old navigation; the current compact favorites are intentional. The replacement dialog’s former flush-left body was a padding defect, corrected with the shared inset task body and fixed footer; that defect is not a density rule. Old charcoal midnight colors and historical global fixed-light-dialog guidance do not override theme-aware surfaces; the current fixed-light treatment is scoped to Settings. Historical no-visible-HUD guidance does not remove the real actor/deadline or accessible status; the shipped quieting removes routine coaching. None of these superseded patterns is a rule for future surfaces. The former compact status-column collision and low-contrast Settings control were defects; the corrected row and explicit cream foreground are the recorded behavior. The earlier unmeasured deep crop, hand-count scale reduction, fixed lift/headroom tiers and superseded viewport-only arena tiers are not current rules; the owner-approved, fan-compensated quarter crop is intentional. The reviewed compact inspection/badge and Draw/wild-label collisions were defects, resolved in the final recaptures; their overlap is not a spacing precedent. Earlier setup footer overflow and narrow-width overrides defeating short-height spacing were defects, not density rules; the final bounded body/footer composition is the precedent. Static screenshots do not certify physical hinge behavior, physical touch, audible quality or execution of reduced-motion fallbacks.
+Not canonized: the pale Settings sheet, repeated separator lines, home mode icon/description/subtitle, Draw pill, persistent Mercy meter, No Mercy header badge and merged Reverse shafts were owner-rejected and corrected; none is a reusable rule. The former generic special-card app icons, white All Wild action ovals, composite quantity badges and wheel-based Color Roulette mark were corrected; none is a reusable card-print rule. The former crowded selects, long repeated settings explanations, 32px settings gutters, all-cream headers, separate body back row, circular active check, solid-blue favorite stars and third custom-row action were corrected or superseded; none is a reusable rule. The rejected settings sidebar/mobile selector, Appearance controls, persistence slogan and custom avatar creator are superseded by the compact task sheet; none should be restored as a system rule. Historical custom recipes remain compatible data, not an editing pattern. Legacy tab selectors, the earlier single-Classic restriction, the removed-home-track instruction and the earlier tabbed blue-title-bar preference layout remain superseded; the current integrated edition-colored settings header is intentional, not a restoration of that old navigation; the current compact favorites are intentional. The replacement dialog’s former flush-left body was a padding defect, corrected with the shared inset task body and fixed footer; that defect is not a density rule. Old charcoal midnight colors and historical global fixed-light-dialog guidance do not override theme-aware surfaces; the earlier fixed-light Settings treatment is explicitly superseded by the edition task palette. Informational help remains cream. Historical no-visible-HUD guidance does not remove the real actor/deadline or accessible status; the shipped quieting removes routine coaching. None of these superseded patterns is a rule for future surfaces. The former compact status-column collision and low-contrast Settings control were defects; the corrected row and explicit cream foreground are the recorded behavior. The earlier unmeasured deep crop, hand-count scale reduction, fixed lift/headroom tiers and superseded viewport-only arena tiers are not current rules; the owner-approved, fan-compensated quarter crop is intentional. The reviewed compact inspection/badge and Draw/wild-label collisions were defects, resolved in the final recaptures; their overlap is not a spacing precedent. Earlier setup footer overflow and narrow-width overrides defeating short-height spacing were defects, not density rules; the final bounded body/footer composition is the precedent. Static screenshots do not certify physical hinge behavior, physical touch, audible quality or execution of reduced-motion fallbacks.

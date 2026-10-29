@@ -61,7 +61,13 @@ export default function GameSetup({
           <p className="muted">
             {getRuleSetLabel(rules)} ·{" "}
             {getBotDifficultyLabel(rules.botDifficulty)} bots ·{" "}
-            {startingHandSize} cards each. First to an empty hand wins.
+            {startingHandSize} cards each.
+            <span className="sr-only">
+              {" "}
+              {rules.eliminationHandLimit && rules.eliminationHandLimit > 0
+                ? "Empty your hand or be the last player standing."
+                : "First to an empty hand wins."}
+            </span>
           </p>
           <button
             className="button primary wide"
@@ -79,15 +85,11 @@ export default function GameSetup({
         </>
       }
     >
-      <SetupIntro
-        title="Take your seat."
-        description="Pick your crew. Deal some trouble."
-        onBack={onBack}
-      />
+      <SetupIntro title="Take your seat." onBack={onBack} />
       <div className="seat-count">
         <div>
           <h2>Seats at the table</h2>
-          <p>
+          <p className="sr-only">
             You, plus {names.length - 1} {names.length === 2 ? "bot" : "bots"}.
           </p>
         </div>

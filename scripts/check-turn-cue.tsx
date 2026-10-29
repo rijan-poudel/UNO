@@ -4,6 +4,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import TurnCue from '../components/TurnCue';
 import { initializeGame } from '../lib/gameSetup';
 import type { GameState } from '../types/game';
+import { createPracticeRound } from '../lib/practiceRounds';
 
 const base = initializeGame(['You', 'Cleo'], {
   allowStartingActionCard: false,
@@ -45,3 +46,6 @@ assert.match(
 );
 assert.equal(cue({ ...base, winnerId: base.players[0].id }), '');
 console.log('Turn cue checks passed');
+const practice = createPracticeRound('no_mercy', 'stack');
+assert.match(cue(practice, 2), /Stack \+6 or higher/);
+assert.match(cue(practice, 2), /or draw 10 total/);

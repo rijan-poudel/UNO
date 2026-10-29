@@ -159,6 +159,73 @@ async function main() {
     );
     assert.equal(invitedRoom.room.players.length, 2);
     assert.equal((await joinedNotice).targetName, 'Bob');
+
+    // Switching tables is atomic: a destination that filled after the invite
+    // cannot strand the recipient outside their existing live round.
+    await request(returning, 'room:leave', { roomId });
+    const source = await request<{ room: RoomSnapshot }>(
+      returning,
+      'room:create',
+      b,
+    );
+    const sourceId = source.room.roomId;
+    await request(returning, 'room:add-bot', { roomId: sourceId });
+    const playing = await request<{ room: RoomSnapshot }>(
+      returning,
+      'room:start',
+      { roomId: sourceId },
+    );
+    const transfer = await request<{ invite: FriendInvite }>(
+      alice,
+      'friend:invite',
+      { ...a, targetFriendCode: b.friendCode },
+    );
+    let fullRoom: RoomSnapshot = created.room;
+    for (let seat = 1; seat < 6; seat++) {
+      fullRoom = (
+        await request<{ room: RoomSnapshot }>(alice, 'room:add-bot', { roomId })
+      ).room;
+    }
+    const blockedTransfer = (await returning
+      .timeout(5000)
+      .emitWithAck('friend:invite:accept', {
+        ...b,
+        inviteId: transfer.invite.inviteId,
+      })) as Ack<unknown>;
+    assert.equal(blockedTransfer.ok, false);
+    if (!blockedTransfer.ok)
+      assert.equal(blockedTransfer.error, 'Room is full.');
+    const preserved = await request<{ room: RoomSnapshot }>(
+      returning,
+      'game:action',
+      { roomId: sourceId, action: { type: 'resumeControl' } },
+    );
+    assert.equal(preserved.room.roomId, sourceId);
+    assert.equal(preserved.room.game?.roundId, playing.room.game?.roundId);
+    const removableBot = fullRoom.players.find((player) => player.isBot);
+    assert.ok(removableBot);
+    await request(alice, 'room:kick', {
+      roomId,
+      targetPlayerId: removableBot.playerId,
+    });
+    const switched = await request<{ room: RoomSnapshot }>(
+      returning,
+      'friend:invite:accept',
+      { ...b, inviteId: transfer.invite.inviteId },
+    );
+    assert.equal(switched.room.roomId, roomId);
+    assert.equal(switched.room.players.length, 6);
+    const oldMembership = (await returning
+      .timeout(5000)
+      .emitWithAck('game:action', {
+        roomId: sourceId,
+        action: { type: 'resumeControl' },
+      })) as Ack<unknown>;
+    assert.equal(
+      oldMembership.ok,
+      false,
+      'A successful transfer releases the old seat',
+    );
     await request(alice, 'social:remove', { friendCode: b.friendCode });
     assert.equal(
       (await request<SocialSnapshot>(returning, 'social:sync', {})).friends
@@ -166,7 +233,7 @@ async function main() {
       0,
     );
     console.log(
-      'Social network passed: room contacts, owned requests, reciprocal acceptance, reconnect recovery, actionable invitations and shared removal.',
+      'Social network passed: room contacts, owned requests, reciprocal acceptance, reconnect recovery, atomic invitation transfers, full-room recovery and shared removal.',
     );
   } finally {
     sockets.forEach((socket) => socket.disconnect());

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-27T13:21:34Z",
-  "title": "Design System: UNO — Color play",
+  "generatedAt": "2026-10-29T02:50:03.565793Z",
+  "title": "Design System: UNO \u2014 Color play",
   "extensions": {
     "colorMeta": {
       "club-ink": {
@@ -90,7 +90,7 @@
       },
       "stage": {
         "role": "primary",
-        "displayName": "Stage and settings header blue",
+        "displayName": "Stage and informational help header blue",
         "tonalRamp": [
           "oklch(15% 0.1314 260.47)",
           "oklch(26% 0.1314 260.47)",
@@ -732,35 +732,75 @@
           "oklch(95% 0.0219 263.19)"
         ]
       },
-      "draw-label-surface": {
+      "settings-classic-highlight": {
         "role": "neutral",
-        "displayName": "Draw label ink",
+        "displayName": "Classic settings highlight",
         "tonalRamp": [
-          "oklch(15% 0.0446 262.33)",
-          "oklch(26% 0.0446 262.33)",
-          "oklch(37% 0.0446 262.33)",
-          "oklch(49% 0.0446 262.33)",
-          "oklch(60% 0.0446 262.33)",
-          "oklch(72% 0.0446 262.33)",
-          "oklch(84% 0.0446 262.33)",
-          "oklch(95% 0.0446 262.33)"
-        ],
-        "purpose": "Pile-status overlay only; frontmatter preserves the source rgba alpha."
+          "oklch(15% 0.0806 254.28)",
+          "oklch(26% 0.0806 254.28)",
+          "oklch(37% 0.0806 254.28)",
+          "oklch(49% 0.0806 254.28)",
+          "oklch(60% 0.0806 254.28)",
+          "oklch(72% 0.0806 254.28)",
+          "oklch(84% 0.0806 254.28)",
+          "oklch(95% 0.0806 254.28)"
+        ]
       },
-      "forced-draw-label-surface": {
+      "settings-no-mercy-ground": {
         "role": "neutral",
-        "displayName": "Forced draw label ink",
+        "displayName": "No Mercy settings ground",
         "tonalRamp": [
-          "oklch(15% 0.0301 82.74)",
-          "oklch(26% 0.0301 82.74)",
-          "oklch(37% 0.0301 82.74)",
-          "oklch(49% 0.0301 82.74)",
-          "oklch(60% 0.0301 82.74)",
-          "oklch(72% 0.0301 82.74)",
-          "oklch(84% 0.0301 82.74)",
-          "oklch(95% 0.0301 82.74)"
-        ],
-        "purpose": "Pile-status overlay only; frontmatter preserves the source rgba alpha."
+          "oklch(15% 0.0289 334.17)",
+          "oklch(26% 0.0289 334.17)",
+          "oklch(37% 0.0289 334.17)",
+          "oklch(49% 0.0289 334.17)",
+          "oklch(60% 0.0289 334.17)",
+          "oklch(72% 0.0289 334.17)",
+          "oklch(84% 0.0289 334.17)",
+          "oklch(95% 0.0289 334.17)"
+        ]
+      },
+      "settings-no-mercy-highlight": {
+        "role": "neutral",
+        "displayName": "No Mercy settings highlight",
+        "tonalRamp": [
+          "oklch(15% 0.0315 332.85)",
+          "oklch(26% 0.0315 332.85)",
+          "oklch(37% 0.0315 332.85)",
+          "oklch(49% 0.0315 332.85)",
+          "oklch(60% 0.0315 332.85)",
+          "oklch(72% 0.0315 332.85)",
+          "oklch(84% 0.0315 332.85)",
+          "oklch(95% 0.0315 332.85)"
+        ]
+      },
+      "settings-all-wild-ground": {
+        "role": "neutral",
+        "displayName": "All Wild settings ground",
+        "tonalRamp": [
+          "oklch(15% 0.0638 301.02)",
+          "oklch(26% 0.0638 301.02)",
+          "oklch(37% 0.0638 301.02)",
+          "oklch(49% 0.0638 301.02)",
+          "oklch(60% 0.0638 301.02)",
+          "oklch(72% 0.0638 301.02)",
+          "oklch(84% 0.0638 301.02)",
+          "oklch(95% 0.0638 301.02)"
+        ]
+      },
+      "settings-all-wild-highlight": {
+        "role": "neutral",
+        "displayName": "All Wild settings highlight",
+        "tonalRamp": [
+          "oklch(15% 0.0718 304.49)",
+          "oklch(26% 0.0718 304.49)",
+          "oklch(37% 0.0718 304.49)",
+          "oklch(49% 0.0718 304.49)",
+          "oklch(60% 0.0718 304.49)",
+          "oklch(72% 0.0718 304.49)",
+          "oklch(84% 0.0718 304.49)",
+          "oklch(95% 0.0718 304.49)"
+        ]
       }
     },
     "typographyMeta": {
@@ -1055,7 +1095,7 @@
           "pile": 0.78
         },
         {
-          "condition": "width >=1000px and height 501–600px",
+          "condition": "width >=1000px and height 501\u2013600px",
           "hand": 1.1,
           "pile": 1.05
         },
@@ -1101,9 +1141,9 @@
       "controls": {
         "desktop": "Centered turn/inspection toolbar with independent right UNO/Pass slots.",
         "height <=600px": "Turn cue left and actions right of a 200px central pile lane; inspection uses its own bounded lane below badges.",
-        "height <=360px": "180px central pile lane; Draw inset at top of card back and written chosen wild color inset at bottom of discard.",
+        "height <=360px": "180px central pile lane; written chosen wild color inset at bottom of discard; no Draw caption.",
         "targets": "44px paging, inspection dismiss and contextual actions",
-        "height <=300px": "Pile scale 0.6; center at 45cqh minus header height; upper seats top -8px and flank seats top 6%; ordinary enabled draw-pile parent animation none."
+        "height <=300px": "Pile scale 0.6; center at 45cqh minus header height; upper seats top -8px and flank seats top 6%; static idle draw pile at all sizes."
       },
       "segments": {
         "scope": "Board and native game dialogs occupy reported first uninterrupted segment; dialogs inset 12px.",
@@ -1111,6 +1151,135 @@
         "fallback": "Ordinary responsive viewport without segment reporting.",
         "evidenceLimit": "Panel-sized captures do not certify physical hinge/touch behavior or runtime reduced-motion execution. Quarter-hand finish review: ship, zero material fixes."
       }
+    },
+    "playClarity": {
+      "contract": ".impeccable/review/play-clarity/contract.md; inherited Color play FORM seed 2fba311c",
+      "authority": [
+        "components/TurnCue.tsx",
+        "lib/gameRules.ts getStackResponseLabel and isValidStackCard",
+        "components/GameBoard.tsx targetChoice flow",
+        "components/OpponentSeat.tsx",
+        "app/arena.css target-seat styling",
+        "components/PracticeHand.tsx",
+        "components/PracticeHand.module.css",
+        "lib/practiceRounds.ts",
+        "components/HowToPlayModal.tsx"
+      ],
+      "stackResponse": {
+        "wording": "Engine stack-validation predicate supplies exact legal amounts; the minimum responding card value is separate from the accumulated draw total.",
+        "example": "Stack +6 or higher; or draw 10 total.",
+        "scope": "Actionable stacks show concise decision copy; unavoidable draws retain actual totals and automatic resolution. Routine turn hints remain visually quiet."
+      },
+      "targeting": {
+        "surface": "Actual non-eliminated opponent portrait/name/count seats become native buttons with action-specific accessible names. Amber outlines, cream focus outline and blue outer ring use the incumbent palette. Compact action cue and toolbar Cancel replace a duplicate player-list dialog.",
+        "focus": "Focus the first eligible seat; Escape or Cancel leaves the card unplayed and restores the origin, with the current roving hand card as fallback.",
+        "authority": "Block competing hand/draw actions, preserve play options including UNO, keep the published clock running and invalidate selection against current turn/card/connection/decision state."
+      },
+      "practice": {
+        "entry": "Native Try a practice hand disclosure in No Mercy and All Wild help mounts example controls, cards and state only while open. Classic tutorial keeps its existing flow.",
+        "lessons": {
+          "no_mercy": [
+            "Stacking",
+            "Hand swap triggered by a 7",
+            "Color Roulette"
+          ],
+          "all_wild": [
+            "Skip Two",
+            "Targeted Draw Two",
+            "Forced Swap"
+          ]
+        },
+        "engine": "Conserved original-edition decks, real legality and engine actions; results use actual totals, hand counts and next players.",
+        "isolation": "Explicit practice labels; separate from actual table/custom rules; no clocks, automatic bots, persistence or progress writes.",
+        "layout": "Existing cream scrolling help body, protected heading/Close/fixed Done, native cards and amber selected lesson controls. Try again resets; Next example appears after completion."
+      },
+      "review": ".impeccable/review/play-clarity/review.md: ship; no material fixes",
+      "evidence": [
+        "practice-stack-826.jpg",
+        "roulette-phone.jpg",
+        "targeting-826.jpg",
+        "targeting-phone.jpg",
+        "all-wild-practice-short.jpg",
+        "practice-target-final.jpg"
+      ],
+      "evidenceLimit": "Browser verification and assertions support the recorded flows; the precise intermediate online swap snapshot was not captured. Physical touch, hinge behavior and audible quality were not assessed. Inherited classic-help token advisories remain outside this extension."
+    },
+    "quietPlay": {
+      "contract": ".impeccable/review/quiet-play/contract.md; inherited Color play FORM seed 2fba311c",
+      "authority": [
+        "app/settings.css",
+        "components/SettingsModal.tsx",
+        "components/RuleProfileManager.tsx",
+        "components/home/HomeScreen.tsx",
+        "app/home.css",
+        "components/GameBoard.tsx",
+        "app/arena.css",
+        "components/icons/UnoActionSymbol.tsx"
+      ],
+      "settings": {
+        "scope": "Main settings, custom editor and favorite replacement; informational help retains cream reading body and other dialogs retain saved appearance.",
+        "tones": {
+          "classic": {
+            "ground": "{colors.club-ink}",
+            "highlight": "{colors.settings-classic-highlight}"
+          },
+          "no-mercy": {
+            "ground": "{colors.settings-no-mercy-ground}",
+            "highlight": "{colors.settings-no-mercy-highlight}"
+          },
+          "all-wild": {
+            "ground": "{colors.settings-all-wild-ground}",
+            "highlight": "{colors.settings-all-wild-highlight}"
+          }
+        },
+        "foreground": "Cream text; amber focus, checked switches, active checks, pinned stars and primary decisions. Portrait tiles retain their existing blue selection.",
+        "grouping": "8px overview gap, 16px choice padding and 12px corners; no horizontal separator rules. Inset tone groups progress, rule disclosures and audio notes."
+      },
+      "home": "Text-only favorites; optional native mode info popover anchored below its 44px trigger with centered fallback; centered Play label without subtitle or arrow.",
+      "table": "No edition badge, persistent Mercy meter, Draw caption or idle draw pulse. Preserve exact counts, real deadline, legal actions, accessible labels and exceptional knockout outcomes.",
+      "reverse": "Two separated bent arrow bodies; Reverse +4 uses the shared white pair with navy outline over solid native-color cards. Preserve the negative-space channel at hand and help scale.",
+      "review": "review.md first requested one Reverse separation fix; verdict.md resolves it with disposition ship and remaining clear. Twelve JPEG captures include three post-fix recaptures.",
+      "notCanonized": "Owner-rejected pale settings, separators, ornamental home/table labels and joined Reverse shafts are corrected, not reusable rules."
+    },
+    "classicPractice": {
+      "source": "components/HowToPlayModal.tsx and components/HowToPlayModal.module.css",
+      "phases": [
+        "choose",
+        "wild-color",
+        "drawn",
+        "complete"
+      ],
+      "colorAndReplayTarget": "44px",
+      "layout": "Natural-height miniature table inside the independently scrolling lesson; heading and footer stay protected.",
+      "keyboard": "Arrow-key lesson navigation belongs to the step controls; color selection and replay receive focus."
+    },
+    "socialDecisions": {
+      "source": "components/FriendsPanel.tsx and app/settings.css",
+      "removal": "Tonal inline confirmation; Keep friend and Remove friend use existing secondary controls with 44px minimum height.",
+      "recovery": "Escape returns to the trigger; failed removal retains the decision and focuses retry; success focuses the friends heading.",
+      "requestDraft": "Completing a request clears only the submitted code, preserving a newer draft."
+    },
+    "roundOutcomes": {
+      "source": "components/RoundSummary.tsx, components/GameSetup.tsx and app/club.css",
+      "knockoutLabel": "Out, with the accessible name Knocked out; 14px muted Outfit.",
+      "survivalLabel": "Last player standing, centered above the existing score/finish list."
+    },
+    "wholeSiteRefinement": {
+      "source": "components/RematchStatus.tsx, components/Modal.tsx, components/ChoiceDialog.tsx, components/RuleProfileManager.tsx and app/page.tsx",
+      "readiness": "One native disclosure, live ready count, optional seat details and existing semantic theme colors; disconnected humans do not count as ready.",
+      "decisions": "Safe deletion focus, innermost Escape cancellation, busy invitation transfer and retry focus; popups suspend during transfer confirmation.",
+      "motion": "Held-card return motion and hand paging use the shared reduced-motion predicate.",
+      "cleanup": "Obsolete global styles removed; narrow 3px functional confetti/collection geometry and 4px focus-outline radius exceptions preserved."
+    },
+    "helpCleanup": {
+      "date": "2026-10-29",
+      "scope": "Shorter original-edition help with separate actual-table rules, focus-preserving practice, OS reduced motion and shared controls. Existing Color play world preserved.",
+      "verification": ".impeccable/review/help-cleanup/verification.md"
+    },
+    "finalCleanup": {
+      "date": "2026-10-29",
+      "scope": "Shared readable activity, menu destination focus return, accessible result units and resilient online recovery. Existing visual direction preserved.",
+      "verification": ".impeccable/review/final-cleanup/verification.md"
     }
   },
   "components": [
@@ -1134,9 +1303,9 @@
       "name": "Home Play",
       "kind": "button",
       "refersTo": "launch-primary",
-      "description": "Dominant immediate-bot action; home uses a larger Outfit role.",
-      "html": "<button class=\"ds-play\"><span>Let’s play<small>Jump in with bots</small></span><svg width=\"25\" height=\"25\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M5 12h14m-6-6 6 6-6 6\"/></svg></button>",
-      "css": ".ds-play{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;min-height:70px;padding:12px 22px;border:0;border-radius:14px;background:var(--club-yellow,#ffd45a);color:#38290c;box-shadow:inset 0 -4px 0 #bf8a28,0 8px 18px #061e4c45;text-align:left;font-family:var(--font-body,Outfit),sans-serif;font-size:24px;font-weight:750;line-height:1.25;cursor:pointer;transition:transform 140ms cubic-bezier(.16,1,.3,1),background-color 140ms ease}.ds-play small{display:block;margin-top:1px;font-size:13px;font-weight:500;color:#5a410f}.ds-play:hover{background:#ffdc36}.ds-play:active{transform:scale(.97)}.ds-play:focus-visible{outline:3px solid #ffd45a;outline-offset:4px}@media(prefers-reduced-motion:reduce){.ds-play{transition:none}.ds-play:active{transform:none}}"
+      "description": "Centered primary Play label in the larger Outfit role; no subtitle or decorative arrow.",
+      "html": "<button class=\"ds-play\">Let\u2019s play</button>",
+      "css": ".ds-play{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;min-height:70px;padding:12px 22px;border:0;border-radius:14px;background:var(--club-yellow,#ffd45a);color:#38290c;box-shadow:inset 0 -4px 0 #bf8a28,0 8px 18px #061e4c45;text-align:center;font-family:var(--font-body,Outfit),sans-serif;font-size:24px;font-weight:750;line-height:1.25;cursor:pointer;transition:transform 140ms cubic-bezier(.16,1,.3,1),background-color 140ms ease}.ds-play:hover{background:#ffdc36}.ds-play:active{transform:scale(.97)}.ds-play:focus-visible{outline:3px solid #ffd45a;outline-offset:4px}@media(prefers-reduced-motion:reduce){.ds-play{transition:none}.ds-play:active{transform:none}}"
     },
     {
       "name": "Room field",
@@ -1150,25 +1319,25 @@
       "name": "Settings overview",
       "kind": "nav",
       "refersTo": "settings-sheet",
-      "description": "Blue-header, cream-body native task sheet offers four choices or one active task; the same scrolling-body and fixed-amber-decision pattern serves Invite friends, with Add friends when empty.",
+      "description": "Edition-colored native task sheet: cream lettering, amber decisions, spaced choices and inset tonal groups. Help keeps a separate cream body.",
       "html": "<section class=\"ds-settings\" aria-label=\"Settings\"><h2>Settings</h2><nav class=\"ds-settings-choices\" aria-label=\"Settings sections\"><button type=\"button\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"8\" r=\"4\"/><path d=\"M4 21v-2a8 8 0 0 1 16 0v2\"/></svg><span><strong>Profile</strong><small>Your name and avatar</small></span><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"m9 18 6-6-6-6\"/></svg></button><button type=\"button\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2m20 0v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75\"/><circle cx=\"9\" cy=\"7\" r=\"4\"/></svg><span><strong>Friends</strong><small>Your people and invitations</small></span><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"m9 18 6-6-6-6\"/></svg></button><button type=\"button\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M21 4H14M10 4H3M21 12H12M8 12H3M21 20H16M12 20H3M14 1v6M8 9v6M16 17v6\"/></svg><span><strong>Game rules</strong><small>Game profiles and house rules</small></span><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"m9 18 6-6-6-6\"/></svg></button><button type=\"button\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M2 10v4m4-7v10m4-14v18m4-12v6m4-11v14m4-8v2\"/></svg><span><strong>Audio</strong><small>Sounds, music and voice</small></span><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"m9 18 6-6-6-6\"/></svg></button></nav><footer><button class=\"ds-settings-done\" type=\"button\">Done</button></footer></section>",
-      "css": ".ds-settings{--ui-surface:#fffcf4;--ui-text:var(--club-ink,#17345f);--ui-muted:#58687a;--ui-line:#ccd3da;--ui-accent-blue:#1254b5;display:flex;flex-direction:column;width:min(620px,calc(100vw - 32px));height:fit-content;max-height:min(800px,calc(100dvh - 40px));overflow:hidden;border-radius:24px;background:var(--ui-surface);color:var(--ui-text);font-family:var(--font-body,Outfit),sans-serif;box-shadow:0 20px 60px #061e4c66}.ds-settings h2{flex:none;margin:0;min-height:80px;display:flex;align-items:center;padding:18px 24px;background:#123d86;color:var(--club-paper,#fff7e7);font-size:26px;line-height:1.15;font-weight:750}.ds-settings-choices{display:grid;min-height:0;overflow:auto;padding:20px 24px 16px}.ds-settings-choices button{display:flex;align-items:center;gap:16px;min-height:76px;padding:16px 0;border:0;border-bottom:1px solid var(--ui-line);background:transparent;color:inherit;font:inherit;text-align:left;cursor:pointer}.ds-settings-choices button:last-child{border-bottom:0}.ds-settings-choices button>span{flex:1}.ds-settings-choices svg{flex:none}.ds-settings-choices strong{display:block;font-size:18px;font-weight:650}.ds-settings-choices small{display:block;margin-top:4px;font-size:14px;color:var(--ui-muted)}.ds-settings footer{display:flex;justify-content:flex-end;flex:none;padding:16px 24px 20px}.ds-settings-done{min-width:112px;min-height:44px;padding:10px 15px;border:0;border-radius:12px;background:var(--club-yellow,#ffd45a);color:var(--ui-text);font:750 14px var(--font-body,Outfit),sans-serif;box-shadow:inset 0 -3px 0 #bf8a28,0 4px 10px #061e4c20;cursor:pointer}.ds-settings button:focus-visible{outline:3px solid var(--ui-accent-blue);outline-offset:3px}.ds-settings-done:active{transform:scale(.97)}@media(hover:hover){.ds-settings-choices button:hover{color:var(--ui-accent-blue)}.ds-settings-done:hover{background:#ffdc36}}@media(max-width:640px){.ds-settings{width:calc(100vw - 24px);max-height:calc(100dvh - 24px);border-radius:20px}.ds-settings h2{min-height:72px;padding:14px 20px}.ds-settings-choices{padding:16px 20px}.ds-settings-choices button{min-height:76px}.ds-settings footer{padding:12px 20px 16px}}@media(max-height:500px){.ds-settings{max-height:calc(100dvh - 16px)}.ds-settings h2{min-height:52px;padding-block:12px;font-size:24px}.ds-settings-choices{padding-block:8px}.ds-settings footer{padding-block:8px 12px}}"
+      "css": ".ds-settings{--settings-ground:#17345f;--settings-highlight:#24466f;--ui-surface:var(--settings-ground);--ui-text:var(--club-paper,#fff7e7);--ui-muted:#c3d5ee;--ui-line:#557194;--ui-accent-blue:var(--club-yellow,#ffd45a);display:flex;flex-direction:column;width:min(620px,calc(100vw - 32px));height:fit-content;max-height:min(800px,calc(100dvh - 40px));overflow:hidden;border-radius:24px;background:var(--ui-surface);color:var(--ui-text);font-family:var(--font-body,Outfit),sans-serif;box-shadow:0 20px 60px #061e4c66}.ds-settings h2{flex:none;margin:0;min-height:80px;display:flex;align-items:center;padding:18px 24px;background:var(--settings-ground,#17345f);color:var(--club-paper,#fff7e7);font-size:26px;line-height:1.15;font-weight:750}.ds-settings-choices{display:grid;gap:8px;min-height:0;overflow:auto;padding:20px 24px 16px}.ds-settings-choices button{display:flex;align-items:center;gap:16px;min-height:76px;padding:16px;border:0;border-radius:12px;background:transparent;color:inherit;font:inherit;text-align:left;cursor:pointer}.ds-settings-choices button:last-child{border-bottom:0}.ds-settings-choices button>span{flex:1}.ds-settings-choices svg{flex:none}.ds-settings-choices strong{display:block;font-size:18px;font-weight:650}.ds-settings-choices small{display:block;margin-top:4px;font-size:14px;color:var(--ui-muted)}.ds-settings footer{display:flex;justify-content:flex-end;flex:none;padding:16px 24px 20px}.ds-settings-done{min-width:112px;min-height:44px;padding:10px 15px;border:0;border-radius:12px;background:var(--club-yellow,#ffd45a);color:var(--club-ink,#17345f);font:750 14px var(--font-body,Outfit),sans-serif;box-shadow:inset 0 -3px 0 #bf8a28,0 4px 10px #061e4c20;cursor:pointer}.ds-settings button:focus-visible{outline:3px solid var(--ui-accent-blue);outline-offset:3px}.ds-settings-done:active{transform:scale(.97)}@media(hover:hover){.ds-settings-choices button:hover{background:var(--settings-highlight)}.ds-settings-done:hover{background:#ffdc36}}@media(max-width:640px){.ds-settings{width:calc(100vw - 24px);max-height:calc(100dvh - 24px);border-radius:20px}.ds-settings h2{min-height:72px;padding:14px 20px}.ds-settings-choices{padding:16px 20px}.ds-settings-choices button{min-height:76px}.ds-settings footer{padding:12px 20px 16px}}@media(max-height:500px){.ds-settings{max-height:calc(100dvh - 16px)}.ds-settings h2{min-height:52px;padding-block:12px;font-size:24px}.ds-settings-choices{padding-block:8px}.ds-settings footer{padding-block:8px 12px}}.ds-settings[data-tone=\"no-mercy\"],.ds-editor[data-tone=\"no-mercy\"]{--settings-ground:#2c1e29;--settings-highlight:#40303d;--ui-muted:#d6c1d0;--ui-line:#7a6373}.ds-settings[data-tone=\"all-wild\"],.ds-editor[data-tone=\"all-wild\"]{--settings-ground:#322447;--settings-highlight:#49365f;--ui-muted:#d6c7e8;--ui-line:#7d6a94}"
     },
     {
       "name": "Game profile row",
       "kind": "chip",
       "refersTo": "rule-profile-select",
-      "description": "Fixed originals and named custom copies share a flat row; the active check and favorite star express independent states.",
-      "html": "<div class=\"ds-profile-row\"><button class=\"ds-profile-select\" aria-pressed=\"true\"><span class=\"ds-profile-check\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"m20 6-11 11-5-5\"/></svg></span><span><strong>Classic UNO</strong><small>Standard 108-card deck, matching color or number, single draws.</small></span></button><div class=\"ds-profile-actions\"><button aria-label=\"Unpin Classic UNO\" aria-pressed=\"true\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"currentColor\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"m12 3 2.8 5.7 6.3.9-4.5 4.4 1.1 6.2L12 17.3l-5.7 2.9 1.1-6.2L2.9 9.6l6.3-.9z\"/></svg></button><button aria-label=\"Copy Classic UNO\"><svg width=\"17\" height=\"17\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><rect x=\"9\" y=\"9\" width=\"13\" height=\"13\" rx=\"2\"/><path d=\"M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1\"/></svg></button></div></div>",
-      "css": ".ds-profile-row{display:flex;align-items:center;gap:8px;padding-block:14px;border-bottom:1px solid var(--ui-line,#ccd3da);color:var(--club-ink,#17345f);font-family:var(--font-body,Outfit),sans-serif}.ds-profile-select{display:flex;align-items:center;gap:12px;flex:1;min-width:0;padding:4px 0;border:0;background:transparent;color:inherit;text-align:left;font:inherit;cursor:pointer}.ds-profile-select strong{display:block;font-size:16px;overflow-wrap:anywhere}.ds-profile-select small{display:block;margin-top:4px;color:var(--ui-muted,#58687a);font-size:13px;line-height:1.5}.ds-profile-check{display:grid;place-items:center;flex:none;width:24px;height:24px;border:1px solid var(--ui-accent-blue,#1254b5);border-radius:50%;background:var(--ui-accent-blue,#1254b5);color:var(--ui-surface,#fffcf4)}.ds-profile-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;max-width:88px;flex:none}.ds-profile-actions button{display:grid;place-items:center;width:40px;height:40px;min-width:44px;min-height:44px;border:0;border-radius:12px;background:transparent;color:inherit;cursor:pointer}.ds-profile-actions [aria-pressed=\"true\"]{color:var(--ui-accent-blue,#1254b5)}.ds-profile-row button:focus-visible{outline:3px solid var(--ui-accent-blue,#1254b5);outline-offset:3px}.ds-profile-actions button:hover{background:var(--ui-bg,#fff7e7)}.ds-profile-row button:active{transform:scale(.97)}@media(prefers-reduced-motion:reduce){.ds-profile-row button:active{transform:none}}"
+      "description": "Spaced profile row uses the selected edition highlight and inline amber check; its favorite star is independent.",
+      "html": "<div class=\"ds-profile-row\"><button class=\"ds-profile-select\" aria-pressed=\"true\"><span><strong>Classic UNO<span class=\"ds-profile-check\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"m20 6-11 11-5-5\"/></svg></span></strong><small>Standard 108-card deck, matching color or number, single draws.</small></span></button><div class=\"ds-profile-actions\"><button aria-label=\"Unpin Classic UNO\" aria-pressed=\"true\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"currentColor\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"m12 3 2.8 5.7 6.3.9-4.5 4.4 1.1 6.2L12 17.3l-5.7 2.9 1.1-6.2L2.9 9.6l6.3-.9z\"/></svg></button><button aria-label=\"Copy Classic UNO\"><svg width=\"17\" height=\"17\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><rect x=\"9\" y=\"9\" width=\"13\" height=\"13\" rx=\"2\"/><path d=\"M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1\"/></svg></button></div></div>",
+      "css": ".ds-profile-row{display:flex;align-items:center;gap:12px;min-height:80px;padding:12px;border:0;border-radius:12px;background:var(--settings-highlight,#24466f);color:var(--club-paper,#fff7e7);font-family:var(--font-body,Outfit),sans-serif}.ds-profile-select{display:flex;align-items:center;gap:12px;flex:1;min-width:0;min-height:48px;padding:0;border:0;background:transparent;color:inherit;text-align:left;font:inherit;cursor:pointer}.ds-profile-select strong{display:flex;align-items:center;gap:8px;font-size:16px;overflow-wrap:anywhere}.ds-profile-select small{display:block;margin-top:4px;color:var(--ui-muted,#c3d5ee);font-size:13px;line-height:1.5}.ds-profile-check{display:inline-flex;flex:none;color:var(--ui-accent-blue,#ffd45a)}.ds-profile-actions{display:flex;gap:4px;flex:none}.ds-profile-actions button{display:grid;place-items:center;width:40px;height:40px;min-width:44px;min-height:44px;border:0;border-radius:50%;background:transparent;color:inherit;cursor:pointer}.ds-profile-actions [aria-pressed=\"true\"]{color:var(--ui-accent-blue,#ffd45a)}.ds-profile-row button:focus-visible{outline:3px solid var(--ui-accent-blue,#ffd45a);outline-offset:3px}.ds-profile-actions button:hover{background:rgba(18,84,181,.08);color:var(--ui-accent-blue,#ffd45a)}.ds-profile-row button:active{transform:scale(.97)}@media(prefers-reduced-motion:reduce){.ds-profile-row button:active{transform:none}}"
     },
     {
       "name": "Custom profile draft",
       "kind": "card",
       "refersTo": "settings-sheet",
-      "description": "Named custom draft in its own blue-header native task sheet, with scrolling cream content and fixed Save and use / Cancel; failed application keeps the saved draft open, restores prior selection and allows retry.",
+      "description": "Focused custom-profile draft inherits the selected edition task tone with scrolling body and fixed Save and use / Cancel decisions.",
       "html": "<section class=\"ds-editor\" aria-label=\"Custom profile\"><header><h2>Custom profile</h2><button class=\"ds-editor-close\" aria-label=\"Close custom profile\">Close</button></header><form><div class=\"ds-editor-body\"><label>Profile name<input value=\"Classic custom\" maxlength=\"30\" required /></label><p>Classic rules</p></div><footer><button class=\"ds-editor-save\" type=\"submit\">Save and use</button><button class=\"ds-editor-cancel\" type=\"button\">Cancel</button></footer></form></section>",
-      "css": ".ds-editor{--ui-surface:#fffcf4;--ui-text:var(--club-ink,#17345f);--ui-muted:#58687a;--ui-line:#ccd3da;--ui-accent-blue:#1254b5;display:flex;flex-direction:column;width:min(620px,calc(100vw - 32px));height:fit-content;max-height:min(800px,calc(100dvh - 40px));overflow:hidden;border-radius:24px;background:var(--ui-surface,#fffcf4);color:var(--ui-text,#17345f);box-shadow:0 20px 60px #061e4c66;font:15px/1.5 var(--font-body,Outfit),sans-serif}.ds-editor header{display:flex;align-items:center;justify-content:space-between;gap:16px;flex:none;min-height:80px;padding:18px 24px;background:#123d86;color:var(--club-paper,#fff7e7)}.ds-editor h2{margin:0;font-size:26px;font-weight:750;line-height:1.15;letter-spacing:-.02em}.ds-editor form{display:flex;flex:1 1 auto;min-height:0;flex-direction:column}.ds-editor-body{flex:1 1 auto;min-height:0;overflow:auto;overscroll-behavior:contain;scrollbar-gutter:stable;padding:20px 24px 16px}.ds-editor-body label{display:grid;gap:8px;font-size:14px;font-weight:750}.ds-editor-body input{min-width:0;min-height:50px;padding:12px 15px;border:2px solid var(--ui-line,#ccd3da);border-radius:6px;background:var(--ui-surface,#fffcf4);color:inherit;font:400 15px var(--font-body,Outfit),sans-serif}.ds-editor-body p{color:var(--ui-muted,#58687a)}.ds-editor footer{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:12px;flex:none;padding:16px 24px 20px}.ds-editor button{min-height:44px;min-width:44px;padding:10px 15px;border:1px solid var(--ui-line,#ccd3da);border-radius:12px;background:transparent;color:inherit;font:750 14px var(--font-body,Outfit),sans-serif;cursor:pointer}.ds-editor .ds-editor-save{background:var(--club-yellow,#ffd45a);border:0;box-shadow:inset 0 -3px 0 #bf8a28,0 4px 10px #061e4c20}.ds-editor .ds-editor-close{border:0;padding:8px;color:inherit}.ds-editor header :focus-visible{outline-color:var(--club-yellow,#ffd45a)}.ds-editor :focus-visible{outline:3px solid var(--ui-accent-blue,#1254b5);outline-offset:3px}.ds-editor input:focus{border-color:var(--ui-text,#17345f)}.ds-editor button:hover{background:var(--ui-bg,#fff7e7)}.ds-editor .ds-editor-close:hover{background:#ffffff1f}.ds-editor .ds-editor-save:hover{background:#ffdc36}.ds-editor button:active{transform:scale(.97)}@media(max-width:640px){.ds-editor{--ui-surface:#fffcf4;--ui-text:var(--club-ink,#17345f);--ui-muted:#58687a;--ui-line:#ccd3da;--ui-accent-blue:#1254b5;width:calc(100vw - 24px);max-height:calc(100dvh - 24px);border-radius:20px}.ds-editor header{min-height:72px;padding:14px 20px}.ds-editor-body{padding:16px 20px}.ds-editor footer{padding:12px 20px 16px}}@media(max-height:500px){.ds-editor{--ui-surface:#fffcf4;--ui-text:var(--club-ink,#17345f);--ui-muted:#58687a;--ui-line:#ccd3da;--ui-accent-blue:#1254b5;max-height:calc(100dvh - 16px)}.ds-editor header{min-height:52px;padding-block:12px}.ds-editor h2{font-size:24px}.ds-editor-body{padding-block:8px}.ds-editor footer{padding-block:8px 12px}}@media(prefers-reduced-motion:reduce){.ds-editor button:active{transform:none}}.ds-editor button:disabled{opacity:.5;box-shadow:none;cursor:default}"
+      "css": ".ds-editor{--settings-ground:#17345f;--settings-highlight:#24466f;--ui-surface:var(--settings-ground);--ui-text:var(--club-paper,#fff7e7);--ui-muted:#c3d5ee;--ui-line:#557194;--ui-accent-blue:var(--club-yellow,#ffd45a);display:flex;flex-direction:column;width:min(620px,calc(100vw - 32px));height:fit-content;max-height:min(800px,calc(100dvh - 40px));overflow:hidden;border-radius:24px;background:var(--ui-surface,#fffcf4);color:var(--ui-text,#17345f);box-shadow:0 20px 60px #061e4c66;font:15px/1.5 var(--font-body,Outfit),sans-serif}.ds-editor header{display:flex;align-items:center;justify-content:space-between;gap:16px;flex:none;min-height:80px;padding:18px 24px;background:var(--settings-ground,#17345f);color:var(--club-paper,#fff7e7)}.ds-editor h2{margin:0;font-size:26px;font-weight:750;line-height:1.15;letter-spacing:-.02em}.ds-editor form{display:flex;flex:1 1 auto;min-height:0;flex-direction:column}.ds-editor-body{flex:1 1 auto;min-height:0;overflow:auto;overscroll-behavior:contain;scrollbar-gutter:stable;padding:20px 24px 16px}.ds-editor-body label{display:grid;gap:8px;font-size:14px;font-weight:750}.ds-editor-body input{min-width:0;min-height:50px;padding:12px 15px;border:2px solid var(--ui-line,#ccd3da);border-radius:6px;background:var(--ui-surface,#fffcf4);color:inherit;font:400 15px var(--font-body,Outfit),sans-serif}.ds-editor-body p{color:var(--ui-muted,#58687a)}.ds-editor footer{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:12px;flex:none;padding:16px 24px 20px}.ds-editor button{min-height:44px;min-width:44px;padding:10px 15px;border:1px solid var(--ui-line,#ccd3da);border-radius:12px;background:transparent;color:inherit;font:750 14px var(--font-body,Outfit),sans-serif;cursor:pointer}.ds-editor .ds-editor-save{color:var(--club-ink,#17345f);background:var(--club-yellow,#ffd45a);border:0;box-shadow:inset 0 -3px 0 #bf8a28,0 4px 10px #061e4c20}.ds-editor .ds-editor-close{border:0;padding:8px;color:inherit}.ds-editor header :focus-visible{outline-color:var(--club-yellow,#ffd45a)}.ds-editor :focus-visible{outline:3px solid var(--ui-accent-blue,#1254b5);outline-offset:3px}.ds-editor input:focus{border-color:var(--ui-text,#17345f)}.ds-editor button:hover{background:var(--ui-bg,#fff7e7)}.ds-editor .ds-editor-close:hover{background:#ffffff1f}.ds-editor .ds-editor-save:hover{background:#ffdc36}.ds-editor button:active{transform:scale(.97)}@media(max-width:640px){.ds-editor{--settings-ground:#17345f;--settings-highlight:#24466f;--ui-surface:var(--settings-ground);--ui-text:var(--club-paper,#fff7e7);--ui-muted:#c3d5ee;--ui-line:#557194;--ui-accent-blue:var(--club-yellow,#ffd45a);width:calc(100vw - 24px);max-height:calc(100dvh - 24px);border-radius:20px}.ds-editor header{min-height:72px;padding:14px 20px}.ds-editor-body{padding:16px 20px}.ds-editor footer{padding:12px 20px 16px}}@media(max-height:500px){.ds-editor{--settings-ground:#17345f;--settings-highlight:#24466f;--ui-surface:var(--settings-ground);--ui-text:var(--club-paper,#fff7e7);--ui-muted:#c3d5ee;--ui-line:#557194;--ui-accent-blue:var(--club-yellow,#ffd45a);max-height:calc(100dvh - 16px)}.ds-editor header{min-height:52px;padding-block:12px}.ds-editor h2{font-size:24px}.ds-editor-body{padding-block:8px}.ds-editor footer{padding-block:8px 12px}}@media(prefers-reduced-motion:reduce){.ds-editor button:active{transform:none}}.ds-editor button:disabled{opacity:.5;box-shadow:none;cursor:default}.ds-settings[data-tone=\"no-mercy\"],.ds-editor[data-tone=\"no-mercy\"]{--settings-ground:#2c1e29;--settings-highlight:#40303d;--ui-muted:#d6c1d0;--ui-line:#7a6373}.ds-settings[data-tone=\"all-wild\"],.ds-editor[data-tone=\"all-wild\"]{--settings-ground:#322447;--settings-highlight:#49365f;--ui-muted:#d6c7e8;--ui-line:#7d6a94}"
     },
     {
       "name": "Local turn cue",
@@ -1196,7 +1365,7 @@
   ],
   "narrative": {
     "northStar": "Color play",
-    "overview": "A welcoming shared card table combines a rich blue field, warm cream foreground, vivid native UNO cards and expressive illustrated human portraits. Outfit keeps the interface friendly and direct; Barlow Condensed gives the deck, wordmark and selected game actions their familiar energy. Soft contact shadows and inset press edges make cards and controls feel physical.\n\nThis records the shipped October 24 composite: Classic supplies the blue field and card prominence, Color court supplies the portraits, and After-hours supplies amber turn and action emphasis. The approved direction is `.impeccable/review/experience-reset/contract.md` (FORM seed `2fba311c`); its three references are `reset-classic.png`, `reset-color-court.png` and `reset-after-hours.png` under `.impeccable/mocks/decision/`. No catalog quality-bar world was selected. Earlier Comic-card showdown, giant-cast/painted-menu, violet-corner, illustrated-room and poker-table instructions are historical and superseded. Their assets and provenance remain recoverable; they are not current surface guidance.",
+    "overview": "A welcoming shared card table combines a rich blue field, warm cream foreground, vivid native UNO cards and expressive illustrated human portraits. Outfit keeps the interface friendly and direct; Barlow Condensed gives the deck, wordmark and selected game actions their familiar energy. Soft contact shadows and inset press edges make cards and controls feel physical.\n\nThis records the shipped October 24 composite: Classic supplies the blue field and card prominence, Color court supplies the portraits, and After-hours supplies amber turn and action emphasis. The approved direction is `.impeccable/review/experience-reset/contract.md` (FORM seed `2fba311c`); its three references are `reset-classic.png`, `reset-color-court.png` and `reset-after-hours.png` under `.impeccable/mocks/decision/`. No catalog quality-bar world was selected. Earlier Comic-card showdown, giant-cast/painted-menu, violet-corner, illustrated-room and poker-table instructions are historical and superseded. Their assets and provenance remain recoverable; they are not current surface guidance.\n\nThe owner-approved October 25 geometry replacement inherits this world and FORM seed through `.impeccable/review/responsive-table/contract.md`. It replaces bottom-anchored piles with the centered, panel-bounded table. The subsequent owner-requested quarter crop in `.impeccable/review/quarter-hand/contract.md` supersedes that rebuild\u2019s fully-visible-bottom requirement without changing the inherited world or FORM seed. Palette, lettering, portraits and native card print retain their existing authority.\n\nThe October 26 focused-account extension (`.impeccable/review/focused-account/contract.md`, FORM `focused-account-20261026`) preserves this world. Optional identity, social and preference tasks live behind the avatar; joining and routine play remain visually quiet. No new shipping raster assets were introduced.\n\nThe October 26 settings redo (`.impeccable/review/settings-redo/contract.md`) supersedes the focused-account sidebar, mobile section picker and avatar creator. A compact warm-white sheet offers four choices, then one task at a time; the arena and native card world retain their authority.\n\nThe October 27 edition hardening (`.impeccable/review/edition-hardening/contract.md`) is a bounded extension of this world, inheriting FORM seed `2fba311c` under the narrow-extension exemption. It restores three playable fixed originals and home favorites, separates active identity from pins, and gives custom-copy editing its own native dialog. It changes no imagery or home title/card-fan/action composition. Latest product authority is the October 27 entry in `PRODUCT.md`; older single-Classic and removed-home-track guidance is superseded.\n\nThe October 27 settings refinement (`.impeccable/review/settings-spacing/contract.md`) inherits the same world and FORM seed `2fba311c` as a local refinement, with no new world roll or comp. It carries the homepage palette into blue settings headers, cream scrolling bodies, amber decisions, pale-blue active rows and native card miniatures. This supersedes all-cream headers, separate body back rows, blue-filled stars, three custom-row actions and the earlier settings gutters. The shipped profile rows use an 80px minimum including padding; the contract\u2019s provisional 72px row target is not the implemented rule.\n\nThe October 27 printed-symbol correction (`.impeccable/review/card-symbols/contract.md`) is a bounded extension of Color play and FORM seed `2fba311c`. The shipped geometric SVG motifs follow the functional printed vocabulary in Mattel\u2019s illustrated Classic, Show \u2019Em No Mercy and All Wild instruction sheets; they introduce no raster assets or generated artwork. Seven validated JPEG captures and the ship review remain in `.impeccable/review/card-symbols/`. This correction changes card vocabulary and optional edition help, without replacing the existing world.\n\nThe October 27 play-clarity extension (`.impeccable/review/play-clarity/contract.md`) inherits Color play and FORM seed `2fba311c`. Engine-derived stack responses, direct opponent-seat targeting and optional original-edition practice clarify exceptional decisions while preserving the existing native cards, portraits and quiet routine play. Its six captures and ship review remain in `.impeccable/review/play-clarity/`; no new tokens, imagery or visual world were introduced.\n\nThe October 27 quiet-play cleanup (`.impeccable/review/quiet-play/contract.md`) inherits Color play and FORM seed `2fba311c`. The owner explicitly supersedes pale Settings and horizontal separators: main tasks, custom drafts and favorite replacement now use edition-colored grounds, cream lettering, amber decisions and tonal grouping. Home favors text-only choices and a centered Play label; mode details stay in an optional native info popover. The table drops the edition badge, persistent Mercy meter, Draw caption and idle draw pulse. Two separated bent arrows now define Reverse, including the white navy-outlined pair over solid colored cards for Reverse +4. Twelve JPEG captures and the resolved ship verdict remain in `.impeccable/review/quiet-play/`; no new visual world, dependencies or artwork were introduced. Informational help retains its cream body.\n\nSource authority: `app/layout.tsx` imports globals, legacy table geometry, arena, home, club, then settings styles. `app/club.css` owns shared palette/chrome; `app/settings.css` owns the settings sheet, avatar popover, portrait picker and invitation surfaces; `app/home.css` owns home; `app/arena.css` owns live geometry/cues, with its final centered-board section superseding earlier geometry; `PlayerAvatar.module.css`, `OpponentSeat.module.css` and `UnoCard.module.css` own their materials. Component module specificity matters: the active portrait badge is cream, not the older arena yellow badge. Source takes precedence over older captures.",
     "keyCharacteristics": [
       "Quiet blue, charcoal/crimson or plum edition fields keep attention on live cards and people.",
       "Human portraits, opaque nameplates and exact hand counts make the table social and readable.",
@@ -1205,6 +1374,11 @@
       "A quarter-cropped curved held hand preserves direct legal play, readable overlap and independent large-hand scrolling."
     ],
     "rules": [
+      {
+        "name": "The Edition Task Rule",
+        "body": "Main Settings and its editors inherit the selected edition through ground and inset highlight, cream lettering and amber controls. Use spacing and subtle tonal groups instead of horizontal separators; informational help keeps its cream reading body.",
+        "section": "colors"
+      },
       {
         "name": "The Published Color Rule",
         "body": "Amber, cream active badges, legal-card outlines and wild swatches describe actual published state. Retain names, counts and written action/color labels alongside color.",
@@ -1244,13 +1418,24 @@
         "name": "The Distinct State Rule",
         "body": "The active check identifies the selected profile; the star identifies a home favorite. Saving a custom draft is the explicit boundary before its rules become active.",
         "section": "components"
+      },
+      {
+        "name": "The Printed Vocabulary Rule",
+        "body": "Reuse the functional deck motif across native faces and relevant action feedback. Keep corner draw amounts and four-color All Wild action ovals; offer explanations through the optional reference rather than routine play coaching.",
+        "section": "components"
+      },
+      {
+        "name": "The Exact Response Rule",
+        "body": "Derive stack response wording from engine legality and show the accumulated draw total separately. Keep targeted decisions on the existing opponent seats and retain the authoritative clock throughout selection.",
+        "section": "components"
       }
     ],
     "dos": [
       "**Do** use the quiet edition field, warm cream, human portraits and vivid native deck as one shared identity.",
       "**Do** keep Outfit ordinary headings and the separate Barlow Condensed brand/deck roles.",
-      "**Do** retain saved appearances on other dialogs, the avatar popover and invitation notices, while keeping Settings bodies warm-white with navy text, blue/cream headers and amber decisions.",
+      "**Do** retain saved appearances on other dialogs, the avatar popover and invitation notices; use navy/plum/violet main Settings with cream text, amber decisions and tonal grouping, while informational help keeps its cream body.",
       "**Do** keep exact hand counts, inline compact status, a real turn clock and written action/color cues.",
+      "**Do** share printed deck motifs across card faces and relevant feedback, preserve All Wild\u2019s four-color action oval, and keep real-face explanations behind the native Card symbols disclosure.",
       "**Do** preserve the quarter-cropped curved held hand, readable overlap, independent overflow, direct legal play and visible keyboard focus.",
       "**Do** keep compact cues, inspection and actions clear of identities and piles, and confine game dialogs to the reported usable panel.",
       "**Do** keep setup, account and help decisions outside the scrolling content body, and distinguish actual table rules from practice examples.",
@@ -1262,7 +1447,9 @@
     "donts": [
       "**Don't** restore giant background cast, painted menu-card actions, ink swashes, poker felt/rail or the giant orbit field.",
       "**Don't** add decoration behind the piles or allow compact player states to expand into their space.",
-      "**Don't** add another font family, glyph icons, mixed display systems or a parallel component library.",
+      "**Don't** add another font family, glyph icons, mixed display systems or a parallel component library. Functional authored SVG card print remains part of the native deck.",
+      "**Don't** replace printed action motifs with app utility icons or a physical roulette wheel, or merge the two Reverse arrow bodies.",
+      "**Don't** restore home mode icons, an always-visible mode description, Play subtitles, Settings separator lines, the Draw pill, persistent Mercy meter, No Mercy header badge or idle draw pulse.",
       "**Don't** replace the live deadline with a decorative countdown or reset it after a draw or metadata update.",
       "**Don't** add blocking splashes or let audio, reactions or motion gate game turns.",
       "**Don't** repeat identity editors in joining or room setup, or add routine hand coaching.",

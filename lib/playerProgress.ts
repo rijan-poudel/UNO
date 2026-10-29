@@ -1,5 +1,6 @@
 // Honest, device-local round history. The finished state makes recording idempotent.
 import type { GameState } from '../types/game';
+import { hasCompletedRound } from './tableScore';
 export interface PlayerProgress {
   rounds: number;
   wins: number;
@@ -33,7 +34,7 @@ export function parseProgress(raw: string | null): PlayerProgress {
       rounds: value.rounds,
       wins: value.wins,
       streak: value.streak,
-      bestStreak: value.bestStreak,
+      bestStreak: Math.max(value.bestStreak, value.streak),
       recent: value.recent
         .filter((id: unknown): id is string => typeof id === 'string')
         .slice(-100),
@@ -65,7 +66,8 @@ export function readProgressSnapshot(): string {
   }
 }
 export function recordRound(game: GameState, playerId: string): void {
-  if (!game.winnerId || !game.players.some((p) => p.id === playerId)) return;
+  if (!hasCompletedRound(game) || !game.players.some((p) => p.id === playerId))
+    return;
   // Prefer the round identity; older games fall back to their terminal snapshot.
   const id =
     game.roundId ??

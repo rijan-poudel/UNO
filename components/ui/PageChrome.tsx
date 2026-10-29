@@ -33,17 +33,23 @@ export function SetupIntro({
   title,
   description,
   onBack,
+  backDisabled = false,
   trailing,
 }: {
   title: string;
-  description: string;
+  description?: string;
   onBack?: () => void;
+  backDisabled?: boolean;
   trailing?: ReactNode;
 }) {
   return (
     <div className="setup-intro">
       {onBack && (
-        <button className="text-button" onClick={onBack}>
+        <button
+          className="text-button"
+          onClick={onBack}
+          disabled={backDisabled}
+        >
           <ArrowLeft size={16} /> Back to home
         </button>
       )}
@@ -51,7 +57,7 @@ export function SetupIntro({
         <h1>{title}</h1>
         {trailing}
       </div>
-      <p>{description}</p>
+      {description && <p>{description}</p>}
     </div>
   );
 }

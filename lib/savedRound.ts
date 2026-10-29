@@ -120,9 +120,13 @@ export function parseSavedRound(raw: string | null): GameState | null {
       game.roundId.length <= 100
         ? game.roundId
         : undefined;
-    const tableScore = roundId
+    const previousScore = roundId
       ? parseTableScore(game.tableScore, players)
       : undefined;
+    // An unfinished round cannot already be counted. Keep the hand, but discard
+    // contradictory score metadata so finishing after recovery still records a win.
+    const tableScore =
+      previousScore?.lastRoundId === roundId ? undefined : previousScore;
     return {
       ...(roundId ? { roundId } : {}),
       ...(tableScore ? { tableScore } : {}),

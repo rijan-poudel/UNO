@@ -1,4 +1,6 @@
 // Public visitors need a reachable host; local addresses belong only to previews.
+import { isRoomCode } from './roomCodes';
+
 export const ONLINE_UNAVAILABLE_MESSAGE =
   'Online tables are unavailable right now. You can still play with bots.';
 
@@ -22,6 +24,8 @@ export function resolveSocketEndpoint(
     try {
       const url = new URL(endpoint);
       return ['http:', 'https:', 'ws:', 'wss:'].includes(url.protocol) &&
+        (location.protocol !== 'https:' ||
+          ['https:', 'wss:'].includes(url.protocol)) &&
         (localPreview || !isLocalHost(url.hostname))
         ? url.toString()
         : null;
@@ -32,4 +36,30 @@ export function resolveSocketEndpoint(
   return localPreview
     ? `${location.protocol}//${location.hostname}:3001`
     : null;
+}
+
+export interface RoomSession {
+  roomId: string;
+  playerName?: string;
+}
+
+/** A live session survives blocked storage; null explicitly suppresses recovery after leaving. */
+export function readRoomSession(
+  readStored: () => string | null,
+  current: RoomSession | null | undefined = undefined,
+): RoomSession | null {
+  if (current !== undefined) return current;
+  try {
+    const saved = JSON.parse(readStored() ?? 'null');
+    if (!saved || typeof saved.roomId !== 'string' || !isRoomCode(saved.roomId))
+      return null;
+    return {
+      roomId: saved.roomId,
+      ...(typeof saved.playerName === 'string'
+        ? { playerName: saved.playerName.trim().slice(0, 18) }
+        : {}),
+    };
+  } catch {
+    return null;
+  }
 }

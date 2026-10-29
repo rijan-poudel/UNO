@@ -2,6 +2,7 @@
 "use client";
 import { useEffect, useId, useRef, useState } from "react";
 import type { Card } from "../types/card";
+import { isReducedMotion } from "../lib/displaySettings";
 
 export function useHandNavigation(cards: Card[]) {
   const hand = useRef<HTMLDivElement>(null);
@@ -43,9 +44,7 @@ export function useHandNavigation(cards: Card[]) {
     if (!scroller) return;
     scroller.scrollBy({
       left: direction * scroller.clientWidth * 0.7,
-      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
-        ? "instant"
-        : "smooth",
+      behavior: isReducedMotion() ? "instant" : "smooth",
     });
   }
 

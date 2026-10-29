@@ -2,18 +2,9 @@
 "use client";
 
 import type { CSSProperties } from "react";
-import {
-  Ban,
-  Repeat2,
-  Layers,
-  Shuffle,
-  FastForward,
-  ArrowLeftRight,
-  Crosshair,
-  Disc,
-} from "lucide-react";
+import { UnoActionSymbol } from "./icons/UnoActionSymbol";
 import { getCardLabel } from "../types/card";
-import type { Card } from "../types/card";
+import type { Card, CardValue } from "../types/card";
 import styles from "./UnoCard.module.css";
 
 interface UnoCardProps {
@@ -34,42 +25,28 @@ const SYMBOLS: Record<string, string> = {
   wild4: "+4",
   wildDraw6: "+6",
   wildDraw10: "+10",
-  wildSkip2: "×2",
-  wildTargetDraw2: "+2",
+  wildColorRoulette: "?",
   wild: "",
   shuffle: "",
   discardAll: "",
 };
 
-function CardSymbol({ value }: { value: string }) {
-  if (value === "skip") return <Ban aria-hidden="true" />;
-  if (value === "skipEveryone") return <FastForward aria-hidden="true" />;
-  if (value === "wildSkip2")
+function CardSymbol({
+  value,
+  corner = false,
+}: {
+  value: CardValue;
+  corner?: boolean;
+}) {
+  if (corner && value === "wildReverseDraw4") {
     return (
-      <span className="card-skip-two">
-        <Ban aria-hidden="true" />
-        <small>2</small>
+      <span className={styles.cornerRev4} aria-hidden="true">
+        <UnoActionSymbol value="reverse" isCorner />
+        <span>+4</span>
       </span>
     );
-  if (value === "reverse") return <Repeat2 aria-hidden="true" />;
-  if (value === "wildReverseDraw4")
-    return (
-      <span className="card-reverse-draw4">
-        <Repeat2 aria-hidden="true" />
-        <small>+4</small>
-      </span>
-    );
-  if (value === "wildTargetDraw2")
-    return (
-      <span className="card-target-draw2">
-        <Crosshair aria-hidden="true" />
-        <small>+2</small>
-      </span>
-    );
-  if (value === "wildForcedSwap") return <ArrowLeftRight aria-hidden="true" />;
-  if (value === "wildColorRoulette") return <Disc aria-hidden="true" />;
-  if (value === "shuffle") return <Shuffle aria-hidden="true" />;
-  if (value === "discardAll") return <Layers aria-hidden="true" />;
+  }
+  if (corner && SYMBOLS[value]) return <>{SYMBOLS[value]}</>;
   if (value === "wild")
     return (
       <span className="wild-symbol">
@@ -79,7 +56,8 @@ function CardSymbol({ value }: { value: string }) {
         <i />
       </span>
     );
-  return <>{SYMBOLS[value] ?? value}</>;
+  if (/^[0-9]$/.test(value)) return <>{value}</>;
+  return <UnoActionSymbol value={value} isCorner={corner} />;
 }
 
 export default function UnoCard({
@@ -95,6 +73,16 @@ export default function UnoCard({
   cornerHint,
 }: UnoCardProps) {
   const label = faceDown ? "Face-down card" : getCardLabel(card);
+  const wildAction =
+    card.color === "wild" &&
+    [
+      "skip",
+      "reverse",
+      "draw2",
+      "wildSkip2",
+      "wildTargetDraw2",
+      "wildForcedSwap",
+    ].includes(card.value);
   const style = { "--card-scale": sizeMultiplier } as CSSProperties;
   const content = faceDown ? (
     <>
@@ -111,25 +99,16 @@ export default function UnoCard({
   ) : (
     <>
       <span className="card-index top">
-        <CardSymbol value={card.value} />
+        <CardSymbol value={card.value} corner />
       </span>
       <span className="card-orbit" aria-hidden="true" />
       <span
         className={`card-value ${card.value.length > 1 ? "card-action-value" : ""}`}
       >
-        {card.value === "wild4" ? (
-          <span className={styles.drawFour} aria-hidden="true">
-            <i />
-            <i />
-            <i />
-            <i />
-          </span>
-        ) : (
-          <CardSymbol value={card.value} />
-        )}
+        <CardSymbol value={card.value} />
       </span>
       <span className="card-index bottom">
-        <CardSymbol value={card.value} />
+        <CardSymbol value={card.value} corner />
       </span>
     </>
   );
@@ -138,6 +117,7 @@ export default function UnoCard({
     <button
       type="button"
       className={className}
+      data-wild-action={wildAction || undefined}
       style={style}
       onClick={() => {
         if (!disabled) onClick();
@@ -155,7 +135,13 @@ export default function UnoCard({
       <span className={styles.finish} aria-hidden="true" />
     </button>
   ) : (
-    <div className={className} style={style} role="img" aria-label={label}>
+    <div
+      className={className}
+      data-wild-action={wildAction || undefined}
+      style={style}
+      role="img"
+      aria-label={label}
+    >
       {content}
       <span className={styles.finish} aria-hidden="true" />
     </div>

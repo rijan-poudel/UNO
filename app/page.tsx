@@ -104,6 +104,7 @@ export default function Home() {
   const [settingsTab, setSettingsTab] = useState<SettingsSection>("profile");
   const [inviteToJoin, setInviteToJoin] = useState<string | null>(null);
   const joiningInvite = useRef(false);
+  const [joiningInvitation, setJoiningInvitation] = useState(false);
   const [rules, setRules] = useState<Partial<GameRules>>(getInitialRules);
   const [savingRules, setSavingRules] = useState(false);
   // On client this is always true; on server it's false (SSR guard)
@@ -190,13 +191,16 @@ export default function Home() {
   const joinFromInvite = async (id: string) => {
     if (joiningInvite.current) return false;
     joiningInvite.current = true;
+    setJoiningInvitation(true);
     try {
       const invite = online.incomingInvites.find(
         (item) => item.inviteId === id,
       );
-      if (!invite) return false;
-      if (online.room && online.room.roomId !== invite.roomId)
-        await online.leaveRoom();
+      if (!invite) {
+        toast.error("This invitation has expired.");
+        setInviteToJoin(null);
+        return false;
+      }
       const joined = await online.acceptFriendInvite(id, getPlayerName());
       if (joined) {
         if (local.game) local.resetGame();
@@ -205,15 +209,21 @@ export default function Home() {
         setSettingsOpen(false);
       } else toast.error("Couldn’t join that invitation. It may have expired.");
       return joined;
+    } catch {
+      toast.error("Couldn’t join. Try again.");
+      return false;
     } finally {
       joiningInvite.current = false;
+      setJoiningInvitation(false);
     }
   };
   const acceptInvitation = async (id: string) => {
+    if (joiningInvite.current) return false;
     const invite = online.incomingInvites.find((item) => item.inviteId === id);
     if (api.game || (online.room && online.room.roomId !== invite?.roomId)) {
+      if (!invite) return false;
       setInviteToJoin(id);
-      return true;
+      return false;
     }
     return joinFromInvite(id);
   };
@@ -234,6 +244,21 @@ export default function Home() {
     onOpenSettings: () => openSettingsAt("overview"),
     notificationCount:
       online.incomingInvites.length + online.social.incomingRequests.length,
+  };
+  const startLocalGame = (names: string[], bots: boolean[]) => {
+    try {
+      local.startGame(names, rules, bots);
+      if (online.room) void online.leaveRoom();
+      setMode("computer");
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Couldn’t deal. Try fewer cards or players.",
+      );
+      setMode("computer");
+      setView("computer");
+    }
   };
 
   const settingsModal = settingsOpen ? (
@@ -345,12 +370,9 @@ export default function Home() {
             setView("room");
           }}
           onQuickPlay={() => {
-            if (online.room) void online.leaveRoom();
             const names = getSavedPlayerNames();
-            setMode("computer");
-            local.startGame(
+            startLocalGame(
               names,
-              rules,
               names.map((_, i) => i > 0),
             );
           }}
@@ -373,8 +395,7 @@ export default function Home() {
           controls={topBar}
           onBack={() => setView("home")}
           onStart={(names, botFlags) => {
-            setMode("computer");
-            local.startGame(names, rules, botFlags);
+            startLocalGame(names, botFlags);
           }}
         />
       </>
@@ -423,6 +444,7 @@ export default function Home() {
       {content}
       {settingsModal}
       <InvitationNotifications
+        suspended={Boolean(inviteToJoin)}
         invites={online.incomingInvites}
         requests={online.social.incomingRequests}
         connected={online.connected}
@@ -439,14 +461,15 @@ export default function Home() {
               label: "Stay here",
               variant: "secondary",
               onClick: () => setInviteToJoin(null),
+              disabled: joiningInvitation,
             },
             {
-              label: "Leave and join",
+              label: joiningInvitation ? "Joining…" : "Leave and join",
               variant: "primary",
-              onClick: () => {
-                const id = inviteToJoin;
-                setInviteToJoin(null);
-                void joinFromInvite(id);
+              disabled: joiningInvitation,
+              busy: joiningInvitation,
+              onClick: async () => {
+                if (await joinFromInvite(inviteToJoin)) setInviteToJoin(null);
               },
             },
           ]}

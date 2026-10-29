@@ -760,6 +760,13 @@ input[type="range"] {
 .result-player-name {
   font-size: 15px;
 }
+.result-player-out {
+  color: var(--ui-muted);
+  font-size: 14px;
+}
+.round-finish-reason {
+  text-align: center;
+}
 .round-actions .button.primary svg {
   transition: transform 160ms cubic-bezier(0.16, 1, 0.3, 1);
 }

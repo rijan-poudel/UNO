@@ -2,7 +2,9 @@
 export function parseRoomCode(value: string): string {
   let code = value.trim();
   try {
-    code = new URL(code).searchParams.get('room') ?? code;
+    // A pasted link may be relative or omit the scheme shown by the browser.
+    code =
+      new URL(code, 'https://uno.invalid').searchParams.get('room') ?? code;
   } catch {
     /* Plain room code. */
   }

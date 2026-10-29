@@ -9,6 +9,10 @@ import './check-bot-difficulty';
 import './check-table-score';
 import './check-turn-cue';
 import './check-lobby';
+import './check-entry';
+import './check-controller';
+import './check-game-activity';
+import './check-practice';
 import {
   getCardFlight,
   getDealDelay,

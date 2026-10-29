@@ -6,13 +6,24 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import type OnlineLobbyComponent from '../components/OnlineLobby';
 import type SettingsModalComponent from '../components/SettingsModal';
 import type TableScoreCardComponent from '../components/TableScoreCard';
+import type RoundSummaryComponent from '../components/RoundSummary';
+import type GameSetupComponent from '../components/GameSetup';
+import type RematchStatusComponent from '../components/RematchStatus';
+import type ChoiceDialogComponent from '../components/ChoiceDialog';
+import type ColorPickerComponent from '../components/ColorPicker';
 import type PlayerAvatarComponent from '../components/PlayerAvatar';
 import type RulesSummaryComponent from '../components/RulesSummary';
 import type HowToPlayModalComponent from '../components/HowToPlayModal';
 import type CardPlayDialogComponent from '../components/CardPlayDialog';
 import type FriendInvitePickerComponent from '../components/FriendInvitePicker';
 import type FriendsPanelComponent from '../components/FriendsPanel';
-import { defaultRules } from '../types/rules';
+import type UnoCardComponent from '../components/UnoCard';
+import type CardSymbolGuideComponent from '../components/CardSymbolGuide';
+import type OpponentSeatComponent from '../components/OpponentSeat';
+import type PracticeHandComponent from '../components/PracticeHand';
+import type { CardValue } from '../types/card';
+import { defaultRules, NO_MERCY_RULES } from '../types/rules';
+import { initializeGame } from '../lib/gameSetup';
 
 // The assertions inspect rendered content; Next owns CSS module compilation.
 const require = createRequire(import.meta.url);
@@ -24,6 +35,16 @@ const SettingsModal: typeof SettingsModalComponent =
   require('../components/SettingsModal').default;
 const TableScoreCard: typeof TableScoreCardComponent =
   require('../components/TableScoreCard').default;
+const RoundSummary: typeof RoundSummaryComponent =
+  require('../components/RoundSummary').default;
+const GameSetup: typeof GameSetupComponent =
+  require('../components/GameSetup').default;
+const RematchStatus: typeof RematchStatusComponent =
+  require('../components/RematchStatus').default;
+const ChoiceDialog: typeof ChoiceDialogComponent =
+  require('../components/ChoiceDialog').default;
+const ColorPicker: typeof ColorPickerComponent =
+  require('../components/ColorPicker').default;
 const PlayerAvatar: typeof PlayerAvatarComponent =
   require('../components/PlayerAvatar').default;
 const CardPlayDialog: typeof CardPlayDialogComponent =
@@ -32,12 +53,104 @@ const FriendInvitePicker: typeof FriendInvitePickerComponent =
   require('../components/FriendInvitePicker').default;
 const FriendsPanel: typeof FriendsPanelComponent =
   require('../components/FriendsPanel').default;
+const UnoCard: typeof UnoCardComponent =
+  require('../components/UnoCard').default;
+const CardSymbolGuide: typeof CardSymbolGuideComponent =
+  require('../components/CardSymbolGuide').default;
+const OpponentSeat: typeof OpponentSeatComponent =
+  require('../components/OpponentSeat').default;
+const PracticeHand: typeof PracticeHandComponent =
+  require('../components/PracticeHand').default;
 const RulesSummary: typeof RulesSummaryComponent =
   require('../components/RulesSummary').default;
 const HowToPlayModal: typeof HowToPlayModalComponent =
   require('../components/HowToPlayModal').default;
 if (cssLoader) require.extensions['.css'] = cssLoader;
 else delete require.extensions['.css'];
+
+for (const value of [
+  'skip',
+  'reverse',
+  'draw2',
+  'draw4',
+  'wild4',
+  'skipEveryone',
+  'discardAll',
+  'wildReverseDraw4',
+  'wildDraw6',
+  'wildDraw10',
+  'wildColorRoulette',
+  'wildSkip2',
+  'wildTargetDraw2',
+  'wildForcedSwap',
+] satisfies CardValue[]) {
+  const face = renderToStaticMarkup(
+    <UnoCard card={{ id: `symbol-${value}`, color: 'wild', value }} />,
+  );
+  assert.match(
+    face,
+    new RegExp(`data-card-symbol="${value}"`),
+    `${value} has a real printed symbol, not a blank center`,
+  );
+  assert.match(
+    face,
+    /role="img" aria-label="[^"]+"/,
+    'Card names remain accessible independently of the symbol',
+  );
+}
+const closedGuide = renderToStaticMarkup(<CardSymbolGuide mode="no_mercy" />);
+assert.match(closedGuide, /Card symbols/);
+assert.doesNotMatch(
+  closedGuide,
+  /data-card-symbol/,
+  'The optional card reference does not mount card faces until opened',
+);
+const closedPractice = renderToStaticMarkup(<PracticeHand mode="all_wild" />);
+assert.match(closedPractice, /Try a practice hand/);
+assert.doesNotMatch(
+  closedPractice,
+  /Practice table|Your practice cards|data-card-symbol/,
+  'Practice examples stay unmounted until requested',
+);
+const crowdedSeat: ComponentProps<typeof OpponentSeat> = {
+  player: {
+    id: 'seat',
+    name: 'Cleo',
+    isBot: true,
+    saidUno: false,
+    hand: Array.from({ length: 20 }, (_, i) => ({
+      id: `held-${i}`,
+      color: 'red',
+      value: '1',
+    })),
+  },
+  active: false,
+  expression: 'neutral',
+  position: 'seat-top',
+  offline: false,
+  canCatch: false,
+  onCatch() {},
+};
+assert.doesNotMatch(
+  renderToStaticMarkup(<OpponentSeat {...crowdedSeat} />),
+  /seat-mercy-danger|Mercy Danger/,
+  'A large hand has no knockout warning when the table has no Mercy rule',
+);
+assert.match(
+  renderToStaticMarkup(<OpponentSeat {...crowdedSeat} mercyLimit={25} />),
+  /seat-mercy-danger/,
+  'The same hand warns near the actual configured knockout limit',
+);
+const targetSeat = renderToStaticMarkup(
+  <OpponentSeat
+    {...crowdedSeat}
+    targetAction="Swap hands with"
+    onTarget={() => {}}
+  />,
+);
+assert.match(targetSeat, /<button[^>]*data-target="seat"/);
+assert.match(targetSeat, /aria-label="Swap hands with Cleo, 20 cards"/);
+assert.doesNotMatch(targetSeat, /Catch Cleo/);
 
 const ok = async () => true;
 const props: ComponentProps<typeof OnlineLobby> = {
@@ -268,13 +381,134 @@ const scores = renderToStaticMarkup(
   />,
 );
 assert.match(scores, /3 completed rounds/);
-assert.match(scores, /aria-label="1 win"/);
-assert.match(scores, /aria-label="2 wins"/);
+assert.match(scores, /role="img" aria-label="1 win"/);
+assert.match(scores, /role="img" aria-label="2 wins"/);
 assert.ok(
   scores.indexOf('Jo') < scores.indexOf('Alex'),
   'Actual win totals determine display order',
 );
+const mercyRound = initializeGame(['You', 'Cleo', 'Jules'], NO_MERCY_RULES);
+const mercyFinish = renderToStaticMarkup(
+  <RoundSummary
+    game={{
+      ...mercyRound,
+      winnerId: mercyRound.players[0].id,
+      players: mercyRound.players.map((player, index) =>
+        index === 0 ? player : { ...player, hand: [], eliminated: true },
+      ),
+    }}
+    localPlayerId={mercyRound.players[0].id}
+  />,
+);
+assert.match(mercyFinish, /Last player standing/);
+assert.equal(
+  (mercyFinish.match(/role="img" aria-label="Knocked out"/g) ?? []).length,
+  2,
+);
+assert.doesNotMatch(
+  mercyFinish,
+  /aria-label="0 cards left"/,
+  'Cleared knockout hands must never look like empty-hand finishes',
+);
+const emptyHandFinish = renderToStaticMarkup(
+  <RoundSummary
+    game={{
+      ...mercyRound,
+      winnerId: mercyRound.players[0].id,
+      players: mercyRound.players.map((player, index) =>
+        index === 0 ? { ...player, hand: [] } : player,
+      ),
+    }}
+    localPlayerId={mercyRound.players[0].id}
+  />,
+);
+assert.match(emptyHandFinish, /aria-label="0 cards left"/);
+assert.doesNotMatch(emptyHandFinish, /Last player standing|Knocked out/);
+for (const limit of [0, 25]) {
+  const setup = renderToStaticMarkup(
+    <GameSetup
+      rules={{ ...NO_MERCY_RULES, eliminationHandLimit: limit }}
+      onStart={() => {}}
+      onRulesChange={() => {}}
+      onOpenRules={() => {}}
+    />,
+  );
+  assert.equal(
+    setup.includes('last player standing'),
+    limit > 0,
+    'Setup must describe the configured win condition',
+  );
+}
 assert.ok(props.room);
+const readiness = renderToStaticMarkup(
+  <RematchStatus
+    room={{
+      ...props.room,
+      players: [
+        {
+          playerId: 'host',
+          name: 'Host',
+          isBot: false,
+          connected: true,
+          ready: false,
+        },
+        {
+          playerId: 'guest',
+          name: 'Guest',
+          isBot: false,
+          connected: false,
+          ready: true,
+        },
+        {
+          playerId: 'bot',
+          name: 'Bot',
+          isBot: true,
+          connected: false,
+          ready: false,
+        },
+      ],
+    }}
+    playerId="host"
+    starting={false}
+    connected
+  />,
+);
+assert.match(readiness, /<details[^>]*>/);
+assert.match(
+  readiness,
+  /1 of 2 ready/,
+  'Offline humans do not count as ready; bots do',
+);
+assert.match(readiness, /Offline/);
+assert.doesNotMatch(readiness, /Waiting on players|Tap Ready|Guest<\/small>/);
+const pendingChoice = renderToStaticMarkup(
+  <ChoiceDialog
+    title="Join the other table?"
+    description="Leave this table?"
+    actions={[
+      {
+        label: 'Stay here',
+        variant: 'secondary',
+        disabled: true,
+        onClick() {},
+      },
+      {
+        label: 'Joining…',
+        variant: 'primary',
+        disabled: true,
+        busy: true,
+        onClick() {},
+      },
+    ]}
+  />,
+);
+assert.equal((pendingChoice.match(/disabled=""/g) ?? []).length, 2);
+assert.match(pendingChoice, /aria-busy="true"/);
+assert.doesNotMatch(
+  pendingChoice,
+  /aria-label="Close dialog"/,
+  'Pending room transfer cannot be dismissed into another action',
+);
 const scoredLobby = renderToStaticMarkup(
   <OnlineLobby
     {...props}
@@ -374,6 +608,49 @@ assert.match(guide, /Same number; either color/);
 assert.match(guide, /Not required/);
 assert.match(guide, /practice examples show basic play/);
 assert.match(guide, /aria-current="step"/);
+const customMercyHelp = renderToStaticMarkup(
+  <HowToPlayModal
+    open
+    inGame
+    onClose={() => {}}
+    rules={{
+      ...NO_MERCY_RULES,
+      mustDeclareUno: false,
+      drawUntilPlayable: false,
+      stackDraw2: false,
+      stackWild4: false,
+      sevenZero: false,
+      allowDiscardAll: false,
+      eliminationHandLimit: 0,
+    }}
+  />,
+);
+assert.match(customMercyHelp, /Rules at this table/);
+assert.match(customMercyHelp, /One card per draw/);
+assert.match(customMercyHelp, /Not required/);
+assert.match(customMercyHelp, /Not in this deck/);
+assert.doesNotMatch(
+  customMercyHelp,
+  /edition-guide|keep going until you can play|7 and 0|reach the table’s hand limit/,
+  'Help must not contradict custom options with an unconditional original-edition rule list',
+);
+const colorChoice = renderToStaticMarkup(
+  <ColorPicker playerName="Cleo" onSelect={() => {}} />,
+);
+assert.match(colorChoice, /<h2[^>]*>Choose a color<\/h2>/);
+assert.match(colorChoice, /role="group" aria-label="Cleo’s color choice"/);
+assert.doesNotMatch(
+  colorChoice,
+  /class="muted"/,
+  'Normal color selection needs no repeated instruction paragraph',
+);
+const rouletteChoice = renderToStaticMarkup(
+  <ColorPicker roulette onSelect={() => {}} />,
+);
+assert.match(
+  rouletteChoice,
+  /Draw until it appears, keep the cards, and miss this turn/,
+);
 const optionalRules = renderToStaticMarkup(
   <RulesSummary
     rules={{ startingHandSize: undefined, mustDeclareUno: undefined }}
@@ -382,5 +659,5 @@ const optionalRules = renderToStaticMarkup(
 assert.match(optionalRules, /7 each/);
 assert.match(optionalRules, /Call with one card left/);
 console.log(
-  'Setup, room recovery, published-only rule help, rule dependencies and native help naming passed.',
+  'Setup, knockout and empty-hand results, room recovery, published-only rule help, rule dependencies and native help naming passed.',
 );

@@ -41,8 +41,8 @@ export default function CardPlayDialog({
     >
       <p className="muted">
         {canPlayAlone
-          ? "This table allows two matching numbers in one turn. Choose one card or a pair; the second card sets the next color."
-          : "These matching numbers can play together. The card that matches the pile goes first; the second card sets the next color."}
+          ? "Choose one card or a pair. The last card sets the color."
+          : "Play the matching card first. The second sets the color."}
       </p>
       <div className="card-play-options">
         {distinctChoices.map((choice) => {

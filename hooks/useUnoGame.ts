@@ -18,6 +18,7 @@ import type { GameState } from '../types/game';
 import type { Card, CardColor } from '../types/card';
 import type { GameRules } from '../types/rules';
 import { initializeGame } from '../lib/gameSetup';
+import { describeGameAction } from '../lib/gameActivity';
 import {
   playCard as enginePlayCard,
   drawOneCard,
@@ -31,11 +32,7 @@ import {
 import { canPlayCard, getPlayableCards } from '../lib/gameRules';
 import { playBotStep } from '../lib/botSupport';
 import { usePlayerActivity } from './usePlayerActivity';
-import {
-  getPlayerName,
-  resolvePlayerName,
-  subscribePlayerName,
-} from '../lib/playerNames';
+import { getPlayerName, subscribePlayerName } from '../lib/playerNames';
 import { getPlayerAvatar, subscribePlayerAvatar } from '../lib/playerAvatars';
 import { readSavedRound, saveRound, resumeRound } from '../lib/savedRound';
 import { recordTableWin, startTableRound } from '../lib/tableScore';
@@ -48,9 +45,7 @@ import {
   withTurnDeadline,
 } from '../lib/turnFlow';
 
-const BOT_ACTION_DELAY_MS = BOT_TURN_MS;
 const AUTO_PASS_AFTER_DRAW_MS = 650;
-const POST_ACTION_HANDOFF_DELAY_MS = 180;
 
 function withLocalProfile(game: GameState): GameState {
   return {
@@ -80,32 +75,6 @@ function reportHookError(context: string, error: unknown): void {
   }
 }
 
-function getActionPresentationDelay(game: GameState): number {
-  const action = game.lastAction;
-
-  if (action.type === 'init') return 260;
-  if (action.type === 'declareUno') return 300;
-  if (action.type === 'callOut') return 420;
-  if (action.type === 'draw') return Math.min(950, 360 + action.count * 110);
-  if (action.type === 'pass') return 200;
-
-  if (action.type === 'play') {
-    if (action.card.value === 'shuffle') return 460;
-    if (action.card.value === 'discardAll') return 400;
-    if (action.card.value === 'wild4' || action.card.value === 'draw2')
-      return 360;
-    if (
-      action.card.value === 'reverse' ||
-      action.card.value === 'skip' ||
-      action.card.value === 'wild'
-    )
-      return 340;
-    return 240;
-  }
-
-  return 240;
-}
-
 // ── UI-layer state ────────────────────────────────────────────────────────────
 
 export interface UnoUIState {
@@ -133,39 +102,6 @@ type UIAction =
   | { type: 'BOT_THINKING'; value: boolean }
   | { type: 'RESET' };
 
-// ── Action → log string ───────────────────────────────────────────────────────
-
-function describeAction(game: GameState): string {
-  const a = game.lastAction;
-
-  switch (a.type) {
-    case 'play': {
-      const extras: string[] = [];
-      if (a.playedCards) extras.push('played both matching numbers');
-      if (a.declaredUno) extras.push('called UNO');
-      if (a.discardAllCount && a.discardAllCount > 0) {
-        extras.push(`discarded ${a.discardAllCount} extra`);
-      }
-      if (a.shuffledHands) {
-        extras.push('shuffled all hands');
-      }
-      return `${resolvePlayerName(game.players, a.playerId)} played ${a.card.color} ${a.card.value}${
-        a.chosenColor ? ` -> chose ${a.chosenColor}` : ''
-      }${extras.length ? ` (${extras.join(', ')})` : ''}`;
-    }
-    case 'draw':
-      return `${resolvePlayerName(game.players, a.playerId)} drew ${a.count} card${a.count !== 1 ? 's' : ''}`;
-    case 'pass':
-      return `${resolvePlayerName(game.players, a.playerId)} passed`;
-    case 'declareUno':
-      return `${resolvePlayerName(game.players, a.playerId)} said UNO!`;
-    case 'callOut':
-      return `${resolvePlayerName(game.players, a.callerId)} caught ${resolvePlayerName(game.players, a.targetId)} (+${a.penalty} cards)`;
-    default:
-      return 'Game started';
-  }
-}
-
 // ── Reducer ───────────────────────────────────────────────────────────────────
 
 function reducer(state: UnoUIState, action: UIAction): UnoUIState {
@@ -188,7 +124,7 @@ function reducer(state: UnoUIState, action: UIAction): UnoUIState {
       };
 
     case 'PLAY': {
-      const entry = describeAction(action.game);
+      const entry = describeGameAction(action.game);
       return {
         ...state,
         game: withTurnDeadline(state.game, recordTableWin(action.game)),
@@ -206,11 +142,11 @@ function reducer(state: UnoUIState, action: UIAction): UnoUIState {
       return {
         ...state,
         game: withTurnDeadline(state.game, recordTableWin(action.game)),
-        log: [describeAction(action.game), ...state.log].slice(0, 30),
+        log: [describeGameAction(action.game), ...state.log].slice(0, 30),
       };
 
     case 'DRAW_ONE': {
-      const entry = describeAction(action.game);
+      const entry = describeGameAction(action.game);
       return {
         ...state,
         game: withTurnDeadline(state.game, recordTableWin(action.game)),
@@ -267,6 +203,10 @@ export function useUnoGame(paused = false) {
 
   // Ref to always access latest game state in async callbacks
   const gameRef = useRef<GameState | null>(game);
+  const pendingWildPlay = useRef<{
+    cardId: string;
+    options: PlayOptions;
+  } | null>(null);
   useEffect(() => {
     const sync = () => {
       const live = gameRef.current;
@@ -390,6 +330,7 @@ export function useUnoGame(paused = false) {
         card.value !== 'wildColorRoulette'
       ) {
         // Wild cards need a color choice first — open the picker
+        pendingWildPlay.current = { cardId: card.id, options: { ...options } };
         dispatchHuman({ type: 'SELECT_WILD', card });
       } else {
         try {
@@ -430,7 +371,11 @@ export function useUnoGame(paused = false) {
           localPlayerIndex,
           pendingWild.id,
           color,
+          pendingWildPlay.current?.cardId === pendingWild.id
+            ? pendingWildPlay.current.options
+            : {},
         );
+        pendingWildPlay.current = null;
         dispatchHuman({ type: 'PLAY', game: next });
       } catch (e) {
         reportHookError('confirmWildColor error', e);
@@ -439,10 +384,10 @@ export function useUnoGame(paused = false) {
     [game, pendingWild, localPlayerIndex, dispatchHuman],
   );
 
-  const cancelWild = useCallback(
-    () => dispatchHuman({ type: 'CANCEL_WILD' }),
-    [dispatchHuman],
-  );
+  const cancelWild = useCallback(() => {
+    pendingWildPlay.current = null;
+    dispatchHuman({ type: 'CANCEL_WILD' });
+  }, [dispatchHuman]);
 
   // ── Human: draw card(s) ───────────────────────────────────────────────────
 
@@ -524,11 +469,6 @@ export function useUnoGame(paused = false) {
 
     dispatch({ type: 'BOT_THINKING', value: true });
 
-    const coordinatedDelay = Math.max(
-      BOT_ACTION_DELAY_MS,
-      getActionPresentationDelay(game) + POST_ACTION_HANDOFF_DELAY_MS,
-    );
-
     const timer = setTimeout(() => {
       try {
         // Read from ref to get the latest state, avoiding stale closure
@@ -548,7 +488,7 @@ export function useUnoGame(paused = false) {
         reportHookError('bot action error', e);
         dispatch({ type: 'BOT_THINKING', value: false });
       }
-    }, coordinatedDelay);
+    }, BOT_TURN_MS);
 
     return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -661,17 +601,31 @@ export function useUnoGame(paused = false) {
     const playable = getPlayableCards(player.hand, game, localPlayerIndex);
     if (playable.length > 0) return;
 
-    const coordinatedAutoPassDelay = Math.max(AUTO_PASS_AFTER_DRAW_MS);
-
     const timer = window.setTimeout(() => {
       try {
-        if (pausedRef.current) return;
-        const next = passTurn(game, localPlayerIndex);
+        const live = gameRef.current;
+        if (
+          pausedRef.current ||
+          pendingWildRef.current ||
+          !live ||
+          live.winnerId ||
+          live.currentPlayerIndex !== localPlayerIndex ||
+          live.turnCount !== game.turnCount ||
+          !live.drawnThisTurn ||
+          live.pendingDraw > 0 ||
+          getPlayableCards(
+            live.players[localPlayerIndex].hand,
+            live,
+            localPlayerIndex,
+          ).length > 0
+        )
+          return;
+        const next = passTurn(live, localPlayerIndex);
         dispatch({ type: 'PLAY', game: next });
       } catch (e) {
         reportHookError('auto passTurn error', e);
       }
-    }, coordinatedAutoPassDelay);
+    }, AUTO_PASS_AFTER_DRAW_MS);
 
     return () => window.clearTimeout(timer);
   }, [game, localPlayerIndex, drawnThisTurn, paused, pendingWild]);

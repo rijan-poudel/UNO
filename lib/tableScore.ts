@@ -58,14 +58,11 @@ export function startTableRound(
   };
 }
 
-export function recordTableWin(game: GameState): GameState {
-  const score = game.tableScore;
-  if (
-    !score ||
-    !game.roundId ||
-    !game.winnerId ||
-    score.lastRoundId === game.roundId ||
-    !game.players.some(
+/** Both per-table wins and device history use the same completed-result boundary. */
+export function hasCompletedRound(game: GameState): boolean {
+  return (
+    !!game.winnerId &&
+    game.players.some(
       (player) =>
         player.id === game.winnerId &&
         !player.eliminated &&
@@ -73,7 +70,18 @@ export function recordTableWin(game: GameState): GameState {
           game.players.every(
             (other) => other.id === player.id || other.eliminated,
           )),
-    ) ||
+    )
+  );
+}
+
+export function recordTableWin(game: GameState): GameState {
+  const score = game.tableScore;
+  if (
+    !score ||
+    !game.roundId ||
+    !game.winnerId ||
+    score.lastRoundId === game.roundId ||
+    !hasCompletedRound(game) ||
     !Object.hasOwn(score.wins, game.winnerId) ||
     !Number.isSafeInteger(score.completedRounds + 1)
   )

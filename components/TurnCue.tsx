@@ -3,10 +3,18 @@
 import { useEffect, useState } from "react";
 import type { GameState } from "../types/game";
 import { HUMAN_TURN_MS, hasForcedPenalty } from "../lib/turnFlow";
+import { getStackResponseLabel } from "../lib/gameRules";
 const VALUE_LABELS: Record<string, string> = {
   draw2: "+2",
+  draw4: "+4",
   wild4: "+4",
+  wildReverseDraw4: "Reverse +4",
+  wildDraw6: "+6",
+  wildDraw10: "+10",
+  wildColorRoulette: "Roulette",
   skip: "Skip",
+  skipEveryone: "Skip everyone",
+  wildSkip2: "Skip two",
   reverse: "Reverse",
   discardAll: "Discard all",
 };
@@ -16,12 +24,14 @@ export default function TurnCue({
   choosing,
   playableCount,
   connected = true,
+  targetAction,
 }: {
   game: GameState;
   local: boolean;
   choosing: boolean;
   playableCount: number;
   connected?: boolean;
+  targetAction?: string;
 }) {
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
@@ -38,6 +48,10 @@ export default function TurnCue({
     : 1;
   const top = game.discardPile.at(-1);
   const forced = hasForcedPenalty(game);
+  const stack =
+    local && !choosing && connected && game.pendingDraw > 0 && !forced
+      ? getStackResponseLabel(game)
+      : null;
   const value = top ? (VALUE_LABELS[top.value] ?? top.value) : null;
   const hint = !connected
     ? "Reconnecting to the table"
@@ -48,10 +62,12 @@ export default function TurnCue({
         : game.pendingDraw
           ? forced
             ? `Taking +${game.pendingDraw} automatically`
-            : `Stack a draw card or take +${game.pendingDraw}`
+            : `Stack ${stack ?? "a matching draw card"}, or draw ${game.pendingDraw} cards total`
           : game.drawnThisTurn
             ? playableCount > 0
-              ? "Play a lifted card or pass"
+              ? game.rules.gameMode === "no_mercy"
+                ? "Play your drawn card (cannot pass)"
+                : "Play a lifted card or pass"
               : "No match · Passing automatically"
             : playableCount === 0
               ? "No match · Tap the deck to draw"
@@ -90,10 +106,21 @@ export default function TurnCue({
           </span>
         )}
         <span>
-          <strong title={local ? "Your turn" : `${player.name}’s turn`}>
-            {local ? "Your turn" : `${player.name}’s turn`}
+          <strong title={hint}>
+            {targetAction ??
+              (stack
+                ? `Stack ${stack}`
+                : local
+                  ? "Your turn"
+                  : `${player.name}’s turn`)}
           </strong>
-          <small className="sr-only">{hint}</small>
+          <small className={targetAction || stack ? undefined : "sr-only"}>
+            {targetAction
+              ? "Choose a player"
+              : stack
+                ? `or draw ${game.pendingDraw} total`
+                : hint}
+          </small>
         </span>
       </div>
     </div>

@@ -2,10 +2,11 @@
 "use client";
 import {
   useSyncExternalStore,
+  useId,
   type CSSProperties,
   type ReactNode,
 } from "react";
-import { ArrowRight, Users, LogIn } from "lucide-react";
+import { ArrowRight, Info } from "lucide-react";
 import type { GameRules } from "../../types/rules";
 import { getTableMood, matchesPreset } from "../../lib/rulePresets";
 import {
@@ -13,15 +14,14 @@ import {
   getAllProfiles,
   subscribeRuleProfiles,
   setActiveProfileId,
-  getRuleSetLabel,
   getActiveProfileId,
   getRuleProfilesRevision,
   getServerRuleProfilesRevision,
+  getRuleSetLabel,
 } from "../../lib/customRuleProfiles";
 import UnoCard from "../UnoCard";
 import type { Card } from "../../types/card";
 import type { GameState } from "../../types/game";
-import { getBotDifficultyLabel } from "../../lib/botSupport";
 
 interface Props {
   savedGame?: GameState | null;
@@ -33,13 +33,26 @@ interface Props {
   onCreateRoom: () => void;
   onRulesChange?: (rules: Partial<GameRules>) => void;
 }
-const TITLE_CARDS: Card[] = [
+const CLASSIC_TITLE_CARDS: Card[] = [
   { id: "title-blue", color: "blue", value: "5" },
   { id: "title-green", color: "green", value: "reverse" },
   { id: "title-yellow", color: "yellow", value: "7" },
   { id: "title-red", color: "red", value: "draw2" },
 ];
+const NO_MERCY_TITLE_CARDS: Card[] = [
+  { id: "nm-discard", color: "red", value: "discardAll" },
+  { id: "nm-skip", color: "green", value: "skipEveryone" },
+  { id: "nm-draw4", color: "yellow", value: "draw4" },
+  { id: "nm-draw10", color: "wild", value: "wildDraw10" },
+];
+const ALL_WILD_TITLE_CARDS: Card[] = [
+  { id: "wild-base", color: "wild", value: "wild" },
+  { id: "wild-skip", color: "wild", value: "skip" },
+  { id: "wild-swap", color: "wild", value: "wildForcedSwap" },
+  { id: "wild-target", color: "wild", value: "wildTargetDraw2" },
+];
 export default function HomeScreen(props: Props) {
+  const infoId = useId();
   useSyncExternalStore(
     subscribeRuleProfiles,
     getRuleProfilesRevision,
@@ -47,12 +60,19 @@ export default function HomeScreen(props: Props) {
   );
   const favorites = getFavoriteProfiles();
   const activeId = getActiveProfileId();
+  const profiles = getAllProfiles();
   const activeProfile =
-    getAllProfiles().find(
+    profiles.find(
       (p) => p.id === activeId && matchesPreset(props.rules, p.rules),
-    ) ??
-    getAllProfiles().find((p) => matchesPreset(props.rules, p.rules)) ??
-    favorites[0];
+    ) ?? profiles.find((p) => matchesPreset(props.rules, p.rules));
+  const currentMode = props.rules.gameMode ?? activeProfile?.rules.gameMode;
+  const activeName = activeProfile?.name ?? getRuleSetLabel(props.rules);
+  const titleCards =
+    currentMode === "no_mercy"
+      ? NO_MERCY_TITLE_CARDS
+      : currentMode === "all_wild"
+        ? ALL_WILD_TITLE_CARDS
+        : CLASSIC_TITLE_CARDS;
 
   return (
     <div
@@ -67,7 +87,7 @@ export default function HomeScreen(props: Props) {
           </h1>
           <p>Your table. Your rules.</p>
           <div className="title-card-fan" aria-hidden="true">
-            {TITLE_CARDS.map((card, index) => (
+            {titleCards.map((card, index) => (
               <span
                 key={card.id}
                 style={{ "--title-i": index } as CSSProperties}
@@ -103,66 +123,67 @@ export default function HomeScreen(props: Props) {
               <ArrowRight size={20} aria-hidden="true" />
             </button>
           )}
-          <div
-            className="launch-presets"
-            role="group"
-            aria-label="Choose your game"
-          >
-            {favorites.map((item) => {
-              const isSelected = activeProfile?.id === item.id;
-              return (
-                <button
-                  key={item.id}
-                  type="button"
-                  aria-pressed={isSelected}
-                  onClick={() => {
-                    setActiveProfileId(item.id);
-                    props.onRulesChange?.({
-                      ...item.rules,
-                      startingHandSize: item.rules.startingHandSize ?? 7,
-                      maxPlayers:
-                        item.rules.maxPlayers ??
-                        (item.rules.gameMode === "no_mercy" ? 6 : 10),
-                      botDifficulty: props.rules.botDifficulty ?? "standard",
-                    });
-                  }}
-                >
-                  {item.isOriginal
-                    ? item.id === "classic"
-                      ? "Classic UNO"
-                      : item.id === "no_mercy"
-                        ? "No Mercy"
-                        : "All Wild"
-                    : item.name}
-                </button>
-              );
-            })}
+          <div className="launch-mode-picker">
+            <div
+              className="launch-presets"
+              role="group"
+              aria-label="Choose your game"
+            >
+              {favorites.map((item) => {
+                const isSelected = activeProfile?.id === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    aria-pressed={isSelected}
+                    className="launch-preset-btn"
+                    onClick={() => {
+                      setActiveProfileId(item.id);
+                      props.onRulesChange?.({
+                        ...item.rules,
+                        startingHandSize: item.rules.startingHandSize ?? 7,
+                        maxPlayers:
+                          item.rules.maxPlayers ??
+                          (item.rules.gameMode === "no_mercy" ? 6 : 10),
+                        botDifficulty: props.rules.botDifficulty ?? "standard",
+                      });
+                    }}
+                  >
+                    {item.isOriginal
+                      ? item.id === "classic"
+                        ? "Classic UNO"
+                        : item.id === "no_mercy"
+                          ? "No Mercy"
+                          : "All Wild"
+                      : item.name}
+                  </button>
+                );
+              })}
+            </div>
+            <button
+              type="button"
+              className="launch-mode-info"
+              popoverTarget={infoId}
+              aria-label={`About ${activeName}`}
+            >
+              <Info size={18} aria-hidden="true" />
+            </button>
+            <div className="launch-mode-popover" id={infoId} popover="auto">
+              <strong>{activeName}</strong>
+              <p>{activeProfile?.description ?? "Your saved game rules."}</p>
+            </div>
           </div>
-          <p className="launch-preset-description">
-            {activeProfile?.description ??
-              "Standard deck, seven cards each, matching color or number."}
-          </p>
           <button
             className="button primary launch-primary"
             onClick={props.onQuickPlay}
           >
-            <span>
-              {props.savedGame ? "New round" : "Let’s play"}
-              <small>
-                {props.savedGame
-                  ? "Replace your saved bot round"
-                  : `${activeProfile?.name ?? getRuleSetLabel(props.rules)} · ${getBotDifficultyLabel(props.rules.botDifficulty).toLowerCase()} bots`}
-              </small>
-            </span>
-            <ArrowRight size={25} aria-hidden="true" />
+            {props.savedGame ? "New round" : "Play"}
           </button>
           <div className="launch-rooms">
             <button className="button secondary" onClick={props.onCreateRoom}>
-              <Users size={19} aria-hidden="true" />
               Create a room
             </button>
             <button className="button secondary" onClick={props.onJoin}>
-              <LogIn size={19} aria-hidden="true" />
               Join a room
             </button>
           </div>

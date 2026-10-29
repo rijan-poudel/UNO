@@ -7,6 +7,7 @@ import {
   type PointerEvent,
 } from "react";
 import { getHandFan } from "../lib/handLayout";
+import { isReducedMotion } from "../lib/displaySettings";
 import { getCardLabel } from "../types/card";
 import type { Card } from "../types/card";
 import UnoCard from "./UnoCard";
@@ -92,9 +93,7 @@ export default function HandCard({
   function moveHeldCard(dx: number, dy: number, angle: number) {
     const lifted = ghost.current;
     if (!lifted) return;
-    const reduced = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
+    const reduced = isReducedMotion();
     const bank = reduced ? 0 : Math.max(-9, Math.min(9, dx * 0.035));
     lifted.style.transform = `translate(${dx}px, ${dy}px) rotate(${angle + bank}deg)`;
   }
@@ -142,9 +141,7 @@ export default function HandCard({
           top: `${destination.y - start.pose.height / 2}px`,
         });
         const resize = destination.width / start.pose.width;
-        const reduced = window.matchMedia(
-          "(prefers-reduced-motion: reduce)",
-        ).matches;
+        const reduced = isReducedMotion();
         const returning = lifted.animate(
           keyframes.map((frame) => ({
             ...frame,

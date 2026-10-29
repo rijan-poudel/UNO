@@ -1,7 +1,13 @@
 // Preferences use the same controls and typography as the rest of the club.
 "use client";
 import dynamic from "next/dynamic";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  type ReactNode,
+} from "react";
 import {
   AudioLines,
   SlidersHorizontal,
@@ -12,9 +18,14 @@ import {
   ChevronDown,
   ChevronRight,
 } from "lucide-react";
-import { getPlayerName, savePlayerName } from "../lib/playerNames";
+import {
+  getPlayerName,
+  savePlayerName,
+  subscribePlayerName,
+} from "../lib/playerNames";
 import type { GameRules } from "../types/rules";
 import { defaultRules } from "../types/rules";
+import { getTableMood } from "../lib/rulePresets";
 import {
   getAudioSettings,
   getMusicContextSettings,
@@ -227,8 +238,13 @@ export default function SettingsModal({
   const [help, setHelp] = useState(false);
   const [audio, setAudio] = useState(getAudioSettings);
   const [music, setMusic] = useState(getMusicContextSettings);
-  const [name, setName] = useState(getPlayerName);
-  const [savedName, setSavedName] = useState(getPlayerName);
+  const savedName = useSyncExternalStore(
+    subscribePlayerName,
+    getPlayerName,
+    () => "You",
+  );
+  const [nameDraft, setNameDraft] = useState<string | null>(null);
+  const name = nameDraft ?? savedName;
   const nameChanged = name.trim() !== savedName;
   useEffect(() => {
     const sync = () => {
@@ -247,9 +263,8 @@ export default function SettingsModal({
     setAudio(getAudioSettings());
   };
   const saveName = () => {
-    const next = savePlayerName(name);
-    setName(next);
-    setSavedName(next);
+    if (nameChanged) savePlayerName(name);
+    setNameDraft(null);
   };
   const panel = useRef<HTMLDivElement>(null);
   const previousTab = useRef(tab);
@@ -280,7 +295,7 @@ export default function SettingsModal({
               setTab("overview");
             }
       }
-      className="settings-modal"
+      className={`settings-modal settings-tone-${getTableMood(rules)}`}
     >
       <div
         key={tab}
@@ -332,13 +347,14 @@ export default function SettingsModal({
                 maxLength={18}
                 onBlur={saveName}
                 onChange={(e) => {
-                  setName(e.target.value);
+                  setNameDraft(e.target.value);
                 }}
               />
             </form>
             <AvatarPicker />
             <details
               className="settings-disclosure profile-history"
+              open={progressOpen}
               onToggle={(e) => setProgressOpen(e.currentTarget.open)}
             >
               <summary>
@@ -522,7 +538,7 @@ export default function SettingsModal({
             />
             {audio.muted && (
               <p className="audio-muted-note" role="status">
-                Everything is muted. Your sound preferences are kept.
+                Muted. Your preferences are kept.
               </p>
             )}
             <Toggle
@@ -532,13 +548,11 @@ export default function SettingsModal({
             />
             <Toggle
               label="Invitation sounds"
-              description="A short cue for room invites and friend requests."
               checked={audio.notificationsEnabled}
               onChange={(v) => updateAudio({ notificationsEnabled: v })}
             />
             <Toggle
               label="Voice announcer"
-              description="Announce special cards."
               checked={audio.voiceInGame}
               onChange={(v) => updateAudio({ voiceInGame: v })}
             />
