@@ -1,5 +1,9 @@
 # Product
 
+## October 30 — Swiss cards in the production game
+
+The owner approves the refined Swiss Minimal card designs for real gameplay and makes Swiss the default. Offer exactly one optional alternative, Nordic Frost, through Settings → Appearance → Card style, saved on this device. This explicitly supersedes earlier Appearance restrictions and older card lettering, printed-border and generic action-backdrop instructions. Preserve the approved latest symbols, colored Roulette artwork and genuine Shuffle Hands illustration. Retire the standalone card lab and its ring, table-surface, finish and movement controls. Existing arena layout, direct tap/drag play, motion, audio and game rules remain in place. Clean up obsolete card code, run technical checks and commit and push; a manual multiplayer playthrough is not required.
+
 ## October 29 — Whole-site ownership
 
 The owner authorizes a coordinated improvement pass across every section: fix concrete problems as discovered, delegate focused work, and add or remove UI when it improves the experience. Keep interface copy and conversation updates brief. Preserve the approved card world, supported game rules, direct play and working local/online journeys; remove obsolete implementation instead of maintaining parallel flows.

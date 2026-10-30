@@ -1,0 +1,35 @@
+Production asset: public/artwork/cards/color-roulette.png
+Renderer: components/icons/UnoActionSymbol.tsx.
+The following extraction/edit records retain historical source paths. Exact edit prompts ship alongside this file and inside the PNG metadata.
+
+UNO Color Roulette — AI-cleaned and AI-recolored source-informed illustration derivative
+
+CURRENT ASSET: card-designs/artwork/color-roulette.png, 1236 x 1272 pixels, RGBA PNG with true transparent exterior. The four faces are rear yellow, left blue, right green, and front red-coral. This is an AI recolor derivative, not genuine original colored print. One built-in imagegen recolor pass changed the four face fills while preserving the printed illustration's four characters, silhouettes, overlaps, dark outlines and face details. The exact current prompt is embedded in impeccable:prompt and saved at .impeccable/review/roulette-target-color/color-roulette-recolor-prompt.txt.
+
+Recolor generated source: /Users/rizx/.codex/generated_images/01a18d83-69e4-7b03-816d-5ac8a551c0b7/exec-f2db8585-fbd8-4fd6-9794-cad4a02ae4f0.png
+Recolor edit target/predecessor: .impeccable/review/roulette-target-color/color-roulette-grayscale.png (1237 x 1272 RGBA); original predecessor provenance preserved as color-roulette-grayscale.origin.txt in the same review directory.
+Recolor visual QA: all four complete sad faces, dark outlines, overlap order, paper texture and bottom notch retained; distinct clean color separation; no oval, text, frame, background, gradients, glow, or extra objects. Transparent exterior verified. No material visual deviation identified; output width changed by one pixel. Use object-fit:contain at natural aspect ratio 1236:1272 and preserve the opaque colored interiors. Do not use luminance-to-alpha filtering.
+
+The following records the preceding grayscale cleanup stage and original-source lineage; its stage-specific dimensions and grayscale descriptions refer to the predecessor, not the current recolor.
+
+This is an AI-cleaned source-informed derivative, NOT an unretouched genuine print or direct original illustration extraction. One built-in imagegen background-extraction edit removed the disconnected black background wedges and white matte. No further generation iterations or pixel retouching were performed.
+
+Original source: https://service.mattel.com/instruction_sheets/HVW18-Eng.pdf
+Local source PDF: /tmp/uno-no-mercy-reference.pdf
+PDF SHA-256: b17ee32b6fc1c5ec49ddbf4549fc1fff939271424e1dbf541c84d3fda53a6768
+Page: 2 (English instruction sheet)
+Page MediaBox: 482.485 x 1333.01 points, rotation 0.
+Original full-card raster: page 2 /Resources /XObject /Im8, 122 x 189 pixels, 8 bits/component, /DCTDecode, DeviceN Black.
+The source's complete central mark contains FOUR overlapping sad-faced card characters, not three. Intrinsic central detail is approximately 80 x 84 source pixels. The final asset's greater dimensions are generated detail and must not be described as native source resolution.
+
+Exact reference-crop command:
+pdftoppm -f 2 -singlefile -scale-to 48000 -x 3040 -y 34805 -W 725 -H 745 -png /tmp/uno-no-mercy-reference.pdf .impeccable/review/special-five/color-roulette-crop-review
+This yields a 725 x 745 reference crop containing all four complete cards plus two unavoidable disconnected background wedges. Crop coordinates are top-left pixels after the longest page dimension is scaled to 48000. This dirty reference is retained only in review evidence.
+
+Built-in imagegen edit target: .impeccable/review/special-five/color-roulette-crop-review.png
+Generated source file: /Users/rizx/.codex/generated_images/01a18d83-69e4-7b03-816d-5ac8a551c0b7/exec-55ccdd7f-b952-49e4-ac50-0c4ff5e79cd0.png
+Final asset: card-designs/artwork/color-roulette.png, 1237 x 1272 pixels, RGBA PNG, true transparent background. The exact edit prompt is embedded in the PNG impeccable:prompt metadata and retained in .impeccable/review/special-five/color-roulette-cleanup-prompt.txt.
+
+Visual QA: Compared the final transparent asset with the approved PDF crop and original full-card object. All four complete sad faces, overlapping silhouettes, pale rear card, darker middle cards, front bottom notch, and grayscale differences remain recognizable. No black wedges, oval, text, frame, outer shadow, or matte remain. Output has clearer generated edges/texture than the low-resolution source; this is the principal derivative deviation.
+
+Placement: Compose at its natural aspect ratio 1237:1272 (approximately 0.973:1); use object-fit:contain without CSS grayscale/luminance-to-alpha filtering. The interior fills must remain opaque. Use this directly as an image over the semantic cream oval, preserving the small transparent inset so no bottom notch is clipped. The oval, frame, corner graphics, labels, responsive scaling, and all UI remain code responsibilities.

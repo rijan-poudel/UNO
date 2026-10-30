@@ -785,15 +785,15 @@
   outline-offset: 2px;
 }
 .color-choice.choose-red {
-  background: #e71c3b;
+  background: #df254b;
   color: #ffffff;
 }
 .color-choice.choose-blue {
-  background: #095be5;
+  background: #007bb5;
   color: #ffffff;
 }
 .color-choice.choose-green {
-  background: #008749;
+  background: #008458;
   color: #ffffff;
 }
 .color-choice.choose-yellow {

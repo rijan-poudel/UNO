@@ -4,10 +4,8 @@ body {
   --font-display: var(--font-body);
 }
 
-/* ── The deck ── */
+/* Shared card geometry. Face ink, graphics and style live in UnoCard.module.css. */
 .uno-card {
-  --card-color: #ed3b44;
-  --card-ink: #fffdf5;
   width: calc(82px * var(--card-scale, 1));
   height: calc(122px * var(--card-scale, 1));
   position: relative;
@@ -17,145 +15,24 @@ body {
   overflow: hidden;
   vertical-align: top;
   padding: 0;
-  border: calc(3px * var(--card-scale, 1)) solid #fffdf5;
-  border-radius: calc(6px * var(--card-scale, 1));
-  background: var(--card-color);
-  color: var(--card-ink);
-  font-family: var(--font-card), sans-serif;
-  box-shadow:
-    inset 0 1px 1px #ffffff60,
-    0 5px 10px #03090870;
   user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none;
 }
-.card-red {
-  --card-color: #e73442;
-}
-.card-yellow {
-  --card-color: #f7c934;
-  --card-ink: #332810;
-}
-.card-green {
-  --card-color: #159768;
-}
-.card-blue {
-  --card-color: #2474df;
-}
-.card-wild {
-  --card-color: #242837;
-}
-.card-orbit {
-  position: absolute;
-  width: 116%;
-  height: 64%;
-  left: -8%;
-  top: 18%;
-  background: #fffdf5;
-  border-radius: 50%;
-  transform: rotate(-34deg);
-}
 .card-index {
   position: absolute;
   z-index: 2;
-  font-size: calc(19px * var(--card-scale, 1));
-  font-weight: 800;
-  font-style: italic;
-  line-height: 1;
-  display: grid;
-  place-items: center;
-  min-width: calc(19px * var(--card-scale, 1));
-  height: calc(22px * var(--card-scale, 1));
-}
-.card-index.top {
-  top: calc(3px * var(--card-scale, 1));
-  left: calc(3px * var(--card-scale, 1));
+  align-items: center;
+  justify-content: center;
 }
 .card-index.bottom {
-  bottom: calc(3px * var(--card-scale, 1));
-  right: calc(3px * var(--card-scale, 1));
   transform: rotate(180deg);
-}
-.card-index svg {
-  width: calc(15px * var(--card-scale, 1));
-  height: calc(15px * var(--card-scale, 1));
-  stroke-width: 3;
 }
 .card-value {
   position: absolute;
-  inset: 16% 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--card-color);
-  font-size: calc(70px * var(--card-scale, 1));
-  font-weight: 800;
-  font-style: italic;
-  letter-spacing: -0.03em;
-  line-height: 1;
-  transform: rotate(-10deg);
-}
-.card-action-value {
-  font-size: calc(46px * var(--card-scale, 1));
-}
-.card-value svg {
-  width: 58%;
-  height: 58%;
-  stroke-width: 3;
-}
-.card-value .wild-symbol {
-  width: 60%;
-  height: 56%;
-}
-.wild-symbol {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2px;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  overflow: hidden;
-  transform: rotate(24deg);
-}
-.wild-symbol i:nth-child(1) {
-  background: #e73442;
-}
-.wild-symbol i:nth-child(2) {
-  background: #2474df;
-}
-.wild-symbol i:nth-child(3) {
-  background: #f7c934;
-}
-.wild-symbol i:nth-child(4) {
-  background: #159768;
-}
-.card-back {
-  background: #172b2b;
-  color: #fffdf5;
-}
-.card-back::before {
-  content: "";
-  position: absolute;
-  inset: 24% -12%;
-  border-radius: 50%;
-  transform: rotate(-34deg);
-  background: #e73442;
-}
-.card-back-mark {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-content: center;
-  font-family: var(--font-body), sans-serif;
-  font-size: calc(28px * var(--card-scale, 1));
-  font-weight: 900;
-  font-style: italic;
-  letter-spacing: -0.04em;
-  transform: rotate(-24deg);
-  text-shadow: 0 2px 1px #65111a80;
-}
-.card-back-mark span {
-  display: contents;
 }
 
 /* ── An uninterrupted playing arena ── */
@@ -1369,45 +1246,6 @@ body {
 }
 
 /* Authored deck details and physical discard history. */
-.card-back-stripes {
-  position: absolute;
-  inset: 6% 10%;
-  display: flex;
-  gap: 4%;
-  transform: rotate(-34deg);
-}
-.card-back-stripes i {
-  width: 4%;
-  height: 100%;
-  background: #fffdf514;
-}
-.four-color-mark {
-  position: absolute;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  width: 44%;
-  height: 48%;
-  transform: rotate(12deg);
-  opacity: 0.22;
-}
-.four-color-mark i:nth-child(1) {
-  background: #e73442;
-}
-.four-color-mark i:nth-child(2) {
-  background: #2474df;
-}
-.four-color-mark i:nth-child(3) {
-  background: #f7c934;
-}
-.four-color-mark i:nth-child(4) {
-  background: #159768;
-}
-.card-wild .card-value:has(.four-color-mark) {
-  color: #172b2b;
-  text-shadow:
-    1px 1px #fffdf5,
-    -1px -1px #fffdf5;
-}
 .discard-stack {
   position: relative;
 }
@@ -1481,10 +1319,6 @@ body {
   }
 }
 
-.card-yellow .card-value {
-  color: #8b600b;
-}
-
 /* Meaningful pressure and earned round results; no turn is delayed. */
 .last-card-stamp {
   position: absolute;
@@ -1516,9 +1350,6 @@ body {
   min-width: 56px;
   max-width: 56px;
   left: 0;
-}
-.penalty-deck .card-back-mark {
-  opacity: 0.16;
 }
 .draw-penalty {
   position: absolute;

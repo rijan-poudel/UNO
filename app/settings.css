@@ -1076,3 +1076,12 @@ html[data-reduced-motion="true"] *::after {
     transform: translateX(3px);
   }
 }
+
+/* Both approved card-style names remain readable, including narrow dialogs. */
+.settings-modal .settings-appearance .preference-row {
+  flex-wrap: wrap;
+}
+.settings-modal .settings-appearance .setting-select {
+  width: 180px;
+  max-width: 100%;
+}

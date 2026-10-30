@@ -1,0 +1,23 @@
+Production asset: public/artwork/cards/shuffle-hands.png
+Renderer: components/icons/UnoActionSymbol.tsx.
+The following extraction/edit records retain historical source paths. Exact edit prompts ship alongside this file and inside the PNG metadata.
+
+UNO Wild Shuffle Hands — genuine printed illustration extraction
+
+Source: https://service.mattel.com/instruction_sheets/10020-SN70_G1_4XN_IS_Uno.pdf
+Source PDF title: 10020-SN70_G1_4XN_IS
+Page: 1 (only page)
+PDF SHA-256: 6353789db42dc78174cf04c1811ad8ba39ffeabfd9731afd8c3f4be4037cd521
+Source PDF page size: 1985.38 x 1907.95 points; rotation 0.
+
+Production method: Direct PDF rasterization with Poppler pdftoppm. No image generation, tracing, redrawing, masking, retouching, or pixel interpolation.
+Exact command:
+pdftoppm -f 1 -singlefile -scale-to 48000 -x 2598 -y 21530 -W 384 -H 280 -png /tmp/uno-classic-reference.pdf /tmp/uno-shuffle-clean-crop
+
+Crop coordinate system: Top-left pixel coordinates after pdftoppm scales the PDF page's longest dimension to 48000 pixels. Rectangle x=2598, y=21530, width=384, height=280. This is the Wild Shuffle Hands illustration on the first card at the left of its rules paragraph.
+Reference comparison: /tmp/uno-classic-shuffle-detail.png and /tmp/uno-shuffle-print.png. The prior 24000-scale crop x=1276,y=10760,W=244,H=160 includes card-frame wedges. The production crop is tighter by 23 pixels on its left and 29 pixels on its right at that prior scale, and begins 5 pixels lower. Doubling the rasterization scale gives the final native 384 x 280 pixels.
+
+Output: shuffle-hands.png, 384 x 280 pixels, opaque RGB PNG with white matte.
+QA: Visually compared with the source detail and original crop. Both hands and all held cards remain complete; the left forearm naturally enters the left crop edge. No black card-frame fragments, rounded clipping, text, border, shadow, or artificial marks are included.
+Composition: Parent implementation removes white through an SVG luminance filter and composes the printed mark on the diagonal cream oval. Oval, corner graphics, labels, card frame, and game UI remain semantic implementation responsibilities.
+Deviation: None in the printed artwork; the tighter crop removes only reference presentation chrome and peripheral forearm context.

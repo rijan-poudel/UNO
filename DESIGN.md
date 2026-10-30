@@ -50,18 +50,23 @@ colors:
   sunset-text: "#321a20"
   sunset-muted: "#6e4c50"
   sunset-line: "#d7b2ad"
-  card-paper: "#ffffff"
-  card-blue: "#075bee"
-  card-yellow: "#ffce00"
-  card-back: "#101d3a"
-  card-green-index: "#00321e"
-  card-green-value: "#00894a"
-  card-yellow-index: "#482f00"
-  card-yellow-value: "#805100"
+  card-ink: "#ffffff"
+  card-red: "#df254b"
+  card-blue: "#007bb5"
+  card-green: "#008458"
+  card-yellow: "#f59e0b"
+  card-back: "#0d0f17"
+  card-yellow-ink: "#1a1400"
+  card-nordic-ground: "#0e1017"
+  wild-red: "#f43f5e"
+  wild-blue: "#24a9f0"
+  wild-yellow: "#fbbf24"
+  wild-green: "#20c88a"
+  print-paper: "#fffaf0"
   arena-focus: "#ffe329"
 typography:
   home-display:
-    fontFamily: "Barlow Condensed, sans-serif"
+    fontFamily: "Space Grotesk, sans-serif"
     fontSize: "96px"
     fontWeight: 800
     lineHeight: 0.85
@@ -168,16 +173,23 @@ typography:
     fontWeight: 750
     lineHeight: 1.25
   card-value:
-    fontFamily: "Barlow Condensed, sans-serif"
-    fontSize: "calc(70px * var(--card-scale, 1))"
-    fontWeight: 800
+    fontFamily: "Space Grotesk, sans-serif"
+    fontSize: "calc(53.3px * var(--card-scale, 1))"
+    fontWeight: 700
     lineHeight: 1
-    letterSpacing: "-0.03em"
+    letterSpacing: "-0.035em"
   card-index:
-    fontFamily: "Barlow Condensed, sans-serif"
-    fontSize: "calc(19px * var(--card-scale, 1))"
-    fontWeight: 800
+    fontFamily: "Space Grotesk, sans-serif"
+    fontSize: "calc(14.8px * var(--card-scale, 1))"
+    fontWeight: 700
     lineHeight: 1
+    letterSpacing: "-0.035em"
+  card-amount-index:
+    fontFamily: "Space Grotesk, sans-serif"
+    fontSize: "calc(16px * var(--card-scale, 1))"
+    fontWeight: 700
+    lineHeight: 1
+    letterSpacing: "-0.035em"
 rounded:
   field: "6px"
   small: "8px"
@@ -202,6 +214,20 @@ spacing:
   wide: "32px"
   panel: "44px"
 components:
+  card-face:
+    backgroundColor: "{colors.card-red}"
+    textColor: "{colors.card-ink}"
+    typography: "{typography.card-value}"
+    width: "calc(82px * var(--card-scale, 1))"
+    height: "calc(122px * var(--card-scale, 1))"
+    rounded: "calc(9px * var(--card-scale, 1))"
+  card-face-nordic:
+    backgroundColor: "{colors.card-nordic-ground}"
+    textColor: "{colors.wild-red}"
+    typography: "{typography.card-value}"
+    width: "calc(82px * var(--card-scale, 1))"
+    height: "calc(122px * var(--card-scale, 1))"
+    rounded: "calc(9px * var(--card-scale, 1))"
   button-primary:
     backgroundColor: "{colors.club-yellow}"
     textColor: "{colors.club-ink}"
@@ -334,7 +360,7 @@ components:
 
 **Creative North Star: "Color play"**
 
-A welcoming shared card table combines a rich blue field, warm cream foreground, vivid native UNO cards and expressive illustrated human portraits. Outfit keeps the interface friendly and direct; Barlow Condensed gives the deck, wordmark and selected game actions their familiar energy. Soft contact shadows and inset press edges make cards and controls feel physical.
+A welcoming shared card table combines a rich blue field, warm cream foreground, vivid native UNO cards and expressive illustrated human portraits. Outfit keeps the interface friendly and direct; Space Grotesk gives Swiss Minimal cards upright geometric numerals; the shared card-font variable also changes the existing wordmark and emphatic game-action consumers. Soft contact shadows and inset press edges make cards and controls feel physical.
 
 This records the shipped October 24 composite: Classic supplies the blue field and card prominence, Color court supplies the portraits, and After-hours supplies amber turn and action emphasis. The approved direction is `.impeccable/review/experience-reset/contract.md` (FORM seed `2fba311c`); its three references are `reset-classic.png`, `reset-color-court.png` and `reset-after-hours.png` under `.impeccable/mocks/decision/`. No catalog quality-bar world was selected. Earlier Comic-card showdown, giant-cast/painted-menu, violet-corner, illustrated-room and poker-table instructions are historical and superseded. Their assets and provenance remain recoverable; they are not current surface guidance.
 
@@ -342,7 +368,7 @@ This records the shipped October 24 composite: Classic supplies the blue field a
 
 - Quiet blue, charcoal/crimson or plum edition fields keep attention on live cards and people.
 - Human portraits, opaque nameplates and exact hand counts make the table social and readable.
-- Outfit UI and Barlow Condensed deck lettering share one friendly voice.
+- Outfit UI and upright Space Grotesk card lettering share one friendly voice.
 - Amber pressed actions and a compact real countdown explain the current decision.
 - A quarter-cropped curved held hand preserves direct legal play, readable overlap and independent large-hand scrolling.
 
@@ -350,7 +376,7 @@ The owner-approved October 25 geometry replacement inherits this world and FORM 
 
 The October 26 focused-account extension (`.impeccable/review/focused-account/contract.md`, FORM `focused-account-20261026`) preserves this world. Optional identity, social and preference tasks live behind the avatar; joining and routine play remain visually quiet. No new shipping raster assets were introduced.
 
-The October 26 settings redo (`.impeccable/review/settings-redo/contract.md`) supersedes the focused-account sidebar, mobile section picker and avatar creator. A compact warm-white sheet offers four choices, then one task at a time; the arena and native card world retain their authority.
+The October 26 settings redo (`.impeccable/review/settings-redo/contract.md`) supersedes the focused-account sidebar, mobile section picker and avatar creator. That compact warm-white sheet offered four choices, then one task at a time; the Swiss integration adds Appearance for card style; the arena and native card world retain their authority.
 
 The October 27 edition hardening (`.impeccable/review/edition-hardening/contract.md`) is a bounded extension of this world, inheriting FORM seed `2fba311c` under the narrow-extension exemption. It restores three playable fixed originals and home favorites, separates active identity from pins, and gives custom-copy editing its own native dialog. It changes no imagery or home title/card-fan/action composition. Latest product authority is the October 27 entry in `PRODUCT.md`; older single-Classic and removed-home-track guidance is superseded.
 
@@ -360,7 +386,9 @@ The October 27 printed-symbol correction (`.impeccable/review/card-symbols/contr
 
 The October 27 play-clarity extension (`.impeccable/review/play-clarity/contract.md`) inherits Color play and FORM seed `2fba311c`. Engine-derived stack responses, direct opponent-seat targeting and optional original-edition practice clarify exceptional decisions while preserving the existing native cards, portraits and quiet routine play. Its six captures and ship review remain in `.impeccable/review/play-clarity/`; no new tokens, imagery or visual world were introduced.
 
-The October 27 quiet-play cleanup (`.impeccable/review/quiet-play/contract.md`) inherits Color play and FORM seed `2fba311c`. The owner explicitly supersedes pale Settings and horizontal separators: main tasks, custom drafts and favorite replacement now use edition-colored grounds, cream lettering, amber decisions and tonal grouping. Home favors text-only choices and a centered Play label; mode details stay in an optional native info popover. The table drops the edition badge, persistent Mercy meter, Draw caption and idle draw pulse. Two separated bent arrows now define Reverse, including the white navy-outlined pair over solid colored cards for Reverse +4. Twelve JPEG captures and the resolved ship verdict remain in `.impeccable/review/quiet-play/`; no new visual world, dependencies or artwork were introduced. Informational help retains its cream body.
+The October 27 quiet-play cleanup (`.impeccable/review/quiet-play/contract.md`) inherits Color play and FORM seed `2fba311c`. The owner explicitly supersedes pale Settings and horizontal separators: main tasks, custom drafts and favorite replacement now use edition-colored grounds, cream lettering, amber decisions and tonal grouping. Home favors text-only choices and a centered Play label; mode details stay in an optional native info popover. The table drops the edition badge, persistent Mercy meter, Draw caption and idle draw pulse. Two separated bent arrows now define Reverse, including the then-current navy-outlined pair over colored cards for Reverse +4, superseded by the Swiss integration below. Twelve JPEG captures and the resolved ship verdict remain in `.impeccable/review/quiet-play/`; no new visual world, dependencies or artwork were introduced. Informational help retains its cream body.
+
+The owner-approved Swiss integration makes **Swiss Minimal** the default production card style and offers **Nordic Frost** through Settings → Appearance → Card style. This is a card-system refinement within Color play, with no new FORM seed. The native React renderer replaces the standalone study; the current evidence is `.impeccable/review/swiss-integration/`. Existing table geometry, card handling, travel, room and audio remain the production systems. Study-only ring, finish, table and movement controls are not production settings. This recording makes no new independent-review claim.
 
 Source authority: `app/layout.tsx` imports globals, legacy table geometry, arena, home, club, then settings styles. `app/club.css` owns shared palette/chrome; `app/settings.css` owns the settings sheet, avatar popover, portrait picker and invitation surfaces; `app/home.css` owns home; `app/arena.css` owns live geometry/cues, with its final centered-board section superseding earlier geometry; `PlayerAvatar.module.css`, `OpponentSeat.module.css` and `UnoCard.module.css` own their materials. Component module specificity matters: the active portrait badge is cream, not the older arena yellow badge. Source takes precedence over older captures.
 
@@ -376,7 +404,9 @@ The primary palette is saturated blue with cream and amber; the native deck reta
 ### Secondary
 
 - **Club yellow:** primary controls, local-turn cue, catch action and portrait ring. Its darker amber edge supplies the pressed lip; cue ink and cue muted provide readable text.
-- **Native red, blue, green and yellow:** card identity stays faithful to the code-rendered deck. Club blue/yellow are interface colors; card blue/yellow remain distinct tokens.
+- **Swiss card fields:** solid red, blue, green and amber use white marks except amber, which uses dark yellow ink; Wilds and backs use deep navy. Club blue/yellow remain separate interface tokens.
+- **Wild accent inks:** brighter red, blue, yellow and green fill borderless draw fans and Wild quadrants. Nordic Frost uses the same accent inks for colored indices and marks over its common dark ground; Wilds and backs keep white ink.
+- **Print paper:** cream is specific to the Shuffle and Roulette center ovals, not a general action backdrop. Roulette’s four opaque raster faces are rear yellow, left blue, right green and front red-coral.
 
 ### Neutral
 
@@ -384,31 +414,31 @@ The primary palette is saturated blue with cream and amber; the native deck reta
 - **Club ink, UI muted and UI line:** supporting-page text, secondary text and field/divider strokes.
 - **Cue surface:** opaque dark blue identity and remote-turn surfaces; no scene detail shows through names. The draw pile retains its native card-back affordance without a caption pill.
 - **Portrait selected:** portrait tiles retain pale blue with a blue border/check. Active game-profile rows use the edition task highlight and an amber check. Pinned stars use amber independently of active selection.
-- **Saved appearances:** paper is the default; midnight, forest and sunset override supporting UI tokens in `club.css`, including other native dialogs, the avatar popover and invitation notices. Midnight uses a navy surface and cream text rather than charcoal. Main Settings, custom drafts and favorite replacement instead use the edition task grounds: Classic reuses club ink with its navy highlight; No Mercy uses muted plum and All Wild violet. Heading, scrolling body and footer share this ground, with cream text and amber focus/actions. Highlights group selected profiles, progress, rule disclosures and audio notes. These scoped settings tokens do not recolor informational help or other dialogs. No Appearance controls are offered; saved theme readers remain compatible. Home and arena retain their edition or supported custom-rule grounds.
+- **Saved appearances:** paper is the default; midnight, forest and sunset override supporting UI tokens in `club.css`, including other native dialogs, the avatar popover and invitation notices. Midnight uses a navy surface and cream text rather than charcoal. Main Settings, custom drafts and favorite replacement instead use the edition task grounds: Classic reuses club ink with its navy highlight; No Mercy uses muted plum and All Wild violet. Heading, scrolling body and footer share this ground, with cream text and amber focus/actions. Highlights group selected profiles, progress, rule disclosures and audio notes. These scoped settings tokens do not recolor informational help or other dialogs. Appearance now offers only Card style (Swiss Minimal or Nordic Frost); saved UI theme readers remain compatible. Home and arena retain their edition or supported custom-rule grounds.
 
 **The Edition Task Rule.** Main Settings and its editors inherit the selected edition through ground and inset highlight, cream lettering and amber controls. Use spacing and subtle tonal groups instead of horizontal separators; informational help keeps its cream reading body.
 
-**The Published Color Rule.** Amber, cream active badges, legal-card outlines and wild swatches describe actual published state. Retain names, counts and written action/color labels alongside color.
+**The Published Color Rule.** Amber, cream active badges, legal-card emphasis and wild swatches describe actual published state. Retain names, counts and written action/color labels alongside color.
 
 ## Typography
 
-**Display Font:** Barlow Condensed, sans-serif, for the home UNO mark, native card faces and selected game actions; display lettering is italic where implemented.
+**Display / Card Font:** Space Grotesk, sans-serif, loaded at weight 700 through `--font-card`. Cards use upright weight 700; the existing home UNO mark and emphatic game-action consumers inherit the same variable while retaining their own sizes, declared weights and italic styling. This font replacement therefore reaches those consumers as well as the deck.
 **Body Font:** Outfit, sans-serif, for headings, forms, controls, names, help and countdowns. Both are loaded through `next/font` in `app/layout.tsx`.
 
 The ramp is role-based, not a geometric scale. The frontmatter records the actual range, including compact roles; small phone text is subordinate metadata rather than the primary action label.
 
 ### Hierarchy
 
-- **Home display:** home-only condensed italic mark; switches to an 80px role in short landscape. Do not reuse its scale for routine headings.
+- **Home display:** home-only geometric italic mark; switches to an 80px role in short landscape. Do not reuse its scale for routine headings.
 - **Headline / section / dialog:** Outfit with compact tracking and weight 750. Setup headline is responsive; dialog and section titles use their own roles. Settings uses the distinct 26px title role with 1.15 line height on desktop and phones, then 24px at heights of 500px or less; other dialogs retain their own responsive roles.
 - **Body / large body:** supporting content and setup explanations, with measured line lengths (setup 50ch, home rules explanatory copy).
 - **Account section / preference label:** medium-weight Outfit identifies overview choices and Friends groups (18px, 650); disclosures and preference labels use a quieter 14px, 600 role.
 - **Control / support:** regular button and field labels, rule descriptions and secondary actions. Home Play is a larger centered Outfit label with no mode/bot subtitle or decorative arrow.
 - **Player name / count:** names are 13px by default, 12px in narrow or short usable panels and 11px at the shortest panel tier. Counts remain 11px and inline status 10px in the identity module. Outfit carries both name and count. Tabular numerals keep counts and the clock stable.
 - **Cue:** existing viewport rules retain the 18px/16px title roles and compact helper/clock roles; the centered board overrides titles to 12px and helper copy to 10px when usable panel height is at most 600px. A 28px clock fits that panel tier. The board container, rather than whole-window phone width, owns compact control placement.
-- **Native deck:** face values and corner indices scale together through `--card-scale`. Preserve the native card-back Outfit wordmark and Barlow Condensed face numerals.
+- **Native deck:** face values and corner indices scale together through `--card-scale`. Use upright Space Grotesk values, mirrored corner indices and the lowercase Space Grotesk back monogram. Six and nine are underlined in centers and corners.
 
-**The Two Lettering Roles Rule.** Outfit carries ordinary interface headings. Condensed italic lettering belongs to brand/deck expression and the existing emphatic game actions; it is not a global heading transform.
+**The Two Lettering Roles Rule.** Outfit carries ordinary interface headings. Space Grotesk carries upright geometric card print; existing brand and emphatic game-action consumers retain their own italic styling through the shared card-font variable. Italics are not a global heading transform.
 
 ## Layout
 
@@ -440,7 +470,7 @@ The observed spacing vocabulary runs from micro/detail gaps through compact, reg
 
 **The Reachable Decision Rule.** In setup, room, account and help flows, scroll the content body while keeping the primary decision or lesson navigation visible. Short-height adjustments preserve target size and readable content instead of shrinking the entire panel.
 
-**The One Open Task Rule.** Keep optional identity, progress and social controls behind the avatar. Show the four-choice settings overview or one selected task; mount optional progress and pickers when opened. Ready-made profile portraits remain immediately visible. The current task keeps its heading and decision reachable; custom-profile drafts use their own native dialog and explicit save/cancel boundary.
+**The One Open Task Rule.** Keep optional identity, progress and social controls behind the avatar. Show the five-choice settings overview or one selected task; mount optional progress and pickers when opened. Ready-made profile portraits remain immediately visible. The current task keeps its heading and decision reachable; custom-profile drafts use their own native dialog and explicit save/cancel boundary.
 
 ## Elevation & Depth
 
@@ -450,7 +480,7 @@ Depth comes from native card stock, soft blue contact shadows, floating portrait
 
 - **Primary press:** inset amber lip plus a small blue shadow; the home Play enlarges the same relationship.
 - **Identity and cue:** soft blue contact shadows beneath an opaque surface.
-- **Native stock:** fine white highlight, thin layered grey stock and a soft dark contact shadow; the draw pile adds stacked edges.
+- **Card faces:** Swiss Minimal uses a fine light edge, subtle inset highlight and ambient dark contact shadow. Nordic Frost uses an ink-tinted border and inner bloom over its dark field. Existing hand/legal/inspection shadows remain interaction states; the draw pile retains stacked edges.
 - **Dialog:** broad blue ambient shadow, with a dark native backdrop.
 - **Popover and invitation:** the shared UI shadow lifts theme-aware surfaces above the current screen; invitation notices join the topmost open native dialog so they remain visible and actionable.
 
@@ -464,9 +494,9 @@ Avatar popovers use a brief 160ms reveal, and incoming invitation notices use 18
 
 ## Shapes
 
-Printed action symbols use card silhouettes, opposing arrows, skip marks and targets as functional deck geometry. Draw amounts remain in corner indices; the targeted draw places +2 inside its target. These marks do not establish a panel radius or an app-icon style.
+Printed action symbols use card silhouettes, opposing arrows, skip marks and targets as functional deck geometry. Draw amounts appear centrally and in mirrored corner indices; Targeted Draw Two places +2 inside its functional reticle. These marks do not establish a panel radius or an app-icon style.
 
-Forms use gently rounded rectangles: small field corners, medium controls, larger identity/cue surfaces and soft panel corners. Home Play has its own action radius. Portraits are circular with a cream rim. Native cards keep their scaled small corners and oval print: white on colored faces, four deck colors behind All Wild action marks. These distinct silhouettes identify material and function; do not flatten them to one radius. The settings sheet uses its own soft corners (24px desktop, 20px phone). Its plain sliding switches use a full pill radius (999px, geometrically capped at 13px by the 26px track height); this is native control geometry, not a general container radius.
+Forms use gently rounded rectangles: small field corners, medium controls, larger identity/cue surfaces and soft panel corners. Home Play has its own action radius. Portraits are circular with a cream rim. Cards keep the existing scaled (82 by 122px) geometry and (9px) corners. Numeric faces have continuous fields without oval or stadium-ring print. Plain Wild uses a borderless tilted four-color oval; only Shuffle and Roulette retain cream center ovals, and Shuffle alone retains outlined Wild corner ovals. These distinct silhouettes identify material and function; do not flatten them to one radius. The settings sheet uses its own soft corners (24px desktop, 20px phone). Its plain sliding switches use a full pill radius (999px, geometrically capped at 13px by the 26px track height); this is native control geometry, not a general container radius.
 
 ## Components
 
@@ -494,15 +524,19 @@ Help uses the native dialog heading and Close, one scrolling lesson body and pin
 
 ### Printed card symbols and edition help
 
-`UnoActionSymbol` owns the printed action vocabulary within `UnoCard`: two visibly separated bent opposing arrows for Reverse, a circular arrow for Skip Everyone, two overlapping Skip marks for Skip Two, counted card stacks for draws, a centered target +2 for Targeted Draw Two, and card fans with discard or exchange arrows for Discard All and Forced Swap. Color Roulette uses four mystery cards bearing question marks; the compatibility `RouletteWheelIcon` wrapper renders that same motif. These source-authored SVG shapes represent functional physical-card print. Lucide remains the ordinary app-navigation/control icon vocabulary; utility-icon substitutions do not define these printed actions.
+`UnoCard` and its module stylesheet own production faces across hands, piles, travel, help and previews. Swiss Minimal is the default; the device-local `uno.settings.cardStyle` preference accepts `swiss` or `nordic`, with invalid/missing values falling back to Swiss. Root `data-card-style` applies the style immediately. Settings → Appearance → Card style exposes only Swiss Minimal and Nordic Frost; the two styles share geometry, labels and action motifs.
 
-Reverse +4 places solid native-color cards behind the same separated arrow pair, filled white and outlined in navy. Preserve the negative-space channel at held-card and help-miniature sizes.
+`UnoActionSymbol` is the native React renderer for the approved action geometry: flat continuous opposing Reverse arrows; integrated circular Skip Everyone; paired Skip Two signs separated by a face-colored disk; central amounts above small borderless draw fans. Draw Two uses two colored bodies; +4/+6/+10 use a symbolic four-color fan rather than exact-count stacks. Ordinary central amounts use (30 SVG units, y=29) in the (64 by 64) viewBox; action centers occupy 74% of face width. Mirrored HTML corner amounts retain lining/tabular numerals and Reverse/Target qualifiers.
 
-All Wild action detection uses both the wild color and the action value, including Reverse, Skip, Draw Two and Draw Four values that lack a wild prefix. Its action oval retains the existing red, blue, green and yellow deck quadrants, with white marks and a dark edge for contrast. Keep this treatment in shared faces across hand, pile, motion and previews. Action feedback reuses the shared relevant motifs; draw feedback retains the actual penalty total rather than substituting a fixed printed amount. Accessible card labels carry the written action name while the SVG is decorative.
+Discard All combines three current-ink fan bodies, true transparent mask seams, an integrated transfer arrow and a perspective pile. Forced Swap combines four colored fan bodies with the same transparent seams and a symmetric two-headed bridge, without an oval. Reverse +4 places the same opposing arrows above central +4 (30 SVG units, y=62), without a fan. Targeted +2 uses one functional reticle around the amount (26 SVG units, y=41): main radius 24/stroke 3.2 with outside-only ticks at 2–8 and 56–62; corner radius 22/stroke 5 with ticks at 2–10 and 54–62. This meaningful target is the explicit exception to decorative amount-dial prohibitions.
+
+Shuffle retains its genuine raster crop, cream oval, unchanged luminance-to-alpha ink filter and outlined Wild corner ovals. Roulette retains the AI-cleaned and recolored four-face derivative with transparent exterior, opaque yellow/blue/green/red-coral interiors and dark facial marks. Its center placement is (x=11, y=10.4, width=42, height=43.2), over cream; its larger corners use (x=2, y=1, width=60, height=61.7) and RGB transfer (slope 1.35, intercept 0.14) without changing alpha. The two referenced PNGs and their exact origin/edit histories live in [public/artwork/cards](public/artwork/cards/README.md). Roulette is not an unretouched original colored print. Historical paths inside provenance describe earlier stages, not active dependencies.
+
+Shared feedback reuses these functional motifs. Draw feedback retains the actual penalty total, while accessible card labels name the written action and decorative SVGs remain hidden from assistive technology. Lucide remains the ordinary app-navigation/control icon vocabulary.
 
 No Mercy and All Wild help use the shared native blue heading with cream text, cream scrolling body and fixed amber Done action. The optional native **Card symbols** disclosure mounts actual `UnoCard` faces only after it opens. Divider-separated reference rows pair each face with its written name and one concise effect, using a 48px preview column, 16px gap, 15px names and 14px consequence text. Keep the actual table-rule summary separate from these reference faces and retain reachable Close/Done controls in phone and short landscape layouts. Classic retains its existing interactive lesson flow. Original-edition references and practice are explicitly labeled; the actual configurable rules appear only in the separate native disclosure. Do not repeat unconditional original-rule claims above a custom table summary.
 
-**The Printed Vocabulary Rule.** Reuse the functional deck motif across native faces and relevant action feedback. Keep corner draw amounts and four-color All Wild action ovals; offer explanations through the optional reference rather than routine play coaching.
+**The Printed Vocabulary Rule.** Reuse the functional deck motif across native faces and relevant action feedback. Keep the shared center/corner compositions, transparent action-fan seams and specific Shuffle/Roulette artwork treatments; offer explanations through the optional reference rather than routine play coaching.
 
 The persistent Mercy hand meter is removed. Exact hand counts and exceptional knockout outcomes remain; a large hand alone does not imply knockout danger when the elimination limit is disabled.
 
@@ -518,7 +552,7 @@ No Mercy and All Wild help add a native **Try a practice hand** disclosure along
 
 ### Inputs / fields
 
-Theme-aware fields use UI surface/text, a two-pixel divider border, 50px height and a darker text-colored focus stroke. Invalid fields use accent red. Labels remain explicit; room codes and room links share the existing input flow. Native SettingSelect controls share a 132×48px column, a one-pixel divider stroke, 12px radius, 16px values and padding of 10px 40px 10px 14px. A separate decorative 16px Lucide chevron sits 14px from the right with pointer events disabled; the reserved end inset prevents crowding without replacing native select semantics. Bot challenge descriptions are screen-reader-only in Settings and remain associated through aria-describedby; the shared control can still display explanations elsewhere. Disclosure summaries retain a 52px minimum height. Dependent settings remain visible and explain their prerequisite: same-color matching is disabled until matching-number pairs are enabled, without discarding its saved value.
+Theme-aware fields use UI surface/text, a two-pixel divider border, 50px height and a darker text-colored focus stroke. Invalid fields use accent red. Labels remain explicit; room codes and room links share the existing input flow. Native SettingSelect controls normally share a 132×48px column; Appearance’s Card style select widens to 180px with max-width 100%, and its preference row wraps so both approved style names stay readable in narrow dialogs. Selects retain a one-pixel divider stroke, 12px radius, 16px values and padding of 10px 40px 10px 14px. A separate decorative 16px Lucide chevron sits 14px from the right with pointer events disabled; the reserved end inset prevents crowding without replacing native select semantics. Bot challenge descriptions are screen-reader-only in Settings and remain associated through aria-describedby; the shared control can still display explanations elsewhere. Disclosure summaries retain a 52px minimum height. Dependent settings remain visible and explain their prerequisite: same-color matching is disabled until matching-number pairs are enabled, without discarding its saved value.
 
 ### Navigation
 
@@ -579,14 +613,14 @@ An actionable draw stack exposes the exact legal response in the cue and draw de
 ### Do:
 
 - **Do** use the quiet edition field, warm cream, human portraits and vivid native deck as one shared identity.
-- **Do** keep Outfit ordinary headings and the separate Barlow Condensed brand/deck roles.
+- **Do** keep Outfit ordinary headings and the separate Space Grotesk card/brand roles.
 - **Do** retain saved appearances on other dialogs, the avatar popover and invitation notices; use navy/plum/violet main Settings with cream text, amber decisions and tonal grouping, while informational help keeps its cream body.
 - **Do** keep exact hand counts, inline compact status, a real turn clock and written action/color cues.
-- **Do** share printed deck motifs across card faces and relevant feedback, preserve All Wild’s four-color action oval, and keep real-face explanations behind the native Card symbols disclosure.
+- **Do** share printed deck motifs across card faces and relevant feedback, preserve the Swiss/Nordic geometry and card-specific oval exceptions, and keep real-face explanations behind the native Card symbols disclosure.
 - **Do** preserve the quarter-cropped curved held hand, readable overlap, independent overflow, direct legal play and visible keyboard focus.
 - **Do** keep compact cues, inspection and actions clear of identities and piles, and confine game dialogs to the reported usable panel.
 - **Do** keep setup, account and help decisions outside the scrolling content body, and distinguish actual table rules from practice examples.
-- **Do** show the four-choice settings overview or one task, keep ready-made portraits visible, and expose rule controls only inside a named custom-profile draft.
+- **Do** show the five-choice settings overview or one task, keep ready-made portraits visible, and expose rule controls only inside a named custom-profile draft.
 - **Do** use soft contact depth and the intentional inset amber pressed-control lip.
 - **Do** keep original artwork and exact provenance, even when earlier artwork is superseded.
 - **Do** verify six-seat landscape phones, large hands and reduced motion when extending the interface.
@@ -604,4 +638,4 @@ An actionable draw stack exposes the exact legal response in the cue and draw de
 - **Don't** offer Stack party or Wild table as built-in choices; use named custom profiles for house rules.
 - **Don't** label Flip or Flex playable before their actual decks/actions exist, or describe the three originals as editable house-rule presets.
 
-Not canonized: the pale Settings sheet, repeated separator lines, home mode icon/description/subtitle, Draw pill, persistent Mercy meter, No Mercy header badge and merged Reverse shafts were owner-rejected and corrected; none is a reusable rule. The former generic special-card app icons, white All Wild action ovals, composite quantity badges and wheel-based Color Roulette mark were corrected; none is a reusable card-print rule. The former crowded selects, long repeated settings explanations, 32px settings gutters, all-cream headers, separate body back row, circular active check, solid-blue favorite stars and third custom-row action were corrected or superseded; none is a reusable rule. The rejected settings sidebar/mobile selector, Appearance controls, persistence slogan and custom avatar creator are superseded by the compact task sheet; none should be restored as a system rule. Historical custom recipes remain compatible data, not an editing pattern. Legacy tab selectors, the earlier single-Classic restriction, the removed-home-track instruction and the earlier tabbed blue-title-bar preference layout remain superseded; the current integrated edition-colored settings header is intentional, not a restoration of that old navigation; the current compact favorites are intentional. The replacement dialog’s former flush-left body was a padding defect, corrected with the shared inset task body and fixed footer; that defect is not a density rule. Old charcoal midnight colors and historical global fixed-light-dialog guidance do not override theme-aware surfaces; the earlier fixed-light Settings treatment is explicitly superseded by the edition task palette. Informational help remains cream. Historical no-visible-HUD guidance does not remove the real actor/deadline or accessible status; the shipped quieting removes routine coaching. None of these superseded patterns is a rule for future surfaces. The former compact status-column collision and low-contrast Settings control were defects; the corrected row and explicit cream foreground are the recorded behavior. The earlier unmeasured deep crop, hand-count scale reduction, fixed lift/headroom tiers and superseded viewport-only arena tiers are not current rules; the owner-approved, fan-compensated quarter crop is intentional. The reviewed compact inspection/badge and Draw/wild-label collisions were defects, resolved in the final recaptures; their overlap is not a spacing precedent. Earlier setup footer overflow and narrow-width overrides defeating short-height spacing were defects, not density rules; the final bounded body/footer composition is the precedent. Static screenshots do not certify physical hinge behavior, physical touch, audible quality or execution of reduced-motion fallbacks.
+Not canonized: the pale Settings sheet, repeated separator lines, home mode icon/description/subtitle, Draw pill, persistent Mercy meter, No Mercy header badge and merged Reverse shafts were owner-rejected and corrected; none is a reusable rule. The former generic special-card app icons, white All Wild action ovals, composite quantity badges and wheel-based Color Roulette mark were corrected; none is a reusable card-print rule. The former crowded selects, long repeated settings explanations, 32px settings gutters, all-cream headers, separate body back row, circular active check, solid-blue favorite stars and third custom-row action were corrected or superseded; none is a reusable rule. The rejected settings sidebar/mobile selector, former broad Appearance controls, persistence slogan and custom avatar creator are superseded by the compact task sheet; none should be restored as a system rule. The current two-style Appearance task is explicitly authorized. Historical custom recipes remain compatible data, not an editing pattern. Legacy tab selectors, the earlier single-Classic restriction, the removed-home-track instruction and the earlier tabbed blue-title-bar preference layout remain superseded; the current integrated edition-colored settings header is intentional, not a restoration of that old navigation; the current compact favorites are intentional. The replacement dialog’s former flush-left body was a padding defect, corrected with the shared inset task body and fixed footer; that defect is not a density rule. Old charcoal midnight colors and historical global fixed-light-dialog guidance do not override theme-aware surfaces; the earlier fixed-light Settings treatment is explicitly superseded by the edition task palette. Informational help remains cream. Historical no-visible-HUD guidance does not remove the real actor/deadline or accessible status; the shipped quieting removes routine coaching. None of these superseded patterns is a rule for future surfaces. The former compact status-column collision and low-contrast Settings control were defects; the corrected row and explicit cream foreground are the recorded behavior. The earlier unmeasured deep crop, hand-count scale reduction, fixed lift/headroom tiers and superseded viewport-only arena tiers are not current rules; the owner-approved, fan-compensated quarter crop is intentional. The reviewed compact inspection/badge and Draw/wild-label collisions were defects, resolved in the final recaptures; their overlap is not a spacing precedent. Earlier setup footer overflow and narrow-width overrides defeating short-height spacing were defects, not density rules; the final bounded body/footer composition is the precedent. Static screenshots do not certify physical hinge behavior, physical touch, audible quality or execution of reduced-motion fallbacks.

@@ -2,7 +2,7 @@
 "use client";
 import { RotateCw } from "lucide-react";
 import { UnoActionSymbol } from "./icons/UnoActionSymbol";
-import { RouletteWheelIcon, NoMercyIcon } from "./icons/NoMercyIcons";
+import { NoMercyIcon } from "./icons/NoMercyIcons";
 import type { GameState } from "../types/game";
 export default function GameFeedback({ game }: { game: GameState }) {
   const action = game.lastAction;
@@ -34,10 +34,7 @@ export default function GameFeedback({ game }: { game: GameState }) {
     ) : value === "wildSkip2" ? (
       <UnoActionSymbol value="wildSkip2" />
     ) : value === "wildReverseDraw4" ? (
-      <span className="feedback-reverse-draw4">
-        <UnoActionSymbol value="wildReverseDraw4" />
-        <small>+4</small>
-      </span>
+      <UnoActionSymbol value="wildReverseDraw4" />
     ) : value === "wildTargetDraw2" ? (
       <UnoActionSymbol value="wildTargetDraw2" />
     ) : value === "wildForcedSwap" || value === "swap" ? (
@@ -51,7 +48,7 @@ export default function GameFeedback({ game }: { game: GameState }) {
         <small>PASS ALL</small>
       </span>
     ) : value === "wildColorRoulette" ? (
-      <RouletteWheelIcon size={52} />
+      <UnoActionSymbol value="wildColorRoulette" size={52} />
     ) : value === "shuffle" ? (
       <UnoActionSymbol value="shuffle" />
     ) : value === "draw2" ? (

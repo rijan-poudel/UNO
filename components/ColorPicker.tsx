@@ -2,7 +2,7 @@
 import { useEffect, useRef } from "react";
 import type { Card, CardColor } from "../types/card";
 import Modal from "./Modal";
-import { RouletteWheelIcon } from "./icons/NoMercyIcons";
+import { UnoActionSymbol } from "./icons/UnoActionSymbol";
 const COLORS = ["red", "yellow", "green", "blue"] as const;
 export default function ColorPicker({
   onSelect,
@@ -42,7 +42,7 @@ export default function ColorPicker({
       >
         {roulette && (
           <div className="roulette-wheel-badge" aria-hidden="true">
-            <RouletteWheelIcon size={38} />
+            <UnoActionSymbol value="wildColorRoulette" size={38} />
           </div>
         )}
         {roulette && (

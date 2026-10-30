@@ -36,6 +36,7 @@ import { UnoWordmark } from "../components/ui/PageChrome";
 import { getPlayerName, getSavedPlayerNames } from "../lib/playerNames";
 import { toast } from "sonner";
 import {
+  getCardStyleSetting,
   getReducedMotionSetting,
   subscribeDisplaySettings,
 } from "../lib/displaySettings";
@@ -133,6 +134,7 @@ export default function Home() {
   useAudioManager(gameContext);
   useEffect(() => {
     const sync = () => {
+      document.documentElement.dataset.cardStyle = getCardStyleSetting();
       document.documentElement.dataset.reducedMotion = String(
         getReducedMotionSetting(),
       );

@@ -2,9 +2,9 @@
 "use client";
 
 import type { CSSProperties } from "react";
-import { UnoActionSymbol } from "./icons/UnoActionSymbol";
+import { DRAW_AMOUNTS, UnoActionSymbol } from "./icons/UnoActionSymbol";
 import { getCardLabel } from "../types/card";
-import type { Card, CardValue } from "../types/card";
+import type { Card, CardColor, CardValue } from "../types/card";
 import styles from "./UnoCard.module.css";
 
 interface UnoCardProps {
@@ -19,45 +19,39 @@ interface UnoCardProps {
   tabIndex?: number;
   cornerHint?: string;
 }
-const SYMBOLS: Record<string, string> = {
-  draw2: "+2",
-  draw4: "+4",
-  wild4: "+4",
-  wildDraw6: "+6",
-  wildDraw10: "+10",
-  wildColorRoulette: "?",
-  wild: "",
-  shuffle: "",
-  discardAll: "",
-};
-
 function CardSymbol({
   value,
+  color,
   corner = false,
 }: {
   value: CardValue;
+  color: CardColor;
   corner?: boolean;
 }) {
-  if (corner && value === "wildReverseDraw4") {
+  const amount = DRAW_AMOUNTS[value];
+  if (corner && amount)
     return (
-      <span className={styles.cornerRev4} aria-hidden="true">
-        <UnoActionSymbol value="reverse" isCorner />
-        <span>+4</span>
+      <span className={styles.penaltyIndex}>
+        {value === "wildReverseDraw4" && (
+          <UnoActionSymbol value="reverse" isCorner />
+        )}
+        {value === "wildTargetDraw2" && (
+          <UnoActionSymbol value={value} isCorner />
+        )}
+        <span>+{amount}</span>
       </span>
     );
-  }
-  if (corner && SYMBOLS[value]) return <>{SYMBOLS[value]}</>;
-  if (value === "wild")
+  if (/^[0-9]$/.test(value))
     return (
-      <span className="wild-symbol">
-        <i />
-        <i />
-        <i />
-        <i />
+      <span
+        className={
+          value === "6" || value === "9" ? styles.underlined : undefined
+        }
+      >
+        {value}
       </span>
     );
-  if (/^[0-9]$/.test(value)) return <>{value}</>;
-  return <UnoActionSymbol value={value} isCorner={corner} />;
+  return <UnoActionSymbol value={value} color={color} isCorner={corner} />;
 }
 
 export default function UnoCard({
@@ -73,42 +67,23 @@ export default function UnoCard({
   cornerHint,
 }: UnoCardProps) {
   const label = faceDown ? "Face-down card" : getCardLabel(card);
-  const wildAction =
-    card.color === "wild" &&
-    [
-      "skip",
-      "reverse",
-      "draw2",
-      "wildSkip2",
-      "wildTargetDraw2",
-      "wildForcedSwap",
-    ].includes(card.value);
   const style = { "--card-scale": sizeMultiplier } as CSSProperties;
   const content = faceDown ? (
-    <>
-      <span className="card-back-stripes" aria-hidden="true">
-        <i />
-        <i />
-        <i />
-        <i />
-      </span>
-      <div className="card-back-mark" aria-hidden="true">
+    <span className={styles.backFrame} aria-hidden="true">
+      <span className={styles.backMark}>
         uno<span>.</span>
-      </div>
-    </>
+      </span>
+    </span>
   ) : (
     <>
-      <span className="card-index top">
-        <CardSymbol value={card.value} corner />
+      <span className="card-index top" aria-hidden="true">
+        <CardSymbol value={card.value} color={card.color} corner />
       </span>
-      <span className="card-orbit" aria-hidden="true" />
-      <span
-        className={`card-value ${card.value.length > 1 ? "card-action-value" : ""}`}
-      >
-        <CardSymbol value={card.value} />
+      <span className="card-value" aria-hidden="true">
+        <CardSymbol value={card.value} color={card.color} />
       </span>
-      <span className="card-index bottom">
-        <CardSymbol value={card.value} corner />
+      <span className="card-index bottom" aria-hidden="true">
+        <CardSymbol value={card.value} color={card.color} corner />
       </span>
     </>
   );
@@ -117,7 +92,9 @@ export default function UnoCard({
     <button
       type="button"
       className={className}
-      data-wild-action={wildAction || undefined}
+      data-face={
+        faceDown ? "back" : /^[0-9]$/.test(card.value) ? "number" : "action"
+      }
       style={style}
       onClick={() => {
         if (!disabled) onClick();
@@ -132,18 +109,18 @@ export default function UnoCard({
           {cornerHint}
         </span>
       )}
-      <span className={styles.finish} aria-hidden="true" />
     </button>
   ) : (
     <div
       className={className}
-      data-wild-action={wildAction || undefined}
+      data-face={
+        faceDown ? "back" : /^[0-9]$/.test(card.value) ? "number" : "action"
+      }
       style={style}
       role="img"
       aria-label={label}
     >
       {content}
-      <span className={styles.finish} aria-hidden="true" />
     </div>
   );
 }

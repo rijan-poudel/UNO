@@ -1,127 +1,161 @@
-/* Laminate, printed ink and a thin physical edge. Geometry stays in table.css. */
+/* Swiss faces share existing hand geometry and interaction; Nordic changes ink only. */
 .face:global(.uno-card) {
-  --card-color: #df0735;
+  --card-ground: #0d0f17;
   --card-ink: #ffffff;
-  --card-value-ink: var(--card-color);
-  --card-elevation:
-    inset 0 1px 2px #ffffffb0, inset 0 -1px 1px #17234145, 0 1px 1px #c4ccdf,
-    0 3px 1px #68748e, 0 8px 12px #02071880;
-  border-color: #ffffff;
-  background:
-    linear-gradient(145deg, #ffffff12, transparent 45%, #00000012),
-    var(--card-color);
+  --card-elevation: inset 0 1px 1px #ffffff14, 0 4px 14px #00000059;
+  --wild-red: #f43f5e;
+  --wild-blue: #24a9f0;
+  --wild-yellow: #fbbf24;
+  --wild-green: #20c88a;
+  --print-paper: #fffaf0;
+  background: var(--card-ground);
+  color: var(--card-ink);
+  border: 1px solid #ffffff24;
+  border-radius: calc(9px * var(--card-scale, 1));
   box-shadow: var(--card-elevation);
   backface-visibility: hidden;
-  transform: none;
+  font-family: var(--font-card), sans-serif;
+  font-style: normal;
 }
 .face:global(.card-red) {
-  --card-color: #df0735;
-  --card-glow: #df073566;
+  --card-ground: #df254b;
+  --card-glow: #df254b66;
 }
 .face:global(.card-blue) {
-  --card-color: #075bee;
-  --card-glow: #075bee66;
+  --card-ground: #007bb5;
+  --card-glow: #007bb566;
 }
 .face:global(.card-green) {
-  --card-color: #00bc68;
-  --card-ink: #00321e;
-  --card-value-ink: #00894a;
-  --card-glow: #00bc6866;
+  --card-ground: #008458;
+  --card-glow: #00845866;
 }
 .face:global(.card-yellow) {
-  --card-color: #ffce00;
-  --card-ink: #482f00;
-  --card-value-ink: #805100;
-  --card-glow: #ffce0066;
+  --card-ground: #f59e0b;
+  --card-ink: #1a1400;
+  --card-glow: #f59e0b66;
 }
 .face:global(.card-wild),
 .face:global(.card-back) {
-  --card-color: #101d3a;
-  --card-glow: #ffd0004d;
+  --card-ground: #0d0f17;
+  --card-glow: #ffffff40;
 }
-.face :global(.card-orbit) {
-  background: #ffffff;
-  box-shadow: 0 1px 3px #06123024;
+:global([data-card-style="nordic"]) .face:global(.uno-card) {
+  --card-ground: #0e1017;
+  border-color: color-mix(in srgb, var(--card-ink) 45%, transparent);
+  --card-elevation:
+    inset 0 0 28px color-mix(in srgb, var(--card-ink) 12%, transparent),
+    0 6px 18px #00000070;
 }
-.face[data-wild-action] {
-  --card-value-ink: #ffffff;
+:global([data-card-style="nordic"]) .face:global(.card-red) {
+  --card-ink: #f43f5e;
 }
-.face[data-wild-action] :global(.card-orbit) {
-  background: conic-gradient(
-    #df0735 0 25%,
-    #075bee 25% 50%,
-    #00bc68 50% 75%,
-    #ffce00 75% 100%
-  );
+:global([data-card-style="nordic"]) .face:global(.card-blue) {
+  --card-ink: #24a9f0;
 }
-.face[data-wild-action] :global(.card-value) > svg {
-  filter: drop-shadow(1px 1px 0 #101d3a) drop-shadow(-1px -1px 0 #101d3a);
+:global([data-card-style="nordic"]) .face:global(.card-green) {
+  --card-ink: #20c88a;
+}
+:global([data-card-style="nordic"]) .face:global(.card-yellow) {
+  --card-ink: #fbbf24;
+}
+:global([data-card-style="nordic"]) .face:global(.card-wild),
+:global([data-card-style="nordic"]) .face:global(.card-back) {
+  --card-ink: #ffffff;
 }
 .face:global(.uno-card) :global(.card-value) {
-  color: var(--card-value-ink);
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  color: inherit;
+  transform: none;
+  font-family: inherit;
+  font-size: calc(53.3px * var(--card-scale, 1));
+  font-weight: 700;
+  font-style: normal;
+  line-height: 1;
+  letter-spacing: -0.035em;
+}
+.face[data-face="action"] :global(.card-value) {
+  inset: auto;
+  left: 50%;
+  top: 50%;
+  width: 74%;
+  height: auto;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+}
+.face:global(.uno-card) :global(.card-value) > svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
 }
 .face :global(.card-index) {
-  color: var(--card-ink);
+  min-width: 0;
+  height: auto;
+  display: flex;
+  color: inherit;
+  font:
+    700 calc(14.8px * var(--card-scale, 1)) / 1 var(--font-card),
+    sans-serif;
+  letter-spacing: -0.035em;
 }
-.face:global(.card-back)::before {
-  background: #df0735;
-  box-shadow: 0 2px 6px #02071845;
+.face :global(.card-index.top) {
+  top: 8%;
+  left: 8%;
 }
-.face :global(.card-back-mark) {
-  color: #ffffff;
-  text-shadow: 0 2px 2px #800622;
+.face :global(.card-index.bottom) {
+  bottom: 8%;
+  right: 8%;
 }
-.face :global(.wild-symbol) {
-  box-shadow: 0 2px 3px #06123030;
+.face :global(.card-index) > svg {
+  width: calc(18.9px * var(--card-scale, 1));
+  height: calc(18.9px * var(--card-scale, 1));
 }
-.face :global(.wild-symbol) i:nth-child(1) {
-  background: #df0735;
+.face svg text {
+  font-family: var(--font-card), sans-serif;
+  font-weight: 700;
+  text-anchor: middle;
+  dominant-baseline: alphabetic;
+  letter-spacing: -0.035em;
+  stroke: none;
 }
-.face :global(.wild-symbol) i:nth-child(2) {
-  background: #075bee;
+.underlined {
+  text-decoration: underline;
+  text-decoration-thickness: 0.045em;
+  text-underline-offset: 0.07em;
 }
-.face :global(.wild-symbol) i:nth-child(3) {
-  background: #ffce00;
+.penaltyIndex {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(2px * var(--card-scale, 1));
+  font-size: calc(16px * var(--card-scale, 1));
+  font-variant-numeric: lining-nums tabular-nums;
 }
-.face :global(.wild-symbol) i:nth-child(4) {
-  background: #00bc68;
+.penaltyIndex svg {
+  width: calc(13px * var(--card-scale, 1));
+  height: calc(18.9px * var(--card-scale, 1));
 }
-.finish {
+.backFrame {
   position: absolute;
-  inset: 18% 0;
-  z-index: 4;
+  inset: 9%;
+  border: 1px solid #ffffff40;
   border-radius: inherit;
-  pointer-events: none;
-  background: linear-gradient(
-    115deg,
-    transparent 32%,
-    #ffffff35 50%,
-    transparent 68%
-  );
-  transform: translateX(-35%);
-  opacity: 0;
-  transition:
-    transform 180ms cubic-bezier(0.16, 1, 0.3, 1),
-    opacity 130ms;
+  display: grid;
+  place-items: center;
 }
-@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
-  .face:hover .finish {
-    transform: translateX(18%);
-    opacity: 1;
-  }
-  .face:active .finish {
-    opacity: 0;
-    transition: none;
-  }
+.backMark {
+  display: block;
+  color: #ffffff;
+  font:
+    700 calc(27px * var(--card-scale, 1)) / 1 var(--font-card),
+    sans-serif;
+  letter-spacing: -0.04em;
+  transform: rotate(-25deg);
 }
-@media (prefers-reduced-motion: reduce) {
-  .face:global(.uno-card),
-  .finish {
-    transition: none;
-  }
+.backMark > span {
+  color: #f43f5e;
 }
-
-/* A quiet action cue belongs to the held face; it never replaces the number. */
+/* Existing hand hints remain separate from the printed corner index. */
 .playHint {
   position: absolute;
   z-index: 4;
@@ -133,36 +167,8 @@
   color: #17345f;
   box-shadow: 0 2px 5px #061e4c40;
   font:
-    750 clamp(10px, calc(11px * var(--card-scale)), 18px)/1 "Outfit",
+    750 clamp(10px, calc(11px * var(--card-scale)), 18px)/1 var(--font-body),
     sans-serif;
   pointer-events: none;
   white-space: nowrap;
-}
-
-/* Identical printed silhouettes in the hand, piles and miniature corners. */
-.cornerRev4 {
-  display: inline-flex;
-  align-items: center;
-  gap: 1px;
-}
-.cornerRev4 svg {
-  width: calc(13px * var(--card-scale, 1)) !important;
-  height: calc(13px * var(--card-scale, 1)) !important;
-}
-.cornerRev4 span {
-  font-family: "Barlow Condensed", sans-serif;
-  font-size: calc(17px * var(--card-scale, 1));
-  font-weight: 800;
-  font-style: italic;
-  line-height: 1;
-}
-
-.face:global(.uno-card) :global(.card-value) > :global(.uno-action-symbol) {
-  width: 78%;
-  height: 88%;
-  overflow: visible;
-}
-.face:global(.uno-card) :global(.card-index) > :global(.uno-action-symbol) {
-  width: calc(18px * var(--card-scale, 1));
-  height: calc(20px * var(--card-scale, 1));
 }

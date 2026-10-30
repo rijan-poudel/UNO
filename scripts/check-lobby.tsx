@@ -340,8 +340,22 @@ const overview = renderToStaticMarkup(
 assert.match(overview, /aria-label="Settings sections"/);
 assert.doesNotMatch(
   overview,
-  /avatar-options|role="switch"|Appearance|Saved on this device/,
+  /avatar-options|role="switch"|<select|Saved on this device/,
 );
+assert.match(overview, /Appearance/);
+const appearance = renderToStaticMarkup(
+  <SettingsModal {...settingsProps} initialTab="appearance" />,
+);
+assert.match(appearance, /aria-label="Card style"/);
+assert.match(appearance, /value="swiss" selected=""/);
+assert.match(appearance, /Swiss Minimal/);
+assert.match(appearance, /Nordic Frost/);
+assert.equal(
+  (appearance.match(/<option /g) ?? []).length,
+  2,
+  'Only the two approved card styles are offered',
+);
+assert.doesNotMatch(appearance, /Table finish|Prism|Casino|Ring|Movement/);
 const extendedPortrait = renderToStaticMarkup(
   <PlayerAvatar seed="portrait-check" avatarId="portrait-11" />,
 );

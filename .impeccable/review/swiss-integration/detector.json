@@ -1,0 +1,13 @@
+[
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "/Users/rizx/projects/UNO/components/UnoCard.module.css",
+    "line": 156,
+    "snippet": "Undocumented color #f43f5e is outside DESIGN.md colors",
+    "ignoreValue": "#f43f5e"
+  }
+]

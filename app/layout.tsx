@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Outfit, Barlow_Condensed } from "next/font/google";
+import { Outfit, Space_Grotesk } from "next/font/google";
 import { Toaster } from "sonner";
 import "./globals.css";
 import "./table.css";
@@ -13,11 +13,10 @@ const bodyFont = Outfit({
   subsets: ["latin"],
   display: "swap",
 });
-const cardFont = Barlow_Condensed({
+const cardFont = Space_Grotesk({
   variable: "--font-card",
   subsets: ["latin"],
-  weight: ["700", "800"],
-  style: ["normal", "italic"],
+  weight: ["700"],
   display: "swap",
 });
 
@@ -41,7 +40,7 @@ export default function RootLayout({
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('uno.preferred.theme');if(['paper','midnight','forest','sunset'].includes(t))document.documentElement.dataset.theme=t}catch(e){}})();`,
+            __html: `(function(){try{var t=localStorage.getItem('uno.preferred.theme');if(['paper','midnight','forest','sunset'].includes(t))document.documentElement.dataset.theme=t}catch(e){}try{document.documentElement.dataset.cardStyle=localStorage.getItem('uno.settings.cardStyle')==='nordic'?'nordic':'swiss'}catch(e){document.documentElement.dataset.cardStyle='swiss'}})();`,
           }}
         />
       </head>

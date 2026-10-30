@@ -17,6 +17,7 @@ import {
   Bot,
   ChevronDown,
   ChevronRight,
+  Palette,
 } from "lucide-react";
 import {
   getPlayerName,
@@ -37,6 +38,11 @@ import {
   primeTableAudioFromUserGesture,
   playTableChime,
 } from "../lib/tableChimes";
+import {
+  getCardStyleSetting,
+  setCardStyleSetting,
+  subscribeDisplaySettings,
+} from "../lib/displaySettings";
 import Modal from "./Modal";
 import SettingSelect from "./ui/SettingSelect";
 import RuleProfileManager from "./RuleProfileManager";
@@ -48,7 +54,7 @@ const HowToPlayModal = dynamic(() => import("./HowToPlayModal"), {
   loading: () => null,
 });
 export type SettingsSection =
-  "overview" | "profile" | "friends" | "controls" | "audio";
+  "overview" | "profile" | "friends" | "controls" | "appearance" | "audio";
 const SECTIONS = [
   {
     id: "profile",
@@ -67,6 +73,12 @@ const SECTIONS = [
     label: "Game rules",
     description: "Modes & house rules",
     Icon: SlidersHorizontal,
+  },
+  {
+    id: "appearance",
+    label: "Appearance",
+    description: "Card style",
+    Icon: Palette,
   },
   {
     id: "audio",
@@ -238,6 +250,11 @@ export default function SettingsModal({
   const [help, setHelp] = useState(false);
   const [audio, setAudio] = useState(getAudioSettings);
   const [music, setMusic] = useState(getMusicContextSettings);
+  const cardStyle = useSyncExternalStore(
+    subscribeDisplaySettings,
+    getCardStyleSetting,
+    () => "swiss",
+  );
   const savedName = useSyncExternalStore(
     subscribePlayerName,
     getPlayerName,
@@ -528,6 +545,25 @@ export default function SettingsModal({
               </button>
             </div>
           </>
+        )}
+        {tab === "appearance" && (
+          <label className="preference-row">
+            <span>
+              <strong>Card style</strong>
+            </span>
+            <SettingSelect
+              aria-label="Card style"
+              value={cardStyle}
+              onChange={(e) =>
+                setCardStyleSetting(
+                  e.target.value === "nordic" ? "nordic" : "swiss",
+                )
+              }
+            >
+              <option value="swiss">Swiss Minimal</option>
+              <option value="nordic">Nordic Frost</option>
+            </SettingSelect>
+          </label>
         )}
         {tab === "audio" && (
           <>

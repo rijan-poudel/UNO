@@ -1,3 +1,4 @@
+import './check-card-faces';
 import './check-avatar';
 import './check-hand-layout';
 import './check-card-plays';
