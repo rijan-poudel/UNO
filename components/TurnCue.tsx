@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import type { GameState } from "../types/game";
 import { HUMAN_TURN_MS, hasForcedPenalty } from "../lib/turnFlow";
 import { getStackResponseLabel } from "../lib/gameRules";
+import GameFeedback from "./GameFeedback";
 const VALUE_LABELS: Record<string, string> = {
   draw2: "+2",
   draw4: "+4",
@@ -74,11 +75,29 @@ export default function TurnCue({
               : game.rules.gameMode === "all_wild"
                 ? "Play any one card"
                 : `Match ${game.activeColor}${top?.color !== "wild" && value ? ` or ${value}` : ""}`;
+  const shortHint = !connected
+    ? "Reconnecting…"
+    : choosing
+      ? "Choose a color"
+      : forced && local
+        ? "Taking the penalty"
+        : local && game.drawnThisTurn
+          ? playableCount === 0
+            ? "Passing…"
+            : game.rules.gameMode === "no_mercy"
+              ? "Play your drawn card"
+              : "Play or pass"
+          : local && playableCount === 0
+            ? "Tap the deck to draw"
+            : "Play a card";
   return (
     <div
-      className={`turn-cue ${local ? "turn-cue-local" : ""} ${seconds !== null && seconds <= 5 ? "turn-urgent" : ""}`}
+      className={`turn-cue ${local && connected ? "turn-cue-local" : ""} ${local && connected && seconds !== null && seconds <= 5 ? "turn-urgent" : ""}`}
     >
-      <div className="turn-message">
+      <div
+        key={`${game.currentPlayerIndex}:${game.turnCount}`}
+        className="turn-message"
+      >
         {seconds !== null && connected ? (
           <span
             className="turn-countdown"
@@ -106,23 +125,28 @@ export default function TurnCue({
           </span>
         )}
         <span>
-          <strong title={hint}>
-            {targetAction ??
-              (stack
-                ? `Stack ${stack}`
-                : local
-                  ? "Your turn"
-                  : `${player.name}’s turn`)}
+          <strong title={hint} role="status" aria-atomic="true">
+            {!connected
+              ? "Reconnecting…"
+              : (targetAction ??
+                (stack
+                  ? `Stack ${stack}`
+                  : local
+                    ? "Your turn"
+                    : `${player.name}’s turn`))}
           </strong>
-          <small className={targetAction || stack ? undefined : "sr-only"}>
+          <small className={local || !connected ? undefined : "sr-only"}>
             {targetAction
               ? "Choose a player"
               : stack
                 ? `or draw ${game.pendingDraw} total`
-                : hint}
+                : local || !connected
+                  ? shortHint
+                  : hint}
           </small>
         </span>
       </div>
+      <GameFeedback game={game} />
     </div>
   );
 }

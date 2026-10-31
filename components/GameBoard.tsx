@@ -57,7 +57,8 @@ import RematchStatus from "./RematchStatus";
 import RoundSummary from "./RoundSummary";
 import TableScoreCard from "./TableScoreCard";
 import OpponentSeat from "./OpponentSeat";
-import GameFeedback, { VictoryBurst } from "./GameFeedback";
+import { VictoryBurst } from "./GameFeedback";
+import TableDirection from "./TableDirection";
 import UnoCard from "./UnoCard";
 import HandCard from "./HandCard";
 import {
@@ -634,7 +635,6 @@ export default function GameBoard({
                   : ""}
             </span>
           </div>
-          <GameFeedback game={game} />
           {opponents.map(({ player, index }, i) => (
             <OpponentSeat
               key={player.id}
@@ -680,25 +680,7 @@ export default function GameBoard({
             />
           ))}
           <div className="table-center">
-            {(["far", "near"] as const).map((half) => (
-              <div
-                key={half}
-                className={`direction-orbit direction-orbit-${half} ${game.direction === -1 ? "direction-reversed" : ""}`}
-                aria-hidden="true"
-              >
-                <span className="direction-orbit-track" />
-                <span className="direction-orbit-ring">
-                  <i />
-                  <i />
-                  <i />
-                  <i />
-                  <i />
-                  <i />
-                  <i />
-                  <i />
-                </span>
-              </div>
-            ))}
+            <TableDirection direction={game.direction} />
             <div className="pile-zone">
               <button
                 data-draw-pile

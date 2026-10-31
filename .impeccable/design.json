@@ -1050,11 +1050,6 @@
         "purpose": "Bounded actual expression response; no animation in reduced motion."
       },
       {
-        "name": "impact",
-        "value": "1100ms",
-        "purpose": "Published move impact; reduced motion uses opacity only."
-      },
-      {
         "name": "dialog-enter",
         "value": "180ms",
         "purpose": "Dialog fade/8px lift/0.98 scale; none in reduced motion."
@@ -1073,6 +1068,21 @@
         "name": "invitation-reveal",
         "value": "180ms cubic-bezier(0.16, 1, 0.3, 1)",
         "purpose": "Incoming room invitation reveal; OS or saved reduced motion suppresses travel."
+      },
+      {
+        "name": "card-flight",
+        "value": "360–450ms",
+        "purpose": "Readable play/draw arcs; exact pickup and contact remain authoritative; no turn gating."
+      },
+      {
+        "name": "table-direction",
+        "value": "16000ms linear infinite",
+        "purpose": "Two curved ribbons on a 58-degree plane under the piles; reverse playback preserves phase; hidden/reduced-motion pauses."
+      },
+      {
+        "name": "bot-step",
+        "value": "1700ms",
+        "purpose": "Shared local/server read window between published bot snapshots; forced human draw uses 1400ms."
       }
     ],
     "breakpoints": [
@@ -1367,6 +1377,12 @@
       "controls": "Only Swiss Minimal and Nordic Frost card styles are exposed. No prototype table/finish/ring/movement controls were integrated; game travel, motion, table, room and audio remain production systems.",
       "evidence": ".impeccable/review/swiss-integration/: swiss-desktop.png, nordic-desktop.png, swiss-mobile.png (844×390 landscape), settings.png. Existing portrait pause policy remains. This record makes no new independent-review claim.",
       "appearanceLayout": "Card style select is 180px wide with max-width:100%; its preference row wraps. This scoped exception to the shared 132px select column keeps both approved names readable in narrow dialogs."
+    },
+    "turnReadability": {
+      "focus": "2px cream keyboard outline; held cards inset 4px; target identities use a quiet charcoal surface, contained 1px muted edge and cream names. Amber emphasis stays on the central decision cue.",
+      "cue": "Preserve the amber current-turn/target pill; explicit short legal next step and persistent action receipt beneath it.",
+      "receipt": "Reuse describeGameAction and existing accessible activity; no large symbol flash or overlay over opponent cards.",
+      "direction": "Two tapered curved ribbons with stock-like edge and contact shadow, true pile occlusion, no circular track."
     }
   },
   "components": [

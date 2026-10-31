@@ -137,8 +137,8 @@
   color: #5a410f;
 }
 :global(.game-main) .seat .label:focus-visible {
-  outline: 2px solid #ffd45a;
-  outline-offset: 3px;
+  outline: 2px solid #fff7e7;
+  outline-offset: 2px;
 }
 :global(.game-main) .seat .label:global(.catch-seat):active {
   transform: scale(0.96);

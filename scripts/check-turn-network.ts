@@ -5,7 +5,11 @@ import { io, type Socket } from 'socket.io-client';
 import type { Ack, RoomSnapshot } from '../types/multiplayer';
 import { toPresentationGame } from '../lib/gameView';
 import { getBotMove } from '../lib/botSupport';
-import { AUTO_PLAY_TURN_MS, HUMAN_TURN_MS } from '../lib/turnFlow';
+import {
+  AUTO_PLAY_TURN_MS,
+  FORCED_DRAW_DELAY_MS,
+  HUMAN_TURN_MS,
+} from '../lib/turnFlow';
 const url = process.env.UNO_CHECK_SOCKET_URL ?? 'http://localhost:3001';
 const sockets: Socket[] = [];
 async function connect() {
@@ -112,7 +116,9 @@ async function main() {
       else await request(penaltyHost, 'room:leave', { roomId: penaltyRoomId });
     }
     assert.ok(penaltyGame, 'Exercise a real draw-two opener');
-    await new Promise((resolve) => setTimeout(resolve, 1250));
+    await new Promise((resolve) =>
+      setTimeout(resolve, FORCED_DRAW_DELAY_MS + 250),
+    );
     const paid = penaltyUpdates.find(
       (room) =>
         room.game?.lastAction.type === 'draw' &&

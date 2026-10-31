@@ -1,5 +1,9 @@
 # Product
 
+## October 31 — Quiet focus and readable turns
+
+The owner rejects large yellow focus rings that crowd opponents and wants the existing central yellow turn/target prompt preserved. Use thin cream keyboard focus, a contained target-selection accent, a readable current-turn cue and a persistent last-action receipt instead of large covering flashes. Slow bot and card movement enough to follow without blocking manual actions. Replace the complete circle and floating arrowheads with restrained curved ribbons on a tilted plane beneath the piles; depth and real card occlusion should explain direction. Preserve Swiss Minimal faces and responsive hand geometry.
+
 ## October 31 — Audible bot UNO and genuine call-outs
 
 The owner confirms that bots should sometimes forget UNO depending on difficulty, giving players a real opportunity to call them out. Successful bot declarations must be published and audible. Spoken UNO is a basic game sound respecting master mute, card sounds and effects volume, independently of the optional Voice announcer. Keep turn timing independent of audio. Out-of-turn call-outs must work for eligible seated players; caught players receive the configured penalty without restarting another player's clock.

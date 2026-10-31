@@ -735,7 +735,7 @@ assert.equal(
   flight.keyframes.at(-1)?.transform,
   'translate(0px, 0px) rotate(7deg) scale(1)',
 );
-assert.ok(flight.duration >= 240 && flight.duration <= 300);
+assert.ok(flight.duration >= 360 && flight.duration <= 450);
 const middle = flight.keyframes[2];
 assert.ok(middle.transform.startsWith('translate(-50px, 176px)'));
 assert.equal(middle.offset, 0.5);
@@ -744,14 +744,14 @@ assert.equal(
     { x: 0, y: 0, width: 80, angle: 0 },
     { x: 0, y: 0, width: 80, angle: 0 },
   ).duration,
-  240,
+  360,
 );
 assert.equal(
   getCardFlight(
     { x: 10000, y: 10000, width: 80, angle: 0 },
     { x: 0, y: 0, width: 80, angle: 0 },
   ).duration,
-  300,
+  450,
 );
 for (const kind of ['deal', 'draw', 'return'] as const) {
   const motion = getCardFlight(
@@ -764,7 +764,9 @@ for (const kind of ['deal', 'draw', 'return'] as const) {
     motion.keyframes.at(-1)?.transform,
     flight.keyframes.at(-1)?.transform,
   );
-  assert.ok(motion.duration <= (kind === 'deal' ? 360 : 300));
+  assert.ok(
+    motion.duration <= (kind === 'deal' ? 390 : kind === 'return' ? 270 : 450),
+  );
 }
 assert.equal(getDealDelay(0), 0);
 assert.ok(getDealDelay(1) > getDealDelay(0, 5));

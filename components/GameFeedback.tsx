@@ -1,112 +1,14 @@
-// Brief action signals complement the cards without blocking the next move.
+// A persistent action receipt lets players follow play without a covering flash.
 "use client";
-import { RotateCw } from "lucide-react";
-import { UnoActionSymbol } from "./icons/UnoActionSymbol";
-import { NoMercyIcon } from "./icons/NoMercyIcons";
+import { describeGameAction } from "../lib/gameActivity";
 import type { GameState } from "../types/game";
+
 export default function GameFeedback({ game }: { game: GameState }) {
-  const action = game.lastAction;
-  const value =
-    action.type === "play"
-      ? action.declaredUno
-        ? "uno"
-        : game.rules.sevenZero && action.card.value === "7"
-          ? "swap"
-          : game.rules.sevenZero && action.card.value === "0"
-            ? "passAll"
-            : action.card.value
-      : action.type === "declareUno"
-        ? "uno"
-        : action.type === "callOut"
-          ? "caught"
-          : action.type === "draw" && action.count > 1
-            ? "penalty"
-            : action.type === "mercyElimination"
-              ? "mercyElimination"
-              : null;
-  const visual =
-    value === "reverse" ? (
-      <UnoActionSymbol value="reverse" />
-    ) : value === "skip" ? (
-      <UnoActionSymbol value="skip" />
-    ) : value === "skipEveryone" ? (
-      <UnoActionSymbol value="skipEveryone" />
-    ) : value === "wildSkip2" ? (
-      <UnoActionSymbol value="wildSkip2" />
-    ) : value === "wildReverseDraw4" ? (
-      <UnoActionSymbol value="wildReverseDraw4" />
-    ) : value === "wildTargetDraw2" ? (
-      <UnoActionSymbol value="wildTargetDraw2" />
-    ) : value === "wildForcedSwap" || value === "swap" ? (
-      <span className="feedback-swap">
-        <UnoActionSymbol value="wildForcedSwap" />
-        <small>SWAP</small>
-      </span>
-    ) : value === "passAll" ? (
-      <span className="feedback-pass-all">
-        <RotateCw />
-        <small>PASS ALL</small>
-      </span>
-    ) : value === "wildColorRoulette" ? (
-      <UnoActionSymbol value="wildColorRoulette" size={52} />
-    ) : value === "shuffle" ? (
-      <UnoActionSymbol value="shuffle" />
-    ) : value === "draw2" ? (
-      `+${game.pendingDraw || 2}`
-    ) : value === "draw4" ? (
-      `+${game.pendingDraw || 4}`
-    ) : value === "wildDraw6" ? (
-      `+${game.pendingDraw || 6}`
-    ) : value === "wildDraw10" ? (
-      `+${game.pendingDraw || 10}`
-    ) : value === "wild4" ? (
-      `+${game.pendingDraw || 4}`
-    ) : value === "mercyElimination" ? (
-      <span className="feedback-mercy-elimination">
-        <NoMercyIcon size={44} />
-        <small>KNOCKOUT</small>
-      </span>
-    ) : value === "uno" ? (
-      "UNO!"
-    ) : value === "penalty" && action.type === "draw" ? (
-      `+${action.count}`
-    ) : value === "caught" ? (
-      action.type === "callOut" ? (
-        `+${action.penalty}`
-      ) : null
-    ) : value === "discardAll" ? (
-      action.type === "play" ? (
-        `−${1 + (action.discardAllCount ?? 0)}`
-      ) : (
-        "ALL!"
-      )
-    ) : value === "wild" ? (
-      <span className="wild-burst">
-        <i />
-        <i />
-        <i />
-        <i />
-      </span>
-    ) : null;
-  if (!visual) return null;
+  if (game.lastAction.type === "init") return null;
+  const description = describeGameAction(game);
   return (
-    <div
-      key={`${game.turnCount}:${JSON.stringify(action)}`}
-      className={`game-feedback feedback-${value}`}
-      aria-hidden="true"
-    >
-      <span>{visual}</span>
-      {(game.pendingDraw > 0 ||
-        value === "penalty" ||
-        action.type === "mercyElimination") && (
-        <small>
-          {action.type === "mercyElimination"
-            ? `${game.players.find((player) => player.id === action.playerId)?.name ?? "Player"} knocked out`
-            : value === "penalty" && action.type === "draw"
-              ? `${game.players.find((player) => player.id === action.playerId)?.name} takes the cards`
-              : `${game.players[game.currentPlayerIndex].name} is up next`}
-        </small>
-      )}
+    <div className="game-feedback" aria-hidden="true" title={description}>
+      <span>{description}</span>
     </div>
   );
 }

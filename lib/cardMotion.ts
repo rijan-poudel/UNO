@@ -41,7 +41,7 @@ export function getCardFlight(
   const angle = ((to.angle - from.angle + 540) % 360) - 180;
   return {
     duration: Math.round(
-      (kind === 'return' ? 180 : kind === 'deal' ? 300 : 240) + distance * 0.1,
+      (kind === 'return' ? 180 : kind === 'deal' ? 300 : 360) + distance * 0.15,
     ),
     keyframes: [0, 0.25, 0.5, 0.75, 1].map((progress) => {
       const arc = 4 * progress * (1 - progress);

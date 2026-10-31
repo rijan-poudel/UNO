@@ -5,8 +5,8 @@ import { getPlayableCards } from './gameRules';
 
 export const HUMAN_TURN_MS = 30_000;
 export const AUTO_PLAY_TURN_MS = 10_000;
-export const BOT_TURN_MS = 1150;
-export const FORCED_DRAW_DELAY_MS = 1000;
+export const BOT_TURN_MS = 1700;
+export const FORCED_DRAW_DELAY_MS = 1400;
 
 export function hasForcedPenalty(game: GameState): boolean {
   return (
