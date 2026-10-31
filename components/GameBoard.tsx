@@ -859,15 +859,22 @@ export default function GameBoard({
               )}
             {targetCard && (
               <div
-                className="move-buttons"
+                className="move-buttons target-actions"
                 role="group"
                 aria-label="Choose a player"
               >
                 <button
-                  className="button secondary target-cancel"
+                  type="button"
+                  className="target-cancel"
+                  aria-label={
+                    targetCard.value === "wildTargetDraw2"
+                      ? "Cancel targeted draw"
+                      : "Cancel swap"
+                  }
                   onClick={() => setTargetChoice(null)}
                 >
-                  <X size={16} /> Cancel
+                  <span>Cancel</span>
+                  <X size={14} aria-hidden="true" />
                 </button>
               </div>
             )}

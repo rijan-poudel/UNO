@@ -560,6 +560,105 @@
         ],
         "createdAt": "2026-10-29T02:01:24.195Z",
         "reason": "Maintainer review: preserve the existing Classic help miniature-table palette and compact card/status geometry recorded in DESIGN.md. These scoped values predate this cleanup; actual contrast and motion defects are fixed separately. This is not a new app-wide token or visual direction."
+      },
+      {
+        "rule": "design-system-color",
+        "value": "rgba(14, 25, 46, 0.92)",
+        "files": [
+          "app/arena.css"
+        ],
+        "createdAt": "2026-10-31T03:06:21.704Z",
+        "reason": "Maintainer review: existing arena drop-readiness yellow, opaque chosen-color badge and No Mercy danger/knockout signals predate this Cancel-only refinement. Preserve the established game-state cues and compact knockout label documented in DESIGN.md; Cancel itself uses existing surface tokens."
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#ffd000",
+        "files": [
+          "app/arena.css"
+        ],
+        "createdAt": "2026-10-31T03:06:21.736Z",
+        "reason": "Maintainer review: existing arena drop-readiness yellow, opaque chosen-color badge and No Mercy danger/knockout signals predate this Cancel-only refinement. Preserve the established game-state cues and compact knockout label documented in DESIGN.md; Cancel itself uses existing surface tokens."
+      },
+      {
+        "rule": "design-system-color",
+        "value": "rgba(255, 208, 0, 0.25)",
+        "files": [
+          "app/arena.css"
+        ],
+        "createdAt": "2026-10-31T03:06:21.774Z",
+        "reason": "Maintainer review: existing arena drop-readiness yellow, opaque chosen-color badge and No Mercy danger/knockout signals predate this Cancel-only refinement. Preserve the established game-state cues and compact knockout label documented in DESIGN.md; Cancel itself uses existing surface tokens."
+      },
+      {
+        "rule": "design-system-color",
+        "value": "rgba(255, 208, 0, 0.5)",
+        "files": [
+          "app/arena.css"
+        ],
+        "createdAt": "2026-10-31T03:06:21.818Z",
+        "reason": "Maintainer review: existing arena drop-readiness yellow, opaque chosen-color badge and No Mercy danger/knockout signals predate this Cancel-only refinement. Preserve the established game-state cues and compact knockout label documented in DESIGN.md; Cancel itself uses existing surface tokens."
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#ffe066",
+        "files": [
+          "app/arena.css"
+        ],
+        "createdAt": "2026-10-31T03:06:21.852Z",
+        "reason": "Maintainer review: existing arena drop-readiness yellow, opaque chosen-color badge and No Mercy danger/knockout signals predate this Cancel-only refinement. Preserve the established game-state cues and compact knockout label documented in DESIGN.md; Cancel itself uses existing surface tokens."
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#ffc700",
+        "files": [
+          "app/arena.css"
+        ],
+        "createdAt": "2026-10-31T03:06:21.889Z",
+        "reason": "Maintainer review: existing arena drop-readiness yellow, opaque chosen-color badge and No Mercy danger/knockout signals predate this Cancel-only refinement. Preserve the established game-state cues and compact knockout label documented in DESIGN.md; Cancel itself uses existing surface tokens."
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#ff536f",
+        "files": [
+          "app/arena.css"
+        ],
+        "createdAt": "2026-10-31T03:06:21.927Z",
+        "reason": "Maintainer review: existing arena drop-readiness yellow, opaque chosen-color badge and No Mercy danger/knockout signals predate this Cancel-only refinement. Preserve the established game-state cues and compact knockout label documented in DESIGN.md; Cancel itself uses existing surface tokens."
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#ff3355",
+        "files": [
+          "app/arena.css"
+        ],
+        "createdAt": "2026-10-31T03:06:21.961Z",
+        "reason": "Maintainer review: existing arena drop-readiness yellow, opaque chosen-color badge and No Mercy danger/knockout signals predate this Cancel-only refinement. Preserve the established game-state cues and compact knockout label documented in DESIGN.md; Cancel itself uses existing surface tokens."
+      },
+      {
+        "rule": "design-system-color",
+        "value": "#ffaa00",
+        "files": [
+          "app/arena.css"
+        ],
+        "createdAt": "2026-10-31T03:06:22.000Z",
+        "reason": "Maintainer review: existing arena drop-readiness yellow, opaque chosen-color badge and No Mercy danger/knockout signals predate this Cancel-only refinement. Preserve the established game-state cues and compact knockout label documented in DESIGN.md; Cancel itself uses existing surface tokens."
+      },
+      {
+        "rule": "design-system-color",
+        "value": "rgba(255, 51, 85, 0.45)",
+        "files": [
+          "app/arena.css"
+        ],
+        "createdAt": "2026-10-31T03:06:22.043Z",
+        "reason": "Maintainer review: existing arena drop-readiness yellow, opaque chosen-color badge and No Mercy danger/knockout signals predate this Cancel-only refinement. Preserve the established game-state cues and compact knockout label documented in DESIGN.md; Cancel itself uses existing surface tokens."
+      },
+      {
+        "rule": "design-system-font-size",
+        "value": "17px",
+        "files": [
+          "app/arena.css"
+        ],
+        "createdAt": "2026-10-31T03:06:22.078Z",
+        "reason": "Maintainer review: existing arena drop-readiness yellow, opaque chosen-color badge and No Mercy danger/knockout signals predate this Cancel-only refinement. Preserve the established game-state cues and compact knockout label documented in DESIGN.md; Cancel itself uses existing surface tokens."
       }
     ]
   }

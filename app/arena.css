@@ -2258,15 +2258,47 @@
   outline-color: #fff7e7;
   box-shadow: 0 0 0 6px #1254b5;
 }
+.game-main .target-actions {
+  grid-template-columns: max-content;
+}
 .game-main .target-cancel {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 10px 14px;
+  border: 1px solid var(--ui-line);
+  border-radius: 8px;
   color: #fff7e7;
-  background: #09285c;
-  border-color: #cfe0fa;
+  background: var(--ui-surface);
+  box-shadow: none;
+  font:
+    600 13px/1 var(--font-body),
+    sans-serif;
+  cursor: pointer;
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease;
+}
+.game-main .target-cancel svg {
+  flex-shrink: 0;
+}
+.game-main .target-cancel:focus-visible {
+  outline: 2px solid #fff7e7;
+  outline-offset: 3px;
 }
 @media (hover: hover) {
+  .game-main .target-cancel:hover {
+    background: var(--ui-line);
+    border-color: var(--club-paper);
+  }
   .game-main .opponent-label.target-seat:hover {
     background: #153765;
   }
+}
+.game-main .target-cancel:active {
+  background: var(--ui-bg);
 }
 .eliminated-seat .opponent-hand {
   visibility: hidden;
