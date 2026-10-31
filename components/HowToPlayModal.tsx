@@ -16,7 +16,6 @@ import {
   RotateCw,
   RotateCcw,
   Trophy,
-  RotateCcw as ResetIcon,
 } from "lucide-react";
 import Modal from "./Modal";
 import UnoCard from "./UnoCard";
@@ -777,7 +776,7 @@ function ClassicHowToPlayModal({
                       onClick={handleResetStep1}
                       autoFocus
                     >
-                      <ResetIcon size={12} />
+                      <RotateCcw size={12} />
                       Reset Hand
                     </button>
                   )}
@@ -985,7 +984,7 @@ function ClassicHowToPlayModal({
                     }}
                     autoFocus
                   >
-                    <ResetIcon size={12} />
+                    <RotateCcw size={12} />
                     Try again
                   </button>
                 )}

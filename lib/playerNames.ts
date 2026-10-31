@@ -34,6 +34,7 @@ export function savePlayerName(value: string): string {
   return name;
 }
 export function subscribePlayerName(onChange: () => void): () => void {
+  if (typeof window === 'undefined') return () => {};
   window.addEventListener(PLAYER_NAME_EVENT, onChange);
   const onStorage = (event: StorageEvent) => {
     if (event.key === PLAYER_NAME_KEY || event.key === null) {

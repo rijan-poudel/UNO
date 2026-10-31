@@ -309,6 +309,7 @@ export function playBotStep(game: GameState): GameState {
       seat !== index && player.hand.length === 1 && !player.saidUno,
   );
   const state = target < 0 ? game : callOutUno(game, index, target);
+  if (state.winnerId) return state;
   const move = getBotMove(state, index);
   let next: GameState;
   if (move.action === 'drawRequired') next = drawRequiredCards(state, index);

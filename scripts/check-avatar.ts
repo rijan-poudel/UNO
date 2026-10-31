@@ -8,7 +8,12 @@ import {
   type AvatarFeature,
   type AvatarColor,
 } from '../lib/avatarCustomization';
-import { getPlayerAvatar, isAvatarId } from '../lib/playerAvatars';
+import {
+  getPlayerAvatar,
+  isAvatarId,
+  savePlayerAvatar,
+  subscribePlayerAvatar,
+} from '../lib/playerAvatars';
 const id = customAvatarId(DEFAULT_CUSTOM_AVATAR);
 assert.deepEqual(parseCustomAvatar(id), DEFAULT_CUSTOM_AVATAR);
 assert.ok(isAvatarId(id));
@@ -56,6 +61,11 @@ for (const value of [
 }
 assert.ok(isAvatarId('portrait-11'));
 assert.ok(isAvatarId('initials'));
+assert.doesNotThrow(() => savePlayerAvatar('initials'));
+assert.doesNotThrow(() => {
+  const unsubscribe = subscribePlayerAvatar(() => {});
+  unsubscribe();
+});
 const originalStorage = Object.getOwnPropertyDescriptor(
   globalThis,
   'localStorage',

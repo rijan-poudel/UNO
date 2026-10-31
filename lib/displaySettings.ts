@@ -43,6 +43,7 @@ export function setReducedMotionSetting(value: boolean): void {
     window.dispatchEvent(new Event('uno:display-settings'));
 }
 export function subscribeDisplaySettings(listener: () => void): () => void {
+  if (typeof window === 'undefined') return () => {};
   const onStorage = (event: StorageEvent) => {
     if (
       event.key === REDUCED_MOTION_KEY ||

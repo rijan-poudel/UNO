@@ -45,9 +45,11 @@ export function savePlayerAvatar(avatarId: AvatarId): void {
   } catch {
     /* Play without persistence. */
   }
-  window.dispatchEvent(new Event(AVATAR_EVENT));
+  if (typeof window !== 'undefined')
+    window.dispatchEvent(new Event(AVATAR_EVENT));
 }
 export function subscribePlayerAvatar(onChange: () => void): () => void {
+  if (typeof window === 'undefined') return () => {};
   window.addEventListener(AVATAR_EVENT, onChange);
   const onStorage = (event: StorageEvent) => {
     if (event.key === AVATAR_KEY || event.key === null) {

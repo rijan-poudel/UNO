@@ -92,6 +92,7 @@ export function recordRound(game: GameState, playerId: string): void {
   }
 }
 export function subscribeProgress(listener: () => void): () => void {
+  if (typeof window === 'undefined') return () => {};
   window.addEventListener('uno:progress', listener);
   window.addEventListener('storage', listener);
   return () => {

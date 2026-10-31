@@ -130,6 +130,30 @@ for (let turn = 0; turn < 20; turn++) {
     'Human takeover keeps reliable declaration',
   );
 }
+// Bot call-out that causes a terminal elimination ends the round immediately.
+const terminalCalloutGame: GameState = {
+  ...base,
+  rules: {
+    ...base.rules,
+    mustDeclareUno: true,
+    eliminationHandLimit: 3,
+    missedUnoDrawPenalty: 2,
+  },
+  currentPlayerIndex: 0,
+  players: [
+    { ...base.players[0], hand: base.players[0].hand.slice(0, 2) },
+    {
+      ...base.players[1],
+      hand: base.players[1].hand.slice(0, 1),
+      saidUno: false,
+    },
+    { ...base.players[2], hand: [], eliminated: true },
+  ],
+};
+const terminalStep = playBotStep(terminalCalloutGame);
+assert.equal(terminalStep.winnerId, base.players[0].id);
+assert.equal(terminalStep.lastAction.type, 'callOut');
+
 console.log(
   `Bot UNO passed: published audible calls, catchable misses by difficulty (${JSON.stringify(misses)}), immutable decisions, penalties and safe human takeover.`,
 );

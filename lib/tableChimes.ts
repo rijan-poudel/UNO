@@ -37,11 +37,13 @@ export function getTableAudioStatus(): TableAudioStatus {
   return context?.state === 'running' ? 'ready' : 'locked';
 }
 export function subscribeTableAudio(listener: () => void): () => void {
+  if (typeof window === 'undefined') return () => {};
   window.addEventListener('uno:audio-status', listener);
   return () => window.removeEventListener('uno:audio-status', listener);
 }
 function notifyStatus(): void {
-  window.dispatchEvent(new Event('uno:audio-status'));
+  if (typeof window !== 'undefined')
+    window.dispatchEvent(new Event('uno:audio-status'));
 }
 function warmCard(ctx: AudioContext): void {
   if (loadingCard) return;
