@@ -1,5 +1,9 @@
 # Product
 
+## October 31 — Audible bot UNO and genuine call-outs
+
+The owner confirms that bots should sometimes forget UNO depending on difficulty, giving players a real opportunity to call them out. Successful bot declarations must be published and audible. Spoken UNO is a basic game sound respecting master mute, card sounds and effects volume, independently of the optional Voice announcer. Keep turn timing independent of audio. Out-of-turn call-outs must work for eligible seated players; caught players receive the configured penalty without restarting another player's clock.
+
 ## October 30 — Swiss cards in the production game
 
 The owner approves the refined Swiss Minimal card designs for real gameplay and makes Swiss the default. Offer exactly one optional alternative, Nordic Frost, through Settings → Appearance → Card style, saved on this device. This explicitly supersedes earlier Appearance restrictions and older card lettering, printed-border and generic action-backdrop instructions. Preserve the approved latest symbols, colored Roulette artwork and genuine Shuffle Hands illustration. Retire the standalone card lab and its ring, table-surface, finish and movement controls. Existing arena layout, direct tap/drag play, motion, audio and game rules remain in place. Clean up obsolete card code, run technical checks and commit and push; a manual multiplayer playthrough is not required.

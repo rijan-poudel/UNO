@@ -767,14 +767,19 @@ function handleGameAction(
     return;
   }
 
-  if (activeChoice && activeChoice.playerId !== actorPlayerId) {
+  if (
+    activeChoice &&
+    activeChoice.playerId !== actorPlayerId &&
+    action.type !== 'callOut'
+  ) {
     throw new Error('Waiting for active player to choose a color.');
   }
 
   if (
     activeChoice &&
     action.type !== 'play' &&
-    action.type !== 'cancelWildChoice'
+    action.type !== 'cancelWildChoice' &&
+    (action.type !== 'callOut' || activeChoice.playerId === actorPlayerId)
   ) {
     throw new Error('Choose a color for the selected wild card first.');
   }
@@ -888,7 +893,6 @@ function handleGameAction(
       break;
     }
     case 'callOut': {
-      requireTurn();
       const targetIndex = state.players.findIndex(
         (p) => p.id === action.targetPlayerId,
       );

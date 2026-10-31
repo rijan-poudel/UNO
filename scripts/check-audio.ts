@@ -2,6 +2,9 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { defaultAudioSettings, AUDIO_SETTINGS_KEY } from '../lib/audioSettings';
+import { audioUrlsForStem } from '../lib/audiosRegistry';
+import { initializeGame } from '../lib/gameSetup';
+import type { LastAction } from '../types/game';
 
 let now = 0;
 let muted = false;
@@ -12,6 +15,9 @@ let sources = 0;
 let audible = 0;
 let stopped = 0;
 let resume: (() => void) | undefined;
+const unoBuffer = { length: 22050 };
+let finishUnoDecode: ((buffer: typeof unoBuffer) => void) | undefined;
+const sampleStarts: { buffer: { length: number }; volume: number }[] = [];
 const windowEvents = new EventTarget();
 const documentEvents = new EventTarget();
 const param = () => ({
@@ -21,17 +27,24 @@ const param = () => ({
 });
 class Node extends EventTarget {
   buffer: { length: number } | null = null;
+  output: Node | null = null;
   gain = param();
   frequency = param();
   playbackRate = param();
   Q = param();
-  connect() {
-    return this;
+  connect(output: Node) {
+    this.output = output;
+    return output;
   }
   disconnect() {}
   start() {
     sources++;
     if (!this.buffer || this.buffer.length > 1) audible++;
+    if (this.buffer)
+      sampleStarts.push({
+        buffer: this.buffer,
+        volume: this.output?.gain.value ?? 0,
+      });
   }
   stop() {
     stopped++;
@@ -59,6 +72,11 @@ class Context extends EventTarget {
   }
   createBuffer(_channels: number, length: number) {
     return { length, getChannelData: () => new Float32Array(length) };
+  }
+  decodeAudioData() {
+    return new Promise<typeof unoBuffer>((resolve) => {
+      finishUnoDecode = resolve;
+    });
   }
   createBufferSource() {
     return new Node();
@@ -215,6 +233,82 @@ async function main() {
     beforeNotificationDraw + 1,
     'first draw survives cold-context gesture unlock',
   );
+  assert.equal(defaultAudioSettings.chimesEnabled, true);
+  assert.equal(defaultAudioSettings.voiceInGame, false);
+  const beforeMissingUno = audible;
+  playTableChime('uno');
+  assert.equal(
+    audible,
+    beforeMissingUno + 2,
+    'missing UNO clip immediately uses the existing two-tone fallback',
+  );
+  let unoFetches = 0;
+  const unoPath = audioUrlsForStem('uno')[0];
+  assert.ok(unoPath, 'UNO has a registered sound clip');
+  globalThis.fetch = async (input) => {
+    if (String(input) !== unoPath) throw new Error('Card sample stays offline');
+    unoFetches++;
+    return new Response(new ArrayBuffer(8));
+  };
+  primeTableAudioFromUserGesture();
+  await flush();
+  assert.ok(
+    finishUnoDecode,
+    'gesture warms and decodes the registered UNO clip',
+  );
+  const beforeLateUno = audible;
+  playTableChime('uno');
+  assert.equal(
+    audible,
+    beforeLateUno + 2,
+    'a clip still decoding falls back immediately',
+  );
+  finishUnoDecode(unoBuffer);
+  await flush();
+  assert.equal(
+    audible,
+    beforeLateUno + 2,
+    'late UNO decode never replays an action',
+  );
+  primeTableAudioFromUserGesture();
+  await flush();
+  assert.equal(unoFetches, 1, 'decoded UNO clip is cached across gestures');
+  const beforeReadyUno = audible;
+  playTableChime('uno');
+  assert.equal(
+    audible,
+    beforeReadyUno + 1,
+    'UNO plays one warmed sample with default narration off',
+  );
+  assert.equal(sampleStarts.at(-1)?.buffer, unoBuffer);
+  assert.equal(
+    sampleStarts.at(-1)?.volume,
+    volume,
+    'UNO follows sound-effect volume',
+  );
+  muted = true;
+  playTableChime('uno');
+  muted = false;
+  enabled = false;
+  playTableChime('uno');
+  enabled = true;
+  volume = 0;
+  playTableChime('uno');
+  volume = 0.65;
+  Object.defineProperty(document, 'hidden', {
+    value: true,
+    configurable: true,
+  });
+  playTableChime('uno');
+  Object.defineProperty(document, 'hidden', {
+    value: false,
+    configurable: true,
+  });
+  assert.equal(
+    audible,
+    beforeReadyUno + 1,
+    'mute, disabled effects, zero volume, and hidden tab block UNO',
+  );
   const stoppedBeforeMute = stopped;
   muted = true;
   windowEvents.dispatchEvent(new Event('uno:audio-settings'));
@@ -296,7 +390,7 @@ async function main() {
     },
   });
   Object.assign(window, { setTimeout, clearTimeout });
-  const { playVoiceStem, stopBoardVoiceover } =
+  const { playVoiceStem, stopBoardVoiceover, announceBoardFromTransition } =
     await import('../lib/voiceAnnouncer');
   const voiceOptions = {
     audience: { type: 'room' as const },
@@ -313,10 +407,61 @@ async function main() {
   setAudioSettings({ muted: true });
   playVoiceStem('reverse', voiceOptions);
   assert.equal(spoken, 1, 'Master mute blocks the announcer');
+  setAudioSettings({ muted: false, voiceInGame: true });
+  const game = initializeGame(['You', 'Bot']);
+  const unoActions: LastAction[] = [
+    {
+      type: 'play',
+      playerId: game.players[1].id,
+      card: { id: 'uno-skip', color: 'red', value: 'skip' },
+      declaredUno: true,
+    },
+    { type: 'declareUno', playerId: game.players[0].id },
+  ];
+  for (const [i, lastAction] of unoActions.entries()) {
+    const beforeUno: number = audible;
+    announceBoardFromTransition(
+      game,
+      { ...game, lastAction },
+      null,
+      `uno-${i}`,
+    );
+    playTableChime('uno');
+    assert.equal(
+      audible,
+      beforeUno + 1,
+      'UNO transition plays one basic sample with narration on',
+    );
+    assert.equal(
+      spoken,
+      1,
+      'UNO neither duplicates narration nor competes with the played card line',
+    );
+  }
+  const spokenBeforeCallOut = spoken;
+  announceBoardFromTransition(
+    game,
+    {
+      ...game,
+      lastAction: {
+        type: 'callOut',
+        callerId: game.players[0].id,
+        targetId: game.players[1].id,
+        penalty: 2,
+      },
+    },
+    null,
+    'call-out',
+  );
+  assert.equal(
+    spoken,
+    spokenBeforeCallOut + 1,
+    'Other existing announcer lines remain available',
+  );
   stopBoardVoiceover();
   assert.ok(sources > 0);
   console.log(
-    `Audio checks passed: unlock race, offline fallback, mute, hidden tab, expiry, no backlog. Blocked storage and prompt sample onset passed. Card sample peak ${peak.toFixed(2)}, RMS ${rms.toFixed(3)}.`,
+    `Audio checks passed: unlock race, offline fallback, mute, hidden tab, expiry, no backlog. Cached UNO, immediate fallback, narrator independence, blocked storage and prompt sample onset passed. Card sample peak ${peak.toFixed(2)}, RMS ${rms.toFixed(3)}.`,
   );
 }
 void main().catch((error) => {

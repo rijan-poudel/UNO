@@ -17,7 +17,7 @@ Open [localhost:3004](http://localhost:3004). The frontend uses port 3004 and th
 
 - A playful illustrated interface with four themes, readable card faces, and a touch-friendly scrolling hand.
 - Local games with one human and one to five bots.
-- Casual, Standard and Tactical bot challenges, shared by local play and online bot seats. Standard preserves the original strategy; Tactical uses only its own hand and public information.
+- Casual, Standard and Tactical bot challenges, shared by local play and online bot seats. Standard preserves the original card strategy; Tactical uses only its own hand and public information. Bots can miss UNO calls more often at easier levels; tap their badge when Catch appears. Spoken UNO is a basic game sound, respecting mute and effects volume even with the optional announcer off.
 - Private online tables with room codes, invitation links, friend codes, bot seats, and rematches.
 - Private online hands: each browser receives its own cards, public counts and discards; opponents’ hands and the draw deck remain on the server.
 - After a round, hosts can edit the table and deal again in the same room, keeping everyone’s seats and invitation code.

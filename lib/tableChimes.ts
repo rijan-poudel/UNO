@@ -1,5 +1,6 @@
 // One low-latency audio context; card texture is generated once, never fetched on tap.
 import { getAudioSettings } from './audioSettings';
+import { audioUrlsForStem } from './audiosRegistry';
 export type TableChime =
   | 'notification'
   | 'pickup'
@@ -20,6 +21,8 @@ let context: AudioContext | null = null;
 let paper: AudioBuffer | null = null;
 let recordedCard: AudioBuffer | null = null;
 let loadingCard = false;
+let recordedUno: AudioBuffer | null = null;
+let loadingUno = false;
 let resumeAttempt: Promise<void> | null = null;
 let feedbackSequence = 0;
 export type TableAudioStatus = 'locked' | 'ready' | 'unavailable';
@@ -54,6 +57,24 @@ function warmCard(ctx: AudioContext): void {
     })
     .catch(() => {
       loadingCard = false;
+    });
+}
+function warmUno(ctx: AudioContext): void {
+  if (loadingUno) return;
+  const path = audioUrlsForStem('uno')[0];
+  if (!path) return;
+  loadingUno = true;
+  void fetch(path)
+    .then((response) => {
+      if (!response.ok) throw new Error('UNO sound unavailable');
+      return response.arrayBuffer();
+    })
+    .then((bytes) => ctx.decodeAudioData(bytes))
+    .then((buffer) => {
+      recordedUno = buffer;
+    })
+    .catch(() => {
+      loadingUno = false;
     });
 }
 const voices = new Set<AudioScheduledSourceNode>();
@@ -101,6 +122,7 @@ export function primeTableAudioFromUserGesture(): void {
     const ctx = getContext();
     if (!ctx) return;
     warmCard(ctx);
+    warmUno(ctx);
     const silent = ctx.createBufferSource();
     silent.buffer = ctx.createBuffer(1, 1, ctx.sampleRate);
     silent.connect(ctx.destination);
@@ -119,6 +141,25 @@ export function primeTableAudioFromUserGesture(): void {
     notifyStatus();
   }
 }
+function playSample(
+  ctx: AudioContext,
+  buffer: AudioBuffer,
+  volume: number,
+  playbackRate = 1,
+): void {
+  const source = ctx.createBufferSource();
+  const gain = ctx.createGain();
+  source.buffer = buffer;
+  source.playbackRate.value = playbackRate;
+  gain.gain.value = volume;
+  source.connect(gain).connect(ctx.destination);
+  source.onended = () => {
+    source.disconnect();
+    gain.disconnect();
+  };
+  retain(source);
+  source.start();
+}
 function cardTexture(
   ctx: AudioContext,
   volume: number,
@@ -126,18 +167,7 @@ function cardTexture(
   pickup = false,
 ): void {
   if (recordedCard && !pickup) {
-    const source = ctx.createBufferSource();
-    const gain = ctx.createGain();
-    source.buffer = recordedCard;
-    source.playbackRate.value = draw ? 0.8 : 1;
-    gain.gain.value = volume * 0.85;
-    source.connect(gain).connect(ctx.destination);
-    source.onended = () => {
-      source.disconnect();
-      gain.disconnect();
-    };
-    retain(source);
-    source.start();
+    playSample(ctx, recordedCard, volume * 0.85, draw ? 0.8 : 1);
     return;
   }
   // Fetch/decode never holds up the first card. This audible texture is the fallback.
@@ -258,6 +288,10 @@ function renderChime(ctx: AudioContext, event: TableChime): void {
     }
     if (event === 'pickup') {
       cardTexture(ctx, volume * 0.52, false, true);
+      return;
+    }
+    if (event === 'uno' && recordedUno) {
+      playSample(ctx, recordedUno, volume);
       return;
     }
     if (['cardPlay', 'draw', 'deal', 'shuffle'].includes(event)) {

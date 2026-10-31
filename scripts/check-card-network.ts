@@ -54,6 +54,17 @@ async function main() {
       playerName: 'Neutral guest',
       deviceId: randomBytes(12).toString('hex'),
     });
+    const observer = await connect('initials');
+    const observed = await request(observer, 'room:join', {
+      roomId,
+      playerName: 'UNO catcher',
+      deviceId: randomBytes(12).toString('hex'),
+    });
+    const actors = new Map([
+      [hostId, host],
+      [joined.playerId, guest],
+      [observed.playerId, observer],
+    ]);
     assert.equal(
       joined.room.players.find((p) => p.playerId === hostId)?.avatarId,
       'portrait-3',
@@ -138,13 +149,15 @@ async function main() {
     assert.equal(invalidAvatar.ok, false);
     let paired = false;
     let called = false;
-    // Exercise complete real rounds, with both humans driven immediately by this check.
-    for (let round = 0; round < 4 && !(paired && called); round++) {
+    let caught = false;
+    // Exercise complete real rounds, with all human seats driven immediately by this check.
+    for (let round = 0; round < 4 && !(paired && called && caught); round++) {
       if (round) room = (await request(host, 'room:start', { roomId })).room;
       for (let step = 0; step < 800 && !room.game?.winnerId; step++) {
         assert.ok(room.game);
         const currentId = room.game.players[room.game.currentPlayerIndex].id;
-        const socket = currentId === hostId ? host : guest;
+        const socket = actors.get(currentId);
+        assert.ok(socket);
         room = (
           await request(socket, 'game:action', {
             roomId,
@@ -179,7 +192,7 @@ async function main() {
             type: 'play',
             cardId: lead.id,
             secondCardId: picked.choice.secondCardId,
-            declareUno: picked.choice.remaining === 1,
+            declareUno: picked.choice.remaining === 1 && caught,
             ...(lead.color === 'wild' ? { chosenColor: 'red' as const } : {}),
           };
           const rejected = (await socket
@@ -221,6 +234,46 @@ async function main() {
               2,
             );
           }
+          if (
+            !caught &&
+            after.handCount === 1 &&
+            !after.saidUno &&
+            !room.game?.winnerId
+          ) {
+            const beforeCatch = room.game;
+            assert.ok(beforeCatch);
+            const activeId =
+              beforeCatch.players[beforeCatch.currentPlayerIndex].id;
+            const catcher = [...actors].find(
+              ([id]) => id !== player.id && id !== activeId,
+            );
+            assert.ok(
+              catcher,
+              'A third seat can catch without owning the current turn',
+            );
+            room = (
+              await request(catcher[1], 'game:action', {
+                roomId,
+                action: { type: 'callOut', targetPlayerId: player.id },
+              })
+            ).room;
+            assert.equal(
+              room.game?.players[index].handCount,
+              1 + game.rules.missedUnoDrawPenalty,
+            );
+            assert.equal(
+              room.game?.currentPlayerIndex,
+              beforeCatch.currentPlayerIndex,
+            );
+            assert.equal(room.game?.turnCount, beforeCatch.turnCount);
+            assert.equal(
+              room.game?.turnDeadlineAt,
+              beforeCatch.turnDeadlineAt,
+              'Out-of-turn catch does not restart the active clock',
+            );
+            assert.equal(room.game?.lastAction.type, 'callOut');
+            caught = true;
+          }
           if (action.type === 'play' && action.declareUno) {
             called = true;
             assert.equal(
@@ -237,11 +290,11 @@ async function main() {
       );
     }
     assert.ok(
-      paired && called,
-      'Real rounds exercised a pair and an atomic UNO call',
+      paired && called && caught,
+      'Real rounds exercised a pair, an atomic UNO call and an out-of-turn catch',
     );
     console.log(
-      'Network card checks passed: matching pairs, atomic UNO, wins, validated avatar choices and live profile updates without resetting the turn.',
+      'Network card checks passed: matching pairs, atomic UNO, out-of-turn catches, wins, validated avatar choices and live profile updates without resetting the turn.',
     );
   } finally {
     for (const socket of sockets) socket.disconnect();

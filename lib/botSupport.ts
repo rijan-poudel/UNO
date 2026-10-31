@@ -280,6 +280,20 @@ export function getBotMove(state: GameState, playerIndex: number): BotAction {
   };
 }
 
+// Public round/seat data keeps the decision deterministic across controllers.
+function botRemembersUno(game: GameState, index: number): boolean {
+  const player = game.players[index];
+  if (!player.isBot) return true; // Unattended human seats keep the existing safety net.
+  let hash = 2166136261;
+  for (const character of `${game.roundId ?? ''}:${game.turnCount}:${player.id}`) {
+    hash = Math.imul(hash ^ character.charCodeAt(0), 16777619);
+  }
+  const missPercent = { casual: 35, standard: 15, tactical: 5 }[
+    game.rules.botDifficulty ?? 'standard'
+  ];
+  return (hash >>> 0) % 100 >= missPercent;
+}
+
 /** Execute one recommendation, publishing draws before any follow-up play. */
 export function playBotStep(game: GameState): GameState {
   if (game.winnerId) return game;
@@ -305,7 +319,17 @@ export function playBotStep(game: GameState): GameState {
       targetPlayerId: move.targetPlayerId,
     });
 
-  return !next.winnerId && next.players[index].hand.length === 1
-    ? { ...declareUno(next, index), lastAction: next.lastAction }
-    : next;
+  if (
+    !next.winnerId &&
+    next.rules.mustDeclareUno &&
+    next.players[index].hand.length === 1 &&
+    !next.players[index].saidUno &&
+    botRemembersUno(game, index)
+  ) {
+    const declared = declareUno(next, index);
+    return next.lastAction.type === 'play'
+      ? { ...declared, lastAction: { ...next.lastAction, declaredUno: true } }
+      : declared;
+  }
+  return next;
 }

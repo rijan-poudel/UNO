@@ -666,7 +666,6 @@ export default function GameBoard({
                 !targetCard &&
                 !localPlayer.eliminated &&
                 !player.eliminated &&
-                (!online || isLocalTurn) &&
                 !winner &&
                 !pendingWild &&
                 !pendingAction &&

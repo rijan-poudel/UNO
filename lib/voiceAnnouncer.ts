@@ -284,15 +284,8 @@ export function announceBoardFromTransition(
 
     case 'play': {
       const { card, chosenColor, discardAllCount, shuffledHands } = action;
-      if (action.declaredUno) {
-        playVoiceStem(pickStem(POOLS.unoDeclare, seed), {
-          audience: { type: 'room' },
-          localPlayerId,
-          channel: 'board:uno',
-          minGapMs: 4500,
-        });
-        return;
-      }
+      // The basic UNO effect owns this call, including with narration disabled.
+      if (action.declaredUno) return;
 
       if (shuffledHands) {
         const mapped = normalizeActionColor(chosenColor);
@@ -416,13 +409,6 @@ export function announceBoardFromTransition(
     }
 
     case 'declareUno': {
-      const stem = pickStem(POOLS.unoDeclare, seed);
-      playVoiceStem(stem, {
-        audience: { type: 'room' },
-        localPlayerId,
-        channel: 'board:uno',
-        minGapMs: 4500,
-      });
       break;
     }
 

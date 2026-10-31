@@ -857,6 +857,10 @@ export function callOutUno(
   if (!target || !caller) throw new Error('Player not found.');
   if (callerIndex === targetIndex)
     throw new Error('You cannot call yourself out.');
+  if (caller.eliminated || target.eliminated)
+    throw new Error(
+      'Knocked-out players cannot make or receive UNO call-outs.',
+    );
 
   // Determine whether the call-out is valid.
   const isValidCallOut = target.hand.length === 1 && !target.saidUno;
