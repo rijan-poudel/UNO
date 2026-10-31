@@ -24,6 +24,7 @@ import {
   type CardFlightKind,
   type CardPose,
 } from "../lib/cardMotion";
+import { cloneCardElement } from "../lib/cardElement";
 import { readCardPose as cardPose } from "../lib/cardPose";
 
 const ACTION_SOUNDS: Record<string, TableChime> = {
@@ -194,7 +195,7 @@ export function useGamePresentation(
       const { keyframes, duration } = getCardFlight(from, to, kind);
       const resize = to.width / element.offsetWidth;
       const height = element.offsetHeight * resize;
-      const ghost = element.cloneNode(true) as HTMLElement;
+      const ghost = cloneCardElement(element);
       ghost.querySelector("[data-card-hint]")?.remove();
       ghost.removeAttribute("aria-label");
       ghost.setAttribute("aria-hidden", "true");

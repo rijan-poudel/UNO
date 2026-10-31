@@ -277,7 +277,7 @@ export function UnoActionSymbol({
             </filter>
           </defs>
           <image
-            href="/artwork/cards/color-roulette.png"
+            href="/artwork/cards/color-roulette.webp"
             x="2"
             y="1"
             width="60"
@@ -287,7 +287,7 @@ export function UnoActionSymbol({
         </>
       ) : (
         <image
-          href="/artwork/cards/color-roulette.png"
+          href="/artwork/cards/color-roulette.webp"
           x="11"
           y="10.4"
           width="42"

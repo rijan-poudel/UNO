@@ -1,4 +1,12 @@
-Production asset: public/artwork/cards/color-roulette.png
+Lossless delivery optimization — 2026-10-31
+
+Current asset: color-roulette.webp. Converted with cwebp -lossless -exact -q 100 -m 6 -metadata all from the PNG committed in 8fc5774. Dimensions remain 1236 x 1272; decoded RGBA bytes (including transparent pixels) are identical. No new image generation or visual alteration.
+PNG bytes: 1789066; WebP bytes: 1176290.
+PNG SHA-256: a120bdc8721edf3b4469bf60c5822e5993997cfc8ca0d04b01661ca638d752de
+WebP SHA-256: 58f999c573fd8cb263bae7a510492caaad7f36a2bcbb703854234224e7ef4abf
+Exact recolor prompt retained in color-roulette.webp.json and color-roulette-recolor-prompt.txt. Earlier cleanup/origin history follows; PNG paths below are historical.
+
+Production asset: public/artwork/cards/color-roulette.webp
 Renderer: components/icons/UnoActionSymbol.tsx.
 The following extraction/edit records retain historical source paths. Exact edit prompts ship alongside this file and inside the PNG metadata.
 

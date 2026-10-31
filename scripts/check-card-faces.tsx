@@ -1,7 +1,7 @@
 // Every engine value renders safely in shared faces, with unique SVG references.
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { renderToStaticMarkup } from 'react-dom/server';
 import type UnoCardComponent from '../components/UnoCard';
 import { ACTION_VALUES, NUMBER_VALUES, type Card } from '../types/card';
@@ -51,6 +51,23 @@ for (const card of cards.filter((card) => ACTION_VALUES.includes(card.value))) {
     'Roulette must not regress to a question mark',
   );
 }
+const roulette = readFileSync('public/artwork/cards/color-roulette.webp');
+assert.equal(roulette.toString('ascii', 0, 4), 'RIFF');
+assert.equal(roulette.toString('ascii', 8, 12), 'WEBP');
+assert.ok(
+  roulette.length < 1_789_066,
+  'Roulette delivery should remain smaller than its source PNG',
+);
+assert.equal(
+  JSON.parse(
+    readFileSync('public/artwork/cards/color-roulette.webp.json', 'utf8'),
+  ).prompt,
+  readFileSync(
+    'public/artwork/cards/color-roulette-recolor-prompt.txt',
+    'utf8',
+  ),
+  'Lossless delivery retains the exact artwork provenance',
+);
 const back = renderToStaticMarkup(<UnoCard card={cards[0]} faceDown />);
 assert.ok(back.includes('Face-down card'));
 assert.ok(!back.includes('Play red 0'));

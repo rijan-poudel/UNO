@@ -4,6 +4,16 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ["lucide-react", "sonner"],
   },
+  // Cached clients can still request the artwork's previous URL.
+  redirects() {
+    return [
+      {
+        source: "/artwork/cards/color-roulette.png",
+        destination: "/artwork/cards/color-roulette.webp",
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       {

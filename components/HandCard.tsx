@@ -7,6 +7,7 @@ import {
   type PointerEvent,
 } from "react";
 import { getHandFan } from "../lib/handLayout";
+import { cloneCardElement } from "../lib/cardElement";
 import { isReducedMotion } from "../lib/displaySettings";
 import { getCardLabel } from "../types/card";
 import type { Card } from "../types/card";
@@ -239,7 +240,7 @@ export default function HandCard({
           if (element) {
             const pose = onLift(element);
             start.pose = pose;
-            const lifted = element.cloneNode(true) as HTMLElement;
+            const lifted = cloneCardElement(element);
             lifted.removeAttribute("aria-label");
             lifted.setAttribute("aria-hidden", "true");
             lifted.tabIndex = -1;
